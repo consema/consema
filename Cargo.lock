@@ -4,17 +4,18 @@ version = 4
 
 [[package]]
 name = "consema"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "consema-core",
  "consema-document",
  "consema-json",
  "consema-pvce",
+ "consema-toml",
 ]
 
 [[package]]
 name = "consema-conformance"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "consema-core",
  "consema-document",
@@ -25,18 +26,18 @@ dependencies = [
 
 [[package]]
 name = "consema-core"
-version = "0.1.0"
+version = "0.2.0"
 
 [[package]]
 name = "consema-document"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "consema-core",
 ]
 
 [[package]]
 name = "consema-json"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "consema-core",
  "consema-document",
@@ -44,14 +45,14 @@ dependencies = [
 
 [[package]]
 name = "consema-pvce"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "consema-core",
 ]
 
 [[package]]
 name = "consema-toml"
-version = "0.1.0"
+version = "0.2.0"
 dependencies = [
  "consema-core",
  "consema-document",
