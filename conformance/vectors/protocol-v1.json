@@ -43,6 +43,11 @@
       "expected": {"json_equal": true, "pvce_equal": true}
     },
     {
+      "id": "protocol.envelope.all-payloads-dual-transport",
+      "contract": "core.protocol-message@1",
+      "expected": {"payload_contracts": 15, "registry_exact": true, "json_equal": true, "pvce_equal": true}
+    },
+    {
       "id": "protocol.envelope.reject-unknown-contract",
       "contract": "core.protocol-message@1",
       "expected": {"code": "core.protocol.unknown-contract@1"}
