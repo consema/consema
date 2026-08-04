@@ -2,6 +2,39 @@
 
 Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发布能力。
 
+## 0.4.0 — 2026-08-04
+
+### Added
+
+- 接受 RFC 0003，新增 exact raw-byte `SourceSnapshot`、SHA-256 content digest 与独立 process-local snapshot identity；
+- 新增 Binary、UTF-8、UTF-16LE、UTF-16BE、ISO-8859-1 encoding resolution facts，以及不取整的 raw/UTF-8/scalar/UTF-16 decoded locations；
+- 新增 BinaryStructuralIndex 与 format-owned binary regions 的无空洞、无重叠覆盖验证；
+- 新增 `json.lossless-syntax-query@1` 与 `toml.lossless-syntax-query@1`，以及 Completed/Cancelled/Failed ordered cursor terminal；
+- 新增可验证、原子应用的 raw-byte `SourcePatch` 与 redacted review presentation；
+- 新增 `core.semantic-model@2`、`ContractRegistry::v2()`、`ErrorCodeRegistry::v2()`、`core.source-snapshot@1` 与 `core.source-patch@1`，同时保持 v1 精确冻结；
+- 新增 28 个 source、19 个 shared syntax-query 与 11 个 protocol v2 语言无关 conformance cases。
+
+### Correctness
+
+- digest 对包含 BOM 在内的完整原始字节计算，不混入 encoding、Profile 或 metadata；
+- encoding 冲突、非法 UTF 序列、unsupported UTF-32 BOM 与 decoded size/coordinate overflow 均显式失败；
+- Syntax Query kind/text、source order、selection、limit 与 cancellation 在 JSON/TOML 间共享语义但不共享格式 kind 类型；
+- SourcePatch 在分配前验证 count/bytes/output bounds，并在 stale digest、original mismatch、encoding drift、overlap 或 target mismatch 时不产生新 snapshot；
+- lazy query cursor 对 branch clone、merge aggregation 与巨大容器 expansion 施加分配前/分配中上限。
+
+### Verified
+
+- 20 个 core/JSON、18 个 TOML、32 个 protocol v1、28 个 source、19 个 syntax-query 与 11 个 protocol v2 cases 全部通过，共 128 个语言无关案例；
+- SourceSnapshot/SourcePatch 均通过 semantic-model v2 canonical JSON/PVCE envelope 往返；
+- adversarial source decoding、patch offset/count/allocation、协议变异与既有 JSON/TOML/PVCE hardening 语料通过；
+- `toml-test v2.2.0`：205 valid、474 invalid TOML 1.0 decoder cases 保持通过。
+
+### Boundaries
+
+- 公共 source 层支持五种 encoding，不自动扩大现有 JSON/TOML Profile parser 的 UTF-8 准入；
+- SourcePatch 是精确 raw-byte transition，不是 ChangeSet、semantic diff、merge、fuzzy patch、结构编辑或文件系统写入；
+- YAML、INI、XML、Properties、plist、HCL、Schema、materialization 与 Go 尚未作为已实现能力发布。
+
 ## 0.3.0 — 2026-08-04
 
 ### Added

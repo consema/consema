@@ -7,6 +7,9 @@
 - `vectors/v1.json`：`consema.conformance@1`，覆盖 0.1.0 core、PVCE、JSON、query、projection 与 edit 基线，共 20 个 case；
 - `vectors/toml-v1.json`：`consema.toml.conformance@1`，覆盖 `toml.1.0@1` 的 document、native items、query、projection、edit、limits 与真实工程语料，共 18 个 case；
 - `vectors/protocol-v1.json`：`consema.protocol.conformance@1`，覆盖 15 个稳定 payload、canonical JSON/PVCE、registry/error code、process-local identity 拒绝与资源边界，共 32 个 case；
+- `vectors/source-v1.json`：`consema.source.conformance@1`，覆盖 raw identity、五种 encoding、decoded location、binary coverage、SourcePatch 与资源失败，共 28 个 case；
+- `vectors/syntax-query-v1.json`：`consema.syntax-query.conformance@1`，以共享案例覆盖 JSON/TOML lossless kind/text/order/selection/limit/cancellation 与 cursor terminal，共 19 个 case；
+- `vectors/protocol-v2.json`：`consema.protocol.conformance@2`，覆盖 semantic-model v2 registry、SourceSnapshot/SourcePatch 双传输、伪造事实拒绝与 wire 后验证，共 11 个 case；
 - `fixtures/toml/`：由向量按仓库相对路径引用的合法与非法 TOML 真实语料。
 
 每个 case 固定包含：
@@ -20,7 +23,10 @@ Rust runner 为：
 
 - `consema_conformance::run_v1()`；
 - `consema_conformance::run_toml_v1()`；
-- `consema_conformance::run_protocol_v1()`。
+- `consema_conformance::run_protocol_v1()`；
+- `consema_conformance::run_source_v1()`；
+- `consema_conformance::run_syntax_query_v1()`；
+- `consema_conformance::run_protocol_v2()`。
 
 未来 Go 实现必须直接消费相同向量和 fixture。任何实现不得用序列化本地 AST、异常对象或第三方 parser 私有类型来替代向量中的公共字段。
 

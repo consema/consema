@@ -1,6 +1,6 @@
-# Rust `0.3.0` 实现契约
+# Rust `0.4.0` 实现契约
 
-本文记录 Consema 0.3.0 的 crate 边界、版本化 registry、可验证入口和明确非目标。语义权威顺序为：
+本文记录 Consema 0.4.0 的 crate 边界、版本化 registry、可验证入口和明确非目标。语义权威顺序为：
 
 1. 根目录《配置内容统一处理标准与 Rust 参考实现》中的永久不变量；
 2. 已接受 RFC；
@@ -11,12 +11,16 @@
 ## 1. 数据流与 crate 边界
 
 ```text
-UTF-8 source bytes
+raw source bytes
+  -> explicit encoding resolution -> immutable SourceSnapshot
+       |- SHA-256 content digest over exact raw bytes
+       |- optional decoded text + exact raw/UTF-8/scalar/UTF-16 boundaries
+       `- verifiable atomic SourcePatch
   -> format profile parse
   -> immutable JSON or TOML Document snapshot
        |- exact render + exhaustive structural coverage
        |- format-native values/items and association identities
-       |- validated ExecutableQuery -> ordered native matches
+       |- validated ExecutableQuery -> ordered native or lossless syntax matches
        |- explicit ProjectionRequest -> complete value/report/provenance OR failure
        `- EditTransaction -> new Document + complete ChangeSet OR atomic failure
 
@@ -49,7 +53,9 @@ typed protocol object
 
 `LosslessStructuralIndex` 要求 source 从 byte 0 到末尾被有序的 Token/Trivia/ErrorRegion 无空洞、无重叠覆盖。默认 `Document::render()` 返回当前 snapshot 的精确 source bytes。
 
-0.3.0 的 source 仍只接受 UTF-8。raw bytes、多编码和 encoding provenance 属于 0.4.0，不在本版本伪装实现。
+公共 `SourceSnapshot` 保留完整原始字节，以原始字节的 SHA-256 作为跨进程 content identity，并独立于每次文档形成产生的 process-local `SnapshotIdentity`。encoding 闭集为 Binary、UTF-8、UTF-16LE、UTF-16BE 与 ISO-8859-1；BOM、声明、caller override 和 profile default 的解析事实完整保留，冲突不猜测。
+
+所有 `Span` 继续表示原始字节半开区间。text source 只允许在 Unicode scalar boundary 上进行 raw/decoded UTF-8/scalar/UTF-16 坐标互换，不取整；Binary 没有 decoded coordinate。现有 JSON/TOML Profile parser 入口仍接受 UTF-8，公共多编码 source 能力不自动扩大任何格式 Profile 的准入范围。
 
 ## 3. JSON profiles
 
@@ -60,7 +66,7 @@ JSON native model 保留 object member 和 array element 的 association identit
 
 ## 4. TOML profile 与原生模型
 
-`toml.1.0@1` 只形成完整合法 TOML 1.0 文档。语法错误是 `FatalFormationFailure`；0.3.0 不声明 TOML recovery capability。
+`toml.1.0@1` 只形成完整合法 TOML 1.0 文档。语法错误是 `FatalFormationFailure`；0.4.0 不声明 TOML recovery capability。
 
 TOML 公共实体角色：
 
@@ -107,6 +113,13 @@ Rust parser backend 精确固定为 `toml_edit 0.22.27`。不可变 raw document
 
 三个 domain 都使用相同的 selection、Concat、StructureOrderMerge、limit、cancellation 和 ordered cursor 语义。
 
+### Lossless Syntax Query v1
+
+- `json.lossless-syntax-query@1`：`json.syntax-kind-is@1`、`json.syntax-text-equals@1`，返回 `JsonSyntaxPiece`；
+- `toml.lossless-syntax-query@1`：`toml.syntax-kind-is@1`、`toml.syntax-text-equals@1`，返回 `TomlSyntaxPiece`。
+
+两个 domain 都以完整 lossless structural pieces 作为 source-order 输入。kind 在产生第一个 match 前验证；kind enum 与 match 类型保持格式专属。ordered cursor 的最终状态只有 Completed、Cancelled、Failed，并且只在全部已发现项被消费或取消/失败被观察后可见。
+
 `core.query-definition@1` 通过固定字段 PortableValue schema 编码，再通过 PVCE/1 传输。未知、缺失或重排字段均拒绝。
 
 ## 6. Projection
@@ -146,7 +159,9 @@ TOML exact literal 必须恰好是一个 scalar span：前后 trivia、comment�
 
 任意精度 Integer 超出 i64、携带 payload 的非 canonical NaN、亚纳秒 Time、非整分钟 OffsetDateTime 等均明确失败。成功 commit 产生新 Document 和包含 source edits、node mappings、diagnostics 的 ChangeSet；旧 snapshot 永不改变。
 
-0.3.0 不支持 key rename、insert/delete、table move、container replacement 或结构编辑。
+0.4.0 不支持 key rename、insert/delete、table move、container replacement 或结构编辑。
+
+`SourcePatch` 是与格式无关的 raw-byte transition fact：它绑定 base/target digest、encoding facts、有序不重叠区间、原始字节前置条件和确定性 metadata。应用前完整验证 stale base、original bytes、encoding 与 target digest；任何失败都不返回新 snapshot。它不是 ChangeSet、语义 diff、merge、fuzzy patch 或文件系统写入授权。
 
 ## 8. Resource 与安全语义
 
@@ -155,6 +170,8 @@ TOML exact literal 必须恰好是一个 scalar span：前后 trivia、comment�
 - `ProtocolLimits`：canonical JSON/PVCE transport bytes、depth、nodes、container、integer、blob；
 - `QueryLimits`：steps、results；
 - `ProjectionLimits`：value nodes、report、provenance、depth。
+- `SourceLimits`：raw bytes、decoded UTF-8 bytes、decoded scalar/boundary count；
+- `SourcePatchLimits`：resulting source limits、replacement count 与 patch bytes。
 
 超限返回 fatal/failed 状态，不能把截断包装成成功。所有 workspace crates `unsafe_code = forbid`。
 
@@ -165,6 +182,9 @@ TOML exact literal 必须恰好是一个 scalar span：前后 trivia、comment�
 | `consema.conformance@1` | 20/20 |
 | `consema.toml.conformance@1` | 18/18 |
 | `consema.protocol.conformance@1` | 32/32 |
+| `consema.source.conformance@1` | 28/28 |
+| `consema.syntax-query.conformance@1` | 19/19 |
+| `consema.protocol.conformance@2` | 11/11 |
 | `toml-lang/toml-test v2.2.0`, TOML 1.0 valid | 205/205 |
 | `toml-lang/toml-test v2.2.0`, TOML 1.0 invalid | 474/474 |
 
@@ -190,8 +210,14 @@ RFC 0002 冻结 `core.semantic-model@1` 兼容性身份、`core.protocol-message
 
 ProjectionResult 的 present value 使用 `{ portable_value }` wrapper，因此成功的 PortableValue `Null` 与失败/缺席值不混淆。Completion failure、Diagnostic 和 ProjectionReport event code 都由同一个 ErrorCodeRegistry 校验；Diagnostic category 必须与注册表一致。
 
-## 12. 0.3.0 明确边界
+### Semantic model v2
 
-本版本没有 YAML、INI、Properties、XML、plist、HCL、raw multi-encoding source、Syntax Query、Schema、Diff/Patch、Formatter、Live Query、增量解析、Materialization、PortableGraph、全量结构编辑、稳定进程插件协议或 Go 实现。
+RFC 0003 保持 `ContractRegistry::v1()` 的 16 条记录（15 stable + transport）和 `ErrorCodeRegistry::v1()` 的 55 个 code 精确不变。`core.semantic-model@2` 使用 18 条 contract record（增加 `core.source-snapshot@1`、`core.source-patch@1`）与 62 个 error code。`RegistryManifest::v1()`/`v2()` 显式构造冻结集合，`current()` 在 0.4.0 指向 v2；旧 conformance 永远显式绑定 v1。
 
-这些不是“隐藏支持”或文档遗漏；它们是路线图后续版本的显式工作。0.3.0 只声明已由代码、语言无关向量和上游 suite 共同证明的 capability。
+两个新 payload 的 decoder 都重新验证内容事实：SourceSnapshot 重算 digest、encoding resolution、decode status；SourcePatch 重新验证 schema、digest 表示、encoding facts、replacement order 与 limits。通过 wire 不会降低后续 patch application 的 stale/original/target 检查。
+
+## 12. 0.4.0 明确边界
+
+本版本没有 YAML、INI、Properties、XML、plist、HCL、Schema、semantic Diff、结构 Patch、Formatter、Live Query、增量解析、Materialization、PortableGraph、全量结构编辑、稳定进程插件协议或 Go 实现。`SourcePatch` 只声明精确 raw-byte transition，不等价于这些更高层能力。
+
+这些不是“隐藏支持”或文档遗漏；它们是路线图后续版本的显式工作。0.4.0 只声明已由代码、语言无关向量和上游 suite 共同证明的 capability。
