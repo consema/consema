@@ -57,6 +57,9 @@ dependencies = [
 [[package]]
 name = "consema-graph"
 version = "0.6.0"
+dependencies = [
+ "consema-core",
+]
 
 [[package]]
 name = "consema-json"
