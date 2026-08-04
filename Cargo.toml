@@ -7,6 +7,7 @@ members = [
     "crates/consema-document",
     "crates/consema-json",
     "crates/consema-toml",
+    "crates/consema-yaml",
     "crates/consema-protocol",
     "crates/consema-conformance",
     "crates/consema",
@@ -15,6 +16,7 @@ members = [
 [workspace.dependencies]
 sha2 = { version = "=0.11.0", default-features = false }
 toml_edit = { version = "=0.22.27", default-features = false, features = ["parse"] }
+saphyr-parser = { version = "=0.0.11", default-features = false }
 unicode-id-start = "=1.4.0"
 
 [workspace.package]
