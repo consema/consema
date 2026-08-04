@@ -95,6 +95,10 @@ Every byte `00..FF` maps one-to-one to Unicode `U+0000..U+00FF` before line and
 escape processing. A UTF-8 or UTF-16 BOM byte sequence has no BOM meaning and
 is ordinary Latin-1 data. No byte sequence is invalid at the decoding layer.
 
+The source request therefore uses source-v2
+`BomPolicy::TreatAsContent`; the frozen source-v1 implicit BOM-detection
+contract is not used for this Profile.
+
 Characters outside Latin-1 enter keys or values only through Unicode escapes.
 Canonical Latin-1 materialization follows the JDK OutputStream contract and
 emits only printable ASCII directly for keys/values. Tab, LF, CR, and form feed

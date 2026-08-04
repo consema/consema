@@ -95,6 +95,10 @@ sequences are rejected rather than replaced. The chosen code page, BOM facts,
 and exact boundary index remain observable and are preconditions of every
 SourcePatch.
 
+Code-page input uses source-v2 `BomPolicy::TreatAsContent`: leading UTF-8 or
+UTF-16 marker bytes are decoded by the selected code page and never override
+it. UTF-16LE input instead uses `DetectUnicode` and requires its BOM.
+
 This contract models deterministic on-disk text. It does not claim that a
 particular Windows machine has that active code page, and it never calls an
 ANSI profile API to guess one.

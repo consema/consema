@@ -42,7 +42,8 @@ encoding enumeration receive a new version.
 `core.source-snapshot@1`, `core.source-patch@1`, and
 `core.materialization-request@1` encode `Binary | Utf8 | Utf16Le | Utf16Be |
 Latin1` as a closed string enumeration. `core.materialization-result@1` embeds
-`core.source-snapshot@1`.
+`core.source-snapshot@1`. Source v1 also implicitly detects a leading Unicode
+BOM for every non-Binary request.
 
 Adding `Windows1252` or a numeric code page to those v1 fields would make an old
 decoder observe an unknown value under a schema it previously recognized. That
@@ -116,6 +117,7 @@ record's leaf values:
   digest: lowercase-sha256,
   encoding: {
     profile_default: core.source-encoding@1,
+    bom_policy: "DetectUnicode" | "TreatAsContent",
     bom: null | "Utf8" | "Utf16Le" | "Utf16Be",
     declaration: null | core.source-encoding@1,
     caller_override: null | core.source-encoding@1,
@@ -130,18 +132,22 @@ request facts, and explicit limits. It then requires:
 
 - digest equality;
 - complete equality of profile-default, BOM, declaration, caller override and
-  selected encoding;
+  selected encoding plus BOM policy;
 - decoded-status equality;
 - canonical code-page identity;
 - exact raw/decoded boundary reconstruction.
 
-`Binary` is the only `NotText` selected kind. BOMs are compatible only with the
-corresponding Unicode encoding. Windows code pages and Latin-1 never infer a
-BOM. Contradictory facts fail even when the raw bytes could be decoded another
-way.
+`Binary` is the only `NotText` selected kind. Under `DetectUnicode`, BOMs are
+compatible only with the corresponding Unicode encoding and resolution matches
+the frozen v1 rule. Under `TreatAsContent`, `bom` must be null and leading
+marker-shaped bytes are decoded by the selected encoding like any other bytes.
+`ini.windows@1` code-page input and `java-properties.latin1@1` require
+`TreatAsContent`; their UTF-16 Reader/Unicode forms use `DetectUnicode`.
+Contradictory facts fail even when the raw bytes could be decoded another way.
 
 `core.source-snapshot@1` continues to reject every new encoding kind and is not
-routed through the v2 decoder.
+routed through the v2 decoder. Its omitted policy remains exactly
+`DetectUnicode`.
 
 ## 5. `core.source-patch@2`
 
@@ -168,7 +174,7 @@ metadata, base/target digest, and apply semantics are unchanged from v1.
 Applying a v2 patch requires a base snapshot whose complete encoding facts and
 digest agree. Re-decoding the target under the same selected encoding must
 succeed and reproduce the target digest. A patch cannot change code page or BOM
-facts; transcoding is materialization, not an in-place SourcePatch.
+policy/facts; transcoding is materialization, not an in-place SourcePatch.
 
 ## 6. Materialization request and result v2
 
@@ -400,7 +406,8 @@ The semantic-model v6 suite must prove at least:
    PVCE in `core.protocol-message@1`;
 4. old registries reject every new contract and diagnostic code;
 5. source encoding accepts every mandatory code page, rejects all other
-   numbers/aliases, and rejects nullability contradictions;
+   numbers/aliases, distinguishes both BOM policies, and rejects nullability
+   contradictions;
 6. snapshot v2 re-verifies digest, encoding resolution, BOM, decoded status,
    code-page sequences, and boundaries;
 7. patch v2 rejects wrong base encoding/digest/original bytes, overlap,
