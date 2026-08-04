@@ -311,6 +311,34 @@ EntryKey, Delimiter, Quote, EntryValue,
 ContinuationMarker, ErrorRegion
 ```
 
+The native operator schemas are exact:
+
+| Operator | Input role | Output role | Arguments |
+| --- | --- | --- | --- |
+| `ini.document-sections@1` | `IniDocument` | `IniSection` | none |
+| `ini.section-entries@1` | `IniSection` | `IniEntry` | none |
+| `ini.all-entries@1` | `IniDocument` | `IniEntry` | none |
+| `ini.entry-section@1` | `IniEntry` | `IniSection` | none |
+| `ini.section-name-equals@1` | `IniSection` | `IniSection` | String `name`, String `comparison` |
+| `ini.entry-key-equals@1` | `IniEntry` | `IniEntry` | String `key`, String `comparison` |
+| `ini.entry-value-state-is@1` | `IniEntry` | `IniEntry` | String `state` |
+| `ini.duplicate-group@1` | `IniSection` or `IniEntry` | same as input | none |
+| `ini.physical-lines@1` | `IniDocument` | `IniPhysicalLine` | none |
+| `ini.logical-lines@1` | `IniDocument` | `IniLogicalLine` | none |
+
+`comparison` is exactly `OriginalExact` or `ProfileEquivalent`; `state` is
+exactly `Missing`, `Empty`, or `Present`. `ini.duplicate-group@1` expands each
+input occurrence to every same-role occurrence carrying the same non-absent
+group identity, in source order. An occurrence without a group produces no
+match. Repeated input groups may repeat output; callers use the existing
+`core.distinct-by-identity@1` explicitly when deduplication is wanted.
+
+The syntax operators are exactly `ini.syntax-kind-is@1` with String `kind` and
+`ini.syntax-text-equals@1` with String `text`. Text comparison uses the decoded
+Unicode scalar text of the exact piece span, not its raw encoding bytes; this
+keeps UTF-8, UTF-16LE, and explicit Windows-code-page queries semantically
+identical while their raw spans remain distinct.
+
 Domain, operator version, parameters, roles, and profile applicability validate
 before the first result. Existing ordered selection, `Concat`,
 `StructureOrderMerge`, limits, cancellation, and terminal-state rules apply.
