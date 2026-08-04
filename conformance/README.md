@@ -10,6 +10,7 @@
 - `vectors/source-v1.json`：`consema.source.conformance@1`，覆盖 raw identity、五种 encoding、decoded location、binary coverage、SourcePatch 与资源失败，共 28 个 case；
 - `vectors/syntax-query-v1.json`：`consema.syntax-query.conformance@1`，以共享案例覆盖 JSON/TOML lossless kind/text/order/selection/limit/cancellation 与 cursor terminal，共 19 个 case；
 - `vectors/protocol-v2.json`：`consema.protocol.conformance@2`，覆盖 semantic-model v2 registry、SourceSnapshot/SourcePatch 双传输、伪造事实拒绝与 wire 后验证，共 11 个 case；
+- `vectors/operations-v1.json`：`consema.operations.conformance@1`，覆盖 JSON/TOML materialization、两向 conversion、format operation registry、结构编辑与冲突矩阵、dry-run/SourcePatch/UntouchedByteProof、semantic-model v3 双传输和资源边界，共 35 个 case；
 - `fixtures/toml/`：由向量按仓库相对路径引用的合法与非法 TOML 真实语料。
 
 每个 case 固定包含：
@@ -26,7 +27,10 @@ Rust runner 为：
 - `consema_conformance::run_protocol_v1()`；
 - `consema_conformance::run_source_v1()`；
 - `consema_conformance::run_syntax_query_v1()`；
-- `consema_conformance::run_protocol_v2()`。
+- `consema_conformance::run_protocol_v2()`；
+- `consema_conformance::run_operations_v1()`。
+
+上述 7 套语言无关向量合计 163 个 case。每个 runner 固定校验 suite/schema/semantic-model、case 总数、case ID 唯一性与未知 case 拒绝；向量中的 input/expected 会实际驱动执行，防止把预期值硬编码进 runner。
 
 未来 Go 实现必须直接消费相同向量和 fixture。任何实现不得用序列化本地 AST、异常对象或第三方 parser 私有类型来替代向量中的公共字段。
 

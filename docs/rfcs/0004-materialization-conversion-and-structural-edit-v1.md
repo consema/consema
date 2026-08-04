@@ -1,6 +1,6 @@
 # RFC 0004: Materialization, conversion, and structural edit v1
 
-- Status: Accepted for Consema 0.5.0 implementation
+- Status: Implemented in Consema 0.5.0
 - Date: 2026-08-04
 - Scope: portable-value materialization, audited conversion composition, format operation registry, structural edit transactions, dry-run plans, untouched-byte proof, and SourcePatch derivation
 
