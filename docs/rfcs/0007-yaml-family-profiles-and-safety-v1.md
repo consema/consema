@@ -226,6 +226,30 @@ SequenceElement, AnchorDefinition, and AliasOccurrence. Syntax kinds include
 BOM, Directive, DocumentMarker, Indicator, Anchor, Alias, Tag, Scalar,
 Whitespace, Newline, Comment, and ErrorRegion, with stable style subfacts.
 
+The v1 native operator surface is frozen as:
+
+```text
+yaml.documents
+yaml.document-root
+yaml.where-node-kind
+yaml.where-tag
+yaml.scalar-canonical-equals
+yaml.try-sequence-elements
+yaml.sequence-element-node
+yaml.try-mapping-entries
+yaml.mapping-entry-key
+yaml.mapping-entry-value
+yaml.anchor-definition
+yaml.anchor-node
+yaml.alias-occurrences
+yaml.alias-target
+```
+
+The lossless surface adds `yaml.syntax-kind-is` and
+`yaml.syntax-text-equals`. Every match carries a snapshot-bound role and exact
+raw span. Syntax text comparison uses decoded Unicode text while retaining raw
+UTF-8/UTF-16 byte spans; no backend token or event type is exposed.
+
 Native query structure order is presentation order, so alias occurrences are
 independently observable. Graph query order is canonical first-visit order and
 does not repeat shared nodes unless an association operator returns repeated
