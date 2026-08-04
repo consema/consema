@@ -97,6 +97,18 @@
       "capability": "core.parse.resource-limits@1",
       "input": {"source": "value = [[[[1]]]]", "max_node_count": 3, "max_nesting_depth": 2},
       "expected": {"status": "FatalFormationFailure", "truncated_success": false}
+    },
+    {
+      "id": "toml.corpus.cargo-manifest",
+      "capability": "toml.document.complete@1",
+      "input": {"fixture": "Cargo.toml"},
+      "expected": {"formation": "Complete", "render_equals_source": true, "projection": "Complete"}
+    },
+    {
+      "id": "toml.corpus.pyproject",
+      "capability": "toml.document.complete@1",
+      "input": {"fixture": "conformance/fixtures/toml/pyproject.toml"},
+      "expected": {"formation": "Complete", "render_equals_source": true, "projection": "Complete"}
     }
   ]
 }

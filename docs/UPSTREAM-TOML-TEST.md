@@ -1,0 +1,28 @@
+# Official TOML 1.0 compatibility gate
+
+Consema 0.2.0 pins the language-agnostic [`toml-lang/toml-test`](https://github.com/toml-lang/toml-test) suite at release `v2.2.0`, commit `ce08da1ddb075d1c7596d663c7fcba9a2ae02c5c`.
+
+The pinned TOML 1.0 manifest contains:
+
+- 205 valid decoder cases with tagged-JSON expectations;
+- 474 invalid decoder cases that must return a non-zero status.
+
+Last release-gate verification on 2026-08-04:
+
+```text
+toml-test v2.2.0 [consema-toml-test-decoder] [no encoder]
+  valid tests: 205 passed, 0 failed
+invalid tests: 474 passed, 0 failed
+```
+
+`consema-toml-test-decoder` reads TOML from standard input and produces the suite's tagged JSON exclusively through Consema's public `TomlItem`, `TomlEntry` and `TomlArrayElement` APIs. It does not expose or serialize `toml_edit` types.
+
+Run on Windows PowerShell:
+
+```powershell
+./scripts/run-toml-test.ps1
+```
+
+The script pins `v2.2.0`, builds the adapter from the locked Rust workspace, selects TOML 1.0 explicitly, and executes the official suite. Network access is needed only for the Go tool's first download; its module cache serves later runs.
+
+An upstream version change is a reviewed dependency/conformance change. It must be committed separately with the new tag, commit, case counts, complete output, and any newly required Profile decision.

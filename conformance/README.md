@@ -5,7 +5,7 @@
 当前 suite：
 
 - `vectors/v1.json`：`consema.conformance@1`，覆盖 0.1.0 core、PVCE、JSON、query、projection 与 edit 基线，共 20 个 case；
-- `vectors/toml-v1.json`：`consema.toml.conformance@1`，覆盖 `toml.1.0@1` 的 document、native items、query、projection、edit 和 limits，共 16 个 case；
+- `vectors/toml-v1.json`：`consema.toml.conformance@1`，覆盖 `toml.1.0@1` 的 document、native items、query、projection、edit、limits 与真实工程语料，共 18 个 case；
 - `fixtures/toml/`：由向量按仓库相对路径引用的合法与非法 TOML 真实语料。
 
 每个 case 固定包含：
@@ -28,4 +28,3 @@ Rust runner 为：
 2. 既有语义发生不兼容变化时，创建新 suite/profile/operator version；
 3. runner 只是执行器，向量和对应 RFC 才是跨语言事实；
 4. 每个 suite 必须验证 case 数量，防止 runner 静默跳过未知项。
-
