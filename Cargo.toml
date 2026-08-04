@@ -5,9 +5,13 @@ members = [
     "crates/consema-pvce",
     "crates/consema-document",
     "crates/consema-json",
+    "crates/consema-toml",
     "crates/consema-conformance",
     "crates/consema",
 ]
+
+[workspace.dependencies]
+toml_edit = { version = "=0.22.27", default-features = false, features = ["parse"] }
 
 [workspace.package]
 version = "0.1.0"
