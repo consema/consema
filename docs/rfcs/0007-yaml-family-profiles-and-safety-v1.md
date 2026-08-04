@@ -372,6 +372,14 @@ a candidate. Common edits retain indentation, flow/block style, scalar style,
 comments, line endings, delimiters, and untouched raw bytes where compatible.
 Fallback to canonical local spelling is explicit and reported.
 
+Insertions use exact PortableValue materialization and never infer application
+constructors. Mapping keys may be arbitrary portable values. The v1
+`insert-alias` operation inserts a sequence association; mapping-key and
+mapping-value alias insertion are reserved for a later operation version. To
+keep all placements relative to one immutable base snapshot, v1 accepts at
+most one structural mutation per base container in a transaction; independent
+containers, scalar edits, and anchor edits may still commit atomically.
+
 Anchor-safe rules:
 
 - renaming an anchor updates its exact dependent aliases in one transaction;
@@ -384,8 +392,10 @@ Anchor-safe rules:
   not expanded or rewritten.
 
 Successful dry-run and commit have identical replacements and target digest.
-Candidate reparse, graph topology, proof, ChangeSet, and SourcePatch must all
-validate. Failure returns none of them.
+Candidate reparse and a cycle-safe representation-graph isomorphism validate
+the exact tags, scalar canonical values, ordered associations, anchors, alias
+names, sharing, and cycles without relying on reparsed node ordinals. Proof,
+ChangeSet, and SourcePatch must also validate. Failure returns none of them.
 
 ## 13. Security and resource behavior
 
