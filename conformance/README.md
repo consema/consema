@@ -4,7 +4,7 @@
 
 当前 suite：
 
-- `vectors/v1.json`：`consema.conformance@1`，覆盖 0.1.0 core、PVCE、JSON、query、projection 与 edit 基线，共 20 个 case；
+- `vectors/v1.json`：`consema.conformance@1`，覆盖 0.1.0 core、PVCE、JSON、query、projection 与 edit 基线，共 30 个 case；
 - `vectors/toml-v1.json`：`consema.toml.conformance@1`，覆盖 `toml.1.0@1` 的 document、native items、query、projection、edit、limits 与真实工程语料，共 18 个 case；
 - `vectors/protocol-v1.json`：`consema.protocol.conformance@1`，覆盖 15 个稳定 payload、canonical JSON/PVCE、registry/error code、process-local identity 拒绝与资源边界，共 32 个 case；
 - `vectors/source-v1.json`：`consema.source.conformance@1`，覆盖 raw identity、五种 encoding、decoded location、binary coverage、SourcePatch 与资源失败，共 28 个 case；
@@ -12,6 +12,7 @@
 - `vectors/protocol-v2.json`：`consema.protocol.conformance@2`，覆盖 semantic-model v2 registry、SourceSnapshot/SourcePatch 双传输、伪造事实拒绝与 wire 后验证，共 11 个 case；
 - `vectors/operations-v1.json`：`consema.operations.conformance@1`，覆盖 JSON/TOML materialization、两向 conversion、format operation registry、结构编辑与冲突矩阵、dry-run/SourcePatch/UntouchedByteProof、semantic-model v3 双传输和资源边界，共 35 个 case；
 - `vectors/json-family-v2.json`：`consema.json-family.conformance@2`，覆盖 JSON5 形成、精确数值、query v2、投影、materialization、跨方言 conversion、表示保持编辑、同对象 member move、semantic-model v4 与资源边界，共 33 个 case；
+- `vectors/portable-graph-v1.json`：`consema.portable-graph.conformance@1`，覆盖 PortableGraph 同构与拓扑语义、PGCE/1 固定字节、严格拒绝、循环、确定性图查询及资源边界，共 10 个 case；
 - `corpora/json5-v2.2.3.json`：固定到 JSON5 官方 `v2.2.3`/`c3a7524` 的 43 个接受与 39 个拒绝输入，记录上游来源、Git blob、LF 存储变换和 MIT 许可；
 - `fixtures/json5/package-json5-v2.2.3.json5`：官方完整真实 JSON5 配置夹具；
 - `fixtures/real-world/`：覆盖 package JSON、TypeScript/VS Code JSONC 与服务 JSON5 的非专有典型项目配置；
@@ -34,9 +35,10 @@ Rust runner 为：
 - `consema_conformance::run_protocol_v2()`；
 - `consema_conformance::run_operations_v1()`；
 - `consema_conformance::run_json_family_v2()`；
+- `consema_conformance::run_portable_graph_v1()`；
 - `consema_conformance::run_json5_reference_corpus()`。
 
-上述 8 套语言无关向量合计 196 个 case；JSON5 外部参考 gate 另有 83 项接受/拒绝/完整夹具证据。每个 runner 固定校验 suite/schema/semantic-model、case ID 唯一性与未知 action 拒绝；向量中的 input/expected 会实际驱动执行，防止把预期值硬编码进 runner。官方参考 gate 只继承语法接受/拒绝事实，不继承 JavaScript 的 binary64 舍入或 duplicate collapse。
+上述 9 套语言无关向量合计 216 个 case；JSON5 外部参考 gate 另有 83 项接受/拒绝/完整夹具证据。每个 runner 固定校验 suite/schema/semantic-model、case ID 唯一性与未知 action 拒绝；向量中的 input/expected 会实际驱动执行，防止把预期值硬编码进 runner。官方参考 gate 只继承语法接受/拒绝事实，不继承 JavaScript 的 binary64 舍入或 duplicate collapse。
 
 未来 Go 实现必须直接消费相同向量和 fixture。任何实现不得用序列化本地 AST、异常对象或第三方 parser 私有类型来替代向量中的公共字段。
 

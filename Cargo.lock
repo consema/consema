@@ -36,6 +36,7 @@ dependencies = [
  "consema",
  "consema-core",
  "consema-document",
+ "consema-graph",
  "consema-json",
  "consema-protocol",
  "consema-pvce",
