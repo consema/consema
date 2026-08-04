@@ -16,7 +16,7 @@ sha2 = { version = "=0.11.0", default-features = false }
 toml_edit = { version = "=0.22.27", default-features = false, features = ["parse"] }
 
 [workspace.package]
-version = "0.3.0"
+version = "0.4.0"
 edition = "2024"
 rust-version = "1.85"
 license = "MIT"
