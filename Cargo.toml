@@ -8,6 +8,7 @@ members = [
     "crates/consema-json",
     "crates/consema-toml",
     "crates/consema-yaml",
+    "crates/consema-ini",
     "crates/consema-protocol",
     "crates/consema-conformance",
     "crates/consema",

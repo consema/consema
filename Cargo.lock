@@ -30,6 +30,7 @@ dependencies = [
  "consema-core",
  "consema-document",
  "consema-graph",
+ "consema-ini",
  "consema-json",
  "consema-protocol",
  "consema-pvce",
@@ -70,6 +71,14 @@ name = "consema-graph"
 version = "0.7.0"
 dependencies = [
  "consema-core",
+]
+
+[[package]]
+name = "consema-ini"
+version = "0.7.0"
+dependencies = [
+ "consema-core",
+ "consema-document",
 ]
 
 [[package]]
