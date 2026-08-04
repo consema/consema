@@ -2,6 +2,41 @@
 
 Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发布能力。
 
+## 0.7.0 — 2026-08-04
+
+### Added
+
+- 实现 RFC 0006，发布独立 PortableGraph@1、strict graph equality/hash、canonical PGCE/1 与 `core.portable-graph-query@1`；保留多 root、tag、任意/重复 mapping key、sharing 与 cycle；
+- 实现 RFC 0007，发布 `yaml.1.2-core@1` 与 `yaml.1.1-compat@1`：UTF-8/UTF-16 stream、multi-document、完整 lossless/native view、tag/anchor/alias 图语义、native/syntax query、graph/value projection、block/flow materialization 与 9 个 YAML 编辑操作；
+- JSON↔YAML audited conversion 通过显式 PortableValue projection/materialization 组合，YAML sharing、cycle、tag 与 mapping policy 保持可观察；
+- 实现 RFC 0008，发布 `core.semantic-model@5`：30 条 contract、132 个稳定 error code，以及 PortableGraph、graph query/provenance/projection 和外部化 YAML query payload；v1-v4 精确冻结；
+- 新增 10 个 PortableGraph、22 个 semantic-model v5 与 27 个 YAML language-neutral cases，使 11 套 suite 合计达到 255/255；
+- 固定官方 `yaml/yaml-test-suite data-2022-01-17` 完整 402-case gate，新增 Kubernetes、GitHub Actions、Compose、anchor-heavy 四类工程夹具、YAML/PGCE adversarial corpus 与可复现性能基线。
+
+### Correctness
+
+- PortableValue 未因 YAML 增加引用或 graph 类型；YAML graph 默认进入 PortableGraph，tree projection 对 cycle 永远失败，对 sharing/custom tag 只有显式 policy 才允许转换；
+- custom tag 不执行语言构造器、merge、include、import、网络或文件访问；alias 不隐式展开，放大、depth、node、edge、provenance、report 和 output 全部有界；
+- YAML 1.1 与 1.2 boolean/octal/sexagesimal/timestamp 差异完全由 Profile 决定，未来/冲突 version directive 不猜测；
+- graph equality、canonical numbering、query order、PGCE bytes 与 protocol dual transport 均确定；strict decoder 拒绝非规范编号、varint、trailing data 与 readable/PGCE 不一致；
+- YAML graph/value materialization 都重 parse 并验证 promised input；edit 保留 style/trivia/encoding，anchor rename 更新依赖 alias，删除 live anchor 与不可见 alias insertion 原子失败；
+- 官方 suite 与 anchor-heavy fixture 分别发现并锁定两项 lossless scanner 缺陷：多行 plain scalar 中的 `&`/`!` 不再伪造 node property，更深层 mapping 行也不再被上一 plain scalar 吞并。
+
+### Verified
+
+- Rust 1.97 与声明的 MSRV Rust 1.85 均通过 workspace `--all-targets --all-features` 的 312 项 tests 与 strict Clippy；当前工具链另通过 rustfmt、doctest 与 rustdoc `-D warnings`；
+- 11 套语言无关 suite 共 255/255 cases 通过；PortableGraph 10/10、semantic-model v5 22/22、YAML family 27/27；
+- YAML 官方 gate 完整核算 402 项：307/307 valid byte-exact、94/94 invalid atomic rejection、1/1 明确 Profile exclusion；四类 YAML 工程夹具均完成 source/graph/PGCE/materialization closure；
+- `toml-test v2.2.0` 的 205/205 valid 与 474/474 invalid，以及 JSON5 v2.2.3 的 83/83 外部门禁保持通过；
+- RustSec 使用本地 1,189 条 advisory 数据扫描 Cargo.lock 的 35 个 crate dependencies，无已知漏洞；cargo-deny advisories、bans、licenses、sources 四类门禁通过；
+- 固定 anchor-heavy YAML 夹具上发布 parse、syntax query、graph/value projection、PGCE、graph materialization 与 anchor edit 的 3-sample/20,000-iteration release baseline，并记录环境、input digest 与完整样本离散度。
+
+### Boundaries
+
+- canonical YAML materialization 创建新文档，不是既有 YAML formatter；不提供 implicit merge、custom constructor、cross-document anchor、graph diff/merge 或 cross-container move；
+- graph wire payload 只传输 PortableGraph 与已外部定位的结果；raw YAML `Document`、`NodeRef`、native handle、syntax piece 与 cursor 仍是 process-local；
+- 本版本不提供 INI、Properties、XML、plist、HCL、Schema、semantic diff/merge、通用 formatter、增量解析、Live Query、文件系统事务、稳定插件进程协议或 Go 实现。
+
 ## 0.6.0 — 2026-08-04
 
 ### Added
