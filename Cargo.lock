@@ -44,6 +44,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "consema-protocol"
+version = "0.2.0"
+dependencies = [
+ "consema-core",
+ "consema-document",
+ "consema-json",
+ "consema-pvce",
+]
+
+[[package]]
 name = "consema-pvce"
 version = "0.2.0"
 dependencies = [
