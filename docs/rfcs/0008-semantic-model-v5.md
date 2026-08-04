@@ -98,8 +98,10 @@ the result contract therefore does not impose uniqueness.
 `core.graph-provenance-map@1` contains sorted, unique projected locations. A
 location is one of `Root`, `Node`, `SequenceElement`, `MappingKey`, or
 `MappingValue`, expressed with canonical node IDs. Every entry has one or more
-ordered `SourceOrigin` records using the existing stable `source_id`, optional
-caller `node_locator`, half-open byte range, and relation vocabulary. Raw
+ordered `GraphSourceOrigin` records using the existing stable `source_id`,
+optional caller `node_locator`, and half-open byte-range fields. Its independent
+relation vocabulary is exactly `Direct | Reference`, preserving YAML alias-edge
+origins without changing the frozen `core.provenance-map@1` relation enum. Raw
 `SnapshotIdentity`, `NodeRef`, and Rust object addresses never cross the wire.
 
 ```text
