@@ -49,6 +49,7 @@ dependencies = [
  "consema-protocol",
  "consema-pvce",
  "consema-toml",
+ "consema-yaml",
 ]
 
 [[package]]
