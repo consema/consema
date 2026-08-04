@@ -85,6 +85,7 @@ version = "0.6.0"
 dependencies = [
  "consema-core",
  "consema-document",
+ "consema-graph",
  "consema-json",
  "consema-pvce",
 ]
