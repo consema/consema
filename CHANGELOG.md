@@ -2,6 +2,44 @@
 
 Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发布能力。
 
+## 0.5.0 — 2026-08-04
+
+### Added
+
+- 实现 RFC 0004，新增公共 `MaterializationRequest/Result`、fidelity、report、provenance 与 input/output/depth/report/provenance resource limits；
+- 新增 `json.canonical-compact@1`、`json.canonical-pretty@1` 与 `toml.canonical-document@1`，完整区分 exact、显式 transformed 和 unrepresentable failure；
+- 新增由 Projection 与 Materialization 组合的 JSON↔TOML conversion，保留中间 PortableValue、两阶段 provenance/report 和 overall fidelity；
+- 新增 JSON/TOML format operation registry，各发布 7 个版本化 scalar/structural operation；
+- 新增 JSON member/array element 与 TOML entry/array element 的 insert/remove/rename 原子事务；
+- 新增 deterministic dry-run `EditPlan`、`UntouchedByteProof` 以及从成功 commit 派生的可重放 `SourcePatch`；
+- 新增 `core.semantic-model@3`：25 条 contract registry 记录、90 个公共 error code，以及 conversion report、edit plan、operation registry 和 4 个 materialization payload；
+- 新增 `consema.operations.conformance@1` 的 35 个语言无关案例。
+
+### Correctness
+
+- Materialization 的 style、newline、encoding、mapping 与 representability policy 全部显式；任何失败不携带 Document 或 partial output；
+- TOML 全部 scalar/temporal/container 类别可 canonical round-trip；EntryMapping 只有在 unique String key 且调用方授权时才转换为 Object，并报告 `Transformed`；
+- JSON duplicate member identity、JSONC comment/trailing-comma ownership、TOML table/inline-table ownership和 direct-key duplicate constraint 在结构编辑中保留；
+- wrong snapshot/role、duplicate target/key、overlap、ancestor-descendant、removed anchor、unrepresentable value、resource limit 与 reparse failure 均在发布新文档前原子失败；
+- dry-run 与 commit 的 replacement set/target digest 相同；SourcePatch 重放精确复现 commit bytes；UntouchedByteProof 对 replacement 外全部字节提供可篡改检测的完整覆盖；
+- v1 的 16/55 与 v2 的 18/62 contract/error 集合保持冻结；v3 payload 必须通过完整 typed validation，不能凭 schema discriminator 绕过交叉约束；
+- 移除 Rust 1.88 let-chain 依赖，恢复清单声明的 Rust 1.85 最低工具链兼容性。
+
+### Verified
+
+- Rust 1.97 下 workspace `--all-targets --all-features` 共 189 个 tests 通过，rustfmt、strict Clippy、doctest 与 rustdoc `-D warnings` 通过；
+- Rust 1.85 下同一组 189 个 tests 与 strict Clippy 通过；
+- 7 套语言无关 suite 共 163/163 cases 通过，其中 operations v1 为 35/35；
+- 10 个 adversarial/property tests 覆盖 materialization、结构事务、proof/patch、v3 mutation/truncation、source/encoding、JSON/TOML/PVCE 与 cancellation；
+- `toml-test v2.2.0` 的 205/205 valid 与 474/474 invalid TOML 1.0 decoder cases 通过；
+- RustSec 扫描 24 个依赖无已知漏洞；cargo-deny advisories、bans、licenses、sources 四类门禁通过。
+
+### Boundaries
+
+- Materialization 创建新文档，不是既有文档 formatter；conversion 是可审计的两阶段组合，不是 parser-to-writer 捷径；
+- EditPlan 与 SourcePatch 都不授权文件系统写入；本版本不提供 discovery、locking、fsync、atomic rename 或 recovery manifest；
+- 本版本不提供 JSON5、YAML、INI、Properties、XML、plist、HCL、schema、semantic diff/merge、通用 reorder/table move、PortableGraph、稳定插件进程协议或 Go 实现。
+
 ## 0.4.0 — 2026-08-04
 
 ### Added

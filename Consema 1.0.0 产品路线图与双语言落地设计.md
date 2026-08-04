@@ -978,7 +978,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
   ↓
 0.4.0  原始字节 Source / encoding / syntax query 平台    已完成
   ↓
-0.5.0  Materialization / conversion / structural edit    Rust
+0.5.0  Materialization / conversion / structural edit    已完成
   ↓
 0.6.0  JSON family 生产完成（含 JSON5）                  Rust
   ↓
@@ -1116,6 +1116,8 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 
 目标：从“读、查、投影、替换标量”提升为可执行真实迁移的操作平台。
 
+落实状态：已完成（2026-08-04）。规范见 `docs/rfcs/0004-materialization-conversion-and-structural-edit-v1.md`，实现覆盖公共 materialization contract、JSON/TOML generator、两向 audited conversion、format operation registry、结构事务、dry-run、UntouchedByteProof、SourcePatch derivation 与 semantic-model v3；语言无关证据见 `conformance/vectors/operations-v1.json`。
+
 交付：
 
 * MaterializationRequest/Result；
@@ -1138,6 +1140,8 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * untouched source regions 有机器可验证证明；
 * SourcePatch 基础摘要不匹配时必须失败；
 * Materialization 与 Formatter 的边界写入规范。
+
+完成证据：35/35 operations v1、合计 163/163 language-neutral cases；Rust 1.97 与声明的 MSRV Rust 1.85 均通过 189 项 workspace 全 target/all features tests 和 strict Clippy；rustfmt、doctest、rustdoc `-D warnings`、10 项 adversarial/property tests、RustSec、cargo-deny 与官方 TOML 205 valid/474 invalid suite 全部通过。semantic-model v1 的 16/55、v2 的 18/62 保持冻结，v3 发布 25 条 contract registry 记录与 90 个 error code；失败 materialization/transaction 不产生 partial Document，成功 edit 的 patch 重放与 untouched proof 均完成验证。
 
 ## 14.5 `0.6.0`：JSON family 生产完成
 
