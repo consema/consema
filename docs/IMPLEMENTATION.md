@@ -1,6 +1,6 @@
-# Rust `0.2.0` 实现契约
+# Rust `0.3.0` 实现契约
 
-本文记录 Consema 0.2.0 的 crate 边界、版本化 registry、可验证入口和明确非目标。语义权威顺序为：
+本文记录 Consema 0.3.0 的 crate 边界、版本化 registry、可验证入口和明确非目标。语义权威顺序为：
 
 1. 根目录《配置内容统一处理标准与 Rust 参考实现》中的永久不变量；
 2. 已接受 RFC；
@@ -21,19 +21,25 @@ UTF-8 source bytes
        `- EditTransaction -> new Document + complete ChangeSet OR atomic failure
 
 PortableValue <-> PVCE/1
+
+typed protocol object
+  -> fixed-field PortableValue payload
+      |- canonical core.portable-value-json@1
+      `- canonical PVCE/1
 ```
 
-依赖只能向下：
+直接本地依赖保持单向：
 
-```text
-consema-core
-  ↑
-consema-document       consema-pvce
-  ↑
-consema-json           consema-toml
-  ↑                         ↑
-consema-conformance / consema facade
-```
+| crate | 直接本地依赖 |
+|---|---|
+| `consema-core` | 无 |
+| `consema-document` | core |
+| `consema-pvce` | core |
+| `consema-json` | core、document |
+| `consema-toml` | core、document |
+| `consema-protocol` | core、document、json、pvce |
+| `consema-conformance` | core、document、json、pvce、protocol、toml |
+| `consema` | core、document、json、pvce、protocol、toml |
 
 格式 crate 之间不互相依赖。`consema-core` 不依赖格式；`consema-document` 不理解 JSON/TOML 语义；跨格式操作必须通过公共 projection/materialization contract 组合。
 
@@ -43,7 +49,7 @@ consema-conformance / consema facade
 
 `LosslessStructuralIndex` 要求 source 从 byte 0 到末尾被有序的 Token/Trivia/ErrorRegion 无空洞、无重叠覆盖。默认 `Document::render()` 返回当前 snapshot 的精确 source bytes。
 
-0.2.0 的 source 仍只接受 UTF-8。raw bytes、多编码和 encoding provenance 属于 0.4.0，不在本版本伪装实现。
+0.3.0 的 source 仍只接受 UTF-8。raw bytes、多编码和 encoding provenance 属于 0.4.0，不在本版本伪装实现。
 
 ## 3. JSON profiles
 
@@ -54,7 +60,7 @@ JSON native model 保留 object member 和 array element 的 association identit
 
 ## 4. TOML profile 与原生模型
 
-`toml.1.0@1` 只形成完整合法 TOML 1.0 文档。语法错误是 `FatalFormationFailure`；0.2.0 不声明 TOML recovery capability。
+`toml.1.0@1` 只形成完整合法 TOML 1.0 文档。语法错误是 `FatalFormationFailure`；0.3.0 不声明 TOML recovery capability。
 
 TOML 公共实体角色：
 
@@ -140,12 +146,13 @@ TOML exact literal 必须恰好是一个 scalar span：前后 trivia、comment�
 
 任意精度 Integer 超出 i64、携带 payload 的非 canonical NaN、亚纳秒 Time、非整分钟 OffsetDateTime 等均明确失败。成功 commit 产生新 Document 和包含 source edits、node mappings、diagnostics 的 ChangeSet；旧 snapshot 永不改变。
 
-0.2.0 不支持 key rename、insert/delete、table move、container replacement 或结构编辑。
+0.3.0 不支持 key rename、insert/delete、table move、container replacement 或结构编辑。
 
 ## 8. Resource 与安全语义
 
 - `ParseLimits`：source bytes、nesting、token/piece、node、diagnostic；
 - `DecodeLimits`：PVCE bytes、depth、nodes、container、integer、blob；
+- `ProtocolLimits`：canonical JSON/PVCE transport bytes、depth、nodes、container、integer、blob；
 - `QueryLimits`：steps、results；
 - `ProjectionLimits`：value nodes、report、provenance、depth。
 
@@ -157,6 +164,7 @@ TOML exact literal 必须恰好是一个 scalar span：前后 trivia、comment�
 |---|---|
 | `consema.conformance@1` | 20/20 |
 | `consema.toml.conformance@1` | 18/18 |
+| `consema.protocol.conformance@1` | 32/32 |
 | `toml-lang/toml-test v2.2.0`, TOML 1.0 valid | 205/205 |
 | `toml-lang/toml-test v2.2.0`, TOML 1.0 invalid | 474/474 |
 
@@ -172,9 +180,18 @@ TOML corpus 包含全类型、复杂 string/trivia、真实 service config、本
 
 任何不兼容编码修改必须使用新的 encoding version。
 
-## 11. 0.2.0 明确边界
+## 11. Cross-format Protocol v1
+
+RFC 0002 冻结 `core.semantic-model@1` 兼容性身份、`core.protocol-message@1` transport envelope、15 个稳定 payload 契约和 55 个公共 error code。每个 envelope payload 必须同时通过 contract registry、首字段 schema 和对应 typed decoder 的完整校验；只伪造正确 schema 不能形成消息。
+
+协议对象只以固定字段 `PortableValue` 表达，同一 payload 通过 canonical tagged JSON 或 PVCE/1 传输。32 个语言无关 case 证明所有 15 个稳定 payload 都在两种 transport 上严格相等，并覆盖未知 contract/field、非规范表示、注册表矛盾、资源越界与 process-local identity 拒绝。
+
+`NodeRef`、snapshot identity、cursor 与 `CancellationToken` 仍是 process-local。跨进程 Diagnostic、native Query match、Provenance 与 ChangeSet 必须由调用方提供稳定 `source_id`/`node_locator`；适配器缺少绑定时返回 `core.protocol.process-local-handle@1`，不静默删除身份事实。
+
+ProjectionResult 的 present value 使用 `{ portable_value }` wrapper，因此成功的 PortableValue `Null` 与失败/缺席值不混淆。Completion failure、Diagnostic 和 ProjectionReport event code 都由同一个 ErrorCodeRegistry 校验；Diagnostic category 必须与注册表一致。
+
+## 12. 0.3.0 明确边界
 
 本版本没有 YAML、INI、Properties、XML、plist、HCL、raw multi-encoding source、Syntax Query、Schema、Diff/Patch、Formatter、Live Query、增量解析、Materialization、PortableGraph、全量结构编辑、稳定进程插件协议或 Go 实现。
 
-这些不是“隐藏支持”或文档遗漏；它们是路线图后续版本的显式工作。0.2.0 只声明已由代码、语言无关向量和上游 suite 共同证明的 capability。
-
+这些不是“隐藏支持”或文档遗漏；它们是路线图后续版本的显式工作。0.3.0 只声明已由代码、语言无关向量和上游 suite 共同证明的 capability。

@@ -6,7 +6,7 @@
 
 # 0. 文档地位
 
-本文是 Consema 从 Rust `0.1.0` 经已完成的 `0.2.0` 走向 `1.0.0` 的总路线图、产品范围和发布治理基线。
+本文是 Consema 从 Rust `0.1.0` 经已完成的 `0.2.0`、`0.3.0` 走向 `1.0.0` 的总路线图、产品范围和发布治理基线。
 
 它回答以下问题：
 
@@ -58,11 +58,12 @@ Rust `0.2.0` 已在不改写 0.1.0 永久不变量的前提下完成第二格式
 * 通过 `toml-lang/toml-test v2.2.0` TOML 1.0 的 205 个 valid 与 474 个 invalid decoder cases；
 * workspace 统一为 0.2.0，公共 facade 导出 JSON 与 TOML 两个格式实现。
 
-当前仓库为 24 个 Rust source files、11,563 行 Rust、45 个 `#[test]` 函数、38 个语言无关 conformance cases。0.2.0 仍不是生产级 1.0.0；它只证明核心抽象没有过拟合 JSON，下一阶段是 0.3.0 跨格式 contract/protocol 闭合。
+Rust `0.3.0` 已完成跨格式 contract/protocol 闭合：冻结 RFC 0002、Semantic Model v1 identity、15 个稳定 payload、canonical JSON/PVCE 双传输、55 个公共 error code、全量 typed payload validation，以及 process-local identity 的拒绝边界。全部 15 个稳定 payload 均由语言无关向量证明双传输等价。
 
-这证明核心哲学可实现，但尚未证明：
+当前仓库为 40 个 Rust source files、19,220 行 Rust、78 个 `#[test]` 函数、70 个语言无关 conformance cases。0.3.0 仍不是生产级 1.0.0；它证明核心公共行为已有不依赖 Rust 私有类型的跨语言 wire contract，下一阶段是 0.4.0 原始内容 Source/Document 平台。
 
-* 第二格式不会迫使抽象返工；
+这些阶段证明核心哲学可以跨两个格式并通过语言无关协议成立，但尚未证明：
+
 * raw bytes 与多编码平台成立；
 * graph、XML tree、binary document 和 expression-bearing config 成立；
 * structural edit、materialization 和正式 CLI 成立；
@@ -973,7 +974,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
   ↓
 0.2.0  TOML 第二格式验证                                已完成
   ↓
-0.3.0  跨格式核心与语言无关协议闭合                     Rust
+0.3.0  跨格式核心与语言无关协议闭合                     已完成
   ↓
 0.4.0  原始字节 Source / encoding / syntax query 平台    Rust
   ↓
@@ -1053,6 +1054,8 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 
 目标：在 JSON 与 TOML 两个事实基础上，冻结第一套真正跨格式的 v1 contract candidate。
 
+落实状态：已完成（2026-08-04）。规范见 `docs/rfcs/0002-cross-format-protocol-v1.md`，实现见 `consema-protocol`，语言无关证据见 `conformance/vectors/protocol-v1.json`。
+
 交付：
 
 * Semantic Model v1 contract set；
@@ -1073,6 +1076,10 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * NodeRef、cursor、snapshot handle 的可序列化范围明确；
 * Rust 私有枚举名、错误字符串和 AST 不进入协议；
 * 旧 PVCE/1 字节保持不变；若设计错误，发布 PVCE/2 而不是改写 PVCE/1。
+
+完成证据：32/32 protocol language-neutral cases、全部 15 个稳定 payload 的 JSON/PVCE envelope 往返、55 个公共 error code、78 项 workspace 全 target 测试、rustfmt、Clippy/rustdoc `-D warnings`、RustSec audit 与 cargo-deny 门禁全部通过。schema-only payload、未知 code、process-local handle、非 canonical transport、资源越界与成功 Null/absent 歧义均有反例回归。
+
+本版本不加入 raw multi-encoding Source、YAML、结构编辑、materialization 或 Go。
 
 ## 14.3 `0.4.0`：生产 Source/Document 平台
 

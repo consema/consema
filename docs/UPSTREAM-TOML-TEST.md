@@ -1,6 +1,6 @@
 # Official TOML 1.0 compatibility gate
 
-Consema 0.2.0 pins the language-agnostic [`toml-lang/toml-test`](https://github.com/toml-lang/toml-test) suite at release `v2.2.0`, commit `ce08da1ddb075d1c7596d663c7fcba9a2ae02c5c`.
+Consema 0.3.0 continues to pin the language-agnostic [`toml-lang/toml-test`](https://github.com/toml-lang/toml-test) suite at release `v2.2.0`, commit `ce08da1ddb075d1c7596d663c7fcba9a2ae02c5c`.
 
 The pinned TOML 1.0 manifest contains:
 
