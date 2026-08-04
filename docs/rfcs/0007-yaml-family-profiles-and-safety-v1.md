@@ -132,10 +132,10 @@ JSON5 when lowered to PortableValue; YAML has no negative-NaN spelling in the
 Canonical scalar content is independent of source spelling: null is the empty
 string, booleans are `true` or `false`, integers are unbounded base-10, and a
 finite decimal is either `coefficient` or `coefficient` followed immediately
-by `e` and `exponent`, using the normalized decimal coefficient and exponent. Non-finite values are `.inf`,
-`-.inf`, or `.nan`; strings contain their decoded Unicode value. Timestamp and
-binary canonical content belongs to the native YAML layer only and is rejected
-by the default PortableGraph projection.
+by `e` and `exponent`, using the normalized decimal coefficient and exponent.
+Non-finite values are `.inf`, `-.inf`, or `.nan`; strings contain their decoded
+Unicode value. Timestamp and binary remain typed canonical graph scalars; their
+PortableValue lowering is a separate exact projection decision.
 
 ## 6. YAML 1.1 compatibility profile
 
