@@ -330,11 +330,18 @@ FirstWins
 LastWinsJdkTable
 ```
 
-The default is `RequireUnique`. First/last collapse is `Transformed`, emits one
-event per discarded association, and records both retained and discarded
-origins. `LastWinsJdkTable` corresponds only to loading one document into an
+The default is `RequireUnique`. First/last collapse is explicitly authorized
+`Lossy`, emits one event per discarded association, and records both retained
+and discarded origins. Provenance locates the discarded source but does not
+misrepresent the projected value and report as sufficient to reconstruct its
+value. `LastWinsJdkTable` corresponds only to loading one document into an
 otherwise empty `Properties` table; it does not include an existing table or
 defaults chain.
+
+When externalized in a conversion report, the authorizing rule is exactly
+`java-properties.duplicate-key.first-wins@1` or
+`java-properties.duplicate-key.last-wins-jdk-table@1`; `RequireUnique` never
+emits a collapse event.
 
 Provenance may contain several source fragments for one projected string due
 to escape decoding and continuation. It distinguishes key association, value,
