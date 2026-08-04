@@ -283,6 +283,21 @@ default to failure; stripping a tag requires explicit authorization and a
 report event. Duplicate or non-string mapping keys never silently collapse or
 stringify.
 
+The Rust request names freeze these decisions without Boolean shortcuts:
+
+```text
+SharingPolicy::Reject | DuplicateAcyclic
+TagPolicy::RequireKnownPortableTag | StripToNodeKind
+MappingPolicy::BestExactObjectOrEntryMapping | RequireObject | RequireEntryMapping
+```
+
+`BestExactObjectOrEntryMapping` selects Object only when every key is a unique
+`tag:yaml.org,2002:str` scalar; otherwise it selects EntryMapping and preserves
+all key/value associations. Graph provenance distinguishes roots, nodes,
+sequence edges, mapping-key edges, and mapping-value edges. Alias occurrences
+are additional `Reference` origins on graph edges and `Expanded` origins only
+when acyclic tree duplication was explicitly authorized.
+
 Failure carries no PortableGraph/PortableValue and no partial provenance.
 
 ## 11. Materialization
