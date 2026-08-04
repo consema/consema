@@ -93,7 +93,17 @@
       "expected": {"code": "core.protocol.process-local-handle@1"}
     },
     {
+      "id": "protocol.diagnostic.reject-category-registry-mismatch",
+      "contract": "core.diagnostic@1",
+      "expected": {"code": "core.protocol.invalid-value@1"}
+    },
+    {
       "id": "protocol.completion.reject-contradiction",
+      "contract": "core.completion@1",
+      "expected": {"code": "core.protocol.invalid-value@1"}
+    },
+    {
+      "id": "protocol.completion.reject-unregistered-failure-code",
       "contract": "core.completion@1",
       "expected": {"code": "core.protocol.invalid-value@1"}
     },
@@ -121,6 +131,11 @@
       "id": "protocol.projection.no-partial-value",
       "contract": "core.projection-result@1",
       "expected": {"contradiction_rejected": true}
+    },
+    {
+      "id": "protocol.projection.reject-unregistered-event-code",
+      "contract": "core.projection-report@1",
+      "expected": {"code": "core.protocol.invalid-value@1"}
     },
     {
       "id": "protocol.provenance.externalized-roundtrip",
