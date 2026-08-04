@@ -982,7 +982,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
   ↓
 0.6.0  JSON family 生产完成（含 JSON5）                  已完成
   ↓
-0.7.0  YAML family + PortableGraph/PGCE                  Rust
+0.7.0  YAML family + PortableGraph/PGCE                  已完成
   ↓
 0.8.0  INI family + Properties family                    Rust
   ↓
