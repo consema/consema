@@ -976,7 +976,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
   ↓
 0.3.0  跨格式核心与语言无关协议闭合                     已完成
   ↓
-0.4.0  原始字节 Source / encoding / syntax query 平台    Rust
+0.4.0  原始字节 Source / encoding / syntax query 平台    已完成
   ↓
 0.5.0  Materialization / conversion / structural edit    Rust
   ↓
@@ -1085,6 +1085,8 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 
 目标：把 UTF-8 文本原型提升为可支持 XML、Properties 与 binary plist 的原始内容平台。
 
+落实状态：已完成（2026-08-04）。规范见 `docs/rfcs/0003-source-syntax-query-and-patch-v1.md`，实现覆盖 raw SourceSnapshot、五种 encoding、decoded location、binary regions、JSON/TOML lossless Syntax Query、cursor terminal、SourcePatch 与 semantic-model v2；语言无关证据见 `source-v1.json`、`syntax-query-v1.json` 与 `protocol-v2.json`。
+
 交付：
 
 * raw-byte SourceSnapshot；
@@ -1107,6 +1109,8 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * offset conversion 不溢出；
 * decoded char index 不替代原始 byte Span；
 * binary format 不被迫伪造 trivia/token。
+
+完成证据：28/28 source、19/19 syntax-query、11/11 protocol v2 language-neutral cases；141 项 workspace 全 target/all features tests；SourceSnapshot/SourcePatch canonical JSON/PVCE v2 往返；adversarial decoding/offset/count/allocation corpus；rustfmt、strict Clippy、rustdoc、RustSec、cargo-deny 与官方 TOML suite 全部通过。annotated tag `v0.4.0` 精确指向审计提交 `874c7cc`。
 
 ## 14.4 `0.5.0`：生成、转换与结构编辑闭环
 
