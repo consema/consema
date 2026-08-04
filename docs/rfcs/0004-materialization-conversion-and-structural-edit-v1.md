@@ -411,12 +411,15 @@ core.edit.wrong-snapshot@1
 
 core.materialization.formation-failed@1
 core.materialization.invalid-request@1
+core.materialization.mapping-transformed@1
 core.materialization.resource-limit@1
 core.materialization.unrepresentable@1
 core.materialization.unsupported-encoding@1
 core.materialization.unsupported-newline@1
 core.materialization.unsupported-profile@1
 core.materialization.unsupported-style@1
+
+json.projection.structure-reencoded@1
 ```
 
 Protocol shape failures continue to use `core.protocol.*@1`.
