@@ -2,6 +2,40 @@
 
 Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发布能力。
 
+## 0.6.0 — 2026-08-04
+
+### Added
+
+- 实现 RFC 0005，发布完整 `json5.standard@1` Profile：Standard JSON5 形成、无损 Document、精确 native view、Unicode IdentifierName、扩展字符串/数字、comment 与 trailing comma；
+- 新增 `json.native-semantic-query@2`、`json.lossless-syntax-query@2` 与 Profile-bound `json5.projection.best-exact-core@1`，保持 v1 domain 的严格 JSON/JSONC 语义不变；
+- 新增 `json5.canonical-compact@1`、`json5.canonical-pretty@1` 与 JSON5↔strict JSON/JSONC audited conversion；
+- JSON5 scalar/association/array edit 保持合法原表示；新增 `json.edit.move-member@1`，JSON family operation registry 增至 8 项，TOML 保持 7 项；
+- 发布 `core.semantic-model@4`：25 条 contract registry 记录与 92 个公共 error code；v1/v2/v3 registry 精确冻结；
+- 新增 `consema.json-family.conformance@2` 的 33 个语言无关案例、固定 JSON5 v2.2.3 上游 gate、4 份典型项目配置、12 项 hardening/property tests 与可重现性能基线。
+
+### Correctness
+
+- 所有有限 JSON5 数字映射为任意精度 Integer/Decimal；只有 `±Infinity` 与 `±NaN` 映射到四种冻结 BinaryFloat64 位模式，strict JSON 不可表示时原子失败；
+- JSON5 IdentifierStart/Continue 固定到 `unicode-id-start 1.4.0`，不随宿主 Unicode 表漂移；parser 不求值 JavaScript，也不访问文件或网络；
+- query domain、projection target 与 materialization style 均绑定 Profile；跨 Profile 误用显式失败，不静默收窄语义；
+- JSON5 edit 保持 quote、escape、key、comment、comma 与 trivia 所有权；member move 仅允许同一 Object，并保持 dry-run/commit patch 一致；
+- 上游无效语料发现的 escaped identifier continuation panic 已修复为正常拒绝，并加入专门回归；失败 parse/conversion/edit 均不产生 partial success。
+
+### Verified
+
+- Rust 1.97 与声明的 MSRV Rust 1.85 均通过 workspace `--all-targets --all-features` 的 208 项 tests 与 strict Clippy；当前工具链另通过 rustfmt、doctest 与 rustdoc `-D warnings`；
+- 8 套语言无关 suite 共 196/196 cases 通过，其中 JSON family v2 为 33/33；
+- JSON5 v2.2.3 外部门禁 43/43 valid、39/39 invalid 与 1/1 完整配置夹具通过，共 83/83；4 份典型 JSON/JSONC/JSON5 项目配置与 12 项 adversarial/property tests 通过；
+- `toml-test v2.2.0` 的 205/205 valid 与 474/474 invalid cases 保持通过；
+- RustSec 扫描 Cargo.lock 的 25 个 crate dependencies 无已知漏洞；cargo-deny advisories、bans、licenses、sources 四类门禁通过；
+- 固定 JSON5 夹具上发布 parse、syntax query、projection、materialization 与 edit 的 3-sample/20,000-iteration release baseline，并完整记录环境、输入 digest 与样本离散度。
+
+### Boundaries
+
+- canonical JSON5 生成是新文档 materialization，不是现有源文件 formatter；JSON5 支持不包含 JavaScript evaluation、import、computed key、method、regex、template literal、`undefined` 或 bigint；
+- member move 限于同一 JSON Object；本版本不提供跨对象 move、通用 reorder、TOML table move、文件系统写入或稳定进程插件协议；
+- 本版本不提供 YAML、INI、Properties、XML、plist、HCL、Schema、semantic diff/merge、PortableGraph、增量解析、Live Query 或 Go 实现。
+
 ## 0.5.0 — 2026-08-04
 
 ### Added

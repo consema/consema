@@ -1,28 +1,29 @@
 # Consema
 
-Consema 是《配置内容统一处理标准与 Rust 参考实现》的 Rust `0.5.0` 落地。
+Consema 是《配置内容统一处理标准与 Rust 参考实现》的 Rust `0.6.0` 落地。
 
 它将无损文档、格式原生语义、公共值、查询、显式投影、来源映射和原子编辑分离；默认拒绝未经授权的转换、截断或信息损失。
 
 ## 当前实现
 
-- JSON：`json.strict@1`、`jsonc.bounded@1`；
+- JSON family：`json.strict@1`、`jsonc.bounded@1`、`json5.standard@1`；
 - TOML：`toml.1.0@1`；
 - PortableValue 全部 15 类核心值与 strict equality/hash；
 - PVCE/1 canonical encode 与 strict bounded decode；
 - raw-byte `SourceSnapshot`、SHA-256 content identity、UTF-8/UTF-16LE/UTF-16BE/Latin-1/Binary encoding facts 与精确 decoded locations；
-- JSON/TOML format-specific lossless Syntax Query 与显式 Completed/Cancelled/Failed cursor terminal；
+- JSON v1/v2 与 TOML format-specific lossless Syntax Query，以及显式 Completed/Cancelled/Failed cursor terminal；
 - 可验证、原子、基于原始字节前置条件的 `SourcePatch`；
-- `core.protocol-message@1` 公共 envelope、semantic-model v1/v2/v3 注册表与 canonical JSON/PVCE 双传输；
+- `core.protocol-message@1` 公共 envelope、semantic-model v1/v2/v3/v4 注册表与 canonical JSON/PVCE 双传输；
 - Profile、Capability、Diagnostic、Query、Projection、Provenance、ChangeSet、Execution、Completion 与 registry 的固定 wire schema；
 - snapshot-bound `NodeRef`/`Span`、exhaustive lossless source coverage；
 - versioned typed query、完整 projection/report/provenance；
-- JSON/JSONC compact/pretty 与 TOML canonical materialization，显式 style/newline/encoding/mapping/representability policy；
-- JSON↔TOML 由 Projection 与 Materialization 组合的可审计转换，保留两阶段 fidelity、report 与 provenance；
-- JSON/TOML 各 7 个版本化编辑操作，支持标量替换、成员/entry/array element 插入删除和 key rename；
+- JSON/JSONC/JSON5 compact/pretty 与 TOML canonical materialization，显式 style/newline/encoding/mapping/representability policy；
+- JSON family 方言转换与 JSON↔TOML 均由 Projection 与 Materialization 组合，保留两阶段 fidelity、report 与 provenance；
+- JSON 8 个、TOML 7 个版本化编辑操作，支持标量替换、成员/entry/array element 插入删除、key rename 与 JSON 同对象 member move；
 - snapshot-bound 原子事务、dry-run `EditPlan`、`UntouchedByteProof` 与可重放 `SourcePatch`；
-- 25 条 semantic-model v3 contract registry 记录与 90 个公共 error code，同时精确冻结 v1/v2；
-- 20 个 core/JSON、18 个 TOML、32 个 protocol v1、28 个 source、19 个 syntax-query、11 个 protocol v2 与 35 个 operations v1 语言无关 conformance cases，共 163 个；
+- semantic-model v4 保持 25 条 contract registry 记录并发布 92 个公共 error code，同时精确冻结 v1/v2/v3；
+- 8 套语言无关 conformance suite 共 196/196 cases，其中 JSON family v2 为 33/33；
+- 官方 JSON5 v2.2.3 参考语料 43 valid + 39 invalid 与完整 `package.json5` 夹具共 83/83；
 - 官方 `toml-test v2.2.0` TOML 1.0 decoder gate：205 valid + 474 invalid 全部通过。
 
 TOML table、inline table、array-of-tables、dotted key 和 array 拥有各自原生身份，不复用 JSON object/member 类型。`.env` 不属于当前格式 Profile；它在产品路线中是 source adapter。
@@ -35,6 +36,9 @@ TOML table、inline table、array-of-tables、dotted key 和 array 拥有各自�
 - 跨格式协议 v1：[RFC 0002](docs/rfcs/0002-cross-format-protocol-v1.md)
 - raw source、Syntax Query 与 SourcePatch v1：[RFC 0003](docs/rfcs/0003-source-syntax-query-and-patch-v1.md)
 - Materialization、conversion 与结构编辑 v1：[RFC 0004](docs/rfcs/0004-materialization-conversion-and-structural-edit-v1.md)
+- JSON family 生产 Profile 与 JSON5 v1：[RFC 0005](docs/rfcs/0005-json-family-production-v1.md)
+- JSON family 0.6.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.6.0.md)
+- JSON5 v2.2.3 上游参考门禁：[Reference corpus provenance](docs/UPSTREAM-JSON5-REFERENCE.md)
 - 上游 TOML 门禁：[Official TOML 1.0 compatibility gate](docs/UPSTREAM-TOML-TEST.md)
 - 版本变更记录：[CHANGELOG](CHANGELOG.md)
 
@@ -45,11 +49,48 @@ TOML table、inline table、array-of-tables、dotted key 和 array 拥有各自�
 - `consema-core`：PortableValue、诊断、Capability 和类型化查询协议；
 - `consema-pvce`：PVCE/1 规范编码与严格解码；
 - `consema-document`：不可变 source snapshot、Span、NodeRef、materialization、edit plan、proof 与 ChangeSet 公共事实；
-- `consema-json`：JSON/JSONC 无损文档、原生语义、查询、投影、materialization 与结构编辑；
+- `consema-json`：JSON/JSONC/JSON5 无损文档、精确原生语义、查询、投影、materialization 与结构编辑；
 - `consema-toml`：TOML 1.0 无损文档、原生 item、查询、投影、materialization 与结构编辑；
 - `consema-protocol`：语言无关固定 schema、公共注册表、canonical JSON/PVCE transport 与严格 payload validation；
-- `consema-conformance`：语言无关向量 runner、硬化语料和官方 TOML adapter；
+- `consema-conformance`：语言无关向量 runner、JSON5/TOML 上游语料、真实配置夹具、硬化与基准工具；
 - `consema`：公共 facade，导出 `core/document/json/toml/protocol/pvce`。
+
+## JSON5 到 strict JSON 示例
+
+```rust
+use consema::{ConversionResult, convert_json};
+use consema::document::{
+    MaterializationRequest, MaterializationStyleId, NewlinePolicy, ParseLimits, ProfileId,
+};
+use consema::json::{
+    JsonProfile, ProjectionRequestBuilder, ProjectionTarget, parse,
+};
+
+let source = br"{service:'catalog',limit:0x100,retry:.25,enabled:true,}";
+let document = parse(
+    source.as_slice(),
+    JsonProfile::Json5StandardV1,
+    ParseLimits::default(),
+).expect("valid JSON5");
+assert_eq!(document.render(), source);
+
+let projection = ProjectionRequestBuilder::new(
+    ProjectionTarget::Json5BestExactCoreV1,
+).build().unwrap();
+let target = MaterializationRequest::new(
+    ProfileId::new("json.strict", 1),
+    MaterializationStyleId::new("json.canonical-compact", 1),
+).with_newline(NewlinePolicy::None);
+
+let ConversionResult::Complete(converted) = convert_json(&document, &projection, &target)
+else { panic!("finite JSON5 is exactly representable as strict JSON") };
+assert_eq!(
+    converted.document.render(),
+    br#"{"service":"catalog","limit":256,"retry":25e-2,"enabled":true}"#,
+);
+```
+
+`Infinity`、`NaN` 只映射到四种冻结的 BinaryFloat64 位模式；转换到 strict JSON 时显式失败，不会改写为字符串或 `null`。
 
 ## TOML 示例
 
@@ -167,11 +208,12 @@ commit.untouched_proof.verify(
 
 ```text
 cargo fmt --all -- --check
-cargo test --locked --workspace --all-targets
-cargo clippy --locked --workspace --all-targets -- -D warnings
-RUSTDOCFLAGS="-D warnings" cargo doc --locked --workspace --no-deps
+cargo test --locked --workspace --all-targets --all-features
+cargo clippy --locked --workspace --all-targets --all-features -- -D warnings
+RUSTDOCFLAGS="-D warnings" cargo doc --locked --workspace --all-features --no-deps
 cargo audit
 cargo deny check
+cargo run --release -p consema-conformance --example json_family_baseline -- 20000
 ```
 
 官方 TOML 1.0 gate：
@@ -180,4 +222,4 @@ cargo deny check
 ./scripts/run-toml-test.ps1
 ```
 
-当前未实现 JSON5、YAML、INI、XML、Properties、plist、HCL、semantic diff/merge、formatter、通用 reorder/table move、文件系统写入事务和 Go。公共 source 层已支持多编码，但现有 JSON/TOML Profile 仍按各自已发布入口接受 UTF-8；格式级编码声明与准入将在对应格式里程碑单独冻结。这些能力按路线图逐阶段落地，不以 README 声明代替完成证据。
+当前未实现 YAML、INI、XML、Properties、plist、HCL、semantic diff/merge、formatter、跨对象 member move/通用 table move、文件系统写入事务和 Go。公共 source 层已支持多编码，但现有 JSON family/TOML Profile 仍按各自已发布入口接受 UTF-8；格式级编码声明与准入将在对应格式里程碑单独冻结。这些能力按路线图逐阶段落地，不以 README 声明代替完成证据。

@@ -980,7 +980,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
   ↓
 0.5.0  Materialization / conversion / structural edit    已完成
   ↓
-0.6.0  JSON family 生产完成（含 JSON5）                  Rust
+0.6.0  JSON family 生产完成（含 JSON5）                  已完成
   ↓
 0.7.0  YAML family + PortableGraph/PGCE                  Rust
   ↓
@@ -1147,6 +1147,8 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 
 目标：完成 `json.strict@1`、`jsonc.bounded@1` 与 `json5.standard@1` 的完整生产矩阵。
 
+落实状态：已完成（2026-08-04）。规范见 `docs/rfcs/0005-json-family-production-v1.md`，实现覆盖完整 JSON5 Profile、精确 native values、query v2、Profile-bound projection、canonical materialization、audited dialect conversion、表示保持编辑、同对象 member move 与 semantic-model v4；语言无关证据见 `conformance/vectors/json-family-v2.json`，上游来源与性能基线分别见 `docs/UPSTREAM-JSON5-REFERENCE.md` 和 `docs/BENCHMARKS-0.6.0.md`。
+
 交付：
 
 * JSON5 parser、native view、syntax query、projection、materialization、edit；
@@ -1159,6 +1161,8 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * 严格数字、Unicode、escape、NaN/Infinity 的跨 Profile 规则。
 
 硬门禁：JSON family 的第 8 节 capability matrix 在 Rust 中全部为绿色。
+
+完成证据：JSON family v2 为 33/33，8 套 language-neutral suites 合计 196/196；固定 JSON5 v2.2.3 gate 的 43/43 valid、39/39 invalid 与 1/1 完整夹具全部通过，4 份典型项目配置与 12 项 adversarial/property tests 通过。Rust 1.97 与声明的 MSRV Rust 1.85 均通过 208 项 workspace 全 target/all features tests 和 strict Clippy；当前工具链另通过 rustfmt、doctest、rustdoc `-D warnings`，RustSec、cargo-deny 四类门禁与官方 TOML 205 valid/474 invalid suite 保持通过。semantic-model v4 发布 25 条 contract 与 92 个 error code，v1-v3 精确冻结；固定 JSON5 夹具的 parse/query/projection/materialization/edit release baseline 已记录环境、digest 与全部样本。
 
 ## 14.6 `0.7.0`：YAML family 与 PortableGraph
 

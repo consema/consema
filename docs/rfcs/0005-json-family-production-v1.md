@@ -1,6 +1,6 @@
 # RFC 0005: JSON family production profile and JSON5 v1
 
-- Status: Accepted for Consema 0.6.0 implementation
+- Status: Implemented in Consema 0.6.0
 - Date: 2026-08-04
 - Scope: frozen JSON5 formation/native semantics, versioned JSON query domains,
   exact projection, canonical materialization, dialect conversion, structural
