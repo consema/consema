@@ -441,6 +441,9 @@ graph projection/provenance, and any YAML-specific transferable payloads that
 survive the protocol audit. Process-local YAML NodeRef and cursor facts still
 require stable caller bindings before transport.
 
+The exact additive registry, fixed wire schemas, caller-binding boundary, and
+audit exclusions are frozen by [RFC 0008](0008-semantic-model-v5.md).
+
 ## 15. Conformance and production gates
 
 Language-neutral suites cover at least:
