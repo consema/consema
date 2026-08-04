@@ -6,7 +6,7 @@
 
 # 0. 文档地位
 
-本文是 Consema 从 Rust `0.1.0` 走向 `1.0.0` 的总路线图、产品范围和发布治理基线。
+本文是 Consema 从 Rust `0.1.0` 经已完成的 `0.2.0` 走向 `1.0.0` 的总路线图、产品范围和发布治理基线。
 
 它回答以下问题：
 
@@ -45,6 +45,20 @@
 * resource limits 与语言无关 conformance vectors。
 
 当前仓库约有 17 个 Rust source files、7,383 行 Rust、30 个测试函数和 20 个语言无关 conformance cases。基线已通过 workspace tests、Clippy `-D warnings` 和 rustfmt check。
+
+## 0.2 当前已完成阶段
+
+Rust `0.2.0` 已在不改写 0.1.0 永久不变量的前提下完成第二格式验证：
+
+* 冻结 `toml.1.0@1` 与 RFC 0001；
+* 完成 TOML byte-exact Document、原生 item/entry/key/element identity；
+* 区分 table、inline table、array、array-of-tables、implicit/dotted table；
+* 完成 `toml.native-semantic-query@1`、exact core projection、provenance 与 atomic scalar edit；
+* 发布 18 个语言无关 TOML cases 和 Cargo/pyproject/service corpus；
+* 通过 `toml-lang/toml-test v2.2.0` TOML 1.0 的 205 个 valid 与 474 个 invalid decoder cases；
+* workspace 统一为 0.2.0，公共 facade 导出 JSON 与 TOML 两个格式实现。
+
+当前仓库为 24 个 Rust source files、11,563 行 Rust、45 个 `#[test]` 函数、38 个语言无关 conformance cases。0.2.0 仍不是生产级 1.0.0；它只证明核心抽象没有过拟合 JSON，下一阶段是 0.3.0 跨格式 contract/protocol 闭合。
 
 这证明核心哲学可实现，但尚未证明：
 
@@ -957,7 +971,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 ```text
 0.1.0  JSON/JSONC 与核心语义证明                         已完成
   ↓
-0.2.0  TOML 第二格式验证                                Rust
+0.2.0  TOML 第二格式验证                                已完成
   ↓
 0.3.0  跨格式核心与语言无关协议闭合                     Rust
   ↓
@@ -1008,6 +1022,8 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 
 目标：证明 `0.1.0` 的 Document、NodeRef、Query、Projection、Provenance 和 Edit 没有过拟合 JSON。
 
+落实状态：已完成（2026-08-04）。规范见 `docs/rfcs/0001-toml-1.0-profile.md`，实现见 `consema-toml`，语言无关证据见 `conformance/vectors/toml-v1.json`，上游证据见 `docs/UPSTREAM-TOML-TEST.md`。
+
 交付：
 
 * `toml.1.0@1` Profile；
@@ -1015,7 +1031,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * table、inline table、array of tables、dotted key native view；
 * TOML scalar 和 temporal types；
 * `toml.native-semantic-query@1`；
-* Projection 到 Object/EntryMapping；
+* 按原生语义 Projection 到 Object、Sequence 与 core scalar/temporal types；
 * TOML provenance；
 * scalar replacement 与 TOML representation policy；
 * TOML conformance vectors；
@@ -1028,6 +1044,8 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * date/time 与 PortableValue 无降精度；
 * JSON 专属类型不得泄漏为跨格式公共类型；
 * 如果两格式共同机制需要根本重写，必须在本阶段完成，不把错误抽象带入第三格式。
+
+完成证据：18/18 TOML language-neutral cases、205/205 upstream valid cases、474/474 upstream invalid cases、45 项 workspace test、rustfmt、Clippy/rustdoc `-D warnings`、RustSec audit 与 cargo-deny 四类供应链门禁全部通过。table/entry/key/element 使用 TOML 专属角色，JSON 专属类型没有提升为跨格式事实。
 
 本版本不加入 YAML、结构编辑或 Go。
 
