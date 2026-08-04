@@ -53,6 +53,21 @@
       "expected": {"code": "core.protocol.schema-mismatch@1"}
     },
     {
+      "id": "protocol.envelope.reject-schema-only-payload",
+      "contract": "core.protocol-message@1",
+      "expected": {"code": "core.protocol.unknown-field@1"}
+    },
+    {
+      "id": "protocol.envelope.reject-nested-envelope",
+      "contract": "core.protocol-message@1",
+      "expected": {"code": "core.protocol.invalid-value@1"}
+    },
+    {
+      "id": "protocol.envelope.reject-semantic-model-identity",
+      "contract": "core.protocol-message@1",
+      "expected": {"code": "core.protocol.unknown-contract@1"}
+    },
+    {
       "id": "protocol.profile.roundtrip",
       "contract": "core.profile-descriptor@1",
       "expected": {"profile": "toml.1.0@1", "strict_equal": true}
@@ -116,6 +131,11 @@
       "id": "protocol.registry.current-roundtrip",
       "contract": "core.registry-manifest@1",
       "expected": {"sorted_unique": true, "is_current": true}
+    },
+    {
+      "id": "protocol.registry.error-code-schema",
+      "contract": "core.error-code-registry@1",
+      "expected": {"strict_valid": true}
     },
     {
       "id": "protocol.errors.query-codes-registered",

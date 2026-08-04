@@ -34,6 +34,12 @@ Unknown contracts, fields, enum values and non-canonical encodings are errors.
 No decoder silently preserves unknown data unless a schema explicitly defines
 a namespaced extension map. None of the v1 schemas below has such a map.
 
+`core.semantic-model@1` is the compatibility identity referenced by registry
+manifests; it is not an envelope payload schema. `core.protocol-message@1` is
+the transport envelope itself and cannot be nested as a payload. Every other
+contract accepted by the v1 envelope has a complete strict payload decoder;
+matching only the payload's `schema` field is insufficient.
+
 ## 2. Goals
 
 - close the cross-language wire boundary before a third format adds more cases;
