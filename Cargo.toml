@@ -3,6 +3,7 @@ resolver = "3"
 members = [
     "crates/consema-core",
     "crates/consema-pvce",
+    "crates/consema-graph",
     "crates/consema-document",
     "crates/consema-json",
     "crates/consema-toml",
