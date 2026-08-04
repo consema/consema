@@ -24,10 +24,12 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 
 ### Verified
 
+- workspace `--all-targets --all-features` 共 141 个 Rust tests 通过，fmt、strict Clippy、doctest 与 `-D warnings` rustdoc 通过；
 - 20 个 core/JSON、18 个 TOML、32 个 protocol v1、28 个 source、19 个 syntax-query 与 11 个 protocol v2 cases 全部通过，共 128 个语言无关案例；
 - SourceSnapshot/SourcePatch 均通过 semantic-model v2 canonical JSON/PVCE envelope 往返；
 - adversarial source decoding、patch offset/count/allocation、协议变异与既有 JSON/TOML/PVCE hardening 语料通过；
-- `toml-test v2.2.0`：205 valid、474 invalid TOML 1.0 decoder cases 保持通过。
+- `toml-test v2.2.0`：205 valid、474 invalid TOML 1.0 decoder cases 保持通过；
+- RustSec audit 与 cargo-deny advisories/bans/licenses/sources 门禁通过。
 
 ### Boundaries
 
