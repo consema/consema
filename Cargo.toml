@@ -14,6 +14,7 @@ members = [
 [workspace.dependencies]
 sha2 = { version = "=0.11.0", default-features = false }
 toml_edit = { version = "=0.22.27", default-features = false, features = ["parse"] }
+unicode-id-start = "=1.4.0"
 
 [workspace.package]
 version = "0.5.0"
