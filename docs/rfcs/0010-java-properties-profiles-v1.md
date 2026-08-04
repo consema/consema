@@ -284,11 +284,19 @@ properties.duplicate-group@1
 Key matching takes exact UTF-16 code units encoded as `UTF16BE/1`; it does not
 normalize Unicode or case. Duplicate matches remain distinct and ordered.
 
-`java-properties.lossless-syntax-query@1` supports kind and exact decoded-text
-filters over:
+`java-properties.lossless-syntax-query@1` supports the following exact filters:
 
 ```text
-Whitespace, LineBreak, CommentMarker, CommentText,
+properties.syntax-kind-is@1
+properties.syntax-text-equals@1
+properties.syntax-raw-bytes-equals@1
+properties.syntax-utf16be-equals@1
+```
+
+The kind filter ranges over:
+
+```text
+Bom, Whitespace, LineBreak, CommentMarker, CommentText,
 Key, Separator, Value, EscapeMarker, EscapeBody,
 ContinuationMarker, ErrorRegion
 ```
