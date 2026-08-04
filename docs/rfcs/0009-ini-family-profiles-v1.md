@@ -436,7 +436,7 @@ Document or partial bytes.
 
 ## 12. Structural edit
 
-Both format profiles publish the same operation count but independently typed
+All three format profiles publish the same operation count but independently typed
 INI operations:
 
 ```text
