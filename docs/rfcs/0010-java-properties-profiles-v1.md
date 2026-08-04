@@ -147,6 +147,12 @@ Properties whitespace of the following natural line contribute no key/value
 code units. An even run of `2n` backslashes contributes `n` backslashes after
 escape processing and does not continue the line.
 
+At end of source, the OpenJDK line-reader rule also removes a final unmatched
+backslash even though no following natural line exists. Consema retains that
+byte as a `ContinuationMarker`, emits no code unit for it, and does not invent
+an empty following natural line. This boundary is covered by the pinned JDK
+differential suite.
+
 Continuation is resolved before key/value separation and normal escape
 processing. Each skipped marker, line ending, and indentation range remains a
 lossless syntax fact and a provenance boundary.
