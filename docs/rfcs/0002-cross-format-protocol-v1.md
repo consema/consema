@@ -238,15 +238,17 @@ Exact fields:
 ```text
 schema
 completion
-value                     Null | PortableValue
+value                     Null | { portable_value: PortableValue }
 fidelity                  Null | Exact | Transformed | Lossy
 report                    core.projection-report@1 payload
 provenance                core.provenance-map@1 payload
 diagnostics               Sequence<core.diagnostic@1 payload>
 ```
 
-Only `Success` permits a non-Null value and fidelity. Every other state requires
-Null value and fidelity. There is never a partial PortableValue.
+Only `Success` permits a present value wrapper and non-Null fidelity. The
+wrapper makes a successful PortableValue `Null` distinct from an absent value.
+Every other state requires Null value and fidelity. There is never a partial
+PortableValue.
 
 Projection report events have exact fields `code`, `policy_rule_id`,
 `source_locations`, `projected_location`, `old_category`, `new_category`,
