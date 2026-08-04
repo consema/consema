@@ -234,8 +234,9 @@ keeping evaluation outside the Document:
   `option:` contain an Empty string;
 - one source is strict: duplicate section names or duplicate option comparison
   names make formation Recovered;
-- option comparison and duplicate detection use the default lowercase
-  `optionxform`; original option spelling is still retained;
+- option comparison and duplicate detection use the Python 3.14 default
+  lowercase `optionxform`, pinned to Unicode 16.0 independently of the Rust
+  compiler's Unicode tables; original option spelling is still retained;
 - the exact section name `DEFAULT` has a distinct native `DefaultSection` role,
   but its entries are not merged into other sections;
 - quotes and backslashes have no general quoting/escape role in this profile;
