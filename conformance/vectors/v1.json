@@ -106,8 +106,68 @@
     {
       "id": "edit.scalar-minimal",
       "capability": "json.edit.scalar-replace@1",
-      "input": {"profile": "jsonc.bounded@1", "source": "{ /* lead */ \"a\" : 1 // tail\n}", "new_integer": "200"},
+      "input": {"profile": "jsonc.bounded@1", "source": "{ /* lead */ \"a\" : 1 // tail\n}", "new_value": {"integer": "200"}, "policy": "PreserveCompatible"},
       "expected": {"source": "{ /* lead */ \"a\" : 200 // tail\n}", "source_edit_count": 1}
+    },
+    {
+      "id": "edit.preserve-decimal-scale",
+      "capability": "json.edit.scalar-replace@1",
+      "input": {"profile": "json.strict@1", "source": "{\"a\": 1.00}", "new_value": {"decimal": "2.5"}, "policy": "PreserveCompatible"},
+      "expected": {"source": "{\"a\": 2.50}", "source_edit_count": 1}
+    },
+    {
+      "id": "edit.preserve-exponent-style",
+      "capability": "json.edit.scalar-replace@1",
+      "input": {"profile": "json.strict@1", "source": "{\"a\": 1E+02}", "new_value": {"integer": "2"}, "policy": "PreserveCompatible"},
+      "expected": {"source": "{\"a\": 2E+0}", "source_edit_count": 1}
+    },
+    {
+      "id": "edit.canonical-for-profile",
+      "capability": "json.edit.scalar-replace@1",
+      "input": {"profile": "json.strict@1", "source": "{\"a\": 1.00}", "new_value": {"decimal": "2.5"}, "policy": "CanonicalForProfile"},
+      "expected": {"source": "{\"a\": 25e-1}", "source_edit_count": 1}
+    },
+    {
+      "id": "edit.preserve-else-canonical",
+      "capability": "json.edit.scalar-replace@1",
+      "input": {"profile": "json.strict@1", "source": "{\"a\": 1.000}", "new_value": {"decimal": "0.0001"}, "policy": "PreserveElseCanonical"},
+      "expected": {"source": "{\"a\": 1e-4}", "source_edit_count": 1, "fallback_diagnostics": 1}
+    },
+    {
+      "id": "edit.preserve-incompatible-rejected",
+      "capability": "json.edit.scalar-replace@1",
+      "input": {"profile": "json.strict@1", "source": "{\"a\": 1.000}", "new_value": {"decimal": "0.0001"}, "policy": "PreserveCompatible"},
+      "expected": {"status": "Failed", "failure": "RepresentationIncompatible"}
+    },
+    {
+      "id": "query.root-result-limit",
+      "capability": "core.query.ordered-results@1",
+      "input": {"domain": "core.portable-value-query@1", "pipeline": [], "max_results": 0},
+      "expected": {"status": "Failed", "failure": "ResourceLimitExceeded"}
+    },
+    {
+      "id": "query.cursor-failure-terminal",
+      "capability": "core.query.ordered-results@1",
+      "input": {"domain": "core.portable-value-query@1", "pipeline": ["core.try-sequence-elements@1"], "elements": [{"integer": "1"}, {"integer": "2"}, {"integer": "3"}, {"integer": "4"}, {"integer": "5"}], "max_results": 3},
+      "expected": {"yielded_before_failure": 3, "terminal": "Failed"}
+    },
+    {
+      "id": "projection.object-key-provenance",
+      "capability": "json.projection.project-as-object@1",
+      "input": {"source": "{\"a\":1,\"b\":2}", "target": "ProjectAsObject@1", "duplicates": "Reject"},
+      "expected": {"key_association_origins": 2, "entry_association_origins": 2}
+    },
+    {
+      "id": "pvce.object-vector",
+      "capability": "core.pvce.full@1",
+      "input": {"object": {"a": {"integer": "1"}}},
+      "expected": {"hex": "5056434501410a01200201611003010101"}
+    },
+    {
+      "id": "pvce.encode-blob-limit",
+      "capability": "core.pvce.full@1",
+      "input": {"value": {"string": "12345"}, "max_blob_bytes": 4},
+      "expected": {"status": "Failed", "failure": "ResourceLimit"}
     },
     {
       "id": "edit.wrong-snapshot",
