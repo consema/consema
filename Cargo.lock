@@ -29,10 +29,12 @@ version = "0.6.0"
 dependencies = [
  "consema-core",
  "consema-document",
+ "consema-graph",
  "consema-json",
  "consema-protocol",
  "consema-pvce",
  "consema-toml",
+ "consema-yaml",
 ]
 
 [[package]]
