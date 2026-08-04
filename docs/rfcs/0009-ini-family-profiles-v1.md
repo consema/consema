@@ -397,6 +397,21 @@ ini.windows-canonical@1
 ini.python-configparser-canonical@1
 ```
 
+The request combinations are exact: portable requires UTF-8 plus LF; Windows
+requires UTF-16LE plus BOM or one explicit registered Windows code page, plus
+CRLF; Python requires one non-Binary registered text encoding plus LF. UTF-16
+canonical output carries the matching BOM, while UTF-8, Latin-1, and Windows
+code-page output do not gain an implicit marker. Encoding is strict: an
+unrepresentable scalar fails the whole operation.
+
+Both levels of the input are consistently a nested EntryMapping or consistently
+a nested Object, and every section name, key, and value is a String. Mixed
+mapping shapes fail closure. Object input cannot fabricate a Windows
+case-equivalent collision even when its spellings are distinct. Python stored
+values whose leading/trailing per-line whitespace or terminal empty line would
+be normalized away by the frozen parser are unrepresentable rather than
+silently changed.
+
 Portable canonical output uses ASCII, `=`, LF, no BOM, no indentation, and no
 quotes. Any nonportable name/value fails.
 

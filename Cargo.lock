@@ -79,6 +79,7 @@ version = "0.7.0"
 dependencies = [
  "consema-core",
  "consema-document",
+ "encoding_rs",
 ]
 
 [[package]]
