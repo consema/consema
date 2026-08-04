@@ -20,6 +20,7 @@ dependencies = [
  "consema-document",
  "consema-json",
  "consema-pvce",
+ "consema-toml",
 ]
 
 [[package]]
