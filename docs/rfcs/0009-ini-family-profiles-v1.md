@@ -371,6 +371,14 @@ Any authorized collapse is `Transformed`, emits one report event per discarded
 association, and keeps retained/discarded provenance. The default policy is
 exact and never collapses.
 
+The request target names are exactly `BestExactEntryMappingV1` and
+`RequireObjectV1`. `BestExactEntryMappingV1` has no collision choice because it
+never collapses. `RequireObjectV1` requires a `NameComparison` of exactly
+`OriginalExact | ProfileEquivalent` and a `CollisionPolicy` of exactly
+`Reject | First | Last`. `First` and `Last` retain source occurrence spelling
+and retained-source order. A failed projection publishes no PortableValue,
+provenance map, or partial event report.
+
 Provenance distinguishes section associations, entry-key associations, entry
 values, continuation fragments, and quote-derived semantic content. It is
 bounded before a complete result is published.
