@@ -1,4 +1,5 @@
 /target/
+/.pi-tmp/
 **/*.rs.bk
 *.log
 *.tmp
@@ -6,4 +7,3 @@
 Thumbs.db
 .idea/
 .vscode/
-
