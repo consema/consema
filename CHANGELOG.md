@@ -7,7 +7,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 ### Added
 
 - 实现 RFC 0006，发布独立 PortableGraph@1、strict graph equality/hash、canonical PGCE/1 与 `core.portable-graph-query@1`；保留多 root、tag、任意/重复 mapping key、sharing 与 cycle；
-- 实现 RFC 0007，发布 `yaml.1.2-core@1` 与 `yaml.1.1-compat@1`：UTF-8/UTF-16 stream、multi-document、完整 lossless/native view、tag/anchor/alias 图语义、native/syntax query、graph/value projection、block/flow materialization 与 9 个 YAML 编辑操作；
+- 实现 RFC 0007，发布 `yaml.1.2-core@1` 与 `yaml.1.1-compat@1`：UTF-8/UTF-16 stream、multi-document、完整 lossless/native view、tag/anchor/alias 图语义、native/syntax query、graph/value projection、block/flow materialization 与 8 个 YAML 编辑操作；
 - JSON↔YAML audited conversion 通过显式 PortableValue projection/materialization 组合，YAML sharing、cycle、tag 与 mapping policy 保持可观察；
 - 实现 RFC 0008，发布 `core.semantic-model@5`：30 条 contract、132 个稳定 error code，以及 PortableGraph、graph query/provenance/projection 和外部化 YAML query payload；v1-v4 精确冻结；
 - 新增 10 个 PortableGraph、22 个 semantic-model v5 与 27 个 YAML language-neutral cases，使 11 套 suite 合计达到 255/255；

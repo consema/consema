@@ -1192,6 +1192,10 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * 图 identity、query order、PGCE 在所有执行中确定；
 * 资源耗尽不能返回截断图或伪成功 Document。
 
+状态：已完成（2026-08-04）。
+
+完成证据：RFC 0006/0007/0008 已接受并落地；PortableGraph、semantic-model v5、YAML 三套新增语言无关 suite 分别为 10/10、22/22、27/27，使 11 套 suite 合计达到 255/255。官方 `yaml/yaml-test-suite data-2022-01-17` 的 402 项全部核算：307 valid byte-exact、94 invalid atomic rejection、1 个未来 `%YAML 1.3` 的明确 Profile-contract exclusion。Kubernetes、GitHub Actions、Compose 与 anchor-heavy 四类工程夹具完成 source/graph/PGCE/materialization closure；mutation/resource corpus 覆盖 Unicode、truncation、alias bomb、depth、cycle、custom tag 和 PGCE canonicality。Rust 1.97 与 MSRV 1.85 均通过 312 项 workspace 全 target/all features tests 和 strict Clippy；rustfmt、doctest、rustdoc、RustSec、cargo-deny、固定 YAML 性能基线及既有 JSON5/TOML 上游门禁均通过。semantic-model v5 发布 30 条 contract 与 132 个 error code，v1-v4 精确冻结。
+
 ## 14.7 `0.8.0`：INI family 与 Properties family
 
 目标：覆盖跨平台遗留配置与 JVM Properties，并证明共享 lexer 基础设施不等于共享语义。

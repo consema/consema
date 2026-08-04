@@ -1,6 +1,6 @@
-# Rust `0.6.0` 实现契约
+# Rust `0.7.0` 实现契约
 
-本文记录 Consema 0.6.0 的 crate 边界、版本化 registry、可验证入口和明确非目标。语义权威顺序为：
+本文记录 Consema 0.7.0 的 crate 边界、版本化 registry、可验证入口和明确非目标。语义权威顺序为：
 
 1. 根目录《配置内容统一处理标准与 Rust 参考实现》中的永久不变量；
 2. 已接受 RFC；
@@ -17,7 +17,7 @@ raw source bytes
        |- optional decoded text + exact raw/UTF-8/scalar/UTF-16 boundaries
        `- verifiable atomic SourcePatch
   -> format profile parse
-  -> immutable JSON or TOML Document snapshot
+  -> immutable JSON, TOML or YAML Document snapshot
        |- exact render + exhaustive structural coverage
        |- format-native values/items and association identities
        |- validated ExecutableQuery -> ordered native or lossless syntax matches
@@ -25,10 +25,14 @@ raw source bytes
        |- MaterializationRequest + PortableValue -> new Document/report/provenance OR failure
        `- EditTransaction -> EditPlan -> new Document/ChangeSet/proof/SourcePatch OR atomic failure
 
-source Document -> Projection -> PortableValue -> Materialization
+source Document -> explicit Projection -> PortableValue or PortableGraph
+  -> explicit Materialization -> target Document
+
+source Document -> PortableValue Projection -> target Materialization
   -> target Document + two-stage ConversionReport
 
 PortableValue <-> PVCE/1
+PortableGraph <-> PGCE/1
 
 typed protocol object
   -> fixed-field PortableValue payload
@@ -43,13 +47,15 @@ typed protocol object
 | `consema-core` | 无 |
 | `consema-document` | core |
 | `consema-pvce` | core |
+| `consema-graph` | core |
 | `consema-json` | core、document |
 | `consema-toml` | core、document |
-| `consema-protocol` | core、document、json、pvce |
-| `consema-conformance` | facade、core、document、json、pvce、protocol、toml |
-| `consema` | core、document、json、pvce、protocol、toml |
+| `consema-yaml` | core、document、graph |
+| `consema-protocol` | core、document、graph、json、pvce |
+| `consema-conformance` | facade、core、document、graph、json、pvce、protocol、toml、yaml |
+| `consema` | core、document、graph、json、pvce、protocol、toml、yaml |
 
-格式 crate 之间不互相依赖。`consema-core` 不依赖格式；`consema-document` 不理解 JSON/TOML 语义；跨格式操作必须通过公共 projection/materialization contract 组合。
+格式 crate 之间不互相依赖。`consema-core` 不依赖格式；`consema-document` 不理解 JSON/TOML/YAML 语义；跨格式操作必须通过公共 projection/materialization contract 组合。`consema-graph` 是格式无关图模型，不依赖 YAML；YAML 只是首个验证它的格式。
 
 ## 2. 公共 document 事实
 
@@ -59,7 +65,7 @@ typed protocol object
 
 公共 `SourceSnapshot` 保留完整原始字节，以原始字节的 SHA-256 作为跨进程 content identity，并独立于每次文档形成产生的 process-local `SnapshotIdentity`。encoding 闭集为 Binary、UTF-8、UTF-16LE、UTF-16BE 与 ISO-8859-1；BOM、声明、caller override 和 profile default 的解析事实完整保留，冲突不猜测。
 
-所有 `Span` 继续表示原始字节半开区间。text source 只允许在 Unicode scalar boundary 上进行 raw/decoded UTF-8/scalar/UTF-16 坐标互换，不取整；Binary 没有 decoded coordinate。现有 JSON/TOML Profile parser 入口仍接受 UTF-8，公共多编码 source 能力不自动扩大任何格式 Profile 的准入范围。
+所有 `Span` 继续表示原始字节半开区间。text source 只允许在 Unicode scalar boundary 上进行 raw/decoded UTF-8/scalar/UTF-16 坐标互换，不取整；Binary 没有 decoded coordinate。JSON/TOML Profile parser 入口仍接受 UTF-8；YAML 两个 Profile 显式接受 BOM 检测的 UTF-8、UTF-16LE 与 UTF-16BE。
 
 ## 3. JSON profiles
 
@@ -71,7 +77,7 @@ JSON native model 保留 object member 和 array element 的 association identit
 
 ## 4. TOML profile 与原生模型
 
-`toml.1.0@1` 只形成完整合法 TOML 1.0 文档。语法错误是 `FatalFormationFailure`；0.6.0 继续不声明 TOML recovery capability。
+`toml.1.0@1` 只形成完整合法 TOML 1.0 文档。语法错误是 `FatalFormationFailure`；0.7.0 继续不声明 TOML recovery capability。
 
 TOML 公共实体角色：
 
@@ -87,6 +93,24 @@ TOML 公共实体角色：
 `a.b.c = 1` 在逻辑树中形成逐层 entry，同时每个 key segment 保留独立 span。TOML table 不等于 JSON object；二者只在显式投影到 PortableValue Object 时相遇。
 
 Rust parser backend 精确固定为 `toml_edit 0.22.27`。不可变 raw document 和 backend spans 用于建模，但公开 API、diagnostic code、query operator 和 projection 结果均不暴露 backend 类型。
+
+## 4.1 PortableGraph@1 与 PGCE/1
+
+PortableGraph 是与 PortableValue 平行的 immutable portable representation，不是给 PortableValue 增加引用类型。它保留有序 roots、graph-local node identity、Scalar/Sequence/Mapping、tag、任意与重复 mapping key、sharing 和 cycle。strict equality/hash 比较可达拓扑与顺序，不比较 builder 分配编号；不可达节点、未定义节点和跨图引用在 build 完成前失败。
+
+PGCE/1 使用 `PGCE` magic、version 1、minimal unsigned LEB128 与 canonical node numbering。严格 decoder 拒绝非最小 varint、trailing bytes、无效引用、非 canonical numbering、未知版本与全部资源越界；失败不返回 partial graph。`core.portable-graph-query@1` 对 root、reachable node、sequence element 与 mapping entry 提供确定性遍历，sharing 只访问一次，cycle 不展开。
+
+## 4.2 YAML family 与原生图语义
+
+- `yaml.1.2-core@1`：YAML 1.2.2 presentation grammar 与 Core scalar schema；
+- `yaml.1.1-compat@1`：保持相同安全 presentation 边界，并冻结 YAML 1.1 boolean/octal/sexagesimal/timestamp resolution；
+- Profile 只接受自身版本 directive；未来版本、重复 directive 与跨 Profile directive 显式失败；
+- stream、document、node、mapping entry、sequence element、anchor definition 与 alias occurrence 都有 YAML 专属 snapshot-bound 身份；
+- mapping 保留任意 key、重复 key 与顺序；tag、anchor、alias、sharing 和 cycle 不被压平；
+- lossless syntax 保留 directive、document marker、block/flow indicator、五种 scalar style、block content、comment、whitespace 与原始 newline；
+- custom tag 是数据，不执行 constructor、import、网络或文件访问；alias 默认不展开，anchor 作用域严格限制在单个 document。
+
+Rust backend 固定为 `saphyr-parser 0.0.11`，只负责 bounded event parsing。Profile resolution、source identity、lossless scanner、native composition、diagnostic code、query、projection、materialization 与 edit 均由 Consema 层拥有，任何 backend 类型都不进入公共 API。
 
 ## 5. Query registries
 
@@ -118,15 +142,24 @@ v1 对 strict JSON/JSONC 保持冻结。JSON5 必须使用 v2；v2 在既有角�
 | `toml.try-array-elements` | TomlItem | TomlArrayElement |
 | `toml.array-element-item` | TomlArrayElement | TomlItem |
 
-三个 domain 都使用相同的 selection、Concat、StructureOrderMerge、limit、cancellation 和 ordered cursor 语义。
+### `core.portable-graph-query@1`
+
+支持 roots、reachable nodes、sequence elements、mapping entries、entry key/value、node kind/tag filter，以及通用 `core.take` 与 `core.distinct-by-identity`。遍历按 canonical root/association 顺序，sharing 只访问一次且 cycle 不递归展开。
+
+### `yaml.native-semantic-query@1`
+
+支持 stream documents、document root、mapping entries、entry key/value、sequence elements、anchor definitions、alias occurrences、alias target 与 node kind/tag filter；所有结果保留 YAML 专属 role 和 source order。
+
+所有 domain 都使用相同的 selection、Concat、StructureOrderMerge、limit、cancellation 和 ordered cursor 语义。
 
 ### Lossless Syntax Query v1/v2
 
 - `json.lossless-syntax-query@1`：`json.syntax-kind-is@1`、`json.syntax-text-equals@1`，返回 `JsonSyntaxPiece`；
 - `json.lossless-syntax-query@2`：为 JSON5 增加 `Identifier` syntax kind；JSON5 文档拒绝 v1 domain；
-- `toml.lossless-syntax-query@1`：`toml.syntax-kind-is@1`、`toml.syntax-text-equals@1`，返回 `TomlSyntaxPiece`。
+- `toml.lossless-syntax-query@1`：`toml.syntax-kind-is@1`、`toml.syntax-text-equals@1`，返回 `TomlSyntaxPiece`；
+- `yaml.lossless-syntax-query@1`：`yaml.syntax-kind-is@1`、`yaml.syntax-text-equals@1`，返回 `YamlSyntaxPiece`。
 
-两个 domain 都以完整 lossless structural pieces 作为 source-order 输入。kind 在产生第一个 match 前验证；kind enum 与 match 类型保持格式专属。ordered cursor 的最终状态只有 Completed、Cancelled、Failed，并且只在全部已发现项被消费或取消/失败被观察后可见。
+三个 lossless domain 都以完整 structural pieces 作为 source-order 输入。kind 在产生第一个 match 前验证；kind enum 与 match 类型保持格式专属。ordered cursor 的最终状态只有 Completed、Cancelled、Failed，并且只在全部已发现项被消费或取消/失败被观察后可见。
 
 `core.query-definition@1` 通过固定字段 PortableValue schema 编码，再通过 PVCE/1 传输。未知、缺失或重排字段均拒绝。
 
@@ -154,16 +187,19 @@ TOML `toml.best-exact-core@1` 映射：
 
 JSON projection 继续通过显式 target 和 duplicate policy 在 Object/EntryMapping 之间选择，并报告任何 authorized loss。`json5.projection.best-exact-core@1` 只适用于 JSON5，并保留四种非有限 BinaryFloat64 位模式；旧 `json.projection.best-exact-core@1` 与新 target 跨 Profile 使用都会以 target-not-applicable 失败。
 
+YAML 默认 target 是 `yaml.projection.best-exact-graph@1`：每个 document 形成一个 root，node/association 与 alias reference 都有精确 provenance。`yaml.projection.best-exact-value@1` 是显式 tree projection：cycle 永远失败；sharing 默认失败，只能对无环图由 `DuplicateAcyclic` 授权复制；custom tag 默认失败，只能由 `StripToNodeKind` 授权丢失；mapping 可显式选择 exact-first、RequireObject 或 RequireEntryMapping。全部 graph/value/provenance/report/depth/amplification 上限先于完整结果发布。
+
 ## 7. Materialization 与 audited conversion
 
-Materialization 从完整 `PortableValue` 和显式 `MaterializationRequest` 创建一个新文档；它不是既有文档的 formatter。请求冻结 target Profile、style、encoding、newline、EntryMapping policy、ExactOnly representability 以及 input/output/depth/report/provenance 上限。
+Materialization 从完整 `PortableValue` 或 `PortableGraph` 和显式 `MaterializationRequest` 创建一个新文档；它不是既有文档的 formatter。请求冻结 target Profile、style、encoding、newline、EntryMapping policy、ExactOnly representability 以及 input/output/depth/report/provenance 上限。
 
 - JSON/JSONC：`json.canonical-compact@1`、`json.canonical-pretty@1`，接受 JSON 可表示的 core kind；String-key `EntryMapping` 可保序保重复，非 String key 与 BinaryFloat/temporal/bytes 明确失败；
 - JSON5：`json5.canonical-compact@1`、`json5.canonical-pretty@1`；普通值生成 strict JSON 子集，四种非有限位模式生成 `Infinity/-Infinity/NaN/-NaN`，有限 binary64 与其他 NaN payload 明确失败；
 - TOML：`toml.canonical-document@1`，完整支持 TOML scalar、四类 temporal、array 与 nested object；根必须是 Object，或由调用方显式授权 unique String-key EntryMapping 转换为 Object；
+- YAML：`yaml.canonical-block@1`、`yaml.canonical-flow@1`；PortableGraph 的 tag、任意 mapping key、sharing、cycle 与多 root 精确重建，PortableValue 通过 frozen best-exact projection 反验；跨 document sharing 与无已发布 constructor 的 custom tag 原子失败；
 - 完成结果包含新 Document、fidelity、完整 report 与 input-value/association 到 target node/span 的 provenance；失败只包含 failure/report/analyzed paths，不包含文档或 partial bytes。
 
-facade 的 `convert_json`/`convert_toml` 只组合已发布的 Projection 与 Materialization。中间 `PortableValue`、两阶段 provenance、两阶段 fidelity/report 和 source/target Profile 都保留；overall fidelity 是两阶段最差值。未经 policy 授权的 projection loss、重复 key 转换、不可表示 target value 或 materialization failure 都不会产生 target Document。
+facade 的 `convert_json`/`convert_toml`/`convert_yaml` 只组合已发布的 PortableValue Projection 与 Materialization。中间值、两阶段 provenance、两阶段 fidelity/report 和 source/target Profile 都保留；overall fidelity 是两阶段最差值。未经 policy 授权的 projection loss、重复 key、YAML sharing/tag、不可表示 target value 或 materialization failure 都不会产生 target Document。PortableGraph 的图闭环使用独立的 graph projection/materialization，不伪装成 tree conversion。
 
 ## 8. 原子 scalar 与 structural edit
 
@@ -178,9 +214,9 @@ TOML exact literal 必须恰好是一个 scalar span：前后 trivia、comment�
 
 任意精度 Integer 超出 i64、携带 payload 的非 canonical NaN、亚纳秒 Time、非整分钟 OffsetDateTime 等均明确失败。成功 commit 产生新 Document 和包含 source edits、node mappings、diagnostics 的 ChangeSet；旧 snapshot 永不改变。
 
-0.6.0 的 format operation registry 对全部 JSON family Profile 发布 8 个版本化操作，对 TOML 发布 7 个：共同包含 semantic/literal scalar replacement，以及格式专属的 association insert/remove/rename 与 array element insert/remove；JSON 额外发布 `json.edit.move-member@1`。相同操作名不表示两个格式共享 trivia、comma、table ownership 或 duplicate 语义。
+0.7.0 的 format operation registry 对全部 JSON family Profile 发布 8 个版本化操作，对 TOML 发布 7 个，对两个 YAML Profile 发布 8 个。三者共同包含 semantic/literal scalar replacement 和格式专属 collection edit；JSON 额外发布同对象 member move；YAML 额外发布 anchor rename 与 alias insertion，并对 live alias dependency、最新可见 anchor、block/flow placement、tag/anchor property boundary 和同容器冲突进行原子验证。相同操作名不表示格式间共享 trivia、delimiter、table、anchor 或 duplicate 语义。
 
-结构 target 和 placement anchor 都使用 snapshot-bound `NodeRef`。JSON member 的重复身份不会按 key 合并；JSONC/JSON5 只修改 operation 所拥有的 delimiter/association 区域。member move 只允许同一 Object，保留原地 comment/trivia 所有权，并在 dry-run/commit 中产生相同 patch；跨对象/self anchor/并发修改显式失败。TOML entry 保留 root/standard/inline table ownership，rename 不能制造重复 direct key；0.6.0 不移动 table、不合成 dotted-key ownership，也不提供跨对象 move。
+结构 target 和 placement anchor 都使用 snapshot-bound `NodeRef`。JSON member 的重复身份不会按 key 合并；JSONC/JSON5 只修改 operation 所拥有的 delimiter/association 区域。member move 只允许同一 Object，保留原地 comment/trivia 所有权，并在 dry-run/commit 中产生相同 patch；跨对象/self anchor/并发修改显式失败。TOML entry 保留 root/standard/inline table ownership，rename 不能制造重复 direct key；0.7.0 不移动 table、不合成 dotted-key ownership，也不提供跨对象 move。YAML mapping/sequence edit 保留 association order、style 和 trivia；删除仍被 alias 引用的 anchor 或插入指向不可见定义的 alias 必须失败。
 
 多操作冲突在发布新文档前统一判定，包括 wrong snapshot/role、missing or duplicate target、overlapping ownership、ancestor-descendant conflict、removed placement anchor、duplicate key、unrepresentable value、resource limit 与 reparse failure。成功同时产生新 Document、ChangeSet、UntouchedByteProof 和 SourcePatch；失败不产生其中任何一项。
 
@@ -195,6 +231,8 @@ TOML exact literal 必须恰好是一个 scalar span：前后 trivia、comment�
 - `ProtocolLimits`：canonical JSON/PVCE transport bytes、depth、nodes、container、integer、blob；
 - `QueryLimits`：steps、results；
 - `ProjectionLimits`：value nodes、report、provenance、depth。
+- `GraphLimits`/`PgceLimits`：nodes、roots、edges、tag/content/stream bytes 与 depth；
+- `ValueProjectionLimits`：YAML value visits、depth、report、provenance 与 amplification ratio；
 - `SourceLimits`：raw bytes、decoded UTF-8 bytes、decoded scalar/boundary count；
 - `SourcePatchLimits`：resulting source limits、replacement count 与 patch bytes。
 - `MaterializationLimits`：input nodes/depth、output bytes、report 与 provenance；
@@ -213,12 +251,18 @@ TOML exact literal 必须恰好是一个 scalar span：前后 trivia、comment�
 | `consema.protocol.conformance@2` | 11/11 |
 | `consema.operations.conformance@1` | 35/35 |
 | `consema.json-family.conformance@2` | 33/33 |
+| `consema.portable-graph.conformance@1` | 10/10 |
+| `consema.semantic-model-v5.conformance@1` | 22/22 |
+| `consema.yaml.conformance@1` | 27/27 |
 | JSON5 v2.2.3 reference valid/invalid | 43/43 + 39/39 |
 | JSON5 v2.2.3 complete `package.json5` fixture | 1/1 |
 | `toml-lang/toml-test v2.2.0`, TOML 1.0 valid | 205/205 |
 | `toml-lang/toml-test v2.2.0`, TOML 1.0 invalid | 474/474 |
+| `yaml/yaml-test-suite data-2022-01-17`, valid byte-exact | 307/307 |
+| `yaml/yaml-test-suite data-2022-01-17`, invalid atomic rejection | 94/94 |
+| YAML profile-contract exclusions | 1/1（`%YAML 1.3`） |
 
-语言无关向量共 196 个。JSON family v2 以 33 个数据驱动 case 覆盖 JSON5 全语法、精确数值、query v2、投影、生成、方言转换、表示保持编辑、member move、semantic-model v4 与 limits；官方 JSON5 参考 gate 另验证 83 项。4 份典型 JSON/JSONC/JSON5 项目配置均完成 exact parse/render、exact projection 和有限值 strict JSON closure。12 个 adversarial/property tests 包括逐字节 JSON5 mutation、截断、Unicode/escape/number/comment 攻击面和资源上限。TOML corpus 与官方 adapter 继续保持既有证据。
+11 套语言无关向量共 255 个。新增 10 个 PortableGraph、22 个 semantic-model v5 和 27 个 YAML case，覆盖图同构/拓扑/PGCE/query、v1-v4 registry 冻结、graph/YAML wire payload，以及 YAML Profile、encoding、stream、syntax、native graph、projection、materialization、edit 和 limits。官方 YAML gate 完整枚举 402 个 upstream case，不使用 allowlist；唯一 exclusion 要求未来 `%YAML 1.3` directive 按当前 Profile 契约精确拒绝。Kubernetes、GitHub Actions、Compose 与 anchor-heavy 四类自有 MIT fixture 均完成 byte-exact parse/render、lossless coverage、graph/PGCE/materialization closure；tree-shaped fixture 另完成 PortableValue closure。YAML/PGCE hardening 覆盖逐字节 mutation、截断、Unicode、深度/node/token/source limit、alias bomb、cycle、custom tag 与 canonical decode。既有 JSON5/TOML 语料和门禁保持通过。
 
 ## 11. PVCE/1 固定项
 
@@ -229,6 +273,14 @@ TOML exact literal 必须恰好是一个 scalar span：前后 trivia、comment�
 - fixed float bits：network byte order。
 
 任何不兼容编码修改必须使用新的 encoding version。
+
+### PGCE/1 固定项
+
+- magic：ASCII `PGCE`；
+- version：minimal unsigned LEB128 `1`；
+- roots 与 nodes 使用 canonical graph-local 编号；
+- node kind、tag、scalar content、sequence edge 与 mapping association 全部有界编码；
+- decode 后重新 canonical encode 必须产生相同字节，否则输入不是规范 PGCE/1。
 
 ## 12. Cross-format Protocol 与 semantic-model registries
 
@@ -262,10 +314,16 @@ RFC 0004 的 `ContractRegistry::v3()` 含 25 条记录，`ErrorCodeRegistry::v3(
 
 ### Semantic model v4
 
-RFC 0005 的 `ContractRegistry::v4()` 保持 25 条 contract 记录；`ErrorCodeRegistry::v4()` 在冻结 v3 的 90 条基础上增加 `json5.string.unescaped-line-separator@1` 与 `json5.syntax.invalid-identifier@1`，合计 92 条。`RegistryManifest::current()` 在 0.6.0 指向 v4；`v1()`/`v2()`/`v3()` 的内容与构造器保持精确冻结。JSON5 专属 Diagnostic 只有在 v4 registry 下可外部化。
+RFC 0005 的 `ContractRegistry::v4()` 保持 25 条 contract 记录；`ErrorCodeRegistry::v4()` 在冻结 v3 的 90 条基础上增加 `json5.string.unescaped-line-separator@1` 与 `json5.syntax.invalid-identifier@1`，合计 92 条。JSON5 专属 Diagnostic 只有在 v4 及以后 registry 下可外部化。
 
-## 13. 0.6.0 明确边界
+### Semantic model v5
 
-本版本没有 YAML、INI、Properties、XML、plist、HCL、Schema、semantic diff/merge、Formatter、Live Query、增量解析、PortableGraph、跨对象 member move/table move、文件系统原子替换、稳定进程插件协议或 Go 实现。JSON5 不执行 JavaScript 表达式、import、computed key、method、regex、template literal、`undefined` 或 bigint。`SourcePatch` 仍只声明精确 raw-byte transition；`EditPlan` 仍只声明已验证计划，二者都不授予文件系统写入权限。
+RFC 0008 的 `ContractRegistry::v5()` 增至 30 条记录，新增 `core.portable-graph@1`、`core.graph-query-result@1`、`core.graph-provenance-map@1`、`core.graph-projection-result@1` 与 `core.yaml-query-result@1`。PortableGraph payload 同时携带 readable graph 与 canonical PGCE/1，decoder 要求两者严格一致；graph association、provenance location 和 YAML domain/role/order 都重新验证，raw process-local YAML handle 不能过 wire。
 
-这些不是“隐藏支持”或文档遗漏；它们是路线图后续版本的显式工作。0.6.0 只声明已由代码、语言无关向量、adversarial tests、真实夹具、固定基准和上游 suite 共同证明的 capability。
+`ErrorCodeRegistry::v5()` 在 v4 的 92 条上增加 40 条 graph/PGCE/YAML formation/projection/materialization/edit code，共 132 条。`RegistryManifest::current()` 在 0.7.0 指向 v5；v1-v4 的 contract/error 集合、manifest 和 frozen constructors 精确不变。内部 graph/YAML failure 通过 exhaustive mapping 发布稳定 code，不依赖 Rust Debug/Display 文本。
+
+## 13. 0.7.0 明确边界
+
+本版本没有 INI、Properties、XML、plist、HCL、Schema、semantic diff/merge、Formatter、Live Query、增量解析、跨对象 member move/table move、文件系统原子替换、稳定进程插件协议或 Go 实现。JSON5 不执行 JavaScript 表达式、import、computed key、method、regex、template literal、`undefined` 或 bigint。YAML 不执行 custom constructor、merge、include/import、remote tag 或 alias expansion；不提供跨 document anchor、general formatter、graph diff/merge 或跨容器 node move。`SourcePatch` 仍只声明精确 raw-byte transition；`EditPlan` 仍只声明已验证计划，二者都不授予文件系统写入权限。
+
+这些不是“隐藏支持”或文档遗漏；它们是路线图后续版本的显式工作。0.7.0 只声明已由代码、语言无关向量、adversarial tests、真实夹具、固定基准和上游 suite 共同证明的 capability。
