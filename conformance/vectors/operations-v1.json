@@ -18,7 +18,7 @@
       "id": "operations.v1.operation-registry",
       "capability": "core.format-operation-registry@1",
       "input": {},
-      "expected": {"json_operation_count": 7, "toml_operation_count": 7, "required_json": "json.edit.insert-member@1", "required_toml": "toml.edit.insert-entry@1"}
+      "expected": {"json_operation_count": 8, "toml_operation_count": 7, "required_json": "json.edit.move-member@1", "required_toml": "toml.edit.insert-entry@1"}
     },
     {
       "id": "operations.v1.materialize-json-compact",
