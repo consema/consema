@@ -316,12 +316,39 @@ deterministic anchors `&g0`, `&g1`, ... for nodes whose topology requires an
 alias. The first serialization occurrence defines the anchor before child
 edges; later occurrences emit aliases, so cycles terminate.
 
+YAML anchors are document-scoped. A graph node reachable from more than one
+root therefore fails with `yaml.materialization.cross-document-sharing@1`;
+duplicating the node would change graph identity and is never called Exact.
+Custom graph tags fail until a versioned extension constructor contract is
+selected. The v1 canonical styles emit every retained standard repository tag
+explicitly, including default `str`/`seq`/`map` tags, so reparsing never depends
+on an ambient or implementation-defined schema.
+
+PortableValue materialization is Exact for Null, Boolean, Integer, Decimal,
+String, Bytes, Date, minute-offset OffsetDateTime, Sequence, Object, and an
+EntryMapping that cannot be mistaken for an Object. The three frozen binary64
+non-finite values (`.inf`, `-.inf`, canonical positive NaN) are also Exact.
+BinaryFloat32, finite BinaryFloat64, standalone Time, LocalDateTime, years
+outside `0000..9999`, second-granularity offsets, and non-canonical NaN payloads
+fail as unrepresentable instead of changing core kind or precision.
+
+An EntryMapping whose keys are unique Strings has the same YAML representation
+as an Object. ExactOnly therefore rejects it by default. The caller may select
+the common `UniqueStringEntriesToObject` policy; every such local conversion is
+reported, provenance is marked Reencoded, and whole-operation fidelity becomes
+Transformed. EntryMappings with arbitrary or duplicate keys remain Exact and
+preserve association order.
+
 Standard tags are emitted or omitted only where the selected profile resolves
 the same tag and canonical content. Custom tags require a supported extension
 contract. Strings that would resolve to a different tag are quoted. Mapping
 entry and sequence order are preserved. Newline and UTF-8/UTF-16 target
 encoding policies are explicit; output is reparsed under the target profile
 before a Complete result is returned.
+
+The v1 styles accept LF or CRLF and reject `None`. UTF-16LE/UTF-16BE output
+always carries the matching BOM; raw encoded bytes, not only decoded UTF-8
+text, are charged to `max_output_bytes`.
 
 Canonical materialization is not a formatter for an existing Document.
 
