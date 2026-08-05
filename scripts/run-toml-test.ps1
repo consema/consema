@@ -9,6 +9,7 @@ $cargo = if ($env:CONSEMA_CARGO) { $env:CONSEMA_CARGO } else { 'cargo' }
 & $cargo build --locked -p consema-conformance --bin consema-toml-test-decoder
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-$decoder = Join-Path $workspaceRoot 'target\debug\consema-toml-test-decoder.exe'
+$targetDirectory = if ($env:CARGO_TARGET_DIR) { $env:CARGO_TARGET_DIR } else { Join-Path $workspaceRoot 'target' }
+$decoder = Join-Path $targetDirectory 'debug\consema-toml-test-decoder.exe'
 & go run "github.com/toml-lang/toml-test/v2/cmd/toml-test@$TomlTestVersion" test -toml 1.0 -decoder $decoder
 exit $LASTEXITCODE
