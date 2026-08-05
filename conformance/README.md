@@ -4,7 +4,7 @@
 
 当前 suite：
 
-- `vectors/v1.json`：`consema.conformance@1`，覆盖 0.1.0 core、PVCE、JSON、query、projection 与 edit 基线，共 20 个 case；
+- `vectors/v1.json`：`consema.conformance@1`，覆盖 0.1.0 core、PVCE、JSON、query、projection 与 edit 基线，共 30 个 case；
 - `vectors/toml-v1.json`：`consema.toml.conformance@1`，覆盖 `toml.1.0@1` 的 document、native items、query、projection、edit、limits 与真实工程语料，共 18 个 case；
 - `vectors/protocol-v1.json`：`consema.protocol.conformance@1`，覆盖 15 个稳定 payload、canonical JSON/PVCE、registry/error code、process-local identity 拒绝与资源边界，共 32 个 case；
 - `vectors/source-v1.json`：`consema.source.conformance@1`，覆盖 raw identity、五种 encoding、decoded location、binary coverage、SourcePatch 与资源失败，共 28 个 case；
@@ -15,11 +15,16 @@
 - `vectors/portable-graph-v1.json`：`consema.portable-graph.conformance@1`，覆盖 PortableGraph 同构与拓扑语义、PGCE/1 固定字节、严格拒绝、循环、确定性图查询及资源边界，共 10 个 case；
 - `vectors/semantic-model-v5.json`：`consema.semantic-model-v5.conformance@1`，覆盖 v1-v4 registry 冻结、v5 graph/YAML payload 双传输、角色/关联/来源约束、process-local 拒绝、稳定 error code 与 wire mutation，共 22 个 case；
 - `vectors/yaml-v1.json`：`consema.yaml.conformance@1`，覆盖 YAML 1.2/1.1 Profile、encoding、stream、lossless/native/graph、query、projection、materialization、edit 与 limits，共 27 个 case；
+- `vectors/semantic-model-v6.json`：`consema.semantic-model-v6.conformance@1`，覆盖 v1-v5 registry 冻结、INI/Properties 外部 query payload、精确 Java UTF-16 code units、source encoding facts、错误码与 wire mutation，共 25 个 case；
+- `vectors/ini-v1.json`：`consema.ini.conformance@1`，覆盖 Portable、Windows、Python ConfigParser 三个显式 Profile 的 formation、encoding、query、projection、materialization、八类 edit 与 limits，共 20 个 case；
+- `vectors/java-properties-v1.json`：`consema.java-properties.conformance@1`，覆盖 Reader/Latin-1 Profile、自然行/逻辑行、Java UTF-16、query、projection、materialization、五类 edit 与 limits，共 22 个 case；
 - `corpora/json5-v2.2.3.json`：固定到 JSON5 官方 `v2.2.3`/`c3a7524` 的 43 个接受与 39 个拒绝输入，记录上游来源、Git blob、LF 存储变换和 MIT 许可；
 - `fixtures/json5/package-json5-v2.2.3.json5`：官方完整真实 JSON5 配置夹具；
 - `fixtures/real-world/`：覆盖 package JSON、TypeScript/VS Code JSONC 与服务 JSON5 的非专有典型项目配置；
 - `fixtures/toml/`：由向量按仓库相对路径引用的合法与非法 TOML 真实语料；
 - `fixtures/yaml/`：Kubernetes、GitHub Actions、Compose 与 anchor-heavy 自有 MIT 工程夹具，无 secret 或第三方复制内容；
+- `fixtures/ini/`：桌面应用、.NET 风格服务、Python 工具、mixed-newline 与显式 CP1252 自有 MIT 工程夹具；
+- `fixtures/properties/`：logging、localization、build tool、Windows path、continuation、Latin-1 与 Java UTF-16 edge 自有 MIT 工程夹具；
 - `corpora/licenses/yaml-test-suite-MIT.txt`：固定官方 YAML suite 的许可证证据；完整 402-case 上游数据由可复现 adapter 从固定 tag/commit 执行，不复制进仓库。
 
 每个 case 固定包含：
@@ -42,9 +47,12 @@ Rust runner 为：
 - `consema_conformance::run_portable_graph_v1()`；
 - `consema_conformance::run_semantic_model_v5()`；
 - `consema_conformance::run_yaml_v1()`；
+- `consema_conformance::run_semantic_model_v6()`；
+- `consema_conformance::run_ini_v1()`；
+- `consema_conformance::run_properties_v1()`；
 - `consema_conformance::run_json5_reference_corpus()`。
 
-上述 11 套语言无关向量合计 255 个 case；JSON5 外部参考 gate 另有 83 项接受/拒绝/完整夹具证据，YAML 官方 gate 完整核算 402 项（307 valid、94 invalid、1 个显式 Profile exclusion）。每个 runner 固定校验 suite/schema/semantic-model、case ID 唯一性与未知 action 拒绝；向量中的 input/expected 会实际驱动执行，防止把预期值硬编码进 runner。官方参考 gate 只继承各自公开语法接受/拒绝事实，不继承第三方 loader 的数值降精度、duplicate collapse、implicit merge 或语言对象构造行为。
+上述 14 套语言无关向量合计 332 个 case；JSON5 外部参考 gate 另有 83 项接受/拒绝/完整夹具证据，YAML 官方 gate 完整核算 402 项（307 valid、94 invalid、1 个显式 Profile exclusion）。每个 runner 固定校验 suite/schema/semantic-model、case ID 唯一性与未知 action 拒绝；向量中的 input/expected 会实际驱动执行，防止把预期值硬编码进 runner。官方参考 gate 只继承各自公开语法接受/拒绝事实，不继承第三方 loader 的数值降精度、duplicate collapse、implicit merge 或语言对象构造行为。
 
 未来 Go 实现必须直接消费相同向量和 fixture。任何实现不得用序列化本地 AST、异常对象或第三方 parser 私有类型来替代向量中的公共字段。
 
