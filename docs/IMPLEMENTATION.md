@@ -59,6 +59,8 @@ typed protocol object
 
 格式 crate 之间不互相依赖。`consema-core` 不依赖格式；`consema-document` 不理解 JSON/TOML/YAML/INI/Properties 语义；跨格式操作必须通过公共 projection/materialization contract 组合。`consema-graph` 是格式无关图模型，不依赖 YAML；YAML 只是首个验证它的格式。
 
+`consema-conformance` 依赖仓库根目录的语言无关向量、fixtures、upstream suite 与 runtime oracle，因此明确 `publish = false`。它是规范资产的仓库级执行器，不是可脱离这些资产独立发布的运行时库；其余 facade 与十个支撑 crate 形成 11 个可发布归档，并通过解包后 current/MSRV 编译门禁验证。
+
 ## 2. 公共 document 事实
 
 每次成功 parse 或 edit commit 都产生新的 `SnapshotIdentity`。`NodeRef` 和 `Span` 只能由所属 `DocumentAuthority` 验证；相同 source 的两次 parse 也不是同一 snapshot。

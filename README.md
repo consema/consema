@@ -52,6 +52,7 @@ TOML table、inline table、array-of-tables、dotted key 和 array 拥有各自�
 - JSON family 0.6.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.6.0.md)
 - YAML 0.7.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.7.0.md)
 - INI/Properties 0.8.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.8.0.md)
+- 0.8.0 迁移、安全、制品边界与发布记录：[Release record](docs/RELEASE-0.8.0.md)
 - 0.7.0 迁移、安全与发布记录：[Release record](docs/RELEASE-0.7.0.md)
 - JSON5 v2.2.3 上游参考门禁：[Reference corpus provenance](docs/UPSTREAM-JSON5-REFERENCE.md)
 - 上游 TOML 门禁：[Official TOML 1.0 compatibility gate](docs/UPSTREAM-TOML-TEST.md)
@@ -72,7 +73,7 @@ TOML table、inline table、array-of-tables、dotted key 和 array 拥有各自�
 - `consema-ini`：Portable/Windows/Python ConfigParser 无损文档、Profile 原生语义、查询、投影、materialization 与原子编辑；
 - `consema-properties`：Reader/Latin-1 无损文档、Java UTF-16 原生语义、查询、投影、materialization 与原子编辑；
 - `consema-protocol`：语言无关固定 schema、公共注册表、canonical JSON/PVCE transport 与严格 payload validation；
-- `consema-conformance`：语言无关向量 runner、上游语料、固定 runtime oracle、真实配置夹具、硬化与基准工具；
+- `consema-conformance`：仓库内、不可发布的语言无关向量 runner、上游语料、固定 runtime oracle、真实配置夹具、硬化与基准工具；
 - `consema`：公共 facade，导出 `core/document/graph/ini/json/properties/toml/yaml/protocol/pvce`。
 
 ## JSON5 到 strict JSON 示例

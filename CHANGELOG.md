@@ -2,6 +2,40 @@
 
 Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发布能力。
 
+## 0.8.0 — 2026-08-05
+
+### Added
+
+- 实现 RFC 0009，发布 `ini.portable@1`、`ini.windows@1` 与 `ini.python-configparser@1` 三个显式 Profile；覆盖 raw source/encoding、physical/logical line、section/entry identity、native/syntax query、EntryMapping 优先投影、三种 canonical materialization 与 8 个版本化编辑操作；
+- 实现 RFC 0010，发布 `java-properties.reader@1` 与 `java-properties.latin1@1`；覆盖 natural/logical line、separator/continuation/escape、重复 property identity、精确 Java UTF-16 code unit、query、projection、canonical materialization 与 5 个版本化编辑操作；
+- 实现 RFC 0011，发布 `core.semantic-model@6`：38 条 contract registry 记录与 166 个稳定 error code；新增 source encoding/snapshot/patch v2、materialization request/result v2、Java UTF-16 string 与外部定位的 INI/Properties query result，并精确冻结 v1-v5；
+- 新增 `consema-ini`、`consema-properties` 公共 crate 与 facade 导出；新增 77 个语言无关案例，使 14 套 suite 达到 332/332；
+- 固定 OpenJDK、CPython、.NET、Windows wide profile API 与 Qt 五套 runtime oracle 共 36 个差分案例，并加入真实 INI/Properties 工程夹具、adversarial corpus、可复现性能基线及最终 `.crate` 解包验证门禁。
+
+### Correctness
+
+- INI Profile 必须由调用方在 formation 前选择；不按扩展名或“哪个 parser 成功”猜方言，也不隐式执行 interpolation、provider precedence、environment/default lookup、registry redirect 或 typed getter；
+- section、entry 与 duplicate occurrence 保持 source order 和独立身份；case、delimiter、comment、quote、continuation、empty/missing 与 collision policy 由所选 Profile 决定，不能用一个宽松 `ini@1` 抹平；
+- Properties Document 不以 JDK `Hashtable` 为真相，不覆盖重复 key，也不执行 defaults chain；Reader encoding 由调用方显式给定，Latin-1 将 marker-shaped BOM bytes 视为内容，`\uXXXX` 产生的未配对 surrogate 以 exact `JavaString` 保留；
+- Windows code page 使用冻结的数字 registry 和 strict decoding；BOM 的 `DetectUnicode | TreatAsContent` policy、raw/decoded boundary 与 digest 均进入 snapshot/patch 前置条件，transcoding 不伪装为 in-place patch；
+- INI/Properties projection、materialization 与 edit 对 recovered/ambiguous/unrepresentable/resource-limit 输入原子失败；成功 materialization 重 parse 目标 bytes，成功 edit 产生一致 dry-run/commit plan、完整 untouched-byte proof 与可重放 SourcePatch。
+
+### Verified
+
+- Rust 1.97 与声明的 MSRV Rust 1.85 均通过 workspace `--all-targets --all-features` 的 452 项 tests 与 strict Clippy；当前工具链另通过 rustfmt、doctest 与 rustdoc `-D warnings`；
+- 14 套语言无关 suite 共 332/332 cases 通过，其中 semantic-model v6 为 25/25、INI family 为 20/20、Java Properties 为 22/22；
+- 五套固定 runtime oracle 共 36/36：OpenJDK 25.0.4 为 11/11、CPython 3.14.6 为 9/9、.NET 10.0.10 为 7/7、Windows wide API 为 5/5、Qt 6.10.2 为 4/4；
+- `toml-test v2.2.0` 的 205/205 valid 与 474/474 invalid、YAML test-suite 的 307/307 valid、94/94 invalid 与 1/1 Profile exclusion，以及 JSON5 v2.2.3 的 83/83 外部门禁保持通过；
+- RustSec 使用本地 1,189 条 advisory 数据扫描 Cargo.lock 的 38 个 crate dependencies，无已知漏洞；cargo-deny advisories、bans、licenses、sources 四类门禁通过；
+- 11 个可发布 `.crate` 完成路径安全、内部 checksum/归档 SHA-256 一致性检查，并在 Rust 1.97 与 1.85 下从解包内容通过全 target/全 feature 编译；repository-only 的 `consema-conformance` 明确设为不可发布；
+- 固定 INI 与 Properties 工程夹具上发布 parse、native query、exact projection、canonical materialization 与 semantic edit 的 3-sample/20,000-iteration release baseline；辅助 llvm-cov 报告为 region 84.65%、function 82.73%、line 86.59%。
+
+### Boundaries
+
+- INI Profile 只定义确定的文件内容语义，不模拟 Windows registry redirect/cache、.NET provider layering、Python interpolation/multi-file precedence 或 Qt fallback scope；
+- Properties line profiles 不包含 XML Properties、ResourceBundle、classpath、defaults chain、`store()` timestamp/comment 行或宿主 Charset 猜测；
+- 本版本不提供 XML、plist、HCL、Schema、semantic diff/merge、通用 formatter、增量解析、Live Query、文件系统事务、稳定插件进程协议或 Go 实现；`.env` 仍是后续 source adapter，而不是第九种配置格式 Profile。
+
 ## 0.7.0 — 2026-08-04
 
 ### Added

@@ -1219,6 +1219,10 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * Latin-1、Unicode escape 和 Reader semantics 可重放；
 * 三个 INI Profile 的差异均有反例向量。
 
+状态：已完成（2026-08-05）。
+
+完成证据：RFC 0009/0010/0011 已接受并落地；`ini.portable@1`、`ini.windows@1`、`ini.python-configparser@1` 与 `java-properties.reader@1`、`java-properties.latin1@1` 均覆盖无损 formation、原生/语法查询、EntryMapping 优先投影、canonical materialization 和快照绑定编辑。semantic-model v6 发布 38 条 contract 与 166 个 error code，v1-v5 精确冻结；14 套语言无关 suite 合计 332/332。OpenJDK 25.0.4、CPython 3.14.6、.NET 10.0.10、Windows wide profile API 与 Qt 6.10.2 五套固定 runtime oracle 合计 36/36；真实工程夹具与 mutation/resource corpus 覆盖 duplicate、case、separator、continuation、escape、未配对 surrogate、BOM/code-page 边界、recovery 与 atomic publication。Rust 1.97 与 MSRV 1.85 均通过 452 项 workspace 全 target/all features tests 和 strict Clippy；rustfmt、doctest、rustdoc、RustSec、cargo-deny、固定性能基线及既有 JSON5/TOML/YAML 外部门禁均通过。11 个可发布 `.crate` 的路径、内部 checksum、解包内容及 current/MSRV 编译全部验证；仓库级 `consema-conformance` 明确不发布。
+
 ## 14.8 `0.9.0`：XML
 
 目标：完整支持 tree、namespace、mixed content 和多编码配置文档，不把 XML 压平为 Object。
