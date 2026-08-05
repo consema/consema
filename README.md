@@ -49,6 +49,7 @@ TOML table、inline table、array-of-tables、dotted key 和 array 拥有各自�
 - INI family 三 Profile：[RFC 0009](docs/rfcs/0009-ini-family-profiles-v1.md)
 - Java Properties Reader/Latin-1：[RFC 0010](docs/rfcs/0010-java-properties-profiles-v1.md)
 - semantic-model v6 line-format 协议：[RFC 0011](docs/rfcs/0011-semantic-model-v6.md)
+- XML 1.0 safe Profile：[RFC 0012](docs/rfcs/0012-xml-1.0-safe-profile-v1.md)
 - JSON family 0.6.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.6.0.md)
 - YAML 0.7.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.7.0.md)
 - INI/Properties 0.8.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.8.0.md)
