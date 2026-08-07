@@ -23,12 +23,12 @@
       "note": "本 gate 计划（docs/0.13.0-gate-plan.md:6）声明的语义权威顺序：永久不变量 → 已接受 RFC → 语言无关 vectors → 本实现计划与 Rust API。"
     },
     "contract_registry": {
-      "value": "semantic-model v7：41 条 contract / 186 个 error code",
-      "evidence": "README.md:32；crates/consema-protocol/src/registry_manifest.rs（RegistryManifest 序列化源）；crates/consema/tests/cli_m4.rs:160（186 个 code 断言）、cli_m4.rs:9-10（16 profiles / 8 families / 21 query domains）",
-      "note": "v1-v6 精确冻结（README.md:31-32）；v7 追加 core.cli-output@1 / core.batch-plan@1 / core.batch-result@1 与 20 个 cli.* code。§8 草案要求的 registry 序列化 sha256 由 gatekeeper 在发布时用 RegistryManifest::current() 计算并回填（registry_manifest.rs:92-93 的契约序列化入口）。"
+      "value": "semantic-model v7：41 条 contract / 187 个 error code",
+      "evidence": "README.md:32；crates/consema-protocol/src/registry_manifest.rs（RegistryManifest 序列化源）；crates/consema/tests/cli_m4.rs:160（187 个 code 断言）、cli_m4.rs:9-10（16 profiles / 8 families / 21 query domains）",
+      "note": "v1-v6 精确冻结（README.md:31-32）；v7 追加 core.cli-output@1 / core.batch-plan@1 / core.batch-result@1 与 20 个 cli.* code，0.13.0 另注册 json.projection.incomplete-document@1（audit F3，186 → 187）。§8 草案要求的 registry 序列化 sha256 由 gatekeeper 在发布时用 RegistryManifest::current() 计算并回填（registry_manifest.rs:92-93 的契约序列化入口）。"
     },
     "capability_set": {
-      "value": "8 families / 16 profiles / 21 query domains / 16 operation registries / 186 error codes",
+      "value": "8 families / 16 profiles / 21 query domains / 16 operation registries / 187 error codes",
       "evidence": "consema capabilities 实测输出（2026-08-07，target/release/consema.exe，与 cli_m4.rs:160 断言一致）；crates/consema/src/bin/consema/capabilities.rs（由 facade registry 派生，无重复声明）",
       "note": "capabilities 清单是机器可读事实（RFC 0015 硬门禁 1：capabilities 由 facade 类型派生）。"
     },
@@ -73,16 +73,16 @@
     "known_accepted_limitations": [
       {"id": "F2", "limitation": "core.edit.incomplete-target@1 命名两个概念（Recovered 文档门 + json 非完整字面量 target）；v8 拆分提案 core.edit.recovered-document@1 / core.edit.incomplete-literal-target@1", "evidence": "docs/API-REVIEW-0.13.0.md:23-31"},
       {"id": "F3", "limitation": "edit 冲突枚举名漂移（ConflictingEdits vs DuplicateTarget）；注册 code 面一致，1.0.0 统一枚举名", "evidence": "docs/API-REVIEW-0.13.0.md:33-42"},
-      {"id": "F4", "limitation": "xml.projection.recovered-document@1 vs 其余四家 incomplete-document@1 拼写漂移；v8 更名（旧 code deprecated alias 至 1.0.0）", "evidence": "docs/API-REVIEW-0.13.0.md:44-52"},
+      {"id": "F4", "limitation": "xml.projection.recovered-document@1 vs 其余五家 incomplete-document@1 拼写漂移（json 的 incomplete-document@1 已随 audit F3 注册进 v7，186 → 187）；v8 更名（旧 code deprecated alias 至 1.0.0）", "evidence": "docs/API-REVIEW-0.13.0.md:44-54"},
       {"id": "F10", "limitation": "xml/plist/hcl 同时暴露 status() 与 formation_status()；1.0.0 弃用 status()", "evidence": "docs/API-REVIEW-0.13.0.md:54-58"},
       {"id": "F11", "limitation": "plist.duplicate-key-group@1 vs ini/properties duplicate-group@1 操作词漂移；v8 增加别名并弃用旧词", "evidence": "docs/API-REVIEW-0.13.0.md:60-64"},
       {"id": "F13", "limitation": "vector capability id 命名（yaml.native-semantics@1 suite 内部复数 vs 域 id）；冻结，RFC 0016 显式钉死", "evidence": "docs/API-REVIEW-0.13.0.md:66-74"},
       {"id": "F15", "limitation": "hcl PascalCase syntax-kind 拼写（TagClose）vs xml/plist kebab-case（tag-close）；v8 增加 kebab 别名", "evidence": "docs/API-REVIEW-0.13.0.md:76-80"},
-      {"id": "B-1+B-2", "limitation": "facade 未暴露 node-locator API：query 只接线 portable-value 域，native 域需调用方外部化 locator；materialize/convert 的 provenance map 为空（如实表达，非伪造）", "evidence": "docs/API-REVIEW-0.13.0.md:102-103；CHANGELOG.md:39-41"},
+      {"id": "B-1+B-2", "limitation": "facade 未暴露 node-locator API：query 只接线 portable-value 域，native 域需调用方外部化 locator；materialize/convert 的 provenance map 为空（如实表达，非伪造）", "evidence": "docs/API-REVIEW-0.13.0.md:102-103；CHANGELOG.md:40-42"},
       {"id": "B-3", "limitation": "project 报告/来源外部化仅 json/toml；其余家族显式拒绝（含 B-6 修复后 java-properties 在家族门的文档化边界）", "evidence": "docs/API-REVIEW-0.13.0.md:104"},
       {"id": "B-4", "limitation": "信封只携带注册 code，格式本地 code 绑定注册 fallback core.source.invalid-sequence@1（RFC 0015 §4.3 冻结）；stderr 保留真码", "evidence": "docs/API-REVIEW-0.13.0.md:105"},
       {"id": "B-5", "limitation": "失败 cli.convert@1 形态 report/target 为 null（原子失败是诚实形态）；各阶段 report 外部化归 1.0.0", "evidence": "docs/API-REVIEW-0.13.0.md:106"},
-      {"id": "B-7", "limitation": "edit/plan/apply 操作词表仅接线 INI family（B-6 修复后 java-properties convert 可达，edit 仍按家族门拒绝）；每格式映射表归 0.14.0+", "evidence": "docs/API-REVIEW-0.13.0.md:108；CHANGELOG.md:42"},
+      {"id": "B-7", "limitation": "edit/plan/apply 操作词表仅接线 INI family（B-6 修复后 java-properties convert 可达，edit 仍按家族门拒绝）；每格式映射表归 0.14.0+", "evidence": "docs/API-REVIEW-0.13.0.md:108；CHANGELOG.md:43"},
       {"id": "B-8", "limitation": "edit --write 未接线（dry-run only，usage 显式拒绝 edit_cmd.rs:1020-1023）；帮助文本与行为对齐的修订建议归 fsio 里程碑", "evidence": "docs/API-REVIEW-0.13.0.md:109"},
       {"id": "SEMVER-3", "limitation": "cargo-semver-checks vs v0.8.0：consema/consema-core/consema-document 三 crate 仅 enum_variant_added（0.9.0-0.11.0 新家族变体，纯增量），RFC 级批准；CI semver job 保持失败 + 批准记录（API-REVIEW §3 决定的二选一落定为'保留失败并附批准记录'，allowlist 修改属 .github 域外，推入时由 gatekeeper 落定）", "evidence": "docs/API-REVIEW-0.13.0.md:160-174"},
       {"id": "ORACLE-EXCLUSIONS", "limitation": "差分 oracle exclusion inventory：HCL D-1..D-9、plist D-1..D-21、YAML 1 项（各家族 RFC 与 oracle manifest 记录）", "evidence": "conformance/oracles/hcl-go-v1/manifest.json、conformance/oracles/plist-macos-v1/manifest.json 的 exclusion/文档化 skip 记录"},
@@ -147,7 +147,7 @@
           "id": "F-8",
           "name": "无 mandatory capability 标记为 experimental、stub 或 partial",
           "status": "complete",
-          "evidence": ["CHANGELOG.md:39-44（Boundaries：全部是显式拒绝，非 stub）", "docs/cookbook.md §10（每格式能力矩阵与已知边界）", "edit --write 等未接线面以 usage 错误显式拒绝（crates/consema/src/bin/consema/edit_cmd.rs:1020-1023）"],
+          "evidence": ["CHANGELOG.md:40-45（Boundaries：全部是显式拒绝，非 stub）", "docs/cookbook.md §10（每格式能力矩阵与已知边界）", "edit --write 等未接线面以 usage 错误显式拒绝（crates/consema/src/bin/consema/edit_cmd.rs:1020-1023）"],
           "source_of_truth": "RFC 0015 + 本 manifest known_accepted_limitations"
         }
       ]
@@ -167,7 +167,7 @@
           "id": "S-2",
           "name": "每个 contract ID 已登记且不可变",
           "status": "complete",
-          "evidence": ["README.md:31-32（v1-v6 冻结；v7 增量为 additive）", "crates/consema-protocol/src/registry_manifest.rs", "crates/consema/tests/cli_m4.rs:160（186 code 断言）"],
+          "evidence": ["README.md:31-32（v1-v6 冻结；v7 增量为 additive）", "crates/consema-protocol/src/registry_manifest.rs", "crates/consema/tests/cli_m4.rs:160（187 code 断言）"],
           "source_of_truth": "RFC 0011（contract registry）"
         },
         {
@@ -350,7 +350,7 @@
           "id": "SEC-9",
           "name": "CLI secret redaction 和临时文件权限完成跨平台验证",
           "status": "partial",
-          "evidence": ["Windows 实测全量：CHANGELOG.md:14、34（redaction + cli 进程级硬化）", "docs/support-policy.md:65-67（三平台验证归 0.13.0 收口）"],
+          "evidence": ["Windows 实测全量：CHANGELOG.md:14、35（redaction + cli 进程级硬化）", "docs/support-policy.md:65-67（三平台验证归 0.13.0 收口）"],
           "source_of_truth": "RFC 0015 §9.6",
           "completion_path": "Linux/macOS 全量验证随第一次 CI 真跑完成（cli_*.rs 测试矩阵在 3 OS 上运行，含 redaction 与临时文件/权限测试）——见 feature_complete_judgment.open_items C-1。",
           "owner": "0.13.0 gatekeeper（推入 CI 后核对 3 OS 的 cli 测试输出）"
@@ -479,7 +479,7 @@
           "id": "A-8",
           "name": "patch/apply 具备中断、冲突、权限和磁盘错误测试",
           "status": "complete",
-          "evidence": ["crates/consema/tests/cli_m*.rs（stale/篡改 original/只读/目录/symlink/权限/磁盘/中断注入）", "docs/pilot-0.13.0.md:158-200（W8：stale conflict、中断恢复实测）", "CHANGELOG.md:13,23,34"],
+          "evidence": ["crates/consema/tests/cli_m*.rs（stale/篡改 original/只读/目录/symlink/权限/磁盘/中断注入）", "docs/pilot-0.13.0.md:158-200（W8：stale conflict、中断恢复实测）", "CHANGELOG.md:13,23,35"],
           "source_of_truth": "RFC 0015 §6.2（batch 状态机）"
         },
         {

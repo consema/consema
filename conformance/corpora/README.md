@@ -35,7 +35,10 @@ Layout:
   gen_mutation_corpus` regenerates byte-identical output from the committed
   base seed; `-- --check` verifies the committed file is current.
 * **Regressions** are exact minimal inputs from fuzz findings, stored as
-  hex bytes with the production profile that reproduced them.
+  hex bytes with the production profile that reproduced them. The generator
+  round-trips the committed `regressions` array verbatim, so regenerating
+  (or `-- --check`) never wipes, reorders, or reformats entries — adding a
+  finding to the array leaves the corpus current.
 
 ### Replay
 
@@ -66,7 +69,9 @@ Layout:
    default.
 4. The bounded replay test now covers the input permanently — CI fails on
    any regression of it. The entry stays in the corpus forever (gate plan
-   §15.3: "所有 fuzz regression 永久加入 corpus").
+   §15.3: "所有 fuzz regression 永久加入 corpus"). The generator's
+   `-- --check` gate round-trips committed `regressions` entries verbatim,
+   so adding an entry never makes the corpus stale.
 
 ## Finding records (0.13.0 gate plan M2, 2026-08-07)
 

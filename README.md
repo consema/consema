@@ -29,7 +29,7 @@ Consema 是《配置内容统一处理标准与 Rust 参考实现》的 Rust `0.
 - JSON 8 个、TOML 7 个、YAML 8 个、INI 8 个、Properties 5 个、XML 8 个、plist 6 个及 HCL 6 个（tfvars 4 个）版本化编辑操作；格式间相同抽象操作不共享 trivia、delimiter、duplicate 或 encoding 规则；
 - snapshot-bound 原子事务、dry-run `EditPlan`、`UntouchedByteProof` 与可重放 `SourcePatch`；
 - semantic-model v6 发布 38 条 contract registry 记录与 166 个公共 error code，同时精确冻结 v1/v2/v3/v4/v5；
-- semantic-model v7 在 v6 之上追加 `core.cli-output@1`、`core.batch-plan@1`、`core.batch-result@1` 三个 CLI 稳定 payload 与 20 个 `cli.*` error code（41 条 contract / 186 个 code），v1-v6 精确冻结；
+- semantic-model v7 在 v6 之上追加 `core.cli-output@1`、`core.batch-plan@1`、`core.batch-result@1` 三个 CLI 稳定 payload 与 20 个 `cli.*` error code，0.13.0 另注册 `json.projection.incomplete-document@1`（41 条 contract / 187 个 code），v1-v6 精确冻结；
 - 18 套语言无关 conformance suite 共 508/508 cases，其中 semantic-model v6 为 25/25、INI family 为 20/20、Java Properties 为 22/22、XML 为 34/34、plist 为 45/45、HCL 为 57/57、CLI 为 40/40；
 - 官方 JSON5 v2.2.3 参考语料 43 valid + 39 invalid 与完整 `package.json5` 夹具共 83/83；
 - 官方 `toml-test v2.2.0` TOML 1.0 decoder gate：205 valid + 474 invalid 全部通过；

@@ -26,7 +26,8 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 - 三处超线性形成路径修复（见 Added 性能条目），每个带边界宽松的线性回归网（`parser.rs:2842-2878` 10k 元素 <20s、`source.rs:1538-1589` 262,144 次坐标转换 <5s、`offsets.rs:90-156` 与 `raw_byte_at` 逐点相等）；修复只改善性能，BENCHMARKS 冻结预算仍为有效上界，无批准记录需求；
 - B-6 修复：java-properties 源 convert/project 的族前缀特例（`project_cmd.rs:65-73`），发布的两个 `java-properties.projection.*` target 可达，回归测试 3 个（含"唯一阻塞是文档化边界"钉死测试）；
 - B-9 修复：`inspect --profile` 对未注册格式本地 code 诊断复用 `registered_code` 注册 fallback（`inspect.rs` 的 `bind_parse_diagnostic` helper），Recovered→exit 0、fatal→exit 2，不再有 exit 5 内部错误；stderr 与 human 视图保留真码；回归测试矩阵（xml/plist/hcl 三例 Recovered + 三例深度 fatal + ini category 矛盾 + 进程级）；
-- 信封语义不漂移：B-9 修复后 inspect 与 query 行为一致化（同一 fallback `core.source.invalid-sequence@1`，RFC 0015 §4.3 冻结），B-4 处置保持冻结。
+- 信封语义不漂移：B-9 修复后 inspect 与 query 行为一致化（同一 fallback `core.source.invalid-sequence@1`，RFC 0015 §4.3 冻结），B-4 处置保持冻结；
+- audit F3 修复（latent CLI panic）：`json.projection.incomplete-document@1`（0.13.0 的 json Recovered-document 门禁，`crates/consema-json/src/projection.rs:756`）注册进 v7 error registry（`crates/consema-protocol/src/error_registry.rs`，Projection/0.13.0，v7 计数 186 → 187），registry 测试钉死注册与 `Completion::new_with_registry` 接受该 code；project 失败记录改用 `failed_query_result` 同款 minimal_record 回退（`project_cmd.rs`），任何未注册 code 不再可能 panic CLI（exit 101）。
 
 ### Verified
 
@@ -42,14 +43,14 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 - **CI 9 job 已落盘、未在 GitHub 真跑（A-4/A-9/SEC-9，partial）**：推入后在干净 checkout 全矩阵全绿是收口项；semver job 对三个 crate 的 `enum_variant_added` 保持失败 + RFC 级批准记录（`docs/API-REVIEW-0.13.0.md` §3），allowlist 修改属 `.github` 域由 gatekeeper 推入时落定；
 - **真实发布密钥未生成（C-3，partial）**：演练密钥（82301612…）与 scratch 仓库不进入发布记录；0.13.0 发布前按 `docs/release-process-0.13.0.md` §4.1 在默认 keyring 生成真实密钥 + 私钥备份 + 吊销证书，并执行 §7 发布检查单（含版本推进 0.8.0→0.13.0）；
 - 门禁 open backlog 保持：facade node-locator API（B-1/B-2，1.0.0 窗口）、每格式报告外部化（B-3）、失败 convert 形态（B-5，冻结语义）、每格式 edit 词表（B-7，0.14.0+）、`edit --write` 接线（B-8，usage 显式拒绝不漂移）；全部记录于 Feature-Complete Manifest 的 known_accepted_limitations；
-- M2 修复、fuzz/property/mutation 语料与三处性能修复当前为工作树状态（未提交），随 M9 落地 commit 入库；manifest 证据行号按该工作树核验。
+- M2 修复、fuzz/property/mutation 语料与三处性能修复已随 0.13.0 落地 commit 094f5d1（Harden and gate the Rust implementation）与 7e9de38（Record the 0.13.0 gate evidence）入库，不再处于工作树状态；manifest 证据行号按 7e9de38 提交树核验。
 
 ## Unreleased — 0.12.0
 
 ### Added
 
 - 实现 RFC 0015，发布正式 `consema` CLI（11 个命令：inspect/capabilities/query/project/materialize/convert/edit/plan/apply/conformance/explain），作为 facade crate 的 `[[bin]]` 目标内置（`cargo install consema` 同时获得 SDK 与 CLI，可发布归档数不变）；CLI 是产品入口，不是第三个实现——bin 与 lib 同包，只能访问 facade public API，机器输出与 SDK 直接 encode 字节相等；
-- 发布 semantic-model v7：v6 的 38 条 contract 记录冻结不变，追加 `core.cli-output@1`、`core.batch-plan@1`、`core.batch-result@1` 三个 CLI 稳定 payload（固定字段 PortableValue + canonical JSON/PVCE 双传输 + typed decoder 重验交叉约束）；v6 的 166 个 error code 冻结不变，追加 20 个 `cli.*` code（usage 7/data 2/detection 1/limit 3/write 5/interrupted 1/internal 1），共 41 条 contract 与 186 个 code；`RegistryManifest::current()` 指向 v7；
+- 发布 semantic-model v7：v6 的 38 条 contract 记录冻结不变，追加 `core.cli-output@1`、`core.batch-plan@1`、`core.batch-result@1` 三个 CLI 稳定 payload（固定字段 PortableValue + canonical JSON/PVCE 双传输 + typed decoder 重验交叉约束）；v6 的 166 个 error code 冻结不变，追加 20 个 `cli.*` code（usage 7/data 2/detection 1/limit 3/write 5/interrupted 1/internal 1），共 41 条 contract 与 186 个 code（0.13.0 随 audit F3 修复在 v7 追加注册 `json.projection.incomplete-document@1`，v7 现为 187 个 code，见 0.13.0 条目）；`RegistryManifest::current()` 指向 v7；
 - 机器协议：全部命令统一输出 `core.cli-output@1` 信封（command/exit_class/product_version/payload/diagnostics/redaction），stdout 只有一行规范 JSON（`--json`）或命令结果数据，诊断与进度全部走 stderr；exit code 0-5 稳定分类（success/usage/data/limit/precondition/internal），分类是纯函数，每个错误族都有穷尽映射测试；
 - facts-only auto-detection：inspect 只报告字节大小/SHA-256/BOM/marker/候选 Profile（每个候选附理由）/歧义，永不输出"这是 X 格式"的单一结论；parse 类命令必须显式 `--profile`，歧义是可报告的一等结果而不是猜测；
 - plan/apply 批量工作流：`plan` 逐文件 parse + edit dry-run，产出 `core.batch-plan@1` manifest（source_digest/operations/source_patch/target_digest），单文件失败作为 manifest 内容如实记录、不整批失败也不伪装成功；`apply` 逐文件重读重验 base digest 与 original-bytes 双前置条件，通过后同目录临时文件 + 原子替换 + 读回验证 target digest，产出 `core.batch-result@1`（completed/failed/pending/skipped-stale 状态机）；中断恢复：每文件写入前先落 pending 标记、完成后落 completed，重跑 completed 跳过、pending 重做（`CONSEMA_APPLY_INTERRUPT_AFTER`/`CONSEMA_APPLY_WRITE_FAILURE` 注入 seam）；

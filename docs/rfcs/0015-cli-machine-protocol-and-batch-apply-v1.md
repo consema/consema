@@ -38,7 +38,11 @@ core.batch-result@1   the batch-result manifest produced by `consema apply`
 The three contracts enter the `ContractRegistry` of semantic-model v7
 (38 → 41 records) and the `cli.*` error family enters
 `ErrorCodeRegistry::v7()` (166 → 186 codes), with the exact lists frozen by
-this RFC (Section 13). Command-level payload records (`cli.inspect@1`,
+this RFC (Section 13). (0.13.0 errata: the audit-F3 fix registered
+`json.projection.incomplete-document@1`, emitted by the 0.13.0 json
+Recovered-document gate, in v7 — 187 codes total; the Section 13.1
+`cli.*` list itself is unchanged.) Command-level payload records
+(`cli.inspect@1`,
 `cli.capabilities@1`, `cli.explain@1`, `cli.conformance@1`,
 `cli.convert@1`, `cli.edit@1`, and the detection-facts record) appear only
 as envelope payloads and are **not registered** (Section 6).
@@ -80,7 +84,11 @@ facade public API (hard gate 1, Section 2).
   implementation plan §0.3, §11).
 - No new evaluation, import, network, or environment-read path: the CLI
   never executes programs embedded in configuration during parse/query/
-  project (roadmap §10, line 816).
+  project (roadmap §10, line 816). The single exception is the documented
+  `apply` testing/CI injection seam of Section 5.4
+  (`CONSEMA_APPLY_INTERRUPT_AFTER`, `CONSEMA_APPLY_WRITE_FAILURE`): it
+  reads exactly those two variables, is scoped to the `apply` command
+  only, and is documented in `--help`.
 - No "try every dialect" automatic detection: detection returns only facts
   or ambiguity and never emits a single "this is X format" conclusion
   (hard gate 2; Section 7).
@@ -242,7 +250,7 @@ The `core.cli-output@1` typed decoder revalidates cross-constraints:
 whose first line is `[section]`, no `--profile` given):
 
 ```text
-{"schema":"core.portable-value-json@1","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.cli-output@1"}},{"key":"command","value":{"type":"String","value":"inspect"}},{"key":"exit_class","value":{"type":"String","value":"success"}},{"key":"product_version","value":{"type":"String","value":"0.12.0"}},{"key":"payload","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"cli.inspect@1"}},{"key":"path","value":{"type":"String","value":"app.conf"}},{"key":"bytes","value":{"type":"Object","entries":[{"key":"size","value":{"type":"Integer","value":"43"}},{"key":"digest","value":{"type":"Object","entries":[{"key":"algorithm","value":{"type":"String","value":"sha256"}},{"key":"hex","value":{"type":"String","value":"2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"}}]}}]}},{"key":"bom","value":{"type":"Null"}},{"key":"symlink","value":{"type":"Boolean","value":false}},{"key":"markers","value":{"type":"Sequence","items":[{"type":"String","value":"[section]"}]}},{"key":"candidates","value":{"type":"Sequence","items":[{"type":"Object","entries":[{"key":"profile","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"ini.portable"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"reason","value":{"type":"String","value":"leading [section] line"}}]}}]}},{"key":"ambiguous","value":{"type":"Boolean","value":false}},{"key":"ambiguity_reasons","value":{"type":"Sequence","items":[]}},{"key":"parse","value":{"type":"Null"}}]}},{"key":"diagnostics","value":{"type":"Sequence","items":[]}},{"key":"redaction","value":{"type":"Object","entries":[{"key":"redacted","value":{"type":"Boolean","value":false}},{"key":"count","value":{"type":"Integer","value":"0"}}]}}]}}
+{"schema":"core.portable-value-json@1","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.cli-output@1"}},{"key":"command","value":{"type":"String","value":"inspect"}},{"key":"exit_class","value":{"type":"String","value":"success"}},{"key":"product_version","value":{"type":"String","value":"0.12.0"}},{"key":"payload","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"cli.inspect@1"}},{"key":"path","value":{"type":"String","value":"app.conf"}},{"key":"bytes","value":{"type":"Object","entries":[{"key":"size","value":{"type":"Integer","value":"43"}},{"key":"digest","value":{"type":"Object","entries":[{"key":"algorithm","value":{"type":"String","value":"sha256"}},{"key":"hex","value":{"type":"String","value":"2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae"}}]}}]}},{"key":"bom","value":{"type":"Null"}},{"key":"symlink","value":{"type":"Boolean","value":false}},{"key":"markers","value":{"type":"Sequence","items":[{"type":"String","value":"[section]"}]}},{"key":"candidates","value":{"type":"Sequence","items":[{"type":"Object","entries":[{"key":"profile","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"ini.portable"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"reason","value":{"type":"String","value":"leading [section] line"}}]}]}},{"key":"ambiguous","value":{"type":"Boolean","value":false}},{"key":"ambiguity_reasons","value":{"type":"Sequence","items":[]}},{"key":"parse","value":{"type":"Null"}}]}},{"key":"diagnostics","value":{"type":"Sequence","items":[]}},{"key":"redaction","value":{"type":"Object","entries":[{"key":"redacted","value":{"type":"Boolean","value":false}},{"key":"count","value":{"type":"Integer","value":"0"}}]}}]}}
 ```
 
 These bytes are pinned by the `consema.cli.conformance@1` vectors (Section
@@ -314,6 +322,22 @@ SIGINT (Ctrl+C) and SIGTERM trigger graceful shutdown:
 - The shell convention code 130 is not adopted: 130 would break the closed
   0-5 classification (Section 17, rejected alternatives).
 - The re-run recovery semantics of `apply` are in Section 9.4.
+- **The signal-handling seam (std-only, `unsafe` forbidden)**: the binary
+  is std-only with `unsafe_code = forbid` (workspace lint), so a real OS
+  signal handler cannot be installed; on such platforms the CLI exposes
+  two documented environment-variable injection points as the
+  deterministic stand-in for OS signals, scoped to the `apply` command
+  only and intended for testing/CI use:
+  `CONSEMA_APPLY_INTERRUPT_AFTER=<n>` (0-based file index) fires the
+  graceful-shutdown sequence at the exact code point a SIGINT/SIGTERM
+  would be handled — after the in-flight file's pending manifest
+  (Section 9.3 step 3) and before its target write (step 4) — and
+  `CONSEMA_APPLY_WRITE_FAILURE=permission|io` fails the first atomic
+  target write with the named `cli.write.*` error. These two variables
+  are the CLI's only environment reads (Section 2.2, Section 15); they
+  are documented here and in `--help`; an absent, malformed, or
+  out-of-range value disables the injection, and no other command reads
+  the environment.
 
 ## 6. Command-level payload records
 
@@ -455,7 +479,7 @@ cli.parse-facts@1 (nested, CLI-local):
 2. Any command that needs parsing requires an explicit `--profile` (or
    `--format`): absence is a usage error (exit 1), never "try and see"; no
    "try every dialect" automatic attempts exist (INI precedent:
-   IMPLEMENTATION.md line 127).
+   IMPLEMENTATION.md line 132).
 3. On ambiguity, parse-class operations fail (exit 2,
    `cli.detection.ambiguous@1`) and stderr lists the candidates, reasons,
    and usage hints; `consema inspect` itself reports ambiguity
@@ -474,7 +498,7 @@ cli.parse-facts@1 (nested, CLI-local):
 
 `consema plan` is **read-only**: per file, parse → `EditTransaction`
 dry_run → aggregate manifest. The plan manifest is an artifact, not a file
-write authorization (IMPLEMENTATION.md lines 261-263; roadmap §10, line
+write authorization (IMPLEMENTATION.md line 322; roadmap §10, line
 809); dry-run and the future commit must produce identical replacements
 and target digest (SECURITY.md line 26). `plan` never writes any target
 file (the manifest file may be written only via `--output`, and only to
@@ -663,6 +687,13 @@ any other digest                 → skipped-stale (exit 4)
   digest no longer matches.
 - Interruption exits 4 (Section 5.4); after a successful re-run with all
   `completed`, exit 0.
+- The interruption and write-failure injection points of Section 5.4
+  (`CONSEMA_APPLY_INTERRUPT_AFTER`, `CONSEMA_APPLY_WRITE_FAILURE`) are the
+  deterministic, testing/CI-only stand-in for OS signals on platforms
+  where the std-only binary cannot install a signal handler (Section 5.4).
+  They exercise exactly the recovery paths above — pending-left-behind,
+  failed-file re-report, completed-file skip — and must never change the
+  three-way rule itself.
 
 ### 9.5 Normative example (ResultEntry)
 
@@ -700,7 +731,7 @@ any other digest                 → skipped-stale (exit 4)
 - **Newline and encoding policy**: the CLI never transcodes and never
   rewrites newlines — raw bytes enter the `SourceSnapshot` and the raw
   rendered bytes are written (`Document::render()` is byte-exact,
-  IMPLEMENTATION.md line 68); UTF-16/ISO-8859-1 files pass through
+  IMPLEMENTATION.md line 73); UTF-16/ISO-8859-1 files pass through
   unchanged per their encoding facts (R-11).
 - **Read-only targets**: replacement rejects read-only targets
   (`cli.write.read-only@1`); a target that is a directory →
@@ -829,7 +860,10 @@ core.batch-result@1
 ```
 
 - `ErrorCodeRegistry::v7()`: the 166 v6 codes stay exactly unchanged; the
-  20 codes of Section 13.1 are appended (186 total).
+  20 codes of Section 13.1 are appended (186 total; 0.13.0 errata: the
+  audit-F3 fix additionally registered `json.projection.incomplete-document@1`
+  for the json Recovered-document gate, so the live v7 registry holds 187
+  codes — the frozen Section 13.1 list is unchanged).
 - `RegistryManifest::v7()`; `current()` points to v7 (precedent:
   registry_manifest.rs:77-78).
 - Old registries reject every new contract and code (RFC 0011 Section 10);
@@ -871,7 +905,11 @@ core.batch-result@1
   or environment-read path (roadmap §10, line 816; §19.2, lines
   1719-1732); the core's no-filesystem/no-env/no-network invariant is
   unaffected by the CLI layer (CLI file I/O is an explicit application
-  operation, §19.2, line 1734).
+  operation, §19.2, line 1734). The one exception is the documented
+  `apply` testing/CI injection seam (`CONSEMA_APPLY_INTERRUPT_AFTER`,
+  `CONSEMA_APPLY_WRITE_FAILURE`, Section 5.4): it reads exactly those two
+  variables, exists for no other command, and is documented in `--help`;
+  the two variables never change output determinism when unset.
 - **Path traversal**: `path` fields are used verbatim as supplied, without
   canonicalization; write paths reject symlink/junction by default
   (Section 10); `apply` re-reads and writes the same path spelling.
@@ -941,7 +979,11 @@ the full bytes.
 exit-code matrix, full plan→apply flow, failure injection
 (stale/conflict/permission/disk/read-only/interruption), and machine-output
 byte equality with the SDK encode (Section 3.3; implementation plan §8.3,
-§10).
+§10). Process-level interruption/write-failure injection drives the
+documented environment-variable seam of Section 5.4
+(`CONSEMA_APPLY_INTERRUPT_AFTER`, `CONSEMA_APPLY_WRITE_FAILURE`; the
+recovery semantics are in Section 9.4) — the deterministic stand-in for OS
+signals on the std-only binary.
 
 ### 16.4 conformance command boundary
 
@@ -952,7 +994,7 @@ self-check — no repository fixtures) and outputs `cli.conformance@1`
 the full language-neutral suite stays repository-level
 (`cargo test -p consema-conformance`). Release artifacts do not include
 `conformance/vectors` (precedent: consema-conformance `publish = false`,
-IMPLEMENTATION.md line 62).
+IMPLEMENTATION.md line 65).
 
 ## 17. Rejected alternatives
 
@@ -961,7 +1003,7 @@ IMPLEMENTATION.md line 62).
   output schema; only the established path of fixed-field PortableValue +
   canonical JSON/PVCE dual transport + typed-decoder revalidation can be
   proven by language-neutral vectors (precedent: protocol-v1/v2 dual
-  transport equivalence, IMPLEMENTATION.md line 337; implementation plan
+  transport equivalence, IMPLEMENTATION.md line 401; implementation plan
   §2.3). CLI convenience layers (human output, detection-facts display)
   stay local, and the detection-facts semantics (facts-only, ambiguity as a
   first-class result) remain part of the cross-language contract.
@@ -1062,5 +1104,7 @@ IMPLEMENTATION.md line 62).
 - dual-transport equivalence: the three v7 payloads are byte-equivalent
   between canonical JSON and PVCE and round-trip (M2 acceptance gate);
 - v1-v6 registry frozen assertions stay green; v7 is 41 contracts / 186
-  codes, strictly sorted (M2 acceptance gate);
+  codes, strictly sorted (M2 acceptance gate; 0.13.0 errata: the audit-F3
+  fix registered `json.projection.incomplete-document@1` in v7, 187 codes
+  total, pinned by the error_registry test);
 - the total suite count reaches 17 → 18 all green (M9/M10).

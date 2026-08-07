@@ -47,9 +47,10 @@
 
 - `xml.projection.recovered-document@1`：`crates/consema-xml/src/projection.rs:461`；被 `xml-1-0-safe-v1.json` 钉死。
 - `ini.projection.incomplete-document@1`（`consema-ini/src/projection.rs:888`）、`java-properties.projection.incomplete-document@1`（`consema-properties/src/projection.rs:743`）、`plist.projection.incomplete-document@1`（`consema-plist/src/projection.rs:395`；`plist-v1.json` 钉死）、`hcl.projection.incomplete-document@1`（`consema-hcl/src/projection.rs:470`）。
+- `json.projection.incomplete-document@1`（`consema-json/src/projection.rs:756`，0.13.0 的 json Recovered-document 门禁）：随 audit F3 处置在 0.13.0 注册进 v7 error registry（`error_registry.rs`），见下 disposition。
 - `json.projection.semantic-unavailable@1`（`consema-json/src/projection.rs:753`）：**不同概念**（JSON5 语义不可用，非 Recovered 文档拒绝），不并入本条。
 
-**Disposition：exempt-with-reason。** 全部 code 已注册（RFC 0011 registry）并被各家族 RFC（0009/0010/0012/0013/0014）与 vector 冻结。真实漂移只有一处：xml 独用 `recovered-document`，其余四家一致用 `incomplete-document`。后续窗口：semantic-model v8 将 `xml.projection.recovered-document@1` 更名 `xml.projection.incomplete-document@1`（保留旧 code 为 deprecated alias 至 1.0.0）。0.13.0 冻结。记入 FC manifest。
+**Disposition：exempt-with-reason。** 全部 code 已注册：其余五家（ini/java-properties/plist/hcl/json 的 `incomplete-document@1` 与 xml 的 `recovered-document@1`）都在 RFC 0011 registry（v5/v6）或被各家族 RFC（0009/0010/0012/0013/0014）与 vector 冻结；json 的 `json.projection.incomplete-document@1` 由 0.13.0 的 Recovered-document 门禁引入（`consema-json/src/projection.rs:756`），初版 F4 核对时遗漏注册，已随 audit F3 处置注册进 v7（`error_registry.rs`，Projection/0.13.0，v7 计数 186 → 187）并被 registry 测试钉死。真实漂移只有一处：xml 独用 `recovered-document`，其余五家一致用 `incomplete-document`。后续窗口：semantic-model v8 将 `xml.projection.recovered-document@1` 更名 `xml.projection.incomplete-document@1`（保留旧 code 为 deprecated alias 至 1.0.0）。0.13.0 冻结。记入 FC manifest。
 
 ### F10 — `formation_status()` vs `status()`
 
@@ -182,8 +183,8 @@
 ## 5. facade/feature 复查（§15.6 第 1416-1421 行）
 
 - **facade 依赖面**：`crates/consema/Cargo.toml` 13 个依赖全部为 consema-* path 依赖；**无 `[features]` 段**——与 plan §1.6"facade 依赖 13 个 backend；无 [features]"一致。无 feature 即无 feature 组合面，§15.6"feature 关系清楚"成立（单一全量面）。
-- **facade 表面与 CHANGELOG 声称一致**：8 个 `Document::parse_*`（`lib.rs:535-634`）+ 8 个 `as_*` 适配器（`:710-816`）+ 8 个 `convert_*`（`conversion.rs:346-597`）+ `registry` 模块（families 8 / profiles 16 / query_domains 21 / operation_registry 16 / parse_document）+ `pub use consema_* as *` 重导出——与 CHANGELOG.md:9/21/56/77/94/114 声称逐项相等。
-- **`consema capabilities` 由 facade 派生**：capabilities.rs 走 `registry::format_families()/profiles()/query_domains()/operation_registry()`，无重复声明（RFC 0015 硬门禁 1）；`cli_m4.rs` 测试断言 16 profiles / 8 families / 21 query domains / 186 v7 error codes 与 registry 相等（`cli_m4.rs:160`）。
+- **facade 表面与 CHANGELOG 声称一致**：8 个 `Document::parse_*`（`lib.rs:535-634`）+ 8 个 `as_*` 适配器（`:710-816`）+ 8 个 `convert_*`（`conversion.rs:346-597`）+ `registry` 模块（families 8 / profiles 16 / query_domains 21 / operation_registry 16 / parse_document）+ `pub use consema_* as *` 重导出——与 CHANGELOG.md:9/21/57/78/95/115 声称逐项相等。
+- **`consema capabilities` 由 facade 派生**：capabilities.rs 走 `registry::format_families()/profiles()/query_domains()/operation_registry()`，无重复声明（RFC 0015 硬门禁 1）；`cli_m4.rs` 测试断言 16 profiles / 8 families / 21 query domains / 187 v7 error codes 与 registry 相等（`cli_m4.rs:160`，0.13.0 audit F3 注册 `json.projection.incomplete-document@1` 后 186 → 187）。
 - **CLI 只走 public API**：`src/bin/consema/` 无 parse/query/project/materialize/edit/convert 实现（全部调用 facade）；本次 B-6/B-9 修复保持该结构（仅改 wire 映射与诊断绑定）。
 
 ## 6. backend AST 与第三方错误类型泄漏复查（§15.6 第 1417 行）

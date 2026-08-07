@@ -242,6 +242,65 @@ the unchanged budget upper bounds (not re-measured post-fix):
   future -Check runs may raise S3/S4 N back toward the N=200 standard
   (documented in §12).
 
+### 7.1 Convert budget rows (JSON → YAML, B-8)
+
+Audit finding B-8: the JSON→YAML `convert` path had no frozen budget row
+(so -Check could not catch regressions there), and its documented "1.01 s,
+linear" claim (pilot F-2) did not reproduce under the round-2 audit's
+reconstructed inputs: nested shapes measured 5.1-7.2 s at 294-354 KB and
+1.24 s → 7.4 s for 2000 → 4000 items (≈6×). Root cause of the residual
+superlinearity (fixed 2026-08-07, same session): two independent quadratic
+components, both in `crates/consema-yaml/src/`:
+
+- **Composer span resolution** (`native.rs`, the collection-start branches):
+  the single-pass `RawByteResolver` walk restarted from byte 0 for every
+  nested collection because the mapping/sequence covering span was resolved
+  only after its children (O(nodes × source)). Evidence: 12,002 resolver
+  restarts / 3.8 G chars walked for a 636 KB nested document; a reindented
+  copy of the same bytes parsed 113× faster. Fixed by resolving the
+  collection start span eagerly at event consumption time (event spans
+  arrive in non-decreasing order); regression net
+  `large_nested_materialization_stays_within_linear_budget`
+  (`crates/consema-yaml/src/materialization.rs`).
+- **Provenance-map linear scans** (`projection.rs` value/graph provenance,
+  `materialization.rs` value provenance): every origin lookup ran
+  `position()`/`find()` over the whole provenance map (O(entries) per node).
+  Fixed with a location → entry-index `HashMap` preserving the exact entry
+  order and duplicate semantics; the unit accounting and failure codes are
+  unchanged.
+
+Post-fix scaling (whole-process CLI `consema convert`, release build, this
+machine, serial runs without concurrent cargo/rustc processes; N=7 per row,
+nearest-rank percentiles per §2):
+
+| Scenario | Corpus (bytes, SHA-256) | Style | Operation | p50 ns/op | p95 ns/op |
+|---|---|---|---|---|---|
+| C1 flat object | scenario-convert-flat.json (400,001, `684d35fe825daf6f6f83b6c085543b6dec4055ef0540c47f3285f649052efd6f`) | block | convert JSON→YAML, 8,000 keys | 102,700,000 | 114,500,000 |
+| C2 pilot-density flat | scenario-convert-pilot-flat.json (320,001, `1b8e7bf3e6cd2e22dade8394249ddedabb1c9e3d807894d4a88aeaf7f2423afc`) | block | convert JSON→YAML, 5,000 keys, 67 B/item | 72,300,000 | 80,100,000 |
+| C3 nested objects | scenario-convert-nested.json (496,001, `7c3cce7c64324b53ec21408ecf431360f4fa27c066fb4645a3ed607e1cf0e3b8`) | block | convert JSON→YAML, 8,000 items × depth 4 | 381,100,000 | 465,600,000 |
+| C4 arrays | scenario-convert-array.json (480,001, `c475bb48f4ed2122348f5ec1ccea324f0be5d923e7ec0faf55e98854f40096a2`) | block | convert JSON→YAML, 8,000 × 5-element arrays | 405,800,000 | 460,200,000 |
+| C5 nested objects, flow | scenario-convert-nested.json (same corpus) | flow | convert JSON→YAML, same input | 373,600,000 | 381,800,000 |
+
+Scaling evidence (same binary, median of 7 runs, block style):
+
+| Shape | 1,000 items | 2,000 items | 4,000 items | 8,000 items | doubling ratio (2k→8k) |
+|---|---:|---:|---:|---:|---:|
+| flat (50 B/item) | 18.1 ms | 29.4 ms | 54.2 ms | 102.7 ms | 1.7-1.9× |
+| nested (depth 4) | 44.2 ms | 116.7 ms | 257.1 ms | 381.1 ms | 1.7-2.2× |
+| arrays (5 items) | — | 93.5 ms | 194.1 ms | 405.8 ms | 2.0-2.1× |
+
+Pre-fix reference on the same inputs (this machine, same binary shape):
+nested 4,000 items (300 KB): 6.66 s → 0.257 s (~26×); arrays 4,000 items:
+5.56 s → 0.194 s (~29×); the audit's 2000→4000 ≈6× ratio measured 6.6×
+pre-fix and 2.2× post-fix. The pilot F-2 claim "big-nf5000 (335,312 B) →
+1.01 s" does not reproduce on this machine either direction: the same
+shape class (C2, 320,001 B) measures **66.5-72.3 ms p50** post-fix (two
+serial sessions) — the pilot's figure remains a conservative upper bound
+and is superseded by this row (pilot-0.13.0.md F-2 correction note). The
+C1-C5 rows are the -Check comparison contract for the convert path from
+0.13.0 on (§11; the audit noted no frozen convert row existed before this
+section).
+
 ## 8. Regression policy (§20.3, frozen text)
 
 Effective 0.13.0; implements roadmap §20.3 and §15.5 第 1408 行 and the M5
@@ -392,6 +451,11 @@ consema query --profile json.strict --request-file <C>\cli-query-large.json --ma
 consema inspect <C>\scenario-deep.json --profile json.strict
 consema inspect <C>\scenario-many-dup.properties --profile java-properties.reader
 consema inspect <C>\scenario-many-small.xml --profile xml.1.0-safe
+consema convert <C>\scenario-convert-flat.json --profile json.strict --request-file <C>\convert-json-yaml-block.json --max-bytes 100000000
+consema convert <C>\scenario-convert-pilot-flat.json --profile json.strict --request-file <C>\convert-json-yaml-block.json --max-bytes 100000000
+consema convert <C>\scenario-convert-nested.json --profile json.strict --request-file <C>\convert-json-yaml-block.json --max-bytes 100000000
+consema convert <C>\scenario-convert-array.json --profile json.strict --request-file <C>\convert-json-yaml-block.json --max-bytes 100000000
+consema convert <C>\scenario-convert-nested.json --profile json.strict --request-file <C>\convert-json-yaml-flow.json --max-bytes 100000000
 ```
 
 Request records: `cli-query-package.json` and `cli-query-large.json` are
@@ -405,7 +469,18 @@ properties, representability ExactOnly, limits 1,000,000 input nodes /
 64 MiB output / depth 256 / 100,000 report entries / 2,000,000 provenance
 entries); `cli-batch-edit.json` is `cli.edit-request@1` with
 `ini.edit.replace-semantic-value@1` on entry `window:width` (occurrence 0,
-value 1600, policy preserve-compatible).
+value 1600, policy preserve-compatible). The §7.1 convert request files are
+`cli.convert-request@1` (schema, projection_request
+`json.projection.best-exact-core` with default exact-or-reject policy,
+materialization_request `core.materialization-request@2` with target profile
+`yaml.1.2-core`, style `yaml.canonical-block` /
+`yaml.canonical-flow`, encoding Utf8, newline Lf, mapping policy
+UniqueStringEntriesToObject, representability ExactOnly, limits 2,000,000
+input nodes / 64 MiB output / depth 256 / 100,000 report entries / 2,000,000
+provenance entries); their SHA-256 are
+`7d4c8c9de66edba4bc6f745a1e1dbe1531ec30d65b6d62ec28fd41ffa53ac44c`
+(block) and
+`c36deb0ddc5a1ca52b5bbd04358312ad9417075367a29d1d75a3e93c6ac8205f` (flow).
 
 ### 10.3 Scenario corpus generation (deterministic)
 
@@ -443,6 +518,57 @@ for ($i = 0; $i -lt 20000; $i++) {
 [System.IO.File]::WriteAllBytes("scenario-many-small.xml", $utf8.GetBytes($sb3.ToString()))
 ```
 
+The five §7.1 convert corpora (key = `"key"` + 6-digit zero-padded index +
+`"-"` + `$w` copies of `"x"`; compact JSON `{...}` with `,`/`:` separators,
+no spaces — the PowerShell string building below reproduces the digests of
+§7.1 byte-for-byte):
+
+```powershell
+# C1: 8,000-key flat object, 50 B/item
+$sbC = New-Object System.Text.StringBuilder(410000)
+[void]$sbC.Append("{")
+for ($i = 0; $i -lt 8000; $i++) {
+  if ($i -gt 0) { [void]$sbC.Append(",") }
+  $key = "key" + $i.ToString("D6") + "-" + ("x" * 35)
+  [void]$sbC.Append('"').Append($key).Append('":1')
+}
+[void]$sbC.Append("}")
+[System.IO.File]::WriteAllBytes("scenario-convert-flat.json", $utf8.GetBytes($sbC.ToString()))
+
+# C2: 5,000-key flat object, 67 B/item (pilot F-2 density)
+$sbC2 = New-Object System.Text.StringBuilder(330000)
+[void]$sbC2.Append("{")
+for ($i = 0; $i -lt 5000; $i++) {
+  if ($i -gt 0) { [void]$sbC2.Append(",") }
+  $key = "key" + $i.ToString("D6") + "-" + ("x" * 49)
+  [void]$sbC2.Append('"').Append($key).Append('":1')
+}
+[void]$sbC2.Append("}")
+[System.IO.File]::WriteAllBytes("scenario-convert-pilot-flat.json", $utf8.GetBytes($sbC2.ToString()))
+
+# C3/C5: 8,000 items, each {"c": {"b": 1}} (depth 4), 62 B/item
+$sbC3 = New-Object System.Text.StringBuilder(510000)
+[void]$sbC3.Append("{")
+for ($i = 0; $i -lt 8000; $i++) {
+  if ($i -gt 0) { [void]$sbC3.Append(",") }
+  $key = "key" + $i.ToString("D6") + "-" + ("x" * 35)
+  [void]$sbC3.Append('"').Append($key).Append('":{"c":{"b":1}}')
+}
+[void]$sbC3.Append("}")
+[System.IO.File]::WriteAllBytes("scenario-convert-nested.json", $utf8.GetBytes($sbC3.ToString()))
+
+# C4: 8,000 items, each [1,2,3,4,5], 60 B/item
+$sbC4 = New-Object System.Text.StringBuilder(490000)
+[void]$sbC4.Append("{")
+for ($i = 0; $i -lt 8000; $i++) {
+  if ($i -gt 0) { [void]$sbC4.Append(",") }
+  $key = "key" + $i.ToString("D6") + "-" + ("x" * 35)
+  [void]$sbC4.Append('"').Append($key).Append('":[1,2,3,4,5]')
+}
+[void]$sbC4.Append("}")
+[System.IO.File]::WriteAllBytes("scenario-convert-array.json", $utf8.GetBytes($sbC4.ToString()))
+```
+
 (`$utf8 = New-Object System.Text.UTF8Encoding($false)`.) The batch corpus is
 100 byte-identical copies of `ini/desktop-settings.ini` named
 `settings-NNN.ini`, regenerated between apply invocations. The plan command
@@ -456,7 +582,8 @@ The M5 acceptance gate "CI 或定期复核可执行" is served by a -Check job (
 CI workflow file is owned by the M1/M3 milestones; this section is the
 contract the job implements). The job re-runs the §10.1/§10.2 commands —
 SDK rows at 15 samples, CLI rows at N=200 (scenario rows S3 at N=30 and S4
-at N=1 per §12), plan at N=50, apply at N=20 with corpus regeneration — on
+at N=1 per §12, convert rows C1-C5 at N=30), plan at N=50, apply at N=20
+with corpus regeneration — on
 the pinned environment, computes the same percentiles, and compares against
 §4/§5/§6/§7:
 
@@ -477,11 +604,16 @@ cargo run --locked --offline --release -p consema-conformance --example hcl_base
 - Frequency: at every release-candidate gate run and on demand; trends are
   reported on the main branch without gate effect, baselines are frozen on
   release branches (§8 item 2).
-- Estimated full -Check cost on the pinned machine: ~25-30 minutes.
+- Estimated full -Check cost on the pinned machine: ~25-30 minutes
+  (convert rows C1-C5 add ~30 × (0.1-0.45 s per invocation) ≈ 30 s).
 
 ## 12. Honest coverage statement
 
 Measured (all real, on this machine, 2026-08-07): every row in §4/§5/§6/§7.
+The §7.1 convert rows were measured in a separate serial session (no
+concurrent cargo/rustc processes; the §4-§7 rows ran under the concurrent
+load described in §1), N=7 per row with nearest-rank percentiles; the frozen
+convert values are therefore on the same environment discipline as §4-§7.
 
 Could not be measured at freeze time (each is a documented gap with a
 method):

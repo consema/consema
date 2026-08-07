@@ -60,6 +60,58 @@ jobs:
       - name: cargo test --workspace --locked
         run: cargo test --workspace --locked
 
+  # Coverage trend gate (gate plan §4 M3 standing toolchain; roadmap §18.3
+  # "Coverage 不替代语义证明"): scripts/coverage.ps1 measures the workspace
+  # with cargo-llvm-cov over the test job's target set
+  # (--workspace --all-targets --locked) and enforces the hard floors
+  # (regions >= 70 / functions >= 70 / lines >= 80, --fail-under-* on every
+  # invocation). -Trend additionally compares the workspace totals against
+  # the report committed at HEAD (docs/COVERAGE-0.13.0.md) and fails when any
+  # metric drops >= 1.0 pp -- the standing executor for the frozen trend
+  # gate. The measured report is uploaded as an artifact (also on gate
+  # failure, per the script's "evidence for the disposition" rule) and the
+  # committed report is then restored, so this job gates regressions without
+  # ever rewriting the committed numbers; per the script's own policy the
+  # committed report is refreshed only by a release-milestone
+  # `powershell -File scripts/coverage.ps1 -Trend` run.
+  coverage:
+    name: coverage (hard floors + -Trend vs committed report)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: llvm-tools-preview
+      - uses: swatinem/rust-cache@v2
+      - name: cargo install cargo-llvm-cov
+        run: cargo install cargo-llvm-cov
+      - name: scripts/coverage.ps1 -Trend (gate, keep artifact, restore committed report)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $coverageScript = Join-Path $env:GITHUB_WORKSPACE 'scripts/coverage.ps1'
+          $report = Join-Path $env:GITHUB_WORKSPACE 'docs/COVERAGE-0.13.0.md'
+          $artifactDir = Join-Path $env:GITHUB_WORKSPACE 'target/coverage'
+          New-Item -ItemType Directory -Path $artifactDir -Force | Out-Null
+          & $coverageScript -Trend
+          $code = $LASTEXITCODE
+          # Preserve the measured report for the artifact, then restore the
+          # committed report: this job measures and gates only, it never
+          # rewrites the numbers committed at HEAD.
+          if (Test-Path -LiteralPath $report) {
+            Copy-Item -LiteralPath $report -Destination (Join-Path $artifactDir 'COVERAGE-0.13.0.md') -Force
+          }
+          git -C $env:GITHUB_WORKSPACE checkout -- docs/COVERAGE-0.13.0.md
+          exit $code
+      - name: upload measured coverage report (also on gate failure)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: target/coverage/COVERAGE-0.13.0.md
+          if-no-files-found: warn
+
   # MSRV leg: rust-version = "1.85" is declared in the workspace manifest
   # (Cargo.toml rust-version) and must be really verified in CI (§15.6). It
   # runs the same gates as the stable legs on one OS.

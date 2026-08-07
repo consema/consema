@@ -34,13 +34,13 @@ properties/toml/xml/yaml/protocol/pvce`）与 Workspace 章节同步更新。
 |---|---|---|
 | `ContractRegistry::v6()` / `v7()` | 38 条记录 | 38 条冻结不变 + 3 条新增 |
 | 新增 contract | — | `core.cli-output@1`、`core.batch-plan@1`、`core.batch-result@1` |
-| `ErrorCodeRegistry::v6()` / `v7()` | 166 个 code | 166 个冻结不变 + 20 个 `cli.*`（usage 7/data 2/detection 1/limit 3/write 5/interrupted 1/internal 1） |
+| `ErrorCodeRegistry::v6()` / `v7()` | 166 个 code | 166 个冻结不变 + 20 个 `cli.*`（usage 7/data 2/detection 1/limit 3/write 5/interrupted 1/internal 1；0.13.0 另注册 `json.projection.incomplete-document@1`，v7 现 187 个 code） |
 | `RegistryManifest::current()` | 指向 v6 | **指向 v7** |
 
 对调用方的实际影响只有一处需要核对：**读取
 `RegistryManifest::current()` 的代码**（例如做兼容性断言、capability
 清单或版本报告的程序）现在会看到 `core.semantic-model@7`、41 条 contract
-与 186 个 code。如果你的代码断言"当前 manifest 是 v6/38/166"，需要改为
+与 187 个 code。如果你的代码断言"当前 manifest 是 v6/38/166"，需要改为
 断言 v7 或显式绑定 `RegistryManifest::v6()`（v1-v6 的 frozen constructor
 仍可精确构造，冻结断言测试保持全绿）。
 

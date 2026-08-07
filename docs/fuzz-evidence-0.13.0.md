@@ -13,7 +13,7 @@
 | OS | Microsoft Windows 11 Pro 10.0.26200 |
 | 工具链 | rustc 1.97.1 (8bab26f4f 2026-07-14) stable-x86_64-pc-windows-msvc；cargo 1.97.1 |
 | clang | 未安装（MSVC-only）——libfuzzer-sys 的 C++ runtime 无法链接，`cargo fuzz run` 在本机不可用（cargo-fuzz 0.13.2 已安装但每个 target 都需要 clang runtime；fuzz.rs:10-13 与 `crates/*/fuzz/README.md` 同述） |
-| 仓库 HEAD | 9c1ede20fab56829cfaeca6924ee115ff01cd5d2（脏树：M2 文件未提交 + 修复 agent 并发落地中，见 §5） |
+| 仓库 HEAD | 7e9de3825c74b9ee981bdf2d0a9316cdb1b0fd40（clean：M2 修复与语料已随 0.13.0 落地 commit 094f5d1/7e9de38 入库；会话期代码状态见 §5） |
 
 ## 2. 目标清单与迭代常数
 
@@ -45,33 +45,38 @@
 | 1-6 | 14:49-14:57 | 驱动脚本开发/排障（Start-Process 在该 .NET Framework 宿主上损坏 Process.CPU/ExitCode/HasExited 读取，已改用直接 .NET ProcessStartInfo 模式；问题与修复全程记录在 waves.log） | 无有效账本行（两波已运行测试全部通过，其 .out 日志为证；因观测失效未入账，不产生时长） |
 | 7 | 14:56-15:06 | 验证波：1 wave × 1 copy（17 进程） | 17 行入账，0 失败，0.091 CPU-hours |
 | 8 | 15:13:05-15:47:20（墙钟 34m15s） | 主累计运行：30 waves × 3 copies（51 进程/波） | **1530 行入账，0 失败，10.707 CPU-hours** |
+| 9 | 16:48:23-16:51:30（墙钟约 3m07s） | 主累计：2 copies（34 进程/波）；waves 1-3 完成入账，wave 4 启动后未入账（operator ~16:51:30 停止驱动，无 session done 行） | 102 行入账，1,994.9 s（0.554 CPU-hours）；wave 3 的 10 行 exit=-1——外部终止（operator 停止 waves.log tail 监视器时的 TerminateProcess；waves.log 16:52:40 INCIDENT NOTE 分类非 fuzz finding，不清零、无 corpus regression），CPU 真实计入、变异未完成 |
+| 10 | 16:54:51-17:32:44（墙钟 37m53s 至 wave 43 完成；与 session 11 交错运行） | 主累计：2 copies（34 进程/波）；waves 1-43 | 1462 行入账，0 失败；waves 1-42（1428 行，31,106.7 s = 8.641 CPU-hours）计入本文档累计快照；wave 43（34 行）于 17:32:44 快照后入账；waves 44+ 仍在驱动中持续入账（无 session done 行） |
+| 11 | 17:21:19-17:32:22（墙钟 11m03s，含重建 4m57s） | 收尾：3 copies（51 进程/波）；waves 1-4 | 204 行入账，0 失败，4,935.7 s（1.371 CPU-hours）；驱动末行 **`session done: 3281 ledger rows; total CPU-hours=21.364 failures=0`**（17:32:22 快照，即 §3.2/§8 的累计基准；快照时 session 10 的 wave 43 尚未入账） |
 
-### 3.2 每 target 累计账本（数据源 runs.csv，1547 行 = session 7 的 17 行 + session 8 的 1530 行；全部 exit_code=0）
+> **快照基准（诚实口径）**：§3.2/§8 的累计数字以 session 11 的 session done 快照（17:32:22）为基准：3,281 行 = session 7 的 17 + session 8 的 1530 + session 9 的 102 + session 10（waves 1-42）的 1428 + session 11 的 204。快照后 session 10 的驱动仍在运行：wave 43（34 行，717.9 s = 0.199 CPU-hours）于 17:32:44 入账，waves 44+ 持续入账中（截至本文档更新时已至 wave 48，见 waves.log）——这些行不在本累计内，按 §4.4 协议在驱动结束后的会话更新中计入。
 
-每 target 91 次运行（session 7 1 次 + session 8 30 波 × 3 copy）。累计变异数 = 91 × 每 target 单次迭代常数（parse 400,000 / ops 75,000 / protocol 800,000）；全部 target 合计 **418,600,000 次变异**。时钟状态：全部 running（clean）——本会话无任何新 crash/panic/hang/limit bypass，无 target 清零。
+### 3.2 每 target 累计账本（数据源 runs.csv，3281 行 = session 7 的 17 行 + session 8 的 1530 行 + session 9 的 102 行 + session 10（waves 1-42）的 1428 行 + session 11 的 204 行；其中 3271 行 exit_code=0，10 行 exit=-1——session 9 wave 3 外部终止、已分类非 fuzz finding，见 §3.1）
+
+每 target 193 次运行（session 7 1 次 + session 8 30 波 × 3 copy 的 90 次 + session 9 3 波 × 2 copy 的 6 次 + session 10（waves 1-42）× 2 copy 的 84 次 + session 11 4 波 × 3 copy 的 12 次）。累计变异数 = 193 × 每 target 单次迭代常数（parse 400,000 / ops 75,000 / protocol 800,000；session 9 wave 3 的 10 行按计划常数计入但实际变异未完成，见 §3.1）；全部 target 合计 **887,800,000 次变异**。时钟状态：全部 running（clean）——本日无任何新 crash/panic/hang/limit bypass，无 target 清零。
 
 | target | 运行数 | 累计真实 CPU 秒 | CPU-hours | 累计变异数 | findings | 时钟 |
 |---|---|---|---|---|---|---|
-| json-parse | 91 | 3,452.4 | 0.959 | 36,400,000 | 0 | running (clean) |
-| json-ops | 91 | 1,338.4 | 0.372 | 6,825,000 | 0（M2-F1 已知，见 §6） | running (clean) |
-| toml-parse | 91 | 2,182.7 | 0.606 | 36,400,000 | 0 | running (clean) |
-| toml-ops | 91 | 658.7 | 0.183 | 6,825,000 | 0 | running (clean) |
-| yaml-parse | 91 | 4,463.5 | 1.240 | 36,400,000 | 0 | running (clean) |
-| yaml-ops | 91 | 1,729.5 | 0.480 | 6,825,000 | 0（M2-F2 已知，见 §6） | running (clean) |
-| ini-parse | 91 | 4,424.2 | 1.229 | 36,400,000 | 0 | running (clean) |
-| ini-ops | 91 | 1,830.1 | 0.508 | 6,825,000 | 0 | running (clean) |
-| properties-parse | 91 | 4,730.6 | 1.314 | 36,400,000 | 0 | running (clean) |
-| properties-ops | 91 | 2,594.0 | 0.721 | 6,825,000 | 0 | running (clean) |
-| xml-parse | 91 | 1,328.5 | 0.369 | 36,400,000 | 0 | running (clean) |
-| xml-ops | 91 | 406.9 | 0.113 | 6,825,000 | 0 | running (clean) |
-| plist-parse | 91 | 1,896.2 | 0.527 | 36,400,000 | 0 | running (clean) |
-| plist-ops | 91 | 481.8 | 0.134 | 6,825,000 | 0 | running (clean) |
-| hcl-parse | 91 | 3,618.8 | 1.005 | 36,400,000 | 0 | running (clean) |
-| hcl-ops | 91 | 1,193.7 | 0.332 | 6,825,000 | 0 | running (clean) |
-| protocol-decode | 91 | 2,542.2 | 0.706 | 72,800,000 | 0 | running (clean) |
-| **合计** | **1547** | **38,872.2** | **10.798** | **418,600,000** | **0 新** | — |
+| json-parse | 193 | 6,759.4 | 1.878 | 77,200,000 | 0 | running (clean) |
+| json-ops | 193 | 2,637.3 | 0.733 | 14,475,000 | 0（M2-F1 已知，见 §6） | running (clean) |
+| toml-parse | 193 | 4,293.1 | 1.193 | 77,200,000 | 0 | running (clean) |
+| toml-ops | 193 | 1,308.7 | 0.364 | 14,475,000 | 0 | running (clean) |
+| yaml-parse | 193 | 8,869.6 | 2.464 | 77,200,000 | 0 | running (clean) |
+| yaml-ops | 193 | 3,633.5 | 1.009 | 14,475,000 | 0（M2-F2 已知，见 §6） | running (clean) |
+| ini-parse | 193 | 8,776.3 | 2.438 | 77,200,000 | 0 | running (clean) |
+| ini-ops | 193 | 3,589.7 | 0.997 | 14,475,000 | 0 | running (clean) |
+| properties-parse | 193 | 9,447.4 | 2.624 | 77,200,000 | 0 | running (clean) |
+| properties-ops | 193 | 5,034.1 | 1.398 | 14,475,000 | 0 | running (clean) |
+| xml-parse | 193 | 2,621.4 | 0.728 | 77,200,000 | 0 | running (clean) |
+| xml-ops | 193 | 822.5 | 0.228 | 14,475,000 | 0 | running (clean) |
+| plist-parse | 193 | 3,735.8 | 1.038 | 77,200,000 | 0 | running (clean) |
+| plist-ops | 193 | 965.4 | 0.268 | 14,475,000 | 0 | running (clean) |
+| hcl-parse | 193 | 7,065.9 | 1.963 | 77,200,000 | 0 | running (clean) |
+| hcl-ops | 193 | 2,352.4 | 0.653 | 14,475,000 | 0 | running (clean) |
+| protocol-decode | 193 | 4,997.0 | 1.388 | 154,400,000 | 0 | running (clean) |
+| **合计** | **3281** | **76,909.5** | **21.364** | **887,800,000** | **0 新** | — |
 
-按格式家族（parse+ops 汇总）：json 1.331 / toml 0.789 / yaml 1.720 / ini 1.737 / properties 2.035 / xml 0.482 / plist 0.661 / hcl 1.337 CPU-hours；protocol（单 target）0.706。
+按格式家族（parse+ops 汇总）：json 2.610 / toml 1.556 / yaml 3.473 / ini 3.435 / properties 4.023 / xml 0.957 / plist 1.306 / hcl 2.616 CPU-hours；protocol（单 target）1.388。
 
 ### 3.3 波次执行方式与诚实口径
 
@@ -100,7 +105,7 @@
 |---|---|---|---|---|---|
 | M2-F1 | json project/edit | Recovered 文档被 project/edit 接受（错误完成状态） | P1 | 不清零（已知发现，计数器/断言跟踪） | 修复已落地工作树（projection.rs / edit.rs 的 RecoveredDocument 门）；驱动豁免已移除，严格断言生效（operation_fuzz.rs:123） |
 | M2-F2 | yaml native decode | 引号 `"~"` 解码为空（引号标量静默内容丢失） | P0（§18.4 静默损失） | 不清零（已知发现，trip-wire 跟踪） | 修复已落地工作树（native.rs `exact_empty_scalar` 仅 plain 样式重写）；trip-wire 生效（property_graph.rs） |
-| 本次会话（session 7-8） | 全部 17 target | 无新 crash/panic/hang/limit bypass（1547 次运行全部 exit 0） | — | 全部 running（clean） | 账本见 §3.2 |
+| 本日会话（session 7-11） | 全部 17 target | 无新 crash/panic/hang/limit bypass；3281 行账本中 3271 行 exit 0、10 行 exit=-1（session 9 wave 3 外部终止，已分类非 fuzz finding，见 §3.1） | — | 全部 running（clean） | 账本见 §3.2 |
 
 新发现协议：P0/P1 = 立即报告 + 最小输入入 corpus + 清零该 target 时钟；P2 = 记录并给发布判断。`1.0.0` 不允许未解决 P0/P1（§18.4 第 1689 行）。
 
@@ -114,18 +119,19 @@
 
 ## 8. 本会话累计与剩余（诚实陈述）
 
-**本会话（2026-08-07，session 7-8）真实累计：10.798 CPU-hours**（38,872.2 真实 CPU 秒，1547 次进程运行全部 exit 0，4.186 亿次变异；waves.log/runs.csv 为原始记录）。
+**本日（2026-08-07，session 7-11）真实累计：21.364 CPU-hours**（76,909.5 真实 CPU 秒；3281 行账本，其中 3271 行 exit 0、10 行 exit=-1（session 9 wave 3 外部终止，已分类非 fuzz finding，见 §3.1），8.878 亿次计划变异；waves.log/runs.csv 为原始记录；累计基准为 session 11 的 session done 快照 17:32:22，见 §3.1 快照说明）。
 
-- 每格式累计（CPU-hours）：json **1.331** / toml **0.789** / yaml **1.720** / ini **1.737** / properties **2.035** / xml **0.482** / plist **0.661** / hcl **1.337** / protocol（单 target）**0.706**。
-- 相对每格式 72 CPU-hours 门槛（§15.3，按格式家族），本会话最接近的 properties 也仅 2.8%；**72h 门槛未完成**，剩余部分按 §7 完成路径累计（clang 主机 cargo-fuzz 为主，本机协议续跑为备选）。
+- 每格式累计（CPU-hours）：json **2.610** / toml **1.556** / yaml **3.473** / ini **3.435** / properties **4.023** / xml **0.957** / plist **1.306** / hcl **2.616** / protocol（单 target）**1.388**。
+- 相对每格式 72 CPU-hours 门槛（§15.3，按格式家族），最接近的 properties 也仅 5.6%（4.023/72；其余：yaml 4.8%、ini 4.8%、hcl/json 3.6%、toml 2.2%、protocol 1.9%、plist 1.8%、xml 1.3%）；**72h 门槛未完成**，剩余部分按 §7 完成路径累计（clang 主机 cargo-fuzz 为主，本机协议续跑为备选）。
 - **确定性口径（重复声明）**：本机 in-process 波次在相同代码状态下覆盖相同的确定性变异计划（§3.3）；本会话期间修复 agent 多次落地（§5），因此波次覆盖了多个代码快照；会话内所有运行的真实时长均已入账，未测到/观测失败的运行记 0 或未入账（§3.1 时间线如实记录）。
 - **corpus regressions**：本会话无新发现，`conformance/corpora/mutation-v1.json` 的 `regressions` 数组未新增条目（保持空）。
-- **workspace 门禁**：`cargo test --workspace --locked` 于会话末尾对当前工作树运行，**1617 passed / 0 failed，exit 0 全绿**（完整日志 `docs/fuzz-evidence-0.13.0-logs/workspace-gate-2026-08-07.log`；修复 agent 的 M2-F1/M2-F2 严格断言随其工作树状态通过）。
+- **workspace 门禁**：`cargo test --workspace --locked` 于 session 8 结束时（15:49 前后）对当时工作树运行，**1617 passed / 0 failed，exit 0 全绿**（完整日志 `docs/fuzz-evidence-0.13.0-logs/workspace-gate-2026-08-07.log`；修复 agent 的 M2-F1/M2-F2 严格断言随其工作树状态通过）。
 - **corpus 全绿**：`cargo test -p consema-conformance --test mutation_corpus --locked -- --ignored` 全量 175k case replay 通过（63.10s，2026-08-07 15:49）。
 - 剩余工作：每格式累计至 72 CPU-hours 且零未解释问题；M2-F1/M2-F2 修复提交（工作树状态）后复核 trip-wire/严格断言继续全绿。
 
 ## 9. 开放事项
 
 - `crates/consema-conformance/examples/gen_mutation_corpus.rs:623` 硬编码 `"regressions": []`——M2 后续需改为保留 regressions 数组，否则 `--check` 与手工 regressions 条目冲突（本文档 §4 工作流不受影响，replay 测试已覆盖 regressions）。
-- M2-F1/M2-F2 修复的工作树状态→提交、以及修复 agent 收口后的复核（§8 记录本会话末尾的 workspace 门禁结果）。
+- M2-F1/M2-F2 修复的工作树状态→提交、以及修复 agent 收口后的复核（§8 记录 session 8 结束时的 workspace 门禁结果）。
+- session 10 的驱动在本文档累计快照（17:32:22）后仍在运行：wave 43（34 行，0.199 CPU-hours）已于 17:32:44 入账，waves 44+ 持续入账中（截至文档更新时已至 wave 48，尚无 session done 行）——按 §4.4 协议，待驱动结束后的会话更新把这些行计入。
 - session 7 的 wall_s 是"launch→波次结束"（该会话脚本尚未记录进程自身退出时刻；cpu_s 均为真实测量），session 8 起 wall_s 为进程自身存活时长——两段口径已在 runs.csv 中如实区分（§3.1 时间线）。

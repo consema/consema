@@ -293,6 +293,29 @@ lexeme/节点边界都走一次 → O(source × pieces) 的 O(n²) 形成形状�
 §7 修正注与 §12 复验记录）。BENCHMARKS 冻结预算未受影响——修复只改善
 性能，冻结值仍为有效上界。
 
+**F-2 复核修正（audit B-8，2026-08-07）：** 上述 "1.01 s、线性" 结论未完全
+复现：round-2 审计用重建输入测得嵌套形状 294-354 KB → 5.1-7.2 s（block 与
+flow 皆然）、2000→4000 items 1.24 s → 7.4 s（≈6×）。根因是修复后残余的两处
+独立超线性（均在 `crates/consema-yaml/src/`）：
+
+1. **Composer 覆盖 span 滞后解析**（`native.rs`）：集合的 covering span 在子
+   节点之后才解析，单遍 `RawByteResolver` 游标回退 → 每个嵌套集合重走全文
+   （O(nodes × source)）。证据：636 KB 嵌套文档 12,002 次回退、行走 38 亿
+   char；同字节去缩进副本解析快 113×。修复：集合起点 span 在事件消费时即
+   解析（事件 span 单调不减）；回归网
+   `large_nested_materialization_stays_within_linear_budget`。
+2. **Provenance 线性扫描**（`projection.rs` 的 value/graph provenance、
+   `materialization.rs` 的 value provenance）：每次 origin 记录对整个
+   provenance 表做 `position()`/`find()`（O(entries) per node）。修复：
+   location → entry 索引 `HashMap`，条目顺序与去重语义不变。
+
+修复后复测（同机、release、串行无并发构建，N=7）：嵌套 4,000 items
+（300 KB）6.66 s → 0.257 s（≈26×）、数组 4,000 items（5 元素/项）
+5.56 s → 0.194 s（≈29×）；所有形状 1k→8k 倍增比 1.7-2.2×（线性）。pilot
+形状同类（320,001 B flat 5,000 keys）**66.5-72.3 ms p50**（两次串行会话）
+—— 本 pilot 的 1.01 s 数字仍为保守上界，已被 BENCHMARKS-0.13.0.md §7.1
+C2 行取代（该节为 convert 路径新增冻结预算行，含 -Check 契约，见 §11）。
+
 ### F-3（文档/UX 不一致）— convert 的 `--output` 在本构建被拒绝，帮助文本与旧文档宣称可用
 
 ```text
