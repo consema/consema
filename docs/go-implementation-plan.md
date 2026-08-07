@@ -37,7 +37,7 @@
 2. **registry**：semantic-model v7 = 41 条 contract / 187 个 error code（README.md:32；fc-manifest 第 26 行；`crates/consema-protocol/src/registry_manifest.rs` 为序列化源；0.13.0 audit F3 注册 `json.projection.incomplete-document@1`，186 → 187）。
 3. **capability set**：8 families / 16 profiles / 21 query domains / 16 operation registries / 187 codes（fc-manifest 第 31 行；`consema capabilities` 实测）。
 4. **协议 payload**：RFC 0015 v7 记录（`crates/consema-protocol/src/cli.rs`：CliOutputMessage、BatchPlanMessage、BatchResultMessage、CliCommand、Redaction、BatchPlanFileStatus/BatchResultFileStatus；exit 分类 `crates/consema-protocol/src/exit_class.rs:11` 起 Success/Usage/Data/Limit/Precondition/Internal 六类）。
-5. **值模型**：PortableValue 八 kind（Object/Array/String/Integer/Decimal/BinaryFloat64/Boolean/Null，RFC 0016 §4.1 第 123-131 行）；对象有序条目且构造时拒重 key（第 141-143 行，RFC 0002 对象契约）；PVCE/1 与 PGCE/1 为唯一跨语言值字节面（§4.2 第 150-153 行）。
+5. **值模型**：PortableValue 十五 kind（Null/Boolean/Integer/Decimal/BinaryFloat32/BinaryFloat64/String/Bytes/Date/Time/LocalDateTime/OffsetDateTime/Sequence/Object/EntryMapping，RFC 0016 §4.1 第 123-127 行）；对象有序条目且构造时拒重 key（第 141-143 行，RFC 0002 对象契约）；PVCE/1 与 PGCE/1 为唯一跨语言值字节面（§4.2 第 150-153 行）。
 6. **规范边界事实**：差分 oracle exclusion inventory（HCL D-1..D-9、plist D-1..D-21、YAML 1 项，记录于 `conformance/oracles/hcl-go-v1/manifest.json` 与 `conformance/oracles/plist-macos-v1/manifest.json`）——这些是规范边界的冻结事实，Go 必须复现同样的接受/拒绝语义。
 7. **上游语料**（语言无关输入，Go 按里程碑消费）：toml-test v2.2.0（205+474）、yaml-test-suite data-2022-01-17（402）、JSON5 v2.2.3（83/83）、INI/Properties 五套运行时 oracle 36 项（README.md:34-37；fc-manifest 第 44-49 行）。
 
@@ -56,7 +56,7 @@
 
 | Go package（import path `consema.dev/consema/...`） | 对应（Rust） | 职责 |
 |---|---|---|
-| `core` | consema-core + consema-pvce | PortableValue 八 kind、strict equality/hash、PVCE/1 codec、BigInteger/Decimal 包装 |
+| `core` | consema-core + consema-pvce | PortableValue 十五 kind、strict equality/hash、PVCE/1 codec、BigInteger/Decimal 包装 |
 | `graph` | consema-graph | PortableGraph、graph equality、PGCE/1 codec |
 | `protocol` | consema-protocol | language-neutral codecs、contract registry、error registry、Diagnostic、CLI machine protocol records（RFC 0015） |
 | `document` | consema-document | SourceSnapshot、Span、NodeRef、ProfileId、FormationStatus、ParseLimits、MaterializationRequest、SourcePatch |
@@ -92,7 +92,7 @@
 
 ### 1.2 重新实现（Go 惯用实现，非 Rust 翻译）
 
-- **值模型**（RFC 0016 §4.1 第 121-146 行冻结）：`core.Value` 封闭接口八 kind，exhaustive matching 无静默 `default`（第 134-136 行）；`core.Object` = 有序 `[]core.Entry`（**绝不用 `map[string]Value`**，第 125 行）；`core.Integer` 包装 `*big.Int`（第 128 行）；`core.Decimal` 规范化十进制、无 float round-trip（第 129 行）；`core.BinaryFloat64` 精确 IEEE-754 binary64（第 130 行）；`Equal`/`Hash` 与顺序相关（第 137-140 行）；对象构造时拒重 key（第 141-143 行）。
+- **值模型**（RFC 0016 §4.1 第 121-146 行冻结）：`core.Value` 封闭接口十五 kind，exhaustive matching 无静默 `default`（第 134-136 行）；`core.Object` = 有序 `[]core.Entry`（**绝不用 `map[string]Value`**，第 125 行）；`core.Integer` 包装 `*big.Int`（第 128 行）；`core.Decimal` 规范化十进制、无 float round-trip（第 129 行）；`core.BinaryFloat64` 精确 IEEE-754 binary64（第 130 行）；`Equal`/`Hash` 与顺序相关（第 137-140 行）；对象构造时拒重 key（第 141-143 行）。
 - **PVCE/1、PGCE/1 codec**：从协议规范 + 向量重实现；字节与 Rust codec 相等由向量和跨语言字节断言证明（RFC 0016 §4.2 第 150-153 行；路线图 §16.1 第 1469 行硬门禁）。
 - **canonical JSON 传输**（RFC 0015 §3.2）：严格规范解码器，与 `consema-protocol` 的 canonical JSON 字节一致（RFC 0016 §4.2 第 152-153 行；protocol-v1/v2 双传输等价 32+11 case 先例）。
 - **protocol 注册表校验**：Diagnostic 构造校验未知 code / category 矛盾即协议错误（RFC 0016 §6 第 182 行；RFC 0011）；`protocol.ClassifyErrorCode` 一次实现（第 184 行），SDK 自身不分类。
@@ -145,7 +145,7 @@
 
 ### 2.1 0.14.0 — Go core、PVCE、PGCE 与协议（路线图 §16.1 第 1451-1473 行）
 
-- **G0.1（串行起点）**：`go/` scaffold（go.mod 最低版本冻结、目录骨架）+ `core` package——PortableValue 八 kind、有序 Object/Array、strict equality/hash、BigInteger/Decimal/BinaryFloat64、PVCE/1 encode/decode（RFC 0016 §4.1/§4.2）。2500-3500 行。
+- **G0.1（串行起点）**：`go/` scaffold（go.mod 最低版本冻结、目录骨架）+ `core` package——PortableValue 十五 kind、有序 Object/Array、strict equality/hash、BigInteger/Decimal/BinaryFloat64、PVCE/1 encode/decode（RFC 0016 §4.1/§4.2）。2500-3500 行。
 - **G0.2（‖，依赖 G0.1）**：`graph` package——PortableGraph、graph equality/hash、节点身份顺序（RFC 0006）、PGCE/1 codec（RFC 0016 §4.1 第 144-146 行）。1000-1500 行。
 - **G0.3（‖，依赖 G0.1）**：`protocol` package——language-neutral codecs、contract registry（v7 41 条）、error registry（v7 187 码）、Diagnostic 构造校验、Capability/Profile 描述符、QueryDefinition validation/binding、CLI machine protocol records（RFC 0015 v7：CliOutputMessage/BatchPlanMessage/BatchResultMessage）、`ClassifyErrorCode`（RFC 0016 §5.4/§6）。3500-5500 行。
 - **G0.4（串行，依赖 G0.1-G0.3）**：`conformance` package + `cmd/consema-conformance`——Go runner（§4.3）。2000-3000 行。
