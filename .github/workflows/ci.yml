@@ -1,0 +1,250 @@
+# Consema 0.13.0 gate: three-OS CI (roadmap §14.12 "Windows、Linux、macOS CI",
+# §15.6 "MSRV 在 manifest 中声明并在 CI 真正验证"). Every step maps to an
+# existing repository command or script; no repository secrets are required
+# (the audit job uses only the automatic GITHUB_TOKEN).
+#
+# Oracle skip contract: run-hcl-go-oracle.ps1 and run-plist-macos-oracle.ps1
+# exit 3 when their documented skip path applies (conformance/oracles/
+# hcl-go-v1/manifest.json and plist-macos-v1/manifest.json "skip_path"). The
+# oracles job treats exit 0 (ran and passed) and exit 3 (documented skip) as
+# success and any other exit code as failure.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  lint:
+    name: fmt + clippy + rustdoc (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: cargo fmt --check
+        run: cargo fmt --all -- --check
+      - name: cargo clippy (workspace, all-targets, -D warnings)
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: rustdoc (workspace, no-deps, -D warnings)
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --workspace --no-deps --locked
+
+  test:
+    name: cargo test --workspace (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+      - name: cargo test --workspace --locked
+        run: cargo test --workspace --locked
+
+  # MSRV leg: rust-version = "1.85" is declared in the workspace manifest
+  # (Cargo.toml rust-version) and must be really verified in CI (§15.6). It
+  # runs the same gates as the stable legs on one OS.
+  msrv:
+    name: MSRV 1.85 gates (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.85.0
+        with:
+          components: rustfmt, clippy
+      - uses: swatinem/rust-cache@v2
+      - name: cargo fmt --check
+        run: cargo fmt --all -- --check
+      - name: cargo clippy (workspace, all-targets, -D warnings)
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: rustdoc (workspace, no-deps, -D warnings)
+        env:
+          RUSTDOCFLAGS: -D warnings
+        run: cargo doc --workspace --no-deps --locked
+      - name: cargo test --workspace --locked
+        run: cargo test --workspace --locked
+
+  # The repository freezes 18 language-neutral conformance suites with
+  # 508/508 cases (README.md "18 套语言无关 conformance suite 共 508/508
+  # cases"; CHANGELOG.md). The explicit job runs the crate's full test set
+  # (lib suites + per-format hardening/fixtures/publication integration
+  # tests) and then asserts the frozen counts from the vector files so a
+  # vector added or removed without updating the record fails CI.
+  conformance:
+    name: conformance + hardening + fixtures (18 suites / 508 cases)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+      - name: cargo test -p consema-conformance --locked
+        run: cargo test -p consema-conformance --locked
+      - name: suite-count assertions
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $vectorDir = Join-Path $env:GITHUB_WORKSPACE 'conformance/vectors'
+          $suites = 0
+          $cases = 0
+          foreach ($file in Get-ChildItem -LiteralPath $vectorDir -Filter '*.json') {
+            $vector = Get-Content -LiteralPath $file.FullName -Raw -Encoding utf8 | ConvertFrom-Json
+            if (-not ($vector.suite -like 'consema.*')) {
+              throw "unexpected suite id in $($file.Name): $($vector.suite)"
+            }
+            $suites += 1
+            $cases += @($vector.cases).Count
+          }
+          if ($suites -ne 18 -or $cases -ne 508) {
+            throw "suite-count mismatch: expected 18 suites / 508 cases, got $suites suites / $cases cases"
+          }
+          Write-Output "suite-count: $suites suites, $cases cases"
+
+  deny:
+    name: cargo deny check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: embarkstudios/cargo-deny-action@v2
+        with:
+          command: check
+          command-arguments: advisories bans licenses sources
+
+  # No-fetch cargo audit: rustsec/audit-check pins the RustSec advisory
+  # database through the action instead of letting cargo-audit fetch it.
+  audit:
+    name: cargo audit (RustSec advisory DB)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      checks: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: rustsec/audit-check@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+  # API/semver gate (§15.6 "Rust public API 完成独立审查"): the workspace
+  # version is 0.8.0 (Cargo.toml) and the last released state is the v0.8.0
+  # git tag, so the baseline is the tagged source tree (the crates are not
+  # published to crates.io). The 11 crates that already existed at v0.8.0
+  # are checked for breaking changes since the tag; the three crates added
+  # after 0.8.0 (consema-xml/plist/hcl) have no baseline and are excluded.
+  semver:
+    name: cargo-semver-checks (baseline v0.8.0)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: checkout v0.8.0 baseline
+        uses: actions/checkout@v4
+        with:
+          path: baseline
+          ref: v0.8.0
+          fetch-depth: 1
+      - uses: obi1kenobi/cargo-semver-checks-action@v2
+        with:
+          baseline-root: baseline
+          package: >-
+            consema,
+            consema-core,
+            consema-document,
+            consema-graph,
+            consema-ini,
+            consema-json,
+            consema-properties,
+            consema-protocol,
+            consema-pvce,
+            consema-toml,
+            consema-yaml
+
+  # Differential oracles with documented skip paths (§14.12 "differential").
+  # run-hcl-go-oracle.ps1: requires the pinned Go toolchain under
+  # target/oracles/go-1.26.5; when absent it exits 3 (documented skip). The
+  # pinned runtime facts (go.os=windows, windows_build=10.0.26200.0) can
+  # only match a pinned Windows host, so hosted runners take the skip path.
+  # run-plist-macos-oracle.ps1: runs on macOS (plutil + pinned Swift
+  # toolchain per manifest runtime pins) and exits 3 on Windows/Linux
+  # (documented skip). Exit 3 is wired as success per the manifests'
+  # "skip_path" records; any other non-zero exit fails the job.
+  oracles:
+    name: differential oracles (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.5'
+      - name: run differential oracles (exit 3 = documented skip = success)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($script in @('run-hcl-go-oracle.ps1', 'run-plist-macos-oracle.ps1')) {
+            $path = Join-Path $env:GITHUB_WORKSPACE "scripts/$script"
+            Write-Output "==> $script"
+            & $path
+            $code = $LASTEXITCODE
+            if ($code -eq 3) {
+              Write-Output "$script: documented skip (exit 3) treated as success"
+              continue
+            }
+            if ($code -ne 0) {
+              Write-Output "$script: failed with exit code $code"
+              exit $code
+            }
+          }
+
+  # Package-archive verification (§15.6 "release artifact 可从干净环境重建",
+  # scripts/verify-package-archives.ps1): on a clean checkout the script
+  # packages every publishable crate, verifies tar-path safety and lockfile
+  # checksums, checks each unpacked crate offline, and builds each crate
+  # with the declared MSRV (1.85, from workspace rust-version) because the
+  # MSRV leg is part of the 0.13.0 gate. cargo fetch warms the offline
+  # cache that the script's --offline invocations rely on.
+  package:
+    name: verify-package-archives (with MSRV leg)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: dtolnay/rust-toolchain@1.85.0
+      - uses: swatinem/rust-cache@v2
+      - name: cargo fetch --locked
+        run: cargo fetch --locked
+      - name: scripts/verify-package-archives.ps1
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts/verify-package-archives.ps1'
+          & $script
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
