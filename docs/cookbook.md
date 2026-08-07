@@ -188,7 +188,7 @@ report + provenance）：
 `UniqueStringEntriesToObject`）：
 
 ```json
-{"schema":"core.portable-value-json@1","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"cli.convert-request@1"}},{"key":"projection_request","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.projection-request@1"}},{"key":"target","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"json.projection.best-exact-core"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"default_policy","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"core.projection.exact-or-reject"}},{"key":"version","value":{"type":"Integer","value":"1"}},{"key":"arguments","value":{"type":"Object","entries":[]}}]}},{"key":"rules","value":{"type":"Sequence","items":[]}},{"key":"limits","value":{"type":"Object","entries":[]}}]}},{"key":"materialization_request","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.materialization-request@2"}},{"key":"target_profile","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"toml.1.0"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"style","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"toml.canonical-document"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"encoding","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.source-encoding@1"}},{"key":"kind","value":{"type":"String","value":"Utf8"}},{"key":"windows_code_page","value":{"type":"Null"}}]}},{"key":"newline","value":{"type":"String","value":"Lf"}},{"key":"mapping_policy","value":{"type":"String","value":"UniqueStringEntriesToObject"}},{"key":"representability","value":{"type":"String","value":"ExactOnly"}},{"key":"limits","value":{"type":"Object","entries":[{"key":"max_input_nodes","value":{"type":"Integer","value":"1000000"}},{"key":"max_output_bytes","value":{"type":"Integer","value":"67108864"}},{"key":"max_depth","value":{"type":"Integer","value":"256"}},{"key":"max_report_entries","value":{"type":"Integer","value":"100000"}},{"key":"max_provenance_entries","value":{"type":"Integer","value":"2000000"}}]}}]}}]}}]}
+{"schema":"core.portable-value-json@1","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"cli.convert-request@1"}},{"key":"projection_request","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.projection-request@1"}},{"key":"target","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"json.projection.best-exact-core"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"default_policy","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"core.projection.exact-or-reject"}},{"key":"version","value":{"type":"Integer","value":"1"}},{"key":"arguments","value":{"type":"Object","entries":[]}}]}},{"key":"rules","value":{"type":"Sequence","items":[]}},{"key":"limits","value":{"type":"Object","entries":[]}}]}},{"key":"materialization_request","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.materialization-request@2"}},{"key":"target_profile","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"toml.1.0"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"style","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"toml.canonical-document"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"encoding","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.source-encoding@1"}},{"key":"kind","value":{"type":"String","value":"Utf8"}},{"key":"windows_code_page","value":{"type":"Null"}}]}},{"key":"newline","value":{"type":"String","value":"Lf"}},{"key":"mapping_policy","value":{"type":"String","value":"UniqueStringEntriesToObject"}},{"key":"representability","value":{"type":"String","value":"ExactOnly"}},{"key":"limits","value":{"type":"Object","entries":[{"key":"max_input_nodes","value":{"type":"Integer","value":"1000000"}},{"key":"max_output_bytes","value":{"type":"Integer","value":"67108864"}},{"key":"max_depth","value":{"type":"Integer","value":"256"}},{"key":"max_report_entries","value":{"type":"Integer","value":"100000"}},{"key":"max_provenance_entries","value":{"type":"Integer","value":"2000000"}}]}}]}}]}}
 ```
 
 ```text
@@ -204,8 +204,10 @@ $ consema convert package.json --profile json.strict --request-file convert-requ
 "tooling" = { "coverage" = true, "thresholds" = [90, 85, 80] }
 ```
 
-目标字节默认到 stdout；`--output <path>` 显式落盘。全部 8 个格式家族都可作
-convert 源/目标；record 家族（xml/plist/hcl）只能由本家 materializer 消费
+convert 目标字节只到 stdout：本构建对 `--output` 显式拒绝（usage 类错误
+exit 1，`cli.usage.invalid-argument@1`，"file writing lands with fsio in
+milestone M6"），落盘请用 shell 重定向。全部 8 个格式家族都可作 convert
+源/目标；record 家族（xml/plist/hcl）只能由本家 materializer 消费
 内部 record（record-consumption gate），例如 HCL tfvars → HCL canonical：
 
 ```text
@@ -408,7 +410,7 @@ consema conformance (consema.cli.conformance@1)
 | toml.1.0 | ✓ | ✓ | ✓ | — | ✓ |
 | yaml.1.2-core / 1.1-compat | ✓ | ✓ | — | — | ✓ |
 | ini（三 Profile） | ✓ | ✓ | — | ✓（INI 词表） | ✓ |
-| java-properties（reader/latin1） | ✓ | ✓ | —（未接线，见下） | — | —（未接线，见下） |
+| java-properties（reader/latin1） | ✓ | ✓ | —（见边界 6） | — | ✓ |
 | xml.1.0-safe | ✓ | —（native 域未接线） | — | — | ✓ |
 | plist.xml / plist.binary | ✓ | —（native 域未接线） | — | — | ✓ |
 | hcl.native / hcl.tfvars | ✓ | —（native 域未接线） | — | — | ✓ |
@@ -429,14 +431,27 @@ backlog（2026-08-07 复核，disposition 见 `docs/0.13.0-gate-plan.md` §4 M4�
 5. **失败记录形态**：失败的 `cli.convert@1` 记录携带 `report: null,
    target: null`（typed decoder 拒绝部分记录 = 如实声明无完整结果），失败
    事实在信封诊断中。
-6. **java-properties 的 project/convert 目标族前缀不匹配**（2026-08-07 复核
-   发现，非文档化边界）：`format_family` 对 java-properties 返回
-   `properties`，而 `wire_projection_request` 的族前缀检查按
-   `properties.projection.` 拒绝 `java-properties.projection.*` 目标——
-   project/convert 对 java-properties 源当前不可达（query 不受影响）。
-   已记录为 0.13.0 API 评审 backlog 的优先修复项。
+6. **java-properties 的 convert 已修复、project 仍拒绝**（2026-08-07 复核
+   更新）：`format_family` 对 java-properties 返回 `properties`，而
+   `wire_projection_request` 的族前缀检查曾按 `properties.projection.`
+   拒绝 `java-properties.projection.*` 目标——convert 侧已随族前缀特例
+   修复（实测 `convert build-tool.properties --profile
+   java-properties.reader` → JSON 目标 exit 0，见第 12.5 节）；`project`
+   仍按边界 3 拒绝（报告/来源外部化仅 json/toml）。
 7. **edit 词表仅 INI family**：`edit --write` 亦未接线（dry-run only，
    `--write` 是 usage 错误），批量写经 plan/apply。
+8. **inspect 的 Recovered/fatal 报告**（2026-08-07 复核更新）：`inspect
+   --profile` 对携带格式本地 code 的诊断（xml/plist/hcl 家族，以及
+   category 与注册表矛盾的 INI/Properties 恢复诊断）已从内部错误改为
+   正常报告：`inspect bad.xml --profile xml.1.0-safe` 与 `inspect dup.ini
+   --profile ini.portable`（Recovered）均 exit 0，stderr 行保留格式本地
+   真码（如 `xml.tree.mismatched-end-tag@1`），信封绑定注册 fallback
+   （边界 4 语义）。
+9. **record 目标 Profile 的请求契约**：plist.binary 目标要求
+   `encoding: Binary` 与 `newline: None`（RFC 0013 §10 冻结）；
+   json.strict 目标要求 `newline: None`。请求违反契约时材料化原子失败
+   （`core.conversion.materialization-failed@1`，exit 2），不会静默改写
+   编码或换行（实测见第 12.6 节）。
 
 ## 11. exit code 速查（RFC 0015 §5.1，实测对应）
 
@@ -448,3 +463,404 @@ backlog（2026-08-07 复核，disposition 见 `docs/0.13.0-gate-plan.md` §4 M4�
 | 3 | limit | 超出 `--max-bytes`/`--max-files`/manifest 预算（`cli.limit.*@1`） |
 | 4 | precondition | stale digest（`core.source.patch-base-mismatch@1`）、写入失败（`cli.write.*`）、中断（`cli.interrupted.signal@1`） |
 | 5 | internal | 未分类内部错误（`cli.internal.unclassified@1`，如 conformance 自检失败） |
+
+## 12. 每格式 CLI 示例矩阵（路线图 §22.6）
+
+本节按格式家族给出一组**实跑**的 inspect/query/project/edit/convert 示例，
+补齐第 10 节能力矩阵的命令面证据（2026-08-07，0.12.0 开发工作区，
+`target/release/consema.exe` 0.8.0，Windows 11 Pro 10.0.26200）。命令在
+`conformance/fixtures/` 的钉版夹具上执行；未接线的格都是显式拒绝（exit 2，
+绝不输出不完整记录），拒绝消息本身就是可复制的示例。
+
+请求文件体例与第 3-6 节一致：query/project 用 `cli.request@1` 包装（源与
+Profile 在请求内），convert/edit 用裸 payload（源是位置参数、Profile 来自
+`--profile`）。每家族的目标 ID 与操作词表见第 12.9 节，全部可由
+`consema capabilities` 派生。
+
+### 12.1 json 家族（json.strict / jsonc.bounded / json5.standard）
+
+```text
+$ consema inspect application.json5
+consema inspect application.json5
+  bytes: 410 bytes sha256:30c07b89db0fecd9b465835e8bf5a06e69d68ff8a195a1be3a18fbbfe0b1fa1a
+  bom: none
+  symlink: no
+  markers: first non-whitespace '{'
+  candidates: json.strict@1 (first non-whitespace byte is '{'); json5.standard@1 (first non-whitespace byte is '{'); jsonc.bounded@1 (first non-whitespace byte is '{')
+  ambiguous: yes: first non-whitespace '{' is consistent with multiple profiles of the json family
+
+$ consema inspect tsconfig.jsonc --profile jsonc.bounded
+consema inspect tsconfig.jsonc
+  bytes: 428 bytes sha256:c3fa961d9eae747c4b1025cabf8c0dd05b8c7532574db9cb89ec026f1aac7f52
+  bom: none
+  symlink: no
+  markers: first non-whitespace '{'
+  candidates: json.strict@1 (first non-whitespace byte is '{'); json5.standard@1 (first non-whitespace byte is '{'); jsonc.bounded@1 (first non-whitespace byte is '{')
+  ambiguous: yes: first non-whitespace '{' is consistent with multiple profiles of the json family
+  parse (jsonc.bounded@1): Complete
+    diagnostics: none
+    structure counts: json.object_members: 6
+```
+
+query / project / convert 的完整输出见第 3、4、5 节（同一 fixture）。JSON 源
+可作任何可表示目标（TOML/YAML/JSON）的源，JSON → TOML、JSON → YAML 均
+exit 0（第 5 节与第 12.2 节）。
+
+edit（未接线 → 显式拒绝）：
+
+```text
+$ consema edit package.json --profile json.strict --request-file edit-json.json
+consema: error: edit: the json edit surface is not wired in this milestone: the request vocabulary maps the ini family only (the facade exposes typed edit transactions for json, but no operation request mapping yet) (code cli.data.invalid-request@1)
+```
+
+（`edit-json.json` 为 `cli.edit-request@1` 裸 payload，操作
+`json.edit.replace-scalar-semantic@1`，目标 member `version`。该命令 exit 2。
+`edit --write` 另见边界 7：usage 错误 exit 1。）
+
+### 12.2 toml.1.0
+
+```text
+$ consema inspect pyproject.toml
+consema inspect pyproject.toml
+  bytes: 524 bytes sha256:5611e9d8f40d3f464ae9e122e288b14f85c62a9cd2c86267a13455b4183cd5ec
+  bom: none
+  symlink: no
+  markers: [section] line
+  candidates: ini.portable@1 (leading [section] line); ini.python-configparser@1 (leading [section] line); ini.windows@1 (leading [section] line); toml.1.0@1 (leading [section] line)
+  ambiguous: yes: [section] line is consistent with format families: ini, toml
+```
+
+`[section]` 前导使 TOML 与 INI 家族歧义——inspect 如实报告，不猜格式；
+parse 类命令必须显式 `--profile`。
+
+```text
+$ consema query --profile toml.1.0 --request-file query-toml.json
+match 0: $.build-system (key build-system) = {requires: ["hatchling>=1.25"], build-backend: "hatchling.build"}
+match 1: $.project (key project) = {name: "consema-client", version: "0.2.0", description: "A realistic PEP 621 fixture", requires-python: ">=3.11", dependencies: ["httpx>=0.27,<1", "pydantic>=2.8,<3"], optional-dependencies: {test: ["pytest>=8", "pytest-cov>=5"]}}
+match 2: $.tool (key tool) = {pytest: {ini_options: {addopts: "-ra --strict-markers", testpaths: ["tests"]}}, ruff: {line-length: 100, target-version: "py311", lint: {select: ["E", "F", "I", "UP"]}}}
+```
+
+```text
+$ consema project --profile toml.1.0 --request-file project-toml.json
+{build-system: {requires: ["hatchling>=1.25"], build-backend: "hatchling.build"}, project: {name: "consema-client", version: "0.2.0", description: "A realistic PEP 621 fixture", requires-python: ">=3.11", dependencies: ["httpx>=0.27,<1", "pydantic>=2.8,<3"], optional-dependencies: {test: ["pytest>=8", "pytest-cov>=5"]}}, tool: {pytest: {ini_options: {addopts: "-ra --strict-markers", testpaths: ["tests"]}}, ruff: {line-length: 100, target-version: "py311", lint: {select: ["E", "F", "I", "UP"]}}}}
+```
+
+convert → JSON（canonical compact）：
+
+```text
+$ consema convert pyproject.toml --profile toml.1.0 --request-file convert-toml-json.json
+{"build-system":{"requires":["hatchling>=1.25"],"build-backend":"hatchling.build"},"project":{"name":"consema-client","version":"0.2.0","description":"A realistic PEP 621 fixture","requires-python":">=3.11","dependencies":["httpx>=0.27,<1","pydantic>=2.8,<3"],"optional-dependencies":{"test":["pytest>=8","pytest-cov>=5"]}},"tool":{"pytest":{"ini_options":{"addopts":"-ra --strict-markers","testpaths":["tests"]}},"ruff":{"line-length":100,"target-version":"py311","lint":{"select":["E","F","I","UP"]}}}}
+```
+
+convert → YAML（`yaml.canonical-block` 风格；canonical 显式 tagged 渲染是
+materializer 的冻结输出形状，不是缺省猜测）：
+
+```text
+$ consema convert pyproject.toml --profile toml.1.0 --request-file convert-toml-yaml.json
+--- !!map
+? !!str "build-system"
+: !!map
+  ? !!str "requires"
+  : !!seq
+    - !!str "hatchling>=1.25"
+  ? !!str "build-backend"
+  : !!str "hatchling.build"
+? !!str "project"
+...
+```
+
+edit（未接线 → 显式拒绝，exit 2，消息同 12.1 的 toml 变体）。
+
+### 12.3 yaml 家族（yaml.1.2-core / yaml.1.1-compat）
+
+```text
+$ consema inspect github-actions-ci.yaml
+consema inspect github-actions-ci.yaml
+  bytes: 526 bytes sha256:692520d9998309d85972b6d780aa33c41d04eafff67e3e91fe3ae75b84867519
+  bom: none
+  symlink: no
+  markers: key: value line
+  candidates: yaml.1.1-compat@1 (leading key: value line); yaml.1.2-core@1 (leading key: value line)
+  ambiguous: yes: key: value line is consistent with multiple profiles of the yaml family
+```
+
+```text
+$ consema query --profile yaml.1.2-core --request-file query-yaml.json
+match 0: $.name (key name) = "Rust CI"
+match 1: $.on (key on) = {push: {branches: ["main"]}, pull_request: null}
+match 2: $.permissions (key permissions) = {contents: "read"}
+match 3: $.jobs (key jobs) = {test: {runs-on: "${{ matrix.os }}", strategy: {fail-fast: false, matrix: {os: ["ubuntu-latest", "windows-latest"], rust: ["stable", "1.85.0"]}}, steps: [{uses: "actions/checkout@v4"}, {name: "Install Rust", uses: "dtolnay/rust-toolchain@stable", with: {toolchain: "${{ matrix.rust }}"}}, {name: "Test workspace", run: "cargo test --locked --workspace --all-targets"}]}}
+```
+
+convert → JSON：
+
+```text
+$ consema convert github-actions-ci.yaml --profile yaml.1.2-core --request-file convert-yaml-json.json
+{"name":"Rust CI","on":{"push":{"branches":["main"]},"pull_request":null},"permissions":{"contents":"read"},"jobs":{"test":{"runs-on":"${{ matrix.os }}","strategy":{"fail-fast":false,"matrix":{"os":["ubuntu-latest","windows-latest"],"rust":["stable","1.85.0"]}},"steps":[{"uses":"actions/checkout@v4"},{"name":"Install Rust","uses":"dtolnay/rust-toolchain@stable","with":{"toolchain":"${{ matrix.rust }}"}},{"name":"Test workspace","run":"cargo test --locked --workspace --all-targets"}]}}}
+```
+
+project（未接线 → 显式拒绝，exit 2）：
+
+```text
+$ consema project --profile yaml.1.2-core --request-file project-yaml.json
+consema: error: project: the project command is not wired for the 'yaml' family in milestone M5 (its report/provenance externalization is not yet implemented); refusing instead of emitting an incomplete record (code cli.data.invalid-request@1)
+```
+
+图语义 → 树目标的 loss policy（共享未授权 → 原子失败，见第 5.1 节）：
+`anchor-heavy.yaml`（`&defaults`/`*defaults`）转换到 JSON 目标：
+
+```text
+$ consema convert anchor-heavy.yaml --profile yaml.1.2-core --request-file convert-yaml-json.json
+consema: error: convert: conversion failed atomically (core.conversion.projection-failed@1) (code core.conversion.projection-failed@1)
+```
+
+edit（未接线 → 显式拒绝，exit 2，消息同 12.1 的 yaml 变体）。
+
+### 12.4 ini 家族（ini.portable / ini.windows / ini.python-configparser）
+
+```text
+$ consema inspect desktop-settings.ini
+consema inspect desktop-settings.ini
+  bytes: 177 bytes sha256:b01f173b34c8e4121150432b30e64f6a72a150b31d9afcbd806ebfe17e6a6ff8
+  bom: none
+  symlink: no
+  markers: none
+  candidates: none
+  ambiguous: no
+```
+
+（文件以 `;` 注释行开头，前导 marker 不成立——facts-only 如实报告，不因
+扩展名猜格式。）
+
+query 走 `core.try-entry-mapping-entries`（入口映射形状；`try-object-entries`
+对 EntryMapping 无匹配）：
+
+```text
+$ consema query --profile ini.portable --request-file query-ini.json
+match 0: $[value 0] (key PortableValue(String("window"))) = {"width": "1440", "height": "900", "maximized": "false":}
+match 1: $[value 1] (key PortableValue(String("appearance"))) = {"theme": "system", "language": "zh-CN":}
+match 2: $[value 2] (key PortableValue(String("recent"))) = {"workspace": "work/consema", "autosave_seconds": "30":}
+```
+
+convert → JSON：
+
+```text
+$ consema convert desktop-settings.ini --profile ini.portable --request-file convert-ini-json.json
+{"window":{"width":"1440","height":"900","maximized":"false"},"appearance":{"theme":"system","language":"zh-CN"},"recent":{"workspace":"work/consema","autosave_seconds":"30"}}
+```
+
+edit/plan/apply 是 INI 家族唯一接线的编辑词表——单文件 dry-run 与 100 文件
+批量 plan/apply 完整输出见第 6 节。Recovered 文档（重复 section）不可
+convert（formation 执行 duplicate policy，exit 2，见第 5.1 节）。
+
+project（未接线 → 显式拒绝，exit 2，消息同 12.3 的 yaml 变体、家族名替换）。
+
+### 12.5 java-properties（java-properties.reader / java-properties.latin1）
+
+```text
+$ consema inspect build-tool.properties
+consema inspect build-tool.properties
+  bytes: 208 bytes sha256:3c988cf59c07443462e95ab3554713892c94c675a0eff9e6db3a46affbd84636
+  bom: none
+  symlink: no
+  markers: none
+  candidates: none
+  ambiguous: no
+```
+
+query（`core.try-entry-mapping-entries`）：
+
+```text
+$ consema query --profile java-properties.reader --request-file query-properties.json
+match 0: $[value 0] (key PortableValue(String("org.gradle.daemon"))) = "true"
+match 1: $[value 1] (key PortableValue(String("org.gradle.parallel"))) = "true"
+match 2: $[value 2] (key PortableValue(String("org.gradle.caching"))) = "true"
+match 3: $[value 3] (key PortableValue(String("org.gradle.jvmargs"))) = "-Xmx2g -Dfile.encoding=UTF-8"
+match 4: $[value 4] (key PortableValue(String("version"))) = "1.0.0"
+match 5: $[value 5] (key PortableValue(String("publish.url"))) = "https://example.invalid/releases"
+```
+
+convert → JSON（2026-08-07 复核：族前缀特例修复后可达，见边界 6）：
+
+```text
+$ consema convert build-tool.properties --profile java-properties.reader --request-file convert-properties-json.json
+{"org.gradle.daemon":"true","org.gradle.parallel":"true","org.gradle.caching":"true","org.gradle.jvmargs":"-Xmx2g -Dfile.encoding=UTF-8","version":"1.0.0","publish.url":"https://example.invalid/releases"}
+```
+
+project（未接线 → 显式拒绝，exit 2，消息同 12.3 的 yaml 变体、家族名替换）；
+edit（未接线 → 显式拒绝，exit 2）。
+
+### 12.6 plist 家族（plist.xml / plist.binary）
+
+```text
+$ consema inspect Info.plist
+consema inspect Info.plist
+  bytes: 1355 bytes sha256:bfc61719340a722b5bd77f0e29b941d36159a2da8e9cc1a719c9be97cd450592
+  bom: none
+  symlink: no
+  markers: XML declaration
+  candidates: plist.xml@1 (leading XML declaration); xml.1.0-safe@1 (leading XML declaration)
+  ambiguous: yes: XML declaration is consistent with format families: plist, xml
+```
+
+query（native 域未接线 → 显式拒绝，exit 2）：
+
+```text
+$ consema query --profile plist.xml --request-file query-plist.json
+consema: error: query: the core.portable-value-query@1 domain cannot query plist sources: their default projection publishes a versioned internal record (the native query domains require caller locators not yet exposed by the facade) (code cli.data.invalid-request@1)
+```
+
+同家族 convert：XML → XML canonical：
+
+```text
+$ consema convert Info.plist --profile plist.xml --request-file convert-plist-xml-xml.json
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+    <dict>
+...
+```
+
+XML → binary（请求必须带 `encoding: Binary` 与 `newline: None`，边界 9；
+输出为 `bplist00` 头字节）：
+
+```text
+$ consema convert com.example.preferences.plist --profile plist.xml --request-file convert-plist-xml-binary.json > out.binary.plist
+$ od -c out.binary.plist | head -1
+0000000   b   p   l   i   s   t   0   0
+```
+
+（`convert-plist-xml-binary.json` 与第 5 节 `convert-request.json` 同体例，
+仅 materialization 段的 `encoding.kind` 为 `Binary`、`newline` 为 `None`、
+style 为 `plist.binary-canonical`。请求契约违反时材料化原子失败，见边界 9。）
+
+project / edit（未接线 → 显式拒绝，exit 2）。UID 投影的 loss policy 见第
+5.1 节（exact-or-reject 默认拒绝）。
+
+### 12.7 xml.1.0-safe
+
+```text
+$ consema inspect app-server-config.xml
+consema inspect app-server-config.xml
+  bytes: 508 bytes sha256:221ebb7eeadcdc12488cbc0c3c3e061c93f73f52152200d0c3dc624b8b1fec40
+  bom: none
+  symlink: no
+  markers: XML declaration
+  candidates: plist.xml@1 (leading XML declaration); xml.1.0-safe@1 (leading XML declaration)
+  ambiguous: yes: XML declaration is consistent with format families: plist, xml
+
+$ consema inspect app-server-config.xml --profile xml.1.0-safe
+consema inspect app-server-config.xml
+  bytes: 508 bytes sha256:221ebb7eeadcdc12488cbc0c3c3e061c93f73f52152200d0c3dc624b8b1fec40
+  bom: none
+  symlink: no
+  markers: XML declaration
+  candidates: plist.xml@1 (leading XML declaration); xml.1.0-safe@1 (leading XML declaration)
+  ambiguous: yes: XML declaration is consistent with format families: plist, xml
+  parse (xml.1.0-safe@1): Complete
+    diagnostics: none
+    structure counts: xml.nodes: 17
+```
+
+query（native 域未接线 → 显式拒绝，exit 2，消息同 12.6 的 xml 变体）。
+
+同家族 convert：element-tree 投影 → `xml.safe-canonical-document`：
+
+```text
+$ consema convert app-server-config.xml --profile xml.1.0-safe --request-file convert-xml-xml.json
+<?xml version="1.0" encoding="UTF-8"?><server xmlns="urn:example:server" xmlns:db="urn:example:datasource" xmlns:sec="urn:example:security">
+  <sec:realm name="app-realm">
+    <sec:user username="service" roles="app,read"/>
+  </sec:realm>
+...
+```
+
+跨家族目标（XML → JSON）被 record-consumption gate 原子拒绝（record 只能
+由本家 materializer 消费，第 5 节）：
+
+```text
+$ consema convert app-server-config.xml --profile xml.1.0-safe --request-file convert-xml-json.json
+consema: error: convert: conversion failed atomically (core.conversion.materialization-failed@1) (code core.conversion.materialization-failed@1)
+```
+
+project / edit（未接线 → 显式拒绝，exit 2）。malformed 输入的 inspect
+Recovered 报告见边界 8（exit 0，格式本地真码在 stderr）。
+
+### 12.8 hcl 家族（hcl.native / hcl.tfvars）
+
+```text
+$ consema inspect main.tf
+consema inspect main.tf
+  bytes: 1139 bytes sha256:1c9a57fc4f6b7358d22aac8c2f13c7b9ab421194007eac7d6673e7b5558e2436
+  bom: none
+  symlink: no
+  markers: none
+  candidates: none
+  ambiguous: no
+
+$ consema inspect main.tf --profile hcl.native
+consema inspect main.tf
+  bytes: 1139 bytes sha256:1c9a57fc4f6b7358d22aac8c2f13c7b9ab421194007eac7d6673e7b5558e2436
+  bom: none
+  symlink: no
+  markers: none
+  candidates: none
+  ambiguous: no
+  parse (hcl.native@1): Complete
+    diagnostics: none
+    structure counts: hcl.body_items: 10
+```
+
+query（native 域未接线 → 显式拒绝，exit 2，消息同 12.6 的 hcl 变体）。
+
+convert：tfvars → `hcl.canonical-document`（literal-complete 属性，无求值）：
+
+```text
+$ consema convert terraform.tfvars --profile hcl.tfvars --request-file convert-hcl-tfvars.json
+region = "us-east-1"
+instance_type = "t3.micro"
+ami = "ami-0abcdef1234567890"
+instance_count = 2
+monitoring = true
+tags = {
+```
+
+含 derived 表达式（模板字符串）的 `main.tf` 在 exact 投影下原子失败：
+
+```text
+$ consema convert main.tf --profile hcl.native --request-file convert-hcl-body.json
+consema: error: convert: conversion failed atomically (core.conversion.projection-failed@1) (code core.conversion.projection-failed@1)
+```
+
+project / edit（未接线 → 显式拒绝，exit 2）。
+
+### 12.9 目标 ID、风格 ID 与操作词表速查
+
+全部由 `consema capabilities` 派生（第 8 节）。convert/edit 请求文件所需的
+每家族 ID：
+
+| 家族 | 投影目标（projection 段 `target.id`） | 材料化风格（style `id`） | 操作词表（edit/plan，示例） |
+|---|---|---|---|
+| json | `json.projection.best-exact-core`、`project-as-object`、`project-as-entry-mapping`、`json5-best-exact-core` | `json.canonical-compact` / `json.canonical-pretty` | `json.edit.replace-scalar-semantic` 等 8 个（未接线） |
+| toml | `toml.projection.best-exact-core` | `toml.canonical-document` | `toml.edit.replace-scalar-semantic` 等 7 个（未接线） |
+| yaml | `yaml.projection.best-exact-value` | `yaml.canonical-block` / `yaml.canonical-flow` | `yaml.edit.replace-scalar-semantic` 等 8 个（未接线） |
+| ini | `ini.projection.best-exact-entry-mapping`、`require-object` | `ini.portable-canonical` 等三 Profile 风格 | `ini.edit.replace-semantic-value` 等 8 个（**已接线**，第 6 节） |
+| java-properties | `java-properties.projection.best-exact-entry-mapping`、`require-object` | `java-properties.reader-canonical` / `latin1-canonical` | `java-properties.edit.*` 5 个（未接线） |
+| xml | `xml.projection.element-tree` | `xml.safe-canonical-document` | `xml.edit.set-attribute-value` 等 8 个（未接线） |
+| plist | `plist.projection.value-tree` | `plist.xml-canonical` / `plist.binary-canonical` | `plist.edit.set-value` 等 6 个（未接线） |
+| hcl | `hcl.projection.body` | `hcl.canonical-document` | `hcl.edit.set-attribute-value` 等 6 个（未接线） |
+
+convert 组合的 loss policy 小结（全部实测，§22.6）：
+
+- 可表示组合走 ExactOnly 双阶段：JSON↔TOML、JSON↔YAML、TOML→YAML、
+  INI→JSON、Properties→JSON（本节省略重复输出）。
+- 未授权 loss 原子失败（`core.conversion.projection-failed@1`）：YAML
+  sharing/cycle → JSON（12.3）、HCL derived expression（12.8）、plist UID
+  （第 5.1 节）。
+- 目标 Profile 无法表示 → 材料化原子失败（`core.conversion.materialization-failed@1`）：
+  TOML date/time → JSON（`all-values.toml` 实测）、以及 INI/JSON/TOML →
+  INI 或 Properties 等入口映射/标量形状不匹配的组合（实测 exit 2）。
+- record 家族跨家族目标被 record-consumption gate 拒绝（12.7 XML → JSON）。
+- entry-mapping → object 的映射政策是唯一授权转换通道
+  （`mapping_policy: UniqueStringEntriesToObject`，第 5 节 JSON→TOML 例），
+  转换信封携带完整 report（两阶段 fidelity + events，`--json` 可查）。

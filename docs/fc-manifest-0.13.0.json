@@ -1,0 +1,544 @@
+{
+  "manifest": "consema.fc-manifest@1",
+  "gate_version": "0.13.0",
+  "recorded_at": "2026-08-07",
+  "status": "gate_open",
+  "status_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭：本 manifest 记录每个门禁条目的当前状态、证据与完成路径；Go 实现（0.14.0）以本 manifest 为起点，仅在本判定翻转为 closed 后启动（路线图 §15.7 第 1445 行）。",
+  "source_of_truth": [
+    "路线图《Consema 1.0.0 产品路线图与双语言落地设计.md》§15.1-§15.7（门禁清单）、§18.3/§18.4（coverage 政策/缺陷分级）、§19.4（发布供应链）、§20.3（回退政策）、§23（真实项目验证）",
+    "docs/0.13.0-gate-plan.md（执行计划；本条目的证据与缺口对应其 §1/§2/§3/§7）",
+    "RFC 0001-0016（docs/rfcs/；语言无关规范与注册契约的权威载体）",
+    "conformance/vectors/*.json（18 套语言无关 suite，508 cases）",
+    "SECURITY.md、docs/IMPLEMENTATION.md"
+  ],
+  "digests": {
+    "product_version": {
+      "value": "0.8.0",
+      "evidence": "Cargo.toml:31（[workspace.package] version）",
+      "note": "开发态 workspace 版本。发布到 0.13.0 的版本推进是发布检查单第 1 项（docs/release-process-0.13.0.md §7 item 1），属门禁收口的开放项（见 feature_complete_judgment.open_items C-3）。"
+    },
+    "spec_revision": {
+      "value": "roadmap（工作树 9c1ede2）+ RFC 0001-0016 清单",
+      "evidence": "docs/rfcs/0001-toml-1.0-profile.md .. docs/rfcs/0016-go-api-mapping-v1.md；路线图全文档",
+      "note": "本 gate 计划（docs/0.13.0-gate-plan.md:6）声明的语义权威顺序：永久不变量 → 已接受 RFC → 语言无关 vectors → 本实现计划与 Rust API。"
+    },
+    "contract_registry": {
+      "value": "semantic-model v7：41 条 contract / 186 个 error code",
+      "evidence": "README.md:32；crates/consema-protocol/src/registry_manifest.rs（RegistryManifest 序列化源）；crates/consema/tests/cli_m4.rs:160（186 个 code 断言）、cli_m4.rs:9-10（16 profiles / 8 families / 21 query domains）",
+      "note": "v1-v6 精确冻结（README.md:31-32）；v7 追加 core.cli-output@1 / core.batch-plan@1 / core.batch-result@1 与 20 个 cli.* code。§8 草案要求的 registry 序列化 sha256 由 gatekeeper 在发布时用 RegistryManifest::current() 计算并回填（registry_manifest.rs:92-93 的契约序列化入口）。"
+    },
+    "capability_set": {
+      "value": "8 families / 16 profiles / 21 query domains / 16 operation registries / 186 error codes",
+      "evidence": "consema capabilities 实测输出（2026-08-07，target/release/consema.exe，与 cli_m4.rs:160 断言一致）；crates/consema/src/bin/consema/capabilities.rs（由 facade registry 派生，无重复声明）",
+      "note": "capabilities 清单是机器可读事实（RFC 0015 硬门禁 1：capabilities 由 facade 类型派生）。"
+    },
+    "conformance_suite": {
+      "suites": 18,
+      "cases": 508,
+      "aggregate_sha256": "e3d6578858fa1fdcab0c19ee0094cd246923dca76e9be4679aabf86b482b68c8",
+      "evidence": "conformance/vectors/*.json（18 文件，2026-08-07 脚本实测 18 suites / 508 cases）；.github/workflows/ci.yml:93-121（conformance job 的 suite-count 断言 18/508）；README.md:33",
+      "note": "聚合方式：按文件名排序，逐文件 sha256，聚合 sha256(concat of 'name:digest' 行)。与 M1 的 suite-count 断言同源（gate plan §8）。"
+    },
+    "corpus_test_suite_revisions": {
+      "value": [
+        "toml-test v2.2.0（205 valid + 474 invalid，README.md:35）",
+        "yaml/yaml-test-suite data-2022-01-17（402 case：307 valid + 94 invalid + 1 exclusion，README.md:36）",
+        "JSON5 v2.2.3（83/83，README.md:34）",
+        "INI/Properties runtime oracles 5 套 36/36（OpenJDK/CPython/.NET/Windows wide/Qt，README.md:37）",
+        "差分 oracle：conformance/oracles/hcl-go-v1/manifest.json（29 case，skip_path 文档化）、conformance/oracles/plist-macos-v1/manifest.json（7 case，skip_path 文档化）",
+        "mutation corpus：conformance/corpora/mutation-v1.json（46 fixtures / 174,921 cases，generator seed 6840145125992895424）"
+      ],
+      "evidence": "conformance/corpora/mutation-v1.json（2026-08-07 脚本实测 174,921 cases）；crates/*/fuzz/corpus/（47 个种子文件）"
+    },
+    "benchmark_baseline_revision": {
+      "value": "docs/BENCHMARKS-0.13.0.md（2026-08-07 测量；测量构建 HEAD b505ada，会话内 0.12.0 落为 9c1ede2）",
+      "evidence": "docs/BENCHMARKS-0.13.0.md:12-32（§1 Environment）、:90-138（§4 冻结预算行）、:184-204（§7 场景行）",
+      "note": "后修复复测：S3 10k-duplicate properties 4.97 s→127.5 ms（p50），S4 20k-element XML 56.6 s→0.105 s（另一次测量 96.6 s，source.rs:1545）——修复只改善性能，冻结预算仍为有效上界（BENCHMARKS §7 修正注）。"
+    },
+    "rust_compiler_msrv": {
+      "declared": "1.85",
+      "measured_toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
+      "evidence": "Cargo.toml:33（rust-version = \"1.85\"）；.github/workflows/ci.yml:66-85（msrv job，1.85.0 全门禁）；docs/COVERAGE-0.13.0.md:17（实测工具链）；docs/fuzz-evidence-0.13.0.md:14（fuzz 会话工具链）",
+      "note": "msrv job 已落盘但尚未在 GitHub 真跑（开放项 C-1）。"
+    },
+    "dependency_lock_digest": {
+      "sha256": "0adbb56bb0f7e1ba0a5683e15f465f4ad5f7792fb8250e488f0124e25afeaa3e",
+      "evidence": "Cargo.lock（2026-08-07 实测 sha256）；scripts/verify-package-archives.ps1（归档内嵌 Cargo.lock 与兄弟归档交叉校验）"
+    },
+    "supported_targets": {
+      "value": ["windows-latest", "ubuntu-latest", "macos-latest"],
+      "evidence": ".github/workflows/ci.yml:33（lint 矩阵）、:55（test 矩阵）、:201（oracles 矩阵）；docs/support-policy.md:50-59（§3 支持环境）",
+      "note": "矩阵 job 已落盘尚未真跑（开放项 C-1）。"
+    },
+    "known_accepted_limitations": [
+      {"id": "F2", "limitation": "core.edit.incomplete-target@1 命名两个概念（Recovered 文档门 + json 非完整字面量 target）；v8 拆分提案 core.edit.recovered-document@1 / core.edit.incomplete-literal-target@1", "evidence": "docs/API-REVIEW-0.13.0.md:23-31"},
+      {"id": "F3", "limitation": "edit 冲突枚举名漂移（ConflictingEdits vs DuplicateTarget）；注册 code 面一致，1.0.0 统一枚举名", "evidence": "docs/API-REVIEW-0.13.0.md:33-42"},
+      {"id": "F4", "limitation": "xml.projection.recovered-document@1 vs 其余四家 incomplete-document@1 拼写漂移；v8 更名（旧 code deprecated alias 至 1.0.0）", "evidence": "docs/API-REVIEW-0.13.0.md:44-52"},
+      {"id": "F10", "limitation": "xml/plist/hcl 同时暴露 status() 与 formation_status()；1.0.0 弃用 status()", "evidence": "docs/API-REVIEW-0.13.0.md:54-58"},
+      {"id": "F11", "limitation": "plist.duplicate-key-group@1 vs ini/properties duplicate-group@1 操作词漂移；v8 增加别名并弃用旧词", "evidence": "docs/API-REVIEW-0.13.0.md:60-64"},
+      {"id": "F13", "limitation": "vector capability id 命名（yaml.native-semantics@1 suite 内部复数 vs 域 id）；冻结，RFC 0016 显式钉死", "evidence": "docs/API-REVIEW-0.13.0.md:66-74"},
+      {"id": "F15", "limitation": "hcl PascalCase syntax-kind 拼写（TagClose）vs xml/plist kebab-case（tag-close）；v8 增加 kebab 别名", "evidence": "docs/API-REVIEW-0.13.0.md:76-80"},
+      {"id": "B-1+B-2", "limitation": "facade 未暴露 node-locator API：query 只接线 portable-value 域，native 域需调用方外部化 locator；materialize/convert 的 provenance map 为空（如实表达，非伪造）", "evidence": "docs/API-REVIEW-0.13.0.md:102-103；CHANGELOG.md:39-41"},
+      {"id": "B-3", "limitation": "project 报告/来源外部化仅 json/toml；其余家族显式拒绝（含 B-6 修复后 java-properties 在家族门的文档化边界）", "evidence": "docs/API-REVIEW-0.13.0.md:104"},
+      {"id": "B-4", "limitation": "信封只携带注册 code，格式本地 code 绑定注册 fallback core.source.invalid-sequence@1（RFC 0015 §4.3 冻结）；stderr 保留真码", "evidence": "docs/API-REVIEW-0.13.0.md:105"},
+      {"id": "B-5", "limitation": "失败 cli.convert@1 形态 report/target 为 null（原子失败是诚实形态）；各阶段 report 外部化归 1.0.0", "evidence": "docs/API-REVIEW-0.13.0.md:106"},
+      {"id": "B-7", "limitation": "edit/plan/apply 操作词表仅接线 INI family（B-6 修复后 java-properties convert 可达，edit 仍按家族门拒绝）；每格式映射表归 0.14.0+", "evidence": "docs/API-REVIEW-0.13.0.md:108；CHANGELOG.md:42"},
+      {"id": "B-8", "limitation": "edit --write 未接线（dry-run only，usage 显式拒绝 edit_cmd.rs:1020-1023）；帮助文本与行为对齐的修订建议归 fsio 里程碑", "evidence": "docs/API-REVIEW-0.13.0.md:109"},
+      {"id": "SEMVER-3", "limitation": "cargo-semver-checks vs v0.8.0：consema/consema-core/consema-document 三 crate 仅 enum_variant_added（0.9.0-0.11.0 新家族变体，纯增量），RFC 级批准；CI semver job 保持失败 + 批准记录（API-REVIEW §3 决定的二选一落定为'保留失败并附批准记录'，allowlist 修改属 .github 域外，推入时由 gatekeeper 落定）", "evidence": "docs/API-REVIEW-0.13.0.md:160-174"},
+      {"id": "ORACLE-EXCLUSIONS", "limitation": "差分 oracle exclusion inventory：HCL D-1..D-9、plist D-1..D-21、YAML 1 项（各家族 RFC 与 oracle manifest 记录）", "evidence": "conformance/oracles/hcl-go-v1/manifest.json、conformance/oracles/plist-macos-v1/manifest.json 的 exclusion/文档化 skip 记录"},
+      {"id": "BENCH-NOHARNESS", "limitation": "预算面缺口（BENCHMARKS §12）：TOML SDK 行、xml/plist/hcl SDK query/edit 行、独立 render 行、S3/S4 的 N 值偏差（30/1，因修复前单次成本达秒级）；修复后 N 可提升，属 -Check 后续项", "evidence": "docs/BENCHMARKS-0.13.0.md:443-496（§12 诚实覆盖声明）"}
+    ]
+  },
+  "gates": {
+    "functional": {
+      "roadmap_section": "§15.1 功能门禁",
+      "status": "complete",
+      "items": [
+        {
+          "id": "F-1",
+          "name": "八个 mandatory 格式家族与全部 mandatory Profile 完成",
+          "status": "complete",
+          "evidence": ["README.md:26-32", "docs/rfcs/0009-0016（INI/Properties/XML/plist/HCL 家族 RFC + CLI/RFC 0015）", "consema capabilities 实测：8 families / 16 profiles"],
+          "source_of_truth": "RFC 0001-0014 + 路线图 §8 capability matrix"
+        },
+        {
+          "id": "F-2",
+          "name": "第 8 节 capability matrix 全部通过",
+          "status": "complete",
+          "evidence": ["conformance/vectors/*.json 18 suites / 508 cases（2026-08-07 实测）", "README.md:33", ".github/workflows/ci.yml:93-121（计数断言）"],
+          "source_of_truth": "语言无关 conformance vectors（语义权威顺序第 3 级）"
+        },
+        {
+          "id": "F-3",
+          "name": "PortableValue/PVCE 与 PortableGraph/PGCE 完成",
+          "status": "complete",
+          "evidence": ["conformance/vectors/protocol-v1.json", "conformance/vectors/portable-graph-v1.json", "CHANGELOG.md:145-148（0.7.0 记录）"],
+          "source_of_truth": "RFC 0002/0006/0008"
+        },
+        {
+          "id": "F-4",
+          "name": "native query、syntax query、projection、materialization、provenance 完成",
+          "status": "complete",
+          "evidence": ["conformance/vectors/syntax-query-v1.json、operations-v1.json、source-v1.json、semantic-model-v5.json/semantic-model-v6.json", "README.md:25-28"],
+          "source_of_truth": "RFC 0003/0004/0007/0009-0014"
+        },
+        {
+          "id": "F-5",
+          "name": "scalar 与 mandatory structural edits 完成",
+          "status": "complete",
+          "evidence": ["README.md:29（各格式版本化编辑操作清单与计数）", "consema capabilities 实测：16 个 operation registries（json 8/toml 7/yaml 8/ini 8/properties 5/xml 8/plist 6/hcl 6）"],
+          "source_of_truth": "RFC 0004/0005/0007/0009-0014 各家族编辑操作表"
+        },
+        {
+          "id": "F-6",
+          "name": "ChangeSet、SourcePatch、dry-run 和 batch manifest 完成",
+          "status": "complete",
+          "evidence": ["README.md:30-31", "docs/cli-implementation-plan.md:256-277", "conformance/vectors/cli-v1.json（batch-plan/batch-result 状态迁移 case）"],
+          "source_of_truth": "RFC 0003/0004/0015"
+        },
+        {
+          "id": "F-7",
+          "name": "CLI 全部正式命令完成",
+          "status": "complete",
+          "evidence": ["提交 9c1ede2（Land the consema CLI and semantic-model v7）", "CHANGELOG.md:9（11 个命令）", "consema.cli.conformance@1 40 case（conformance/vectors/cli-v1.json）", "crates/consema/tests/cli_*.rs"],
+          "source_of_truth": "RFC 0015"
+        },
+        {
+          "id": "F-8",
+          "name": "无 mandatory capability 标记为 experimental、stub 或 partial",
+          "status": "complete",
+          "evidence": ["CHANGELOG.md:39-44（Boundaries：全部是显式拒绝，非 stub）", "docs/cookbook.md §10（每格式能力矩阵与已知边界）", "edit --write 等未接线面以 usage 错误显式拒绝（crates/consema/src/bin/consema/edit_cmd.rs:1020-1023）"],
+          "source_of_truth": "RFC 0015 + 本 manifest known_accepted_limitations"
+        }
+      ]
+    },
+    "spec": {
+      "roadmap_section": "§15.2 规范门禁",
+      "status": "complete",
+      "items": [
+        {
+          "id": "S-1",
+          "name": "每个公共行为有权威规范章节",
+          "status": "complete",
+          "evidence": ["路线图 §4-§9 + RFC 0001-0016", "docs/IMPLEMENTATION.md"],
+          "source_of_truth": "docs/IMPLEMENTATION.md 语义权威顺序"
+        },
+        {
+          "id": "S-2",
+          "name": "每个 contract ID 已登记且不可变",
+          "status": "complete",
+          "evidence": ["README.md:31-32（v1-v6 冻结；v7 增量为 additive）", "crates/consema-protocol/src/registry_manifest.rs", "crates/consema/tests/cli_m4.rs:160（186 code 断言）"],
+          "source_of_truth": "RFC 0011（contract registry）"
+        },
+        {
+          "id": "S-3",
+          "name": "所有 public object 的 lifecycle、identity、completion 和 failure 已定义",
+          "status": "complete",
+          "evidence": ["docs/IMPLEMENTATION.md", "SECURITY.md（完成状态语义为安全边界）", "RFC 0015 §4-§7（CLI 完成/失败形态）"],
+          "source_of_truth": "RFC 0002/0011/0015"
+        },
+        {
+          "id": "S-4",
+          "name": "没有依赖 Rust 类型名才能解释的语言无关行为",
+          "status": "complete",
+          "evidence": ["docs/cli-implementation-plan.md:496（machine schema 无 Rust 类型名）", "docs/API-REVIEW-0.13.0.md §1（F2/F3/F10/F11/F15 全部豁免：语言无关面由注册 code / vector / 域 id 冻结）"],
+          "source_of_truth": "RFC 0011 + conformance vectors"
+        },
+        {
+          "id": "S-5",
+          "name": "所有 provisional abstraction 已验证、修订或删除",
+          "status": "complete",
+          "evidence": ["路线图 §0.2 记录", "RFC 进程（0001-0016）"],
+          "source_of_truth": "路线图 + RFC 历史"
+        },
+        {
+          "id": "S-6",
+          "name": "Go API mapping RFC 已通过，但 Go 实现尚未开始",
+          "status": "complete",
+          "evidence": ["docs/rfcs/0016-go-api-mapping-v1.md（M4 立项/charter RFC）", "docs/API-REVIEW-0.13.0.md:195-197（§7）"],
+          "source_of_truth": "RFC 0016；Go 实现未开始（路线图 §14.12 第 1345 行前提仍成立）"
+        },
+        {
+          "id": "S-7",
+          "name": "所有已知规范歧义有 resolution 或明确的阻断状态",
+          "status": "complete",
+          "evidence": ["各 RFC rejected alternatives 段", "差分 oracle exclusion inventory（HCL D-1..D-9、plist D-1..D-21、YAML 1 项，oracle manifests）", "docs/API-REVIEW-0.13.0.md §1 逐条 disposition"],
+          "source_of_truth": "RFC 进程 + oracle manifests"
+        }
+      ]
+    },
+    "quality": {
+      "roadmap_section": "§15.3 质量门禁",
+      "status": "partial",
+      "items": [
+        {
+          "id": "Q-1",
+          "name": "所有 unit/integration/doc/conformance tests 通过",
+          "status": "complete",
+          "evidence": ["cargo test --workspace --locked：1,617 passed / 0 failed（2026-08-07 实测，docs/fuzz-evidence-0.13.0.md:123）", "18 suites / 508 cases（README.md:33）"],
+          "source_of_truth": "workspace 测试目标集 + conformance vectors"
+        },
+        {
+          "id": "Q-2",
+          "name": "所有支持格式的上游/官方测试套件通过，任何有意差异都有 Profile 说明和反例",
+          "status": "complete",
+          "evidence": ["README.md:34-37（toml-test 205+474、yaml-test-suite 402、JSON5 83/83、runtime oracles 36/36）", "SECURITY.md:30"],
+          "source_of_truth": "上游套件 + README 记录"
+        },
+        {
+          "id": "Q-3",
+          "name": "accepted Complete Document 全部 byte-exact round-trip",
+          "status": "complete",
+          "evidence": ["conformance/vectors/*.json（round-trip case）", "各格式 fixtures 测试（crates/consema-conformance/tests/*_fixtures.rs）"],
+          "source_of_truth": "语言无关 vectors + fixtures"
+        },
+        {
+          "id": "Q-4",
+          "name": "所有 edit 的 untouched regions byte-exact",
+          "status": "complete",
+          "evidence": ["SECURITY.md:26（UntouchedByteProof）", "CHANGELOG.md:219（0.5.0 UntouchedByteProof 记录）"],
+          "source_of_truth": "RFC 0004（EditPlan/SourcePatch/UntouchedByteProof）"
+        },
+        {
+          "id": "Q-5",
+          "name": "所有未授权 lossy projection/materialization 被拒绝",
+          "status": "complete",
+          "evidence": ["SECURITY.md:14-15", "各格式 materialization 闭包验证（生成字节必先重解析）", "docs/pilot-0.13.0.md §2.7（W7 原子失败实测）"],
+          "source_of_truth": "RFC 0004/0007 + 各家族 RFC"
+        },
+        {
+          "id": "Q-6",
+          "name": "每个 parser、decoder、query、projection、materialization 和 edit target 完成持续 fuzz",
+          "status": "complete",
+          "evidence": ["crates/consema-conformance/src/fuzz.rs（确定性 in-process 变异引擎）", "17 个 target（crates/*/fuzz/fuzz_logic/ 单源 + cargo-fuzz wrapper 双接线，种子 47 个文件已提交）", "tests/parse_fuzz.rs、tests/operation_fuzz.rs、tests/protocol_fuzz.rs"],
+          "source_of_truth": "docs/0.13.0-gate-plan.md §4 M2；fuzz-evidence §2"
+        },
+        {
+          "id": "Q-7",
+          "name": "每个格式发布前至少累计 72 CPU-hours release-candidate fuzz，零未解释 crash、panic、hang 或 limit bypass",
+          "status": "partial",
+          "evidence": ["docs/fuzz-evidence-0.13.0.md:31-74（§3 账本：10.798 CPU-hours、1,547 次运行、4.186 亿次变异、0 新发现）", "docs/fuzz-evidence-0.13.0-logs/runs.csv（1,547 行真实账本）", "docs/fuzz-evidence-0.13.0-logs/waves.log"],
+          "source_of_truth": "路线图 §15.3 第 1382-1387 行（任何新 crash 清零该 target 计时）",
+          "completion_path": "首选：Linux + nightly + clang 主机对 17 个 cargo-fuzz target 运行 cargo +nightly fuzz run（corpus 进化，fuzz/corpus/<target>/ 种子已提交）；备选：本机 in-process 协议续跑（仅代码变化后的波次提供新探索）。按 fuzz-evidence §4 协议把每格式家族（parse+ops 汇总，protocol 单独）真实 CPU 时长追加进 runs.csv；每格式达到 72 CPU-hours 且零未解释问题即关闭（§7.3）。当前最接近的格式（properties 2.035）也仅 2.8%，剩余部分以此路径累计。",
+          "owner": "fuzz 证据账本（agent H 延续）+ 0.13.0 gatekeeper"
+        },
+        {
+          "id": "Q-8",
+          "name": "所有 fuzz regression 永久加入 corpus",
+          "status": "complete",
+          "evidence": ["conformance/corpora/mutation-v1.json 的 regressions 数组（追加式工作流，fuzz-evidence §4 step 2）", "tests/mutation_corpus.rs（replay 测试；174,921 case 全量回放通过，fuzz-evidence:124）", "当前 regressions 为空：本会话零新发现，如实记录（fuzz-evidence:122）"],
+          "source_of_truth": "路线图 §15.3 第 1383 行；conformance/corpora/README.md 工作流"
+        },
+        {
+          "id": "Q-9",
+          "name": "高风险 protocol/varint/offset/graph/alias 逻辑有 property tests 和 mutation review",
+          "status": "complete",
+          "evidence": ["tests/property_graph.rs（PGCE 图 round-trip + YAML anchor/alias）", "tests/property_protocol.rs（protocol/varint/PVCE 规范化 fixed point）", "tests/property_plist.rs（bplist offset/object-ref 每合法宽度）", "conformance/corpora/mutation-v1.json（46 fixtures / 174,921 cases，seed 已提交）"],
+          "source_of_truth": "路线图 §15.3 第 1384 行"
+        },
+        {
+          "id": "Q-10",
+          "name": "没有未分类 P0/P1 缺陷，P2 必须有明确发布判断",
+          "status": "complete",
+          "evidence": ["docs/fuzz-evidence-0.13.0.md:97-105（§6 分类：M2-F1 P1、M2-F2 P0 均已修复）", "M2-F1 修复：crates/consema-json/src/projection.rs:330,363（RecoveredDocument 门）、crates/consema-json/src/edit.rs:262,305，严格断言（operation_fuzz.rs:123）", "M2-F2 修复：crates/consema-yaml/src/native.rs:497（exact_empty_scalar 仅 plain 样式重写）、:1189（回归测试），trip-wire（property_graph.rs:20-34）"],
+          "source_of_truth": "路线图 §18.4 第 1683-1689 行",
+          "note": "两处修复当前为工作树状态（未提交）；M9 落地 commit 一并入库。"
+        }
+      ]
+    },
+    "security": {
+      "roadmap_section": "§15.4 安全门禁",
+      "status": "partial",
+      "items": [
+        {
+          "id": "SEC-1",
+          "name": "Rust workspace 保持 unsafe_code = \"forbid\"",
+          "status": "complete",
+          "evidence": ["Cargo.toml:37", "docs/0.13.0-gate-plan.md P-9"],
+          "source_of_truth": "workspace manifest（lint 常设）"
+        },
+        {
+          "id": "SEC-2",
+          "name": "不因 parse/query/project/materialize 触发网络、文件、环境或程序执行",
+          "status": "complete",
+          "evidence": ["SECURITY.md:3-14（无副作用链）", "CHANGELOG.md:26（默认无文件写入）", "各家族 RFC 硬门禁 1"],
+          "source_of_truth": "SECURITY.md + 各家族 RFC"
+        },
+        {
+          "id": "SEC-3",
+          "name": "XML external entity、YAML tag constructor、HCL evaluation 默认关闭且不可被错误路径绕过",
+          "status": "complete",
+          "evidence": ["SECURITY.md:32（XML entity deny-by-default）、:34（YAML tag 不执行构造器）、:36（HCL 不求值）", "CHANGELOG.md:100（0.9.0 记录）"],
+          "source_of_truth": "RFC 0012/0007/0014"
+        },
+        {
+          "id": "SEC-4",
+          "name": "所有输入、递归、节点、输出、诊断、匹配和编辑均可限制",
+          "status": "complete",
+          "evidence": ["SECURITY.md:3-12", "crates/consema-document/src/source.rs（SourceLimits）", "各格式 *Limits::default()（fuzz 资源上限即生产默认，fuzz.rs 契约）"],
+          "source_of_truth": "SECURITY.md + RFC 0004/0008"
+        },
+        {
+          "id": "SEC-5",
+          "name": "resource limit 不产生截断假成功",
+          "status": "complete",
+          "evidence": ["SECURITY.md:14", "docs/pilot-0.13.0.md:210（指标 5：limit 类 exit 3，size/digest 如实）"],
+          "source_of_truth": "SECURITY.md（安全边界）"
+        },
+        {
+          "id": "SEC-6",
+          "name": "依赖不存在未接受的 critical/high 漏洞",
+          "status": "complete",
+          "evidence": ["cargo audit --no-fetch 本地实测：1,189 advisories / 42 deps / 0 漏洞（2026-08-07，gate plan P-4）", ".github/workflows/ci.yml:136-147（audit job）"],
+          "source_of_truth": "RustSec DB + CI audit job"
+        },
+        {
+          "id": "SEC-7",
+          "name": "dependency license、来源和维护状态完成审计",
+          "status": "complete",
+          "evidence": ["cargo deny check advisories bans licenses sources 实测全绿（gate plan P-3）", "deny.toml", ".github/workflows/ci.yml:123-132（deny job）"],
+          "source_of_truth": "deny.toml（政策）+ CI deny job"
+        },
+        {
+          "id": "SEC-8",
+          "name": "threat model、SECURITY.md、披露与修复流程完成",
+          "status": "complete",
+          "evidence": ["SECURITY.md（threat model 载体：攻击面/无副作用链/资源限制/硬化门禁）", "SECURITY.md:40-48（披露渠道 + 分级 SLA + 支持窗口）", "docs/support-policy.md §4（P0-P3 修复政策）"],
+          "source_of_truth": "路线图 §15.4 第 1398 行、§19.4 第 1764 行；SECURITY.md"
+        },
+        {
+          "id": "SEC-9",
+          "name": "CLI secret redaction 和临时文件权限完成跨平台验证",
+          "status": "partial",
+          "evidence": ["Windows 实测全量：CHANGELOG.md:14、34（redaction + cli 进程级硬化）", "docs/support-policy.md:65-67（三平台验证归 0.13.0 收口）"],
+          "source_of_truth": "RFC 0015 §9.6",
+          "completion_path": "Linux/macOS 全量验证随第一次 CI 真跑完成（cli_*.rs 测试矩阵在 3 OS 上运行，含 redaction 与临时文件/权限测试）——见 feature_complete_judgment.open_items C-1。",
+          "owner": "0.13.0 gatekeeper（推入 CI 后核对 3 OS 的 cli 测试输出）"
+        }
+      ]
+    },
+    "performance": {
+      "roadmap_section": "§15.5 性能门禁",
+      "status": "complete",
+      "items": [
+        {
+          "id": "P-1",
+          "name": "parser/decoder 在正常输入上具有经验证的线性或明确复杂度",
+          "status": "complete",
+          "evidence": ["三处超线性路径已修复并复验：xml raw_offset 恒等快捷（crates/consema-xml/src/parser.rs:2027-2052；回归网 :2842-2878）、SourceSnapshot RawUtf8 保留已校验文本（crates/consema-document/src/source.rs:466-474,501-509；回归网 :1538-1589）、yaml RawByteResolver 单遍偏移解析（crates/consema-yaml/src/offsets.rs:1-80；测试 :90-156）", "后修复实测：xml 20k 96.6 s→0.105 s（~920×，source.rs:1545）、yaml 335KB 69.4 s→1.01 s（~69×，pilot F-2 解决记录）、properties 10k 5.09 s→127.5 ms（~40×）", "S1 3.5 MB 大文档行与 S4 20k 节点行均线性（BENCHMARKS §7 修正注）"],
+          "source_of_truth": "路线图 §15.5 第 1403 行、§20.1；docs/BENCHMARKS-0.13.0.md §7/§12（复验记录）"
+        },
+        {
+          "id": "P-2",
+          "name": "adversarial input 不出现未受限的超线性退化",
+          "status": "complete",
+          "evidence": ["硬化套件 55 个恶意/边界测试（SECURITY.md:16；gate plan P-5）", "fuzz 会话 4.186 亿次变异零超时（fuzz-evidence §3.2）"],
+          "source_of_truth": "SECURITY.md hardening + fuzz 账本"
+        },
+        {
+          "id": "P-3",
+          "name": "每个格式都有 parse、render、query、projection、materialization、edit benchmark",
+          "status": "complete",
+          "evidence": ["docs/BENCHMARKS-0.13.0.md:90-138（§4 SDK 行：parse/syntax_query/projection/materialization/edit 各格式）", "crates/consema-conformance/examples/*_baseline.rs（6 个 harness）"],
+          "source_of_truth": "BENCHMARKS-0.13.0.md（冻结文档）",
+          "note": "诚实覆盖声明：TOML SDK 行与 xml/plist/hcl query/edit 行缺 harness，为文档化缺口（BENCHMARKS §12，已入 known_accepted_limitations）。"
+        },
+        {
+          "id": "P-4",
+          "name": "建立固定硬件、固定 corpus 和版本化 baseline",
+          "status": "complete",
+          "evidence": ["docs/BENCHMARKS-0.13.0.md:12-32（§1 环境 pin）", ":66-88（§3 corpus + SHA-256 pin）", ":206-249（§8 版本化回归政策）"],
+          "source_of_truth": "BENCHMARKS-0.13.0.md"
+        },
+        {
+          "id": "P-5",
+          "name": "p50/p95 时间与峰值内存有正式预算",
+          "status": "complete",
+          "evidence": ["docs/BENCHMARKS-0.13.0.md:90-138（§4 SDK 预算行）", ":140-162（§5 CLI 预算行）", ":164-182（§6 materialize 预算行）", ":184-204（§7 场景预算行）"],
+          "source_of_truth": "BENCHMARKS-0.13.0.md（自 0.13.0 起为 release budget，非趋势记录）"
+        },
+        {
+          "id": "P-6",
+          "name": "任何超过已冻结预算或相对上一基线 10% 的回退必须有批准记录",
+          "status": "complete",
+          "evidence": ["docs/BENCHMARKS-0.13.0.md:206-249（§8 冻结政策文本）", ":251-277（§9 批准记录模板 → docs/APPROVALS-0.13.0.md）", "至 2026-08-07 无触发：后修复只改善性能（冻结预算仍为有效上界）"],
+          "source_of_truth": "路线图 §20.3；BENCHMARKS §8"
+        },
+        {
+          "id": "P-7",
+          "name": "大文档、深嵌套、大量重复项和大量小节点均有独立场景",
+          "status": "complete",
+          "evidence": ["docs/BENCHMARKS-0.13.0.md:184-204（§7：S1 3.5 MB 大文档、S2 深嵌套 200、S3 10k 重复、S4 20k 小节点）"],
+          "source_of_truth": "路线图 §15.5 第 1409 行"
+        },
+        {
+          "id": "P-8",
+          "name": "lazy/streaming capability 的完成、取消和 backpressure 经过验证",
+          "status": "not_applicable",
+          "evidence": ["路线图 §24 非目标核对（无 lazy/streaming capability，gate plan §1.5 行）"],
+          "source_of_truth": "路线图 §24"
+        }
+      ]
+    },
+    "api_product": {
+      "roadmap_section": "§15.6 API 与产品门禁",
+      "status": "partial",
+      "items": [
+        {
+          "id": "A-1",
+          "name": "Rust public API 完成独立审查",
+          "status": "complete",
+          "evidence": ["docs/API-REVIEW-0.13.0.md（五维审计 F2/F3/F4/F10/F11/F13/F15 + 2 philosophy 全部 disposition；B-1..B-9 全部处置）", "B-6 修复（java-properties convert 族前缀）：API-REVIEW §2.6，回归测试 3 个", "B-9 修复（inspect 格式本地 code exit 5）：API-REVIEW §2.9，回归测试矩阵 5+1 个", "cargo-semver-checks vs v0.8.0：11 crate 基线，8 全绿 + 3 仅 enum_variant_added（RFC 级批准，API-REVIEW §3）"],
+          "source_of_truth": "docs/API-REVIEW-0.13.0.md（本里程碑唯一权威载体）"
+        },
+        {
+          "id": "A-2",
+          "name": "backend AST 和第三方错误类型不泄漏",
+          "status": "complete",
+          "evidence": ["docs/API-REVIEW-0.13.0.md:189-193（§6：15 个 crate 零第三方依赖；facade Document 用私有 DocumentInner 包装）"],
+          "source_of_truth": "API-REVIEW §6 + Cargo.toml 依赖面"
+        },
+        {
+          "id": "A-3",
+          "name": "facade、低层 crate 与 feature 关系清楚",
+          "status": "complete",
+          "evidence": ["docs/API-REVIEW-0.13.0.md:182-187（§5：facade 13 个 consema-* path 依赖，无 [features] 段）", "CHANGELOG.md:21（CLI 全部格式知识来自 facade）"],
+          "source_of_truth": "API-REVIEW §5 + crates/consema/Cargo.toml"
+        },
+        {
+          "id": "A-4",
+          "name": "MSRV 在 manifest 中声明并在 CI 真正验证",
+          "status": "partial",
+          "evidence": ["声明：Cargo.toml:33（rust-version = \"1.85\"）", "CI job 已交付：.github/workflows/ci.yml:66-85（msrv job，1.85.0 全门禁）", "本地验证记录：gate plan §4 M1（干净 worktree 全流程 exit 0，MSRV 腿实测拦截 let-chains）"],
+          "source_of_truth": "路线图 §15.6 第 1419 行",
+          "completion_path": "第一次 GitHub push 后 msrv job 在干净 checkout 上真跑（见 open_items C-1）。",
+          "owner": "0.13.0 gatekeeper"
+        },
+        {
+          "id": "A-5",
+          "name": "全部 public API 有 rustdoc",
+          "status": "complete",
+          "evidence": ["docs/API-REVIEW-0.13.0.md:176-180（§4：14 个 crate 在 -D warnings 下零 missing-docs）", "M2 合入后 fuzz.rs 的 12 处 missing-docs 已补齐（crates/consema-conformance/src/fuzz.rs:52-69 全部带 /// 文档）"],
+          "source_of_truth": "workspace lint missing_docs = \"warn\"（Cargo.toml:38）+ RUSTDOCFLAGS=\"-D warnings\" cargo doc"
+        },
+        {
+          "id": "A-6",
+          "name": "每个主要工作流有可复制示例",
+          "status": "complete",
+          "evidence": ["docs/cookbook.md §12（每格式 CLI 示例矩阵，§22.6）", "crates/consema-conformance/examples/（6 个 baseline harness：hcl/json_family/line_formats/plist/xml/yaml）", "docs/pilot-0.13.0.md（真实项目必做工作流）"],
+          "source_of_truth": "路线图 §22.6"
+        },
+        {
+          "id": "A-7",
+          "name": "CLI exit code、stdout/stderr 和 machine schema 冻结为 v1 candidate",
+          "status": "complete",
+          "evidence": ["RFC 0015（§5.1 exit code 分类 0-5、§4.2 stdout/stderr 分流）", "conformance/vectors/cli-v1.json（40 case）", "CHANGELOG.md:11-12（信封与分类冻结）"],
+          "source_of_truth": "RFC 0015（冻结）"
+        },
+        {
+          "id": "A-8",
+          "name": "patch/apply 具备中断、冲突、权限和磁盘错误测试",
+          "status": "complete",
+          "evidence": ["crates/consema/tests/cli_m*.rs（stale/篡改 original/只读/目录/symlink/权限/磁盘/中断注入）", "docs/pilot-0.13.0.md:158-200（W8：stale conflict、中断恢复实测）", "CHANGELOG.md:13,23,34"],
+          "source_of_truth": "RFC 0015 §6.2（batch 状态机）"
+        },
+        {
+          "id": "A-9",
+          "name": "release artifact 可从干净环境重建",
+          "status": "partial",
+          "evidence": ["scripts/verify-package-archives.ps1（-AllowDirty + MSRV 腿 + tar 路径安全 + 校验和）", "本地实测：干净 HEAD worktree 全流程 exit 0（14 个 .crate + MSRV 1.85 腿，gate plan §4 M1 验证记录）", "CI package job 已交付：.github/workflows/ci.yml:233-250", "docs/release-process-0.13.0.md:28-70（干净重建步骤 + CI 常设载体）"],
+          "source_of_truth": "路线图 §15.6 第 1424 行",
+          "completion_path": "第一次 GitHub push 后 package job 在干净 checkout 上真跑（见 open_items C-1）。",
+          "owner": "0.13.0 gatekeeper"
+        },
+        {
+          "id": "A-10",
+          "name": "changelog、migration、compatibility 和 support policy 完成",
+          "status": "complete",
+          "evidence": ["CHANGELOG.md（0.1.0-0.12.0 + 0.13.0 Unreleased 条目）", "docs/migration-guide.md（0.8.0 API → 0.12.0 facade + CLI、v6→v7）", "docs/support-policy.md（§21.4 七个必公开项 + 工具链冻结时机）"],
+          "source_of_truth": "路线图 §21.3/§21.4"
+        }
+      ]
+    }
+  },
+  "feature_complete_judgment": {
+    "verdict": "not_closed",
+    "verdict_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭。已关闭：全部功能/规范门禁、质量门禁除 Q-7 外全部、性能门禁全部、API 与产品门禁除 A-4/A-9 外全部、安全门禁除 SEC-9 外全部。本判定翻转（closed）需要下列开放项全部完成；0.14.0 Go 实现不得提前开始（路线图 §15.7 第 1445 行、§14.12 第 1345 行）。",
+    "closed_gates": ["functional（§15.1）", "spec（§15.2）", "performance（§15.5）"],
+    "partial_gates": {
+      "quality（§15.3）": ["Q-7：72 CPU-hours per-format RC fuzz"],
+      "security（§15.4）": ["SEC-9：CLI redaction/临时文件权限 Linux/macOS 全量验证"],
+      "api_product（§15.6）": ["A-4：MSRV 在 CI 真验证", "A-9：release artifact 干净重建（CI package job 真跑）"]
+    },
+    "open_items": [
+      {
+        "id": "C-1",
+        "name": "CI 第一次真跑：9 job 在 GitHub 上干净 checkout 全矩阵全绿",
+        "status": "partial",
+        "closes": ["A-4（msrv job 真验证）", "A-9（package job 真跑）", "SEC-9（Linux/macOS 上 cli 测试矩阵）", "oracles job 在 hosted runner 的文档化 skip 行为", "semver job 的 approved-failure 落定（API-REVIEW §3：三个 crate 的 enum_variant_added 保持失败 + RFC 级批准记录，或推入时加 allowlist——ci.yml 属 .github 域，由 gatekeeper 在推入时落定）"],
+        "evidence": [".github/workflows/ci.yml（9 job：lint/test/msrv/conformance/deny/audit/semver/oracles/package）", "gate plan §4 M1 验证记录（本地等效全流程实测；GitHub 真跑未发生）"],
+        "completion_path": "推入 GitHub 后对 main 分支跑全矩阵；修复任何 runner 环境差异（R-2/R-3：oracle pin 与 hosted runner 不符时保持文档化 skip=成功）；记录 9 job 全绿结果到本 manifest 与发布记录。",
+        "owner": "0.13.0 gatekeeper（release-process §7 item 2）"
+      },
+      {
+        "id": "C-2",
+        "name": "72 CPU-hours release-candidate fuzz 每格式累计",
+        "status": "partial",
+        "closes": ["Q-7"],
+        "evidence": ["docs/fuzz-evidence-0.13.0.md:107-113（§7 完成路径）", "docs/fuzz-evidence-0.13.0.md:115-125（§8：当前 10.798 CPU-hours，最接近格式 2.8%）"],
+        "completion_path": "见 quality.Q-7.completion_path（clang 主机 cargo-fuzz 为主，本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时）。",
+        "owner": "fuzz 证据账本（agent H 延续）+ 0.13.0 gatekeeper"
+      },
+      {
+        "id": "C-3",
+        "name": "真实发布密钥与 0.13.0 发布执行",
+        "status": "partial",
+        "closes": ["SEC-8 的发布物侧（正式签名/SBOM/checksum）", "版本推进（product_version 0.8.0 → 0.13.0）"],
+        "evidence": ["docs/release-process-0.13.0.md:124-139（§4.4：演练密钥 82301612… 仅流程验证；正式发布前必须在默认 keyring 生成真实密钥 + 备份 + 吊销证书）", "docs/release-process-0.13.0.md:278-291（§7 发布检查单 10 项）"],
+        "completion_path": "按 release-process §7 顺序执行：版本推进 → CI 9 job 全绿 → 本地干净重建 → SBOM → checksum + 签名 → 签名 tag（登记 tag 对象 hash）→ 全量校验 → 恢复演练复跑 → 产物入库 → SECURITY.md 复核。",
+        "owner": "0.13.0 release owner（版本治理 §12）"
+      }
+    ],
+    "tree_state_note": "本 manifest 记录时的仓库为工作树状态：M2 修复（M2-F1/M2-F2）、fuzz/property/mutation 语料、三处性能修复与回归测试均已落盘但未提交（git status 可见）。M9 落地 commit 应包含上述文件与本文档；本 manifest 的 evidence 行号按当前工作树核验。"
+  }
+}

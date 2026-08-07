@@ -2,6 +2,48 @@
 
 Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发布能力。
 
+## Unreleased — 0.13.0
+
+0.13.0 是 Rust 生产加固与 Feature-Complete Gate 版本（路线图 §14.12/§15，执行计划 `docs/0.13.0-gate-plan.md`）：不新增格式，把 §15 门禁逐条落成可复现证据。全部条目状态与证据见 Feature-Complete Manifest（`docs/fc-manifest-0.13.0.json`）；门禁**尚未全部关闭**，本条目末尾 Boundaries 如实列出未完成项与完成路径。
+
+### Added
+
+- 三平台 CI（`.github/workflows/ci.yml`，9 job）：lint/test 各 3 OS × stable、msrv（1.85.0 全门禁）、conformance（18 套 suite / 508 cases 计数断言）、deny 四段、audit（RustSec）、semver（vs v0.8.0 基线 11 crate）、oracles（文档化 skip=成功）、package（含 MSRV 腿的归档重建门禁）；
+- 打包验证脚本加固（`scripts/verify-package-archives.ps1`）：`-AllowDirty` 开关 + 脏树前置条件逐文件报错、`-SkipMsrv` + 默认开启的 MSRV 构建腿（rust-version 读自 cargo metadata）；干净 HEAD 工作树全流程实测 exit 0（14 个 `.crate` + 1.85.0 全 target 构建）；
+- coverage 工具链常设化（`scripts/coverage.ps1` + `docs/COVERAGE-0.13.0.md`）：可复现测量（commit 9c1ede2，region 86.51% / function 82.82% / line 87.91%），硬下限（regions≥70/functions≥70/lines≥80）与 `-Trend` 趋势门禁；取代 0.8.0 的单次不可复现 84.65% 记录；
+- fuzz/property/mutation 语料（门禁 §15.3）：确定性 in-process 变异引擎（`crates/consema-conformance/src/fuzz.rs`）驱动的 17 个长期 target（每格式 parse/operations + protocol decode；`crates/*/fuzz/` 下与 cargo-fuzz wrapper 双接线，corpus 种子 47 个文件进 git）；protocol/varint/offset/graph/alias property tests 3 组（property_graph/property_protocol/property_plist）；mutation corpus 46 fixtures × 174,921 cases（`conformance/corpora/mutation-v1.json`，种子提交）与全量 replay 测试；
+- 两个 fuzz 发现修复：M2-F1（json Recovered 文档被 project/edit 接受，P1）与 M2-F2（yaml 引号 `"~"` 标量被解码为空，P0 静默损失）——均修复并带严格断言/回归（见 Correctness）；
+- API/semver 审查（`docs/API-REVIEW-0.13.0.md`）：五维审计 findings（F2/F3/F4/F10/F11/F13/F15 + 2 philosophy）全部转写并给出 disposition；M10 移交的 CLI backlog B-1..B-9 全部处置；cargo-semver-checks vs v0.8.0 实测（8 全绿 + 3 仅新家族枚举变体新增，RFC 级批准）；rustdoc 100% 断言；backend AST/第三方错误类型泄漏复查零泄漏；Go API mapping RFC 0016 立项；
+- 性能与内存预算冻结（`docs/BENCHMARKS-0.13.0.md`）：每格式 SDK/CLI p50/p95/峰值内存预算行（§4/§5/§6）、§20.3 回退批准记录政策（§8/§9）、大文档/深嵌套/大量重复/大量小节点四场景独立行（§7）；三个超线性路径修复：xml `raw_offset` 恒等快捷（`crates/consema-xml/src/parser.rs:2027-2052`）、`SourceSnapshot` 保留已校验 UTF-8 文本（`crates/consema-document/src/source.rs:466-509`）、yaml `RawByteResolver` 单遍偏移解析（`crates/consema-yaml/src/offsets.rs:1-80`），各带回归测试；修复后实测 xml 20k 节点 96.6 s→0.105 s（~920×）、yaml 335 KB 转换 69.4 s→1.01 s（~69×）、properties 10k 重复键 5.09 s→127.5 ms（~40×），§15.5 线性度门禁据此复验通过；
+- 发布供应链（`docs/release-process-0.13.0.md` + `scripts/release-sign.ps1`/`release-sbom.ps1`）：checksum 清单（`docs/release/SHA256SUMS-0.8.0.txt(.asc/.sig)`）、GPG 签名 tag/artifact 流程（演练全流程实测，tag 重签拒绝）、SPDX-2.3 SBOM（`docs/release/sbom-0.8.0.json`，42 packages / 123 relationships）、干净环境重建步骤 + CI package 常设载体、三场恢复演练真实记录（checksum 篡改/归档损坏/丢 tag）；SECURITY.md 新增安全披露与支持周期章节（协调披露渠道 + 分级 SLA + 支持窗口）；
+- support policy（`docs/support-policy.md`，§21.4 七个必公开项 + 工具链冻结时机）与真实项目 pilot（`docs/pilot-0.13.0.md`，路线图 §23.2 必做工作流 W1-W8 + §23.3 核心指标 12 项）；
+- 72 CPU-hours RC fuzz 证据账本（`docs/fuzz-evidence-0.13.0.md` + `docs/fuzz-evidence-0.13.0-logs/`）：追加式 runs.csv 账本（2026-08-07 会话：10.798 真实 CPU-hours、1,547 次进程运行、4.186 亿次变异、零新发现），确定性口径与完成路径文档化。
+
+### Correctness
+
+- M2-F1 修复：consema-json 在 `Document::project` 与 edit `commit` 入口拒绝 Recovered 文档（`ProjectionFailure::RecoveredDocument`/`EditFailure::RecoveredDocument`，`crates/consema-json/src/projection.rs:330,363`、`edit.rs:262,305`），驱动计数豁免移除、严格断言生效（`operation_fuzz.rs:123`）；
+- M2-F2 修复：yaml 空标量重写仅限 plain 样式（`exact_empty_scalar`，`crates/consema-yaml/src/native.rs:497`），引号 `"~"` 按 YAML 1.2 语义解码为字符串；trip-wire 回归（`property_graph.rs:20-34`）计数即失败；
+- 三处超线性形成路径修复（见 Added 性能条目），每个带边界宽松的线性回归网（`parser.rs:2842-2878` 10k 元素 <20s、`source.rs:1538-1589` 262,144 次坐标转换 <5s、`offsets.rs:90-156` 与 `raw_byte_at` 逐点相等）；修复只改善性能，BENCHMARKS 冻结预算仍为有效上界，无批准记录需求；
+- B-6 修复：java-properties 源 convert/project 的族前缀特例（`project_cmd.rs:65-73`），发布的两个 `java-properties.projection.*` target 可达，回归测试 3 个（含"唯一阻塞是文档化边界"钉死测试）；
+- B-9 修复：`inspect --profile` 对未注册格式本地 code 诊断复用 `registered_code` 注册 fallback（`inspect.rs` 的 `bind_parse_diagnostic` helper），Recovered→exit 0、fatal→exit 2，不再有 exit 5 内部错误；stderr 与 human 视图保留真码；回归测试矩阵（xml/plist/hcl 三例 Recovered + 三例深度 fatal + ini category 矛盾 + 进程级）；
+- 信封语义不漂移：B-9 修复后 inspect 与 query 行为一致化（同一 fallback `core.source.invalid-sequence@1`，RFC 0015 §4.3 冻结），B-4 处置保持冻结。
+
+### Verified
+
+- workspace `cargo test --workspace --locked`：1,617 passed / 0 failed（2026-08-07 实测）；18 套语言无关 suite 508/508（含 fuzz/property/mutation 新增的 conformance 域测试）；
+- mutation corpus 全量 replay：174,921 case 通过（`cargo test -p consema-conformance --test mutation_corpus --locked -- --ignored`，63.10s）；
+- cargo deny 四段与 cargo audit（本地 1,189 advisories / 42 deps / 0 漏洞）保持全绿；CI 9 job 均已落盘（第一次 GitHub 真跑是收口项，见 Boundaries）；
+- coverage 可复现基线入库（86.51/82.82/87.91，脚本产出）；BENCHMARKS-0.13.0.md 预算表 + 后修复复测（S3 127.5 ms、S4 0.105 s）记录在档；
+- 发布供应链演练真实执行：签名全流程、SBOM 生成、三场恢复演练、14 归档校验，记录于 `docs/release-process-0.13.0.md`。
+
+### Boundaries
+
+- **72 CPU-hours RC fuzz 未完成（质量门禁 Q-7，partial）**：2026-08-07 会话累计 10.798 CPU-hours（每格式最接近的 properties 仅 2.8%）；零未解释发现，但"每格式 ≥72 CPU-hours"门槛未达。完成路径（`docs/fuzz-evidence-0.13.0.md` §7）：clang 主机对 17 个 cargo-fuzz target 跑 `cargo +nightly fuzz run`（corpus 进化），本机确定性协议续跑为备选；时长按追加式账本入 `runs.csv`，新 crash 清零该 target 计时；
+- **CI 9 job 已落盘、未在 GitHub 真跑（A-4/A-9/SEC-9，partial）**：推入后在干净 checkout 全矩阵全绿是收口项；semver job 对三个 crate 的 `enum_variant_added` 保持失败 + RFC 级批准记录（`docs/API-REVIEW-0.13.0.md` §3），allowlist 修改属 `.github` 域由 gatekeeper 推入时落定；
+- **真实发布密钥未生成（C-3，partial）**：演练密钥（82301612…）与 scratch 仓库不进入发布记录；0.13.0 发布前按 `docs/release-process-0.13.0.md` §4.1 在默认 keyring 生成真实密钥 + 私钥备份 + 吊销证书，并执行 §7 发布检查单（含版本推进 0.8.0→0.13.0）；
+- 门禁 open backlog 保持：facade node-locator API（B-1/B-2，1.0.0 窗口）、每格式报告外部化（B-3）、失败 convert 形态（B-5，冻结语义）、每格式 edit 词表（B-7，0.14.0+）、`edit --write` 接线（B-8，usage 显式拒绝不漂移）；全部记录于 Feature-Complete Manifest 的 known_accepted_limitations；
+- M2 修复、fuzz/property/mutation 语料与三处性能修复当前为工作树状态（未提交），随 M9 落地 commit 入库；manifest 证据行号按该工作树核验。
+
 ## Unreleased — 0.12.0
 
 ### Added
