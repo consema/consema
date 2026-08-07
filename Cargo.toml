@@ -11,6 +11,9 @@ members = [
     "crates/consema-ini",
     "crates/consema-properties",
     "crates/consema-protocol",
+    "crates/consema-xml",
+    "crates/consema-plist",
+    "crates/consema-hcl",
     "crates/consema-conformance",
     "crates/consema",
 ]
@@ -21,6 +24,8 @@ sha2 = { version = "=0.11.0", default-features = false }
 toml_edit = { version = "=0.22.27", default-features = false, features = ["parse"] }
 saphyr-parser = { version = "=0.0.11", default-features = false }
 unicode-id-start = "=1.4.0"
+unicode-ident = "=1.0.24"
+xmlparser = { version = "=0.13.6", default-features = false }
 
 [workspace.package]
 version = "0.8.0"
