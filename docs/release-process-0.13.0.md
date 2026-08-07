@@ -15,7 +15,7 @@
 | §19.4 要素 | 载体 | 状态 |
 |---|---|---|
 | locked dependency graph | Cargo.lock（`git` 内）；SBOM 的 `dependencyReferences` | 已有 |
-| Cargo 与 Go dependency audit | CI deny/audit job；cargo-audit 本地门禁 | 已有（Go 未开始） |
+| Cargo 与 Go dependency audit | CI deny/audit job；cargo-audit 本地门禁 | 已有（go/ 已按 2026-08-07 decision record 启动 0.14.0 G0.1-G0.3，std-only 零第三方依赖，go-implementation-plan §1.3） |
 | license inventory | deny.toml + SBOM `licenseConcluded` 字段 | 已有 + §4 |
 | source archive | git 仓库 + 14 个 `.crate`（verify-package-archives 打包） | 已有 |
 | SBOM | `docs/release/sbom-<version>.json`（`scripts/release-sbom.ps1`） | §4 |
@@ -57,7 +57,7 @@ MSRV build leg: rustc 1.85.0 for all 14 crates
 - 14 个可发布 crate 集合由 cargo metadata 计算（workspace member 且 `publish`
   为空）；`consema-conformance` 等 `publish = false` crate 只进仓库，不打进归档。
 
-### 2.2 CI package job（常设载体，`.github/workflows/ci.yml:226-250`）
+### 2.2 CI package job（常设载体，`.github/workflows/ci.yml:285-303`）
 
 - `package` job：`ubuntu-latest`、`timeout-minutes: 60`；steps：
   `actions/checkout@v4` → `dtolnay/rust-toolchain@stable` → `dtolnay/rust-toolchain@1.85.0`
@@ -279,7 +279,7 @@ verify exit=0
 
 ```text
 □ 1. workspace 版本推进到 0.13.0（Cargo.toml [workspace.package] version）
-□ 2. CI 9 job 全绿（含 package job，§2.2）——常设重建证明
+□ 2. CI 10 job 全绿（含 package job，§2.2）——常设重建证明
 □ 3. 本地干净重建：cargo fetch --locked + verify-package-archives.ps1（§2.1）
 □ 4. SBOM：scripts/release-sbom.ps1 → docs/release/sbom-0.13.0.json（§5）
 □ 5. Checksum：release-sign.ps1 -SignArtifacts → SHA256SUMS-0.13.0.txt(.asc/.sig)

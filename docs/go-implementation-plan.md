@@ -1,10 +1,10 @@
-# Consema 0.14.0–0.19.0 Go 实现计划（规划阶段文档；实现被 §7 START GATE 门禁）
+# Consema 0.14.0–0.19.0 Go 实现计划（规划阶段文档；发布与里程碑关闭被 §7 START GATE 门禁；实现启动经 2026-08-07 decision record 授权）
 
 - 对应规范：路线图《Consema 1.0.0 产品路线图与双语言落地设计》§11（双实现原则）、§14.12（第 1345 行：只有第 15 节门禁全部通过才允许开始 0.14.0 Go 实现）、§15.7（Feature-Complete Manifest 为 Go 起点，第 1445 行）、§16（Go 阶段详细计划 §16.1-§16.6）、§17（语言无关 Conformance 架构）、§21.2（Go API 政策）、§22/§23（1.0.0 门槛与真实项目验证）；RFC 0016（Go API mapping charter，模块拓扑/值映射/API 形状/错误分类/conformance 集成契约/§8 冻结拼写/rejected alternatives 全部冻结）；docs/0.13.0-gate-plan.md（§4 M4/M9 与 §1.7：C-1/C-2/C-3 开放项）；docs/fc-manifest-0.13.0.json（当前门禁状态：gate_open / not_closed）
 - 目标版本：0.14.0（Go core、PVCE、PGCE 与协议）→ 0.15.0（Document、JSON family 与 TOML）→ 0.16.0（YAML、INI 与 Properties）→ 0.17.0（XML 与 plist）→ 0.18.0（HCL 与全操作 parity）→ 0.19.0（双语言一致性与产品 Beta），全部对应路线图 §16.1-§16.6
 - 先例：`docs/cli-implementation-plan.md`（0.12.0）与 `docs/0.13.0-gate-plan.md`（0.13.0）的多 agent 文件域计划体例；`conformance/oracles/hcl-go-v1/`（仓库内 Go 子目录 module 先例，仅差分 oracle）
 - 语义权威顺序（沿用 `docs/IMPLEMENTATION.md`，0.13.0-gate-plan.md:6）：永久不变量 → 已接受 RFC → 语言无关 conformance vectors → 本实现计划与 Rust API → 第三方行为仅为实现细节
-- **性质声明**：本文是只读调研产出的规划交付物。它**不**启动 Go 实现——0.14.0 的启动由 §7 START GATE 门禁（0.13.0 Rust Feature-Complete Gate 全闭，即 fc-manifest 开放项 C-1/C-2/C-3 完成）决定，本计划只是把该门禁编码为可执行条款。除本文外本次不修改任何仓库文件，不运行 git commit（体例照 cli-implementation-plan.md:8）。
+- **性质声明**：本文是只读调研产出的规划交付物。它**不**启动 Go 实现——0.14.0 的启动原由 §7 START GATE 门禁（0.13.0 Rust Feature-Complete Gate 全闭，即 fc-manifest 开放项 C-1/C-2/C-3 完成）决定；该"启动前置"条款已由 **2026-08-07 decision record**（fc-manifest decisions[0]：owner 按路线图 §0 冲突解决层级书面授权提前启动 go/ 0.14.0 G0.1-G0.3）修订——发布与里程碑关闭仍由 §7 START GATE 门禁决定，go/ 内已开工实现按 §6 门禁独立验证。除本文外本次不修改任何仓库文件，不运行 git commit（体例照 cli-implementation-plan.md:8）。
 
 ---
 
@@ -18,21 +18,22 @@
 - 与仓库内 Go 差分 oracle 的运行时 pin 一致：`conformance/oracles/hcl-go-v1/manifest.json` runtime 段记录 `go.version: go1.26.5 / go.os: windows / go.arch: amd64 / windows_build: 10.0.26200.0`。
 - Go SDK 模块的 go.mod 最低版本须在 0.14.0 冻结并进 CI 验证（路线图 §21.2 第 1825、1831 行）；hcl-go-v1 oracle 的 `go 1.22` 指令是其创建时代遗留，**不是** SDK 版本政策（oracle 的 go.mod 由自身 manifest 钉管，见 §1.3）。
 
-**RFC 0016 已通过，Go 实现尚未开始（规划前置条件满足）：**
+**RFC 0016 已接受；Go 实现已按 2026-08-07 decision record 启动（0.14.0 G0.1-G0.3）：**
 
 - `docs/rfcs/0016-go-api-mapping-v1.md` 已冻结：模块拓扑（§3）、PortableValue/PortableGraph→Go 映射（§4）、formation/projection/materialization/edit API 形状（§5）、错误分类（§6）、conformance 集成契约（§7）、语言无关拼写（§8）、版本关系（§9）、rejected alternatives（§10）。
-- 门禁记录：fc-manifest-0.13.0.json S-6（第 195-199 行）status=complete（"Go API mapping RFC 已通过，但 Go 实现尚未开始"）；0.13.0-gate-plan.md:169（G-8 交付）与 :74（§1.2 规范门禁表）。
+- 门禁记录：fc-manifest-0.13.0.json S-6（第 195-199 行）status=complete（"Go API mapping RFC 已接受；Go 实现 0.14.0 G0.1-G0.3 已按 2026-08-07 decision record 启动"）；0.13.0-gate-plan.md:169（G-8 交付）与 :74（§1.2 规范门禁表）。
+- **2026-08-07 decision record（fc-manifest decisions[0]）**：owner 决定在 C-1/C-2/C-3 完成前启动 Go 实现（go/，0.14.0 G0.1-G0.3）；Go 里程碑顺序、验收门禁（§6）与 C-1/C-2/C-3 完成路径不变；go/ 以 fc-manifest 为能力起点（路线图 §15.7 第 1445 行），不以工作树偶然状态为起点。go/ 已存在 core/graph/protocol 三 package（2026-08-07 实测 go build/vet/test/race/gofmt 全绿）。
 
 **0.13.0 Rust Feature-Complete Gate 当前状态（START GATE 的直接输入，未关闭）：**
 
-- fc-manifest-0.13.0.json：`status: "gate_open"`（第 5 行），`feature_complete_judgment.verdict: "not_closed"`（第 505 行），status_meaning 明示"仅在本判定翻转为 closed 后启动"（第 6 行）。
-- 开放项（第 513-541 行）：C-1（CI 9 job 在 GitHub 干净 checkout 真跑全矩阵全绿，第 515-522 行）、C-2（每格式 72 CPU-hours release-candidate fuzz，当前 10.798 CPU-hours，第 524-531 行）、C-3（真实发布密钥与 0.13.0 发布执行，第 533-540 行）。
+- fc-manifest-0.13.0.json：`status: "gate_open"`（第 5 行），`feature_complete_judgment.verdict: "not_closed"`（第 505 行），status_meaning 原明示"仅在本判定翻转为 closed 后启动"（第 6 行）——已按 2026-08-07 decision record 修订为"已提前启动 go/ 0.14.0 G0.1-G0.3，C-1/C-2/C-3 完成路径不变"。
+- 开放项（第 513-541 行）：C-1（CI 10 job 在 GitHub 干净 checkout 真跑全矩阵全绿，第 515-522 行）、C-2（每格式 72 CPU-hours release-candidate fuzz，当前 26.309 CPU-hours——2026-08-07 会话结束快照，runs.csv 4,063 行，第 524-531 行）、C-3（真实发布密钥与 0.13.0 发布执行，第 533-540 行）。
 - 已关闭：全部功能/规范/性能门禁，质量除 Q-7 外、安全除 SEC-9 外、API 与产品除 A-4/A-9 外（第 506-512 行）。
-- 约束结论（0.13.0-gate-plan.md:136）："0.14.0 不得在判定翻转前开始"。
+- 原约束结论（0.13.0-gate-plan.md:136）："0.14.0 不得在判定翻转前开始"——2026-08-07 decision record 已修订为：C-1/C-2/C-3 完成前不得发布 0.14.0、不得宣称 Go 里程碑关闭，go/ 按 §6 门禁独立验证（见 §7）。
 
 **Go 侧必须镜像的语言无关契约面（只读调研清单）：**
 
-1. **conformance 向量**：`conformance/vectors/` 18 套 suite / 508 cases（本计划逐文件计数复核，2026-08-07）：v1.json 30、toml-v1 18、protocol-v1 32、source-v1 28、syntax-query-v1 19、protocol-v2 11、operations-v1 35、json-family-v2 33、portable-graph-v1 10、semantic-model-v5 22、yaml-v1 27、semantic-model-v6 25、ini-v1 20、java-properties-v1 22、xml-1-0-safe-v1 34、plist-v1 45、hcl-v1 57、cli-v1 40。聚合 sha256 `e3d6578858fa1fdcab0c19ee0094cd246923dca76e9be4679aabf86b482b68c8`（fc-manifest 第 38 行；聚合方式见第 40 行）。
+1. **conformance 向量**：`conformance/vectors/` 18 套 suite / 508 cases（本计划逐文件计数复核，2026-08-07）：v1.json 30、toml-v1 18、protocol-v1 32、source-v1 28、syntax-query-v1 19、protocol-v2 11、operations-v1 35、json-family-v2 33、portable-graph-v1 10、semantic-model-v5 22、yaml-v1 27、semantic-model-v6 25、ini-v1 20、java-properties-v1 22、xml-1-0-safe-v1 34、plist-v1 45、hcl-v1 57、cli-v1 40。聚合 sha256 `e3d6578858fa1fdcab0c19ee0094cd246923dca76e9be4679aabf86b482b68c8`（fc-manifest 第 38 行；聚合方式见第 40 行；2026-08-07 复核可精确复现——按文件名字节序排序，逐文件 sha256（小写 hex），行格式 `{basename}:{digest}` 以 `\n` 连接（无尾换行）后对 UTF-8 字节再 sha256）。
 2. **registry**：semantic-model v7 = 41 条 contract / 187 个 error code（README.md:32；fc-manifest 第 26 行；`crates/consema-protocol/src/registry_manifest.rs` 为序列化源；0.13.0 audit F3 注册 `json.projection.incomplete-document@1`，186 → 187）。
 3. **capability set**：8 families / 16 profiles / 21 query domains / 16 operation registries / 187 codes（fc-manifest 第 31 行；`consema capabilities` 实测）。
 4. **协议 payload**：RFC 0015 v7 记录（`crates/consema-protocol/src/cli.rs`：CliOutputMessage、BatchPlanMessage、BatchResultMessage、CliCommand、Redaction、BatchPlanFileStatus/BatchResultFileStatus；exit 分类 `crates/consema-protocol/src/exit_class.rs:11` 起 Success/Usage/Data/Limit/Precondition/Internal 六类）。
@@ -344,13 +345,19 @@ Go runner 每次执行校验 `conformance/vectors/` 聚合 sha256 与 fc-manifes
 
 ## 7. START GATE（起始门禁；本计划最高优先级条款）
 
-> **0.13.0 门禁全闭（C-1/C-2/C-3 完成）之前，不派发任何 Go 实现 agent、不在 `go/` 下创建任何实现文件、不引入任何 Go 依赖。**
+> **C-1/C-2/C-3 完成之前，不得发布 0.14.0、不得宣称任何 Go 里程碑关闭；`go/` 内实现按 §6 门禁独立验证。**（2026-08-07 decision record 修订：owner 已书面授权提前启动 go/ 0.14.0 G0.1-G0.3，原"门禁全闭前不创建任何实现文件"条款不再适用于已开工的 G0.1-G0.3。）
 
-### 7.1 门禁条件（全部满足才允许启动 0.14.0 G0.1）
+**2026-08-07 决策记录（owner 书面授权；路线图 §0 冲突解决层级：改路线图、不静默缩小承诺）：**
+
+owner 决定：在 C-1/C-2/C-3 完成前启动 Go 实现（`go/`，0.14.0 G0.1-G0.3）。Go 里程碑顺序（§2）、验收门禁（§6）与 C-1/C-2/C-3 完成路径不变；`go/` 以 fc-manifest 为能力起点（路线图 §15.7 第 1445 行），不以工作树偶然状态为起点。决策记录落于 `docs/fc-manifest-0.13.0.json` 顶层 `decisions[0]`（2026-08-07）。
+
+**§7 START GATE 条款（修订后）**：C-1/C-2/C-3 完成前不得发布 0.14.0、不得宣称任何 Go 里程碑关闭；go/ 内已开工的 0.14.0 G0.1-G0.3 按 §6 门禁独立验证（每波次实测 go build/vet/test/race/gofmt 全绿）。门禁翻转判定权仍在 fc-manifest 的书面状态（§7.3），下文 §7.1-§7.3 保留为"发布/里程碑关闭"侧的门禁条款。
+
+### 7.1 门禁条件（全部满足才允许发布 0.14.0 / 宣称 Go 里程碑关闭）
 
 1. `docs/fc-manifest-0.13.0.json` 的 `status` 由 `"gate_open"` 翻转为 `"closed"`（第 5-6 行），且 `feature_complete_judgment.verdict` 为 `"closed"`（第 504-506 行）；
 2. 开放项全部关闭（第 513-541 行）：
-   - C-1：CI 9 job 在 GitHub 干净 checkout 全矩阵全绿（closes A-4/A-9/SEC-9，第 515-522 行）；
+   - C-1：CI 10 job 在 GitHub 干净 checkout 全矩阵全绿（closes A-4/A-9/SEC-9，第 515-522 行）；
    - C-2：每格式 72 CPU-hours release-candidate fuzz，零未解释问题（closes Q-7，第 524-531 行）；
    - C-3：真实发布密钥生成（含备份与吊销证书）与 0.13.0 发布执行，版本推进与 registry digest 回填（closes SEC-8 发布物侧，第 533-540 行；fc-manifest 第 16-18、28 行）；
 3. 门禁记录由 0.13.0 gatekeeper / release owner 在 manifest 中书面确认（owner 字段：fc-manifest 第 521、530、539 行）。
@@ -360,12 +367,12 @@ Go runner 每次执行校验 `conformance/vectors/` 聚合 sha256 与 fc-manifes
 - 路线图 §14.12 第 1345 行："只有第 15 节 Rust Feature-Complete Gate 全部通过，才允许开始 `0.14.0` 的 Go 实现"；
 - 路线图 §15.7 第 1445 行：Go 以 Feature-Complete Manifest 为起点，不以本地工作树偶然状态为起点；
 - 路线图 §11.1 第 826-836 行：Rust 全部功能实现 → 全部门禁通过 → Feature-Complete Baseline 冻结 → 才开始 Go 正式实现（"Go 开发不得提前与 Rust 格式实现并行"）；
-- fc-manifest-0.13.0.json 第 6 行（status_meaning："仅在本判定翻转为 closed 后启动"）、第 506 行（verdict_meaning："0.14.0 Go 实现不得提前开始"）；
+- fc-manifest-0.13.0.json 第 6 行（status_meaning："仅在本判定翻转为 closed 后启动"）、第 506 行（verdict_meaning："0.14.0 Go 实现不得提前开始"）——以上为 2026-08-07 decision record 修订前的原文表述（修订后见 fc-manifest decisions[0] 与本文件 §7 决策记录）；
 - docs/0.13.0-gate-plan.md:136（"0.14.0 不得在判定翻转前开始"）、:4（目标版本声明）。
 
 ### 7.3 执行规则
 
-- 本计划文档是规划阶段唯一交付物：允许的 Go 侧活动仅限只读调研（`go version` 等环境检查）与本文档维护；任何实现活动（agent 派发、文件创建、依赖引入）必须等到 §7.1 全部满足。
+- 本计划文档是规划阶段唯一交付物：允许的 Go 侧活动仅限只读调研（`go version` 等环境检查）与本文档维护；任何实现活动（agent 派发、文件创建、依赖引入）必须等到 §7.1 全部满足。**2026-08-07 decision record 例外**：go/ 0.14.0 G0.1-G0.3（core/graph/protocol）已获 owner 书面授权开工并独立验证（§6），不适用本款"等待 §7.1"约束；0.15.0+ 里程碑派发仍按本款执行（除非另行书面决策）。
 - 门禁翻转动作：0.13.0 gatekeeper 在 fc-manifest 中翻转判定并记录证据；**本计划不授权任何 agent 自行判定门禁已闭**——判定权只在 manifest 的书面状态。
 - 启动后复核：每个 Go 里程碑开始时重新核对 fc-manifest（RFC 0016 §9 第 214 行）；manifest 或能力集变更必须双语言同批处理（RFC 0016 §8 第 207-208 行 v8 窗口纪律）。
 - 门禁开放期间发现的任何"Go 侧预研"结论不得进入实现状态：按 §11.3 流程留档（路线图第 863-875 行），待门禁关闭后作为 0.14.0 输入。

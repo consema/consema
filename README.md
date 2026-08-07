@@ -1,6 +1,6 @@
 # Consema
 
-Consema 是《配置内容统一处理标准与 Rust 参考实现》的 Rust `0.8.0` 落地。
+本文档描述 Rust 参考实现的 0.8.0-0.13.0 特性面（workspace 版本推进 0.8.0→0.13.0 属发布检查单，fc-manifest 开放项 C-3）。
 
 它将无损文档、格式原生语义、公共值、查询、显式投影、来源映射和原子编辑分离；默认拒绝未经授权的转换、截断或信息损失。
 
@@ -73,7 +73,7 @@ TOML table、inline table、array-of-tables、dotted key 和 array 拥有各自�
 - 上游 YAML 门禁：[Official YAML test-suite acceptance gate](docs/UPSTREAM-YAML-TEST-SUITE.md)
 - 版本变更记录：[CHANGELOG](CHANGELOG.md)
 
-`1.0.0` 的目标不是最小闭环，而是覆盖 JSON、YAML、TOML、INI、XML、Properties、Property List 与 HCL 八个格式家族，并由 Rust、Go 两个独立实现共同证明。Go 只在 Rust Feature-Complete Gate 全部通过后开始。
+`1.0.0` 的目标不是最小闭环，而是覆盖 JSON、YAML、TOML、INI、XML、Properties、Property List 与 HCL 八个格式家族，并由 Rust、Go 两个独立实现共同证明。Go SDK（go/，0.14.0 里程碑 G0.1-G0.3：core/graph/protocol）按 2026-08-07 决策记录在 Rust Feature-Complete Gate 关闭前启动（偏差经记录，见 fc-manifest decision record）；其余 Go 里程碑（0.15.0-0.19.0）按 docs/go-implementation-plan.md 顺序推进。
 
 ## Workspace
 
@@ -413,7 +413,7 @@ $ consema convert package.json --profile json.strict --request-file convert-requ
 `UniqueStringEntriesToObject`，ExactOnly）：
 
 ```json
-{"schema":"core.portable-value-json@1","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"cli.convert-request@1"}},{"key":"projection_request","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.projection-request@1"}},{"key":"target","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"json.projection.best-exact-core"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"default_policy","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"core.projection.exact-or-reject"}},{"key":"version","value":{"type":"Integer","value":"1"}},{"key":"arguments","value":{"type":"Object","entries":[]}}]}},{"key":"rules","value":{"type":"Sequence","items":[]}},{"key":"limits","value":{"type":"Object","entries":[]}}]}},{"key":"materialization_request","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.materialization-request@2"}},{"key":"target_profile","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"toml.1.0"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"style","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"toml.canonical-document"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"encoding","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.source-encoding@1"}},{"key":"kind","value":{"type":"String","value":"Utf8"}},{"key":"windows_code_page","value":{"type":"Null"}}]}},{"key":"newline","value":{"type":"String","value":"Lf"}},{"key":"mapping_policy","value":{"type":"String","value":"UniqueStringEntriesToObject"}},{"key":"representability","value":{"type":"String","value":"ExactOnly"}},{"key":"limits","value":{"type":"Object","entries":[{"key":"max_input_nodes","value":{"type":"Integer","value":"1000000"}},{"key":"max_output_bytes","value":{"type":"Integer","value":"67108864"}},{"key":"max_depth","value":{"type":"Integer","value":"256"}},{"key":"max_report_entries","value":{"type":"Integer","value":"100000"}},{"key":"max_provenance_entries","value":{"type":"Integer","value":"2000000"}}]}}]}}]}}]}
+{"schema":"core.portable-value-json@1","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"cli.convert-request@1"}},{"key":"projection_request","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.projection-request@1"}},{"key":"target","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"json.projection.best-exact-core"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"default_policy","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"core.projection.exact-or-reject"}},{"key":"version","value":{"type":"Integer","value":"1"}},{"key":"arguments","value":{"type":"Object","entries":[]}}]}},{"key":"rules","value":{"type":"Sequence","items":[]}},{"key":"limits","value":{"type":"Object","entries":[]}}]}},{"key":"materialization_request","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.materialization-request@2"}},{"key":"target_profile","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"toml.1.0"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"style","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"toml.canonical-document"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"encoding","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.source-encoding@1"}},{"key":"kind","value":{"type":"String","value":"Utf8"}},{"key":"windows_code_page","value":{"type":"Null"}}]}},{"key":"newline","value":{"type":"String","value":"Lf"}},{"key":"mapping_policy","value":{"type":"String","value":"UniqueStringEntriesToObject"}},{"key":"representability","value":{"type":"String","value":"ExactOnly"}},{"key":"limits","value":{"type":"Object","entries":[{"key":"max_input_nodes","value":{"type":"Integer","value":"1000000"}},{"key":"max_output_bytes","value":{"type":"Integer","value":"67108864"}},{"key":"max_depth","value":{"type":"Integer","value":"256"}},{"key":"max_report_entries","value":{"type":"Integer","value":"100000"}},{"key":"max_provenance_entries","value":{"type":"Integer","value":"2000000"}}]}}]}}]}}
 ```
 
 请求文件不能带尾随换行（canonical 字节形式严格判定）。CLI 默认不写
@@ -451,4 +451,4 @@ cargo run --locked --offline --release -p consema-conformance --example hcl_base
 ./scripts/run-qt-ini-oracle.ps1
 ```
 
-当前未实现 semantic diff/merge、formatter、跨对象 member move/通用 table move、文件系统写入事务和 Go。JSON family/TOML Profile 仍按各自入口接受 UTF-8；YAML、INI、Properties 与 XML 各自使用已冻结的显式 source/encoding contract；HCL 恒为 UTF-8。后续能力按路线图逐阶段落地，不以 README 声明代替完成证据。
+当前未实现 semantic diff/merge、formatter、跨对象 member move/通用 table move、文件系统写入事务。Go SDK 按 2026-08-07 决策记录在 go/ 启动（0.14.0 里程碑 G0.1-G0.3：core/graph/protocol）。JSON family/TOML Profile 仍按各自入口接受 UTF-8；YAML、INI、Properties 与 XML 各自使用已冻结的显式 source/encoding contract；HCL 恒为 UTF-8。后续能力按路线图逐阶段落地，不以 README 声明代替完成证据。

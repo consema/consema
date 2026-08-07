@@ -1,6 +1,6 @@
 # RFC 0016: Go API mapping v1
 
-- Status: Draft for Go SDK implementation (Consema 0.14.0+, roadmap §16.1)
+- Status: Accepted（2026-08-07 随 15-kind 契约映射修订；Go 实现 0.14.0 进行中）
 - Date: 2026-08-07
 - Scope: the charter (立项) RFC of the Go SDK API surface. It freezes the Go
   module layout, the core value-model mapping (PortableValue/PortableGraph to
@@ -120,18 +120,32 @@ Constraints:
 
 ### 4.1 PortableValue → Go types (frozen)
 
+The language-neutral PortableValue contract is the closed fifteen-kind
+registry of 配置内容统一处理标准与 Rust 参考实现.md §10 and
+`crates/consema-core/src/value.rs` (PortableValueKind): Null, Boolean,
+Integer, Decimal, BinaryFloat32, BinaryFloat64, String, Bytes, Date, Time,
+LocalDateTime, OffsetDateTime, Sequence, Object, EntryMapping. The Go
+mapping covers all fifteen kinds:
+
 | PortableValue kind | Go type | Notes |
 |---|---|---|
-| Object | `*core.Object` | ordered entries: `[]core.Entry` (key, value); **never `map[string]Value`** — entry order is a language-neutral fact (roadmap §16.3: Go map iteration order must not affect any public result) |
-| Array | `*core.Array` | ordered items: `[]core.Value` |
-| String | `core.String` | `string` alias or struct per implementation |
+| Object | `*core.Object` | ordered entries: `[]core.Entry` (key, value); **never `map[string]Value`** — entry order is a language-neutral fact (roadmap §16.3: Go map iteration order must not affect any public result); duplicate keys rejected at construction (RFC 0002 object contract) |
+| Array | `*core.Array` | ordered items: `[]core.Value`; Sequence on the wire |
+| String | `core.String` | `string` alias or struct per implementation; Unicode scalar sequence, no normalization |
 | Integer | `core.Integer` | wraps `*big.Int`; canonical PVCE integer encoding |
-| Decimal | `core.Decimal` | canonical decimal; no float round-trip |
-| BinaryFloat64 | `core.BinaryFloat64` | exact IEEE-754 binary64 |
+| Decimal | `core.Decimal` | canonical coefficient × 10^exponent; no float round-trip |
+| BinaryFloat32 | `core.BinaryFloat32` | exact IEEE-754 binary32 bit pattern |
+| BinaryFloat64 | `core.BinaryFloat64` | exact IEEE-754 binary64 bit pattern |
+| Bytes | `core.Bytes` | raw octet sequence; never String; all encoding/decoding explicit |
+| Date | `core.Date` | proleptic Gregorian, astronomical year numbering, arbitrary-precision signed year; constructor validates month/day incl. leap rule on the year magnitude |
+| Time | `core.Time` | hour 0-23, minute/second 0-59, exact fractional second in [0, 1); no leap seconds, no 24:00:00 |
+| LocalDateTime | `core.LocalDateTime` | Date + Time, no offset; not a timestamp |
+| OffsetDateTime | `core.OffsetDateTime` | LocalDateTime + fixed UTC offset in whole seconds, \|offset\| < 24 h |
 | Boolean | `core.Boolean` | two-valued |
 | Null | `core.Null` | singleton |
+| EntryMapping | `*core.EntryMapping` | ordered arbitrary-key associations: `[]core.EntryMappingEntry` (key, value are any PortableValue); duplicates and order are value semantics |
 
-- `Value` is a closed interface over the eight kinds; exhaustive matching is
+- `Value` is a closed interface over the fifteen kinds; exhaustive matching is
   required for all conformance-relevant code paths (no `default` that
   silently accepts unknown kinds).
 - Strict equality (`Equal(a, b Value) bool`) implements PortableValue

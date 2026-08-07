@@ -214,7 +214,7 @@ consema: error: apply: interrupted by SIGINT/SIGTERM: the result manifest keeps 
 | 9 | parse/query/edit latency p50/p95 | 见下表 | PowerShell Stopwatch，30 次冷进程各命令（见 §4 复现） |
 | 10 | peak memory/input byte | ≈ 315 字节/输入字节 | 335,312 字节 JSON→TOML 成功转换峰值工作集 105,545,728 B（≈100.7 MiB）；YAML 目标见发现 F-2 |
 | 11 | batch apply success/recovery rate | 100%（100/100）；恢复率 100%（20/20） | 首批 apply 全部 completed；中断后重跑 completed 跳过、pending 重做全完成；stale 场景 9/10 completed + 1 skipped-stale（exit 4，预期） |
-| 12 | Rust/Go observable mismatch count | 0 | Go 实现尚未开始（0.14.0，§14.12）；按定义 N/A，0.14.0 起测量 |
+| 12 | Rust/Go observable mismatch count | 0 | Go 实现已按 2026-08-07 decision record 启动 G0.1-G0.3（go/）；本指标按定义 N/A，0.14.0 起测量 |
 
 延迟 p50/p95（冷进程，n=30，2026-08-07，本机）：
 

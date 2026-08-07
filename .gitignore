@@ -2,6 +2,7 @@
 /.pi-tmp/
 **/*.rs.bk
 *.log
+!docs/fuzz-evidence-0.13.0-logs/waves.log
 *.tmp
 .DS_Store
 Thumbs.db

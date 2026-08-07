@@ -3,7 +3,7 @@
   "gate_version": "0.13.0",
   "recorded_at": "2026-08-07",
   "status": "gate_open",
-  "status_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭：本 manifest 记录每个门禁条目的当前状态、证据与完成路径；Go 实现（0.14.0）以本 manifest 为起点，仅在本判定翻转为 closed 后启动（路线图 §15.7 第 1445 行）。",
+  "status_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭：本 manifest 记录每个门禁条目的当前状态、证据与完成路径；Go 实现（0.14.0）以本 manifest 为起点（路线图 §15.7 第 1445 行），已按 2026-08-07 owner decision（decisions[0]）提前启动 go/ 0.14.0 G0.1-G0.3（core/graph/protocol），C-1/C-2/C-3 完成路径与 Go 里程碑门禁不变。",
   "source_of_truth": [
     "路线图《Consema 1.0.0 产品路线图与双语言落地设计.md》§15.1-§15.7（门禁清单）、§18.3/§18.4（coverage 政策/缺陷分级）、§19.4（发布供应链）、§20.3（回退政策）、§23（真实项目验证）",
     "docs/0.13.0-gate-plan.md（执行计划；本条目的证据与缺口对应其 §1/§2/§3/§7）",
@@ -36,8 +36,8 @@
       "suites": 18,
       "cases": 508,
       "aggregate_sha256": "e3d6578858fa1fdcab0c19ee0094cd246923dca76e9be4679aabf86b482b68c8",
-      "evidence": "conformance/vectors/*.json（18 文件，2026-08-07 脚本实测 18 suites / 508 cases）；.github/workflows/ci.yml:93-121（conformance job 的 suite-count 断言 18/508）；README.md:33",
-      "note": "聚合方式：按文件名排序，逐文件 sha256，聚合 sha256(concat of 'name:digest' 行)。与 M1 的 suite-count 断言同源（gate plan §8）。"
+      "evidence": "conformance/vectors/*.json（18 文件，2026-08-07 脚本实测 18 suites / 508 cases）；.github/workflows/ci.yml:155-173（conformance job 的 suite-count 断言 18/508）；README.md:33",
+      "note": "聚合方式（2026-08-07 复核可精确复现）：按文件名字节序排序，逐文件 sha256（小写 hex），每行格式 '{basename}:{digest}'，各行以 '\\n' 连接（无尾换行），聚合 sha256 即对该 UTF-8 字节串再 sha256。当前 18 文件实测聚合 = e3d6578858…（与 M1 的 suite-count 断言同源，gate plan §8）。"
     },
     "corpus_test_suite_revisions": {
       "value": [
@@ -58,7 +58,7 @@
     "rust_compiler_msrv": {
       "declared": "1.85",
       "measured_toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
-      "evidence": "Cargo.toml:33（rust-version = \"1.85\"）；.github/workflows/ci.yml:66-85（msrv job，1.85.0 全门禁）；docs/COVERAGE-0.13.0.md:17（实测工具链）；docs/fuzz-evidence-0.13.0.md:14（fuzz 会话工具链）",
+      "evidence": "Cargo.toml:33（rust-version = \"1.85\"）；.github/workflows/ci.yml:118-144（msrv job，1.85.0 全门禁）；docs/COVERAGE-0.13.0.md:17（实测工具链）；docs/fuzz-evidence-0.13.0.md:14（fuzz 会话工具链）",
       "note": "msrv job 已落盘但尚未在 GitHub 真跑（开放项 C-1）。"
     },
     "dependency_lock_digest": {
@@ -67,7 +67,7 @@
     },
     "supported_targets": {
       "value": ["windows-latest", "ubuntu-latest", "macos-latest"],
-      "evidence": ".github/workflows/ci.yml:33（lint 矩阵）、:55（test 矩阵）、:201（oracles 矩阵）；docs/support-policy.md:50-59（§3 支持环境）",
+      "evidence": ".github/workflows/ci.yml:33（lint 矩阵）、:55（test 矩阵）、:253（oracles 矩阵）；docs/support-policy.md:50-59（§3 支持环境）",
       "note": "矩阵 job 已落盘尚未真跑（开放项 C-1）。"
     },
     "known_accepted_limitations": [
@@ -105,7 +105,7 @@
           "id": "F-2",
           "name": "第 8 节 capability matrix 全部通过",
           "status": "complete",
-          "evidence": ["conformance/vectors/*.json 18 suites / 508 cases（2026-08-07 实测）", "README.md:33", ".github/workflows/ci.yml:93-121（计数断言）"],
+          "evidence": ["conformance/vectors/*.json 18 suites / 508 cases（2026-08-07 实测）", "README.md:33", ".github/workflows/ci.yml:155-173（conformance job 的 suite-count 断言）"],
           "source_of_truth": "语言无关 conformance vectors（语义权威顺序第 3 级）"
         },
         {
@@ -193,10 +193,10 @@
         },
         {
           "id": "S-6",
-          "name": "Go API mapping RFC 已通过，但 Go 实现尚未开始",
+          "name": "Go API mapping RFC 已接受（2026-08-07 修订为 15-kind 映射）；Go 实现 0.14.0 G0.1-G0.3 已按 2026-08-07 decision record 启动（core/graph/protocol，质量门禁全绿）",
           "status": "complete",
-          "evidence": ["docs/rfcs/0016-go-api-mapping-v1.md（M4 立项/charter RFC）", "docs/API-REVIEW-0.13.0.md:195-197（§7）"],
-          "source_of_truth": "RFC 0016；Go 实现未开始（路线图 §14.12 第 1345 行前提仍成立）"
+          "evidence": ["docs/rfcs/0016-go-api-mapping-v1.md（已接受 charter RFC，§4.1 值映射冻结）", "go/（0.14.0 G0.1-G0.3：core/graph/protocol；2026-08-07 实测 go build/vet/test/race/gofmt 全绿）", "docs/go-implementation-plan.md:319-342（§6 验收门禁）、:346 起（§7 START GATE 修订条款）", "docs/API-REVIEW-0.13.0.md:195-197（§7 立项）"],
+          "source_of_truth": "RFC 0016；2026-08-07 owner decision（decisions[0]）书面授权提前启动；0.13.0 判定仍为 not_closed，C-1/C-2/C-3 完成前不得发布 0.14.0、不得宣称 Go 里程碑关闭（go-implementation-plan §7）"
         },
         {
           "id": "S-7",
@@ -215,7 +215,7 @@
           "id": "Q-1",
           "name": "所有 unit/integration/doc/conformance tests 通过",
           "status": "complete",
-          "evidence": ["cargo test --workspace --locked：1,617 passed / 0 failed（2026-08-07 实测，docs/fuzz-evidence-0.13.0.md:123）", "18 suites / 508 cases（README.md:33）"],
+          "evidence": ["cargo test --workspace --locked：1,617 passed / 0 failed（2026-08-07 实测，docs/fuzz-evidence-0.13.0.md:155）", "18 suites / 508 cases（README.md:33）"],
           "source_of_truth": "workspace 测试目标集 + conformance vectors"
         },
         {
@@ -257,16 +257,16 @@
           "id": "Q-7",
           "name": "每个格式发布前至少累计 72 CPU-hours release-candidate fuzz，零未解释 crash、panic、hang 或 limit bypass",
           "status": "partial",
-          "evidence": ["docs/fuzz-evidence-0.13.0.md:31-74（§3 账本：10.798 CPU-hours、1,547 次运行、4.186 亿次变异、0 新发现）", "docs/fuzz-evidence-0.13.0-logs/runs.csv（1,547 行真实账本）", "docs/fuzz-evidence-0.13.0-logs/waves.log"],
+          "evidence": ["docs/fuzz-evidence-0.13.0.md:81-106（§3.2.1 2026-08-07 会话结束快照：26.309 CPU-hours、4,063 次进程运行、10.994 亿次变异、0 新发现）", "docs/fuzz-evidence-0.13.0.md:158-159（§8 会话结束快照）", "docs/fuzz-evidence-0.13.0-logs/runs.csv（4,063 行真实账本，追加式，唯一权威）", "docs/fuzz-evidence-0.13.0-logs/waves.log"],
           "source_of_truth": "路线图 §15.3 第 1382-1387 行（任何新 crash 清零该 target 计时）",
-          "completion_path": "首选：Linux + nightly + clang 主机对 17 个 cargo-fuzz target 运行 cargo +nightly fuzz run（corpus 进化，fuzz/corpus/<target>/ 种子已提交）；备选：本机 in-process 协议续跑（仅代码变化后的波次提供新探索）。按 fuzz-evidence §4 协议把每格式家族（parse+ops 汇总，protocol 单独）真实 CPU 时长追加进 runs.csv；每格式达到 72 CPU-hours 且零未解释问题即关闭（§7.3）。当前最接近的格式（properties 2.035）也仅 2.8%，剩余部分以此路径累计。",
+          "completion_path": "首选：Linux + nightly + clang 主机对 17 个 cargo-fuzz target 运行 cargo +nightly fuzz run（corpus 进化，fuzz/corpus/<target>/ 种子已提交）；备选：本机 in-process 协议续跑（仅代码变化后的波次提供新探索）。按 fuzz-evidence §4 协议把每格式家族（parse+ops 汇总，protocol 单独）真实 CPU 时长追加进 runs.csv；每格式达到 72 CPU-hours 且零未解释问题即关闭（§7.3）。当前最接近的格式家族（properties 4.964 CPU-hours）也仅 6.9%（4.964/72；2026-08-07 会话结束快照口径，runs.csv 4,063 行），剩余部分以此路径累计。",
           "owner": "fuzz 证据账本（agent H 延续）+ 0.13.0 gatekeeper"
         },
         {
           "id": "Q-8",
           "name": "所有 fuzz regression 永久加入 corpus",
           "status": "complete",
-          "evidence": ["conformance/corpora/mutation-v1.json 的 regressions 数组（追加式工作流，fuzz-evidence §4 step 2）", "tests/mutation_corpus.rs（replay 测试；174,921 case 全量回放通过，fuzz-evidence:124）", "当前 regressions 为空：本会话零新发现，如实记录（fuzz-evidence:122）"],
+          "evidence": ["conformance/corpora/mutation-v1.json 的 regressions 数组（追加式工作流，fuzz-evidence §4 step 2）", "tests/mutation_corpus.rs（replay 测试；174,921 case 全量回放通过，fuzz-evidence:156）", "当前 regressions 为空：本会话零新发现，如实记录（fuzz-evidence:154）"],
           "source_of_truth": "路线图 §15.3 第 1383 行；conformance/corpora/README.md 工作流"
         },
         {
@@ -280,9 +280,9 @@
           "id": "Q-10",
           "name": "没有未分类 P0/P1 缺陷，P2 必须有明确发布判断",
           "status": "complete",
-          "evidence": ["docs/fuzz-evidence-0.13.0.md:97-105（§6 分类：M2-F1 P1、M2-F2 P0 均已修复）", "M2-F1 修复：crates/consema-json/src/projection.rs:330,363（RecoveredDocument 门）、crates/consema-json/src/edit.rs:262,305，严格断言（operation_fuzz.rs:123）", "M2-F2 修复：crates/consema-yaml/src/native.rs:497（exact_empty_scalar 仅 plain 样式重写）、:1189（回归测试），trip-wire（property_graph.rs:20-34）"],
+          "evidence": ["docs/fuzz-evidence-0.13.0.md:129-137（§6 分类：M2-F1 P1、M2-F2 P0 均已修复）", "M2-F1 修复：crates/consema-json/src/projection.rs:330,363（RecoveredDocument 门）、crates/consema-json/src/edit.rs:262,305，严格断言（operation_fuzz.rs:123）", "M2-F2 修复：crates/consema-yaml/src/native.rs:497（exact_empty_scalar 仅 plain 样式重写）、:1189（回归测试），trip-wire（property_graph.rs:20-34）"],
           "source_of_truth": "路线图 §18.4 第 1683-1689 行",
-          "note": "两处修复当前为工作树状态（未提交）；M9 落地 commit 一并入库。"
+          "note": "两处修复已随 0.13.0 落地 commit 094f5d1/7e9de38 提交入库（不再处于工作树状态；本 manifest 证据行号按 7e9de38 提交树核验）；trip-wire/严格断言全绿。"
         }
       ]
     },
@@ -329,7 +329,7 @@
           "id": "SEC-6",
           "name": "依赖不存在未接受的 critical/high 漏洞",
           "status": "complete",
-          "evidence": ["cargo audit --no-fetch 本地实测：1,189 advisories / 42 deps / 0 漏洞（2026-08-07，gate plan P-4）", ".github/workflows/ci.yml:136-147（audit job）"],
+          "evidence": ["cargo audit --no-fetch 本地实测：1,189 advisories / 76 deps / 0 漏洞（2026-08-07，gate plan P-4；Cargo.lock 实测 76 个 [[package]]；cargo audit 口径随版本变化，以当前扫描结果为准）", ".github/workflows/ci.yml:188-206（audit job）"],
           "source_of_truth": "RustSec DB + CI audit job"
         },
         {
@@ -372,7 +372,7 @@
           "id": "P-2",
           "name": "adversarial input 不出现未受限的超线性退化",
           "status": "complete",
-          "evidence": ["硬化套件 55 个恶意/边界测试（SECURITY.md:16；gate plan P-5）", "fuzz 会话 4.186 亿次变异零超时（fuzz-evidence §3.2）"],
+          "evidence": ["硬化套件 55 个恶意/边界测试（SECURITY.md:16；gate plan P-5）", "fuzz 会话 10.994 亿次变异零超时（2026-08-07 会话结束快照，runs.csv 4,063 行；fuzz-evidence §3.2.1）"],
           "source_of_truth": "SECURITY.md hardening + fuzz 账本"
         },
         {
@@ -449,7 +449,7 @@
           "id": "A-4",
           "name": "MSRV 在 manifest 中声明并在 CI 真正验证",
           "status": "partial",
-          "evidence": ["声明：Cargo.toml:33（rust-version = \"1.85\"）", "CI job 已交付：.github/workflows/ci.yml:66-85（msrv job，1.85.0 全门禁）", "本地验证记录：gate plan §4 M1（干净 worktree 全流程 exit 0，MSRV 腿实测拦截 let-chains）"],
+          "evidence": ["声明：Cargo.toml:33（rust-version = \"1.85\"）", "CI job 已交付：.github/workflows/ci.yml:118-144（msrv job，1.85.0 全门禁）", "本地验证记录：gate plan §4 M1（干净 worktree 全流程 exit 0，MSRV 腿实测拦截 let-chains）"],
           "source_of_truth": "路线图 §15.6 第 1419 行",
           "completion_path": "第一次 GitHub push 后 msrv job 在干净 checkout 上真跑（见 open_items C-1）。",
           "owner": "0.13.0 gatekeeper"
@@ -486,7 +486,7 @@
           "id": "A-9",
           "name": "release artifact 可从干净环境重建",
           "status": "partial",
-          "evidence": ["scripts/verify-package-archives.ps1（-AllowDirty + MSRV 腿 + tar 路径安全 + 校验和）", "本地实测：干净 HEAD worktree 全流程 exit 0（14 个 .crate + MSRV 1.85 腿，gate plan §4 M1 验证记录）", "CI package job 已交付：.github/workflows/ci.yml:233-250", "docs/release-process-0.13.0.md:28-70（干净重建步骤 + CI 常设载体）"],
+          "evidence": ["scripts/verify-package-archives.ps1（-AllowDirty + MSRV 腿 + tar 路径安全 + 校验和）", "本地实测：干净 HEAD worktree 全流程 exit 0（14 个 .crate + MSRV 1.85 腿，gate plan §4 M1 验证记录）", "CI package job 已交付：.github/workflows/ci.yml:285-303", "docs/release-process-0.13.0.md:28-70（干净重建步骤 + CI 常设载体）"],
           "source_of_truth": "路线图 §15.6 第 1424 行",
           "completion_path": "第一次 GitHub push 后 package job 在干净 checkout 上真跑（见 open_items C-1）。",
           "owner": "0.13.0 gatekeeper"
@@ -503,7 +503,7 @@
   },
   "feature_complete_judgment": {
     "verdict": "not_closed",
-    "verdict_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭。已关闭：全部功能/规范门禁、质量门禁除 Q-7 外全部、性能门禁全部、API 与产品门禁除 A-4/A-9 外全部、安全门禁除 SEC-9 外全部。本判定翻转（closed）需要下列开放项全部完成；0.14.0 Go 实现不得提前开始（路线图 §15.7 第 1445 行、§14.12 第 1345 行）。",
+    "verdict_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭。已关闭：全部功能/规范门禁、质量门禁除 Q-7 外全部、性能门禁全部、API 与产品门禁除 A-4/A-9 外全部、安全门禁除 SEC-9 外全部。本判定翻转（closed）需要下列开放项全部完成；0.14.0 Go 实现已按 2026-08-07 owner decision（decisions[0]）提前启动 go/ 0.14.0 G0.1-G0.3，但 C-1/C-2/C-3 完成前不得发布 0.14.0、不得宣称 Go 里程碑关闭（路线图 §15.7 第 1445 行；START GATE 修订条款见 docs/go-implementation-plan.md §7）。",
     "closed_gates": ["functional（§15.1）", "spec（§15.2）", "performance（§15.5）"],
     "partial_gates": {
       "quality（§15.3）": ["Q-7：72 CPU-hours per-format RC fuzz"],
@@ -513,11 +513,11 @@
     "open_items": [
       {
         "id": "C-1",
-        "name": "CI 第一次真跑：9 job 在 GitHub 上干净 checkout 全矩阵全绿",
+        "name": "CI 第一次真跑：10 job 在 GitHub 上干净 checkout 全矩阵全绿",
         "status": "partial",
         "closes": ["A-4（msrv job 真验证）", "A-9（package job 真跑）", "SEC-9（Linux/macOS 上 cli 测试矩阵）", "oracles job 在 hosted runner 的文档化 skip 行为", "semver job 的 approved-failure 落定（API-REVIEW §3：三个 crate 的 enum_variant_added 保持失败 + RFC 级批准记录，或推入时加 allowlist——ci.yml 属 .github 域，由 gatekeeper 在推入时落定）"],
-        "evidence": [".github/workflows/ci.yml（9 job：lint/test/msrv/conformance/deny/audit/semver/oracles/package）", "gate plan §4 M1 验证记录（本地等效全流程实测；GitHub 真跑未发生）"],
-        "completion_path": "推入 GitHub 后对 main 分支跑全矩阵；修复任何 runner 环境差异（R-2/R-3：oracle pin 与 hosted runner 不符时保持文档化 skip=成功）；记录 9 job 全绿结果到本 manifest 与发布记录。",
+        "evidence": [".github/workflows/ci.yml（10 job：lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package）", "gate plan §4 M1 验证记录（本地等效全流程实测；GitHub 真跑未发生）"],
+        "completion_path": "推入 GitHub 后对 main 分支跑全矩阵；修复任何 runner 环境差异（R-2/R-3：oracle pin 与 hosted runner 不符时保持文档化 skip=成功）；记录 10 job 全绿结果到本 manifest 与发布记录。",
         "owner": "0.13.0 gatekeeper（release-process §7 item 2）"
       },
       {
@@ -525,7 +525,7 @@
         "name": "72 CPU-hours release-candidate fuzz 每格式累计",
         "status": "partial",
         "closes": ["Q-7"],
-        "evidence": ["docs/fuzz-evidence-0.13.0.md:107-113（§7 完成路径）", "docs/fuzz-evidence-0.13.0.md:115-125（§8：当前 10.798 CPU-hours，最接近格式 2.8%）"],
+        "evidence": ["docs/fuzz-evidence-0.13.0.md:139-145（§7 完成路径）", "docs/fuzz-evidence-0.13.0.md:158-159（§8 会话结束快照：26.309 CPU-hours、4,063 行、10.994 亿次变异，最接近格式家族 properties 6.9%；快照口径，runs.csv 为唯一权威账本）"],
         "completion_path": "见 quality.Q-7.completion_path（clang 主机 cargo-fuzz 为主，本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时）。",
         "owner": "fuzz 证据账本（agent H 延续）+ 0.13.0 gatekeeper"
       },
@@ -535,10 +535,25 @@
         "status": "partial",
         "closes": ["SEC-8 的发布物侧（正式签名/SBOM/checksum）", "版本推进（product_version 0.8.0 → 0.13.0）"],
         "evidence": ["docs/release-process-0.13.0.md:124-139（§4.4：演练密钥 82301612… 仅流程验证；正式发布前必须在默认 keyring 生成真实密钥 + 备份 + 吊销证书）", "docs/release-process-0.13.0.md:278-291（§7 发布检查单 10 项）"],
-        "completion_path": "按 release-process §7 顺序执行：版本推进 → CI 9 job 全绿 → 本地干净重建 → SBOM → checksum + 签名 → 签名 tag（登记 tag 对象 hash）→ 全量校验 → 恢复演练复跑 → 产物入库 → SECURITY.md 复核。",
+        "completion_path": "按 release-process §7 顺序执行：版本推进 → CI 10 job 全绿 → 本地干净重建 → SBOM → checksum + 签名 → 签名 tag（登记 tag 对象 hash）→ 全量校验 → 恢复演练复跑 → 产物入库 → SECURITY.md 复核。",
         "owner": "0.13.0 release owner（版本治理 §12）"
       }
     ],
-    "tree_state_note": "本 manifest 记录时的仓库为工作树状态：M2 修复（M2-F1/M2-F2）、fuzz/property/mutation 语料、三处性能修复与回归测试均已落盘但未提交（git status 可见）。M9 落地 commit 应包含上述文件与本文档；本 manifest 的 evidence 行号按当前工作树核验。"
-  }
+    "tree_state_note": "本 manifest 记录时（2026-08-07）仓库曾为工作树状态；M2 修复（M2-F1/M2-F2）、fuzz/property/mutation 语料、三处性能修复与回归测试已随 0.13.0 落地 commit 094f5d1（Harden and gate the Rust implementation）与 7e9de38（Record the 0.13.0 gate evidence）提交入库，不再处于工作树状态；本 manifest 的 evidence 行号按 7e9de38 提交树核验。"
+  },
+  "decisions": [
+    {
+      "id": "D-1",
+      "recorded_at": "2026-08-07",
+      "subject": "START GATE 提前启动 Go 实现的书面偏差记录（路线图 §0 冲突解决层级：改路线图、不静默缩小承诺）",
+      "decision": "owner 决定：在 C-1/C-2/C-3 完成前启动 Go 实现（go/，0.14.0 G0.1-G0.3）。Go 里程碑顺序、验收门禁（docs/go-implementation-plan.md §6）与 C-1/C-2/C-3 完成路径不变。go/ 以 fc-manifest 为能力起点（路线图 §15.7 第 1445 行），不以工作树偶然状态为起点。",
+      "unchanged": [
+        "Go 里程碑顺序（0.14.0-0.19.0，docs/go-implementation-plan.md §2）",
+        "Go 验收门禁（docs/go-implementation-plan.md §6）",
+        "C-1/C-2/C-3 完成路径与 0.13.0 发布收口（本 manifest open_items）",
+        "本判定（feature_complete_judgment.verdict）翻转条件"
+      ],
+      "effect": "go/ 目录已创建（0.14.0 G0.1-G0.3：core/graph/protocol，2026-08-07 实测 go build/vet/test/race/gofmt 全绿）；按修订后的 START GATE 条款（docs/go-implementation-plan.md §7），C-1/C-2/C-3 完成前不得发布 0.14.0、不得宣称任何 Go 里程碑关闭。"
+    }
+  ]
 }

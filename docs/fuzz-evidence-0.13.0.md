@@ -78,6 +78,33 @@
 
 按格式家族（parse+ops 汇总）：json 2.610 / toml 1.556 / yaml 3.473 / ini 3.435 / properties 4.023 / xml 0.957 / plist 1.306 / hcl 2.616 CPU-hours；protocol（单 target）1.388。
 
+### 3.2.1 2026-08-07 会话结束快照（追加；runs.csv 为唯一权威账本，发布记录数字以本表快照为准）
+
+驱动结束后按 §4.4 协议把 session 10 的 wave 43 与 waves 44-65 全部并入：**4,063 行** = session 7 的 17 + session 8 的 1530 + session 9 的 102 + session 10 全量 + session 11 全量（waves 1-65 全部入账）。其中 4,053 行 exit_code=0，10 行 exit=-1（session 9 wave 3 外部终止、已分类非 fuzz finding，见 §3.1）。每 target 239 次运行；累计计划变异 **1,099,400,000（10.994 亿）次**。时钟状态：全部 running（clean）——本日无任何新 crash/panic/hang/limit bypass，无 target 清零。
+
+| target | 运行数 | 累计真实 CPU 秒 | CPU-hours | 累计变异数 | findings | 时钟 |
+|---|---|---|---|---|---|---|
+| json-parse | 239 | 8,301.0 | 2.306 | 95,600,000 | 0 | running (clean) |
+| json-ops | 239 | 3,240.3 | 0.900 | 17,925,000 | 0（M2-F1 已知，见 §6） | running (clean) |
+| toml-parse | 239 | 5,269.2 | 1.464 | 95,600,000 | 0 | running (clean) |
+| toml-ops | 239 | 1,622.5 | 0.451 | 17,925,000 | 0 | running (clean) |
+| yaml-parse | 239 | 10,952.9 | 3.042 | 95,600,000 | 0 | running (clean) |
+| yaml-ops | 239 | 4,509.5 | 1.253 | 17,925,000 | 0（M2-F2 已知，见 §6） | running (clean) |
+| ini-parse | 239 | 10,832.0 | 3.009 | 95,600,000 | 0 | running (clean) |
+| ini-ops | 239 | 4,404.6 | 1.224 | 17,925,000 | 0 | running (clean) |
+| properties-parse | 239 | 11,684.0 | 3.246 | 95,600,000 | 0 | running (clean) |
+| properties-ops | 239 | 6,186.7 | 1.719 | 17,925,000 | 0 | running (clean) |
+| xml-parse | 239 | 3,226.9 | 0.896 | 95,600,000 | 0 | running (clean) |
+| xml-ops | 239 | 1,014.8 | 0.282 | 17,925,000 | 0 | running (clean) |
+| plist-parse | 239 | 4,580.0 | 1.272 | 95,600,000 | 0 | running (clean) |
+| plist-ops | 239 | 1,185.3 | 0.329 | 17,925,000 | 0 | running (clean) |
+| hcl-parse | 239 | 8,682.2 | 2.412 | 95,600,000 | 0 | running (clean) |
+| hcl-ops | 239 | 2,887.6 | 0.802 | 17,925,000 | 0 | running (clean) |
+| protocol-decode | 239 | 6,133.5 | 1.704 | 191,200,000 | 0 | running (clean) |
+| **合计** | **4063** | **94,713.0** | **26.309** | **1,099,400,000** | **0 新** | — |
+
+按格式家族（parse+ops 汇总）：json 3.206 / toml 1.914 / yaml 4.295 / ini 4.232 / properties 4.964 / xml 1.178 / plist 1.601 / hcl 3.214 CPU-hours；protocol（单 target）1.704。
+
 ### 3.3 波次执行方式与诚实口径
 
 - 每波 = 17 个长期 target 的 `Copies` 份并发进程，每进程一个核心（`--test-threads=1`），整波并行跨满机器核心；波与波之间做 tree-hash 检查（`git status --porcelain -- crates Cargo.toml Cargo.lock conformance` + HEAD），代码变化（修复 agent 落地）→ 先重建测试二进制再跑下一波，保证每波都是**当前 release-candidate 代码状态**的真实运行。
@@ -128,10 +155,12 @@
 - **workspace 门禁**：`cargo test --workspace --locked` 于 session 8 结束时（15:49 前后）对当时工作树运行，**1617 passed / 0 failed，exit 0 全绿**（完整日志 `docs/fuzz-evidence-0.13.0-logs/workspace-gate-2026-08-07.log`；修复 agent 的 M2-F1/M2-F2 严格断言随其工作树状态通过）。
 - **corpus 全绿**：`cargo test -p consema-conformance --test mutation_corpus --locked -- --ignored` 全量 175k case replay 通过（63.10s，2026-08-07 15:49）。
 - 剩余工作：每格式累计至 72 CPU-hours 且零未解释问题；M2-F1/M2-F2 修复提交（工作树状态）后复核 trip-wire/严格断言继续全绿。
+- **2026-08-07 会话结束快照（追加；runs.csv 为唯一权威账本，发布记录数字以本快照为准）**：驱动结束后 session 10/11 全部波次已入账，runs.csv 现为 4,063 行（waves 1-65 全部入账）：**26.309 CPU-hours**（94,713.0 真实 CPU 秒；4,053 行 exit 0、10 行 exit=-1（session 9 wave 3 外部终止、非 fuzz finding，见 §3.1），10.994 亿次计划变异）。每格式家族累计（CPU-hours）：json **3.206** / toml **1.914** / yaml **4.295** / ini **4.232** / properties **4.964** / xml **1.178** / plist **1.601** / hcl **3.214** / protocol（单 target）**1.704**。
+- 相对每格式 72 CPU-hours 门槛（§15.3，按格式家族），最接近的 properties 也仅 **6.9%**（4.964/72；其余：yaml 6.0%、ini 5.9%、hcl/json 4.5%、protocol 2.4%、toml 2.7%、plist 2.2%、xml 1.6%）；**72h 门槛未完成**，剩余部分按 §7 完成路径累计（clang 主机 cargo-fuzz 为主，本机协议续跑为备选）。
 
 ## 9. 开放事项
 
 - `crates/consema-conformance/examples/gen_mutation_corpus.rs:623` 硬编码 `"regressions": []`——M2 后续需改为保留 regressions 数组，否则 `--check` 与手工 regressions 条目冲突（本文档 §4 工作流不受影响，replay 测试已覆盖 regressions）。
-- M2-F1/M2-F2 修复的工作树状态→提交、以及修复 agent 收口后的复核（§8 记录 session 8 结束时的 workspace 门禁结果）。
-- session 10 的驱动在本文档累计快照（17:32:22）后仍在运行：wave 43（34 行，0.199 CPU-hours）已于 17:32:44 入账，waves 44+ 持续入账中（截至文档更新时已至 wave 48，尚无 session done 行）——按 §4.4 协议，待驱动结束后的会话更新把这些行计入。
+- M2-F1/M2-F2 修复的工作树状态→提交事项已解决：修复已随 0.13.0 落地 commit 094f5d1/7e9de38 提交入库（§8 记录 session 8 结束时的 workspace 门禁 1,617 passed / 0 failed；CHANGELOG.md:46 同步）。
+- session 10/11 驱动已结束：waves 1-65 全部入账并计入 §3.2.1 会话结束快照（原"wave 43 于 17:32:44 入账、waves 44+ 持续入账"事项已解决）。
 - session 7 的 wall_s 是"launch→波次结束"（该会话脚本尚未记录进程自身退出时刻；cpu_s 均为真实测量），session 8 起 wall_s 为进程自身存活时长——两段口径已在 runs.csv 中如实区分（§3.1 时间线）。

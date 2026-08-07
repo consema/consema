@@ -28,7 +28,7 @@ unicode-ident = "=1.0.24"
 xmlparser = { version = "=0.13.6", default-features = false }
 
 [workspace.package]
-version = "0.8.0"
+version = "0.13.0"
 edition = "2024"
 rust-version = "1.85"
 license = "MIT"

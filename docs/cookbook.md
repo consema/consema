@@ -33,7 +33,7 @@ Commands (RFC 0015 §6.1):
   project        explicit projection request
   materialize    explicit materialization request
   convert        two-phase cross-format conversion
-  edit           single-file structural edit (dry-run; --write commits)
+  edit           single-file structural edit (dry-run only)
   plan           batch plan manifest (read-only)
   apply          batch apply from a prior plan manifest
   conformance    embedded protocol self-check subset
@@ -51,7 +51,6 @@ Global options:
   --max-files <n>     CLI-layer batch file-count budget
   --redact-keys <glob>  extra redaction key-name patterns
   --show-secrets      reveal secret values (sole presentation opt-out)
-  --write             commit an edit (edit only)
   --help              print this help and exit 0
   --version           print the product version and exit 0
 
@@ -137,10 +136,12 @@ match 7: $.devDependencies (key devDependencies) = {typescript: "5.6.3"}
 ```
 
 选择器 `RequireOne`（恰一个匹配，fail-not-null）违反时是 data 类失败
-（exit 2，`core.query.cardinality-violation@1`）。Recovered 文档不可查询
-（exit 2，报告完整诊断）。native 查询域（如 `json.native-semantic-query@1`）
-与本版本的 xml/plist/hcl 源在 query 上未接线，显式拒绝而非不完整结果
-（0.13.0 API 评审项，见第 10 节）。
+（exit 2，`core.query.cardinality-violation@1`）。CLI `query` 只接线便携值
+查询域，Recovered 永不投影故拒绝（exit 2，报告完整诊断）；SDK native/
+syntax 查询域对 Recovered 可查询已证明部分（IMPLEMENTATION §4.3/§4.5/
+§4.6 的 INI/HCL/XML 恢复语义）。native 查询域（如
+`json.native-semantic-query@1`）与本版本的 xml/plist/hcl 源在 query 上未
+接线，显式拒绝而非不完整结果（0.13.0 API 评审项，见第 10 节）。
 
 机器模式：`--json` 时 stdout 只有一行 `core.cli-output@1` 信封：
 

@@ -2,13 +2,13 @@
 
 Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发布能力。
 
-## Unreleased — 0.13.0
+## 0.13.0 — 2026-08-07
 
-0.13.0 是 Rust 生产加固与 Feature-Complete Gate 版本（路线图 §14.12/§15，执行计划 `docs/0.13.0-gate-plan.md`）：不新增格式，把 §15 门禁逐条落成可复现证据。全部条目状态与证据见 Feature-Complete Manifest（`docs/fc-manifest-0.13.0.json`）；门禁**尚未全部关闭**，本条目末尾 Boundaries 如实列出未完成项与完成路径。
+0.13.0 是 Rust 生产加固与 Feature-Complete Gate 版本（路线图 §14.12/§15，执行计划 `docs/0.13.0-gate-plan.md`）：不新增格式，把 §15 门禁逐条落成可复现证据。全部条目状态与证据见 Feature-Complete Manifest（`docs/fc-manifest-0.13.0.json`）。本版本随 2026-08-07 落地：workspace 版本推进 0.8.0→0.13.0（发布检查单第 1 项）；五维交叉审计（哲学统一/语义一致/逻辑自洽/真实有效/完整可靠）findings 全部处置；Go SDK 0.14.0 G0.1-G0.3 按决策记录 D-1 入库（见本条目「落地记录」与 Boundaries）。门禁开放项 C-1/C-2/C-3 **尚未全部关闭**，Boundaries 如实列出完成路径。
 
 ### Added
 
-- 三平台 CI（`.github/workflows/ci.yml`，9 job）：lint/test 各 3 OS × stable、msrv（1.85.0 全门禁）、conformance（18 套 suite / 508 cases 计数断言）、deny 四段、audit（RustSec）、semver（vs v0.8.0 基线 11 crate）、oracles（文档化 skip=成功）、package（含 MSRV 腿的归档重建门禁）；
+- 三平台 CI（`.github/workflows/ci.yml`，10 job）：lint/test 各 3 OS × stable、coverage（硬下限 + `-Trend` 趋势门禁）、msrv（1.85.0 全门禁）、conformance（18 套 suite / 508 cases 计数断言）、deny 四段、audit（RustSec）、semver（vs v0.8.0 基线 11 crate）、oracles（文档化 skip=成功）、package（含 MSRV 腿的归档重建门禁）；
 - 打包验证脚本加固（`scripts/verify-package-archives.ps1`）：`-AllowDirty` 开关 + 脏树前置条件逐文件报错、`-SkipMsrv` + 默认开启的 MSRV 构建腿（rust-version 读自 cargo metadata）；干净 HEAD 工作树全流程实测 exit 0（14 个 `.crate` + 1.85.0 全 target 构建）；
 - coverage 工具链常设化（`scripts/coverage.ps1` + `docs/COVERAGE-0.13.0.md`）：可复现测量（commit 9c1ede2，region 86.51% / function 82.82% / line 87.91%），硬下限（regions≥70/functions≥70/lines≥80）与 `-Trend` 趋势门禁；取代 0.8.0 的单次不可复现 84.65% 记录；
 - fuzz/property/mutation 语料（门禁 §15.3）：确定性 in-process 变异引擎（`crates/consema-conformance/src/fuzz.rs`）驱动的 17 个长期 target（每格式 parse/operations + protocol decode；`crates/*/fuzz/` 下与 cargo-fuzz wrapper 双接线，corpus 种子 47 个文件进 git）；protocol/varint/offset/graph/alias property tests 3 组（property_graph/property_protocol/property_plist）；mutation corpus 46 fixtures × 174,921 cases（`conformance/corpora/mutation-v1.json`，种子提交）与全量 replay 测试；
@@ -17,7 +17,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 - 性能与内存预算冻结（`docs/BENCHMARKS-0.13.0.md`）：每格式 SDK/CLI p50/p95/峰值内存预算行（§4/§5/§6）、§20.3 回退批准记录政策（§8/§9）、大文档/深嵌套/大量重复/大量小节点四场景独立行（§7）；三个超线性路径修复：xml `raw_offset` 恒等快捷（`crates/consema-xml/src/parser.rs:2027-2052`）、`SourceSnapshot` 保留已校验 UTF-8 文本（`crates/consema-document/src/source.rs:466-509`）、yaml `RawByteResolver` 单遍偏移解析（`crates/consema-yaml/src/offsets.rs:1-80`），各带回归测试；修复后实测 xml 20k 节点 96.6 s→0.105 s（~920×）、yaml 335 KB 转换 69.4 s→1.01 s（~69×）、properties 10k 重复键 5.09 s→127.5 ms（~40×），§15.5 线性度门禁据此复验通过；
 - 发布供应链（`docs/release-process-0.13.0.md` + `scripts/release-sign.ps1`/`release-sbom.ps1`）：checksum 清单（`docs/release/SHA256SUMS-0.8.0.txt(.asc/.sig)`）、GPG 签名 tag/artifact 流程（演练全流程实测，tag 重签拒绝）、SPDX-2.3 SBOM（`docs/release/sbom-0.8.0.json`，42 packages / 123 relationships）、干净环境重建步骤 + CI package 常设载体、三场恢复演练真实记录（checksum 篡改/归档损坏/丢 tag）；SECURITY.md 新增安全披露与支持周期章节（协调披露渠道 + 分级 SLA + 支持窗口）；
 - support policy（`docs/support-policy.md`，§21.4 七个必公开项 + 工具链冻结时机）与真实项目 pilot（`docs/pilot-0.13.0.md`，路线图 §23.2 必做工作流 W1-W8 + §23.3 核心指标 12 项）；
-- 72 CPU-hours RC fuzz 证据账本（`docs/fuzz-evidence-0.13.0.md` + `docs/fuzz-evidence-0.13.0-logs/`）：追加式 runs.csv 账本（2026-08-07 会话：10.798 真实 CPU-hours、1,547 次进程运行、4.186 亿次变异、零新发现），确定性口径与完成路径文档化。
+- 72 CPU-hours RC fuzz 证据账本（`docs/fuzz-evidence-0.13.0.md` + `docs/fuzz-evidence-0.13.0-logs/`）：追加式 runs.csv 账本（2026-08-07 会话结束快照：26.309 真实 CPU-hours、4,063 次进程运行、10.994 亿次变异、零新发现；快照口径——追加式账本以 runs.csv 为准），确定性口径与完成路径文档化。
 
 ### Correctness
 
@@ -33,17 +33,25 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 
 - workspace `cargo test --workspace --locked`：1,617 passed / 0 failed（2026-08-07 实测）；18 套语言无关 suite 508/508（含 fuzz/property/mutation 新增的 conformance 域测试）；
 - mutation corpus 全量 replay：174,921 case 通过（`cargo test -p consema-conformance --test mutation_corpus --locked -- --ignored`，63.10s）；
-- cargo deny 四段与 cargo audit（本地 1,189 advisories / 42 deps / 0 漏洞）保持全绿；CI 9 job 均已落盘（第一次 GitHub 真跑是收口项，见 Boundaries）；
+- cargo deny 四段与 cargo audit（本地 1,189 advisories / 76 deps / 0 漏洞；Cargo.lock 实测 76 个 `[[package]]`，cargo audit 口径随版本变化，以当前扫描结果为准）保持全绿；CI 10 job（lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package）均已落盘（第一次 GitHub 真跑是收口项，见 Boundaries）；
 - coverage 可复现基线入库（86.51/82.82/87.91，脚本产出）；BENCHMARKS-0.13.0.md 预算表 + 后修复复测（S3 127.5 ms、S4 0.105 s）记录在档；
 - 发布供应链演练真实执行：签名全流程、SBOM 生成、三场恢复演练、14 归档校验，记录于 `docs/release-process-0.13.0.md`。
 
 ### Boundaries
 
-- **72 CPU-hours RC fuzz 未完成（质量门禁 Q-7，partial）**：2026-08-07 会话累计 10.798 CPU-hours（每格式最接近的 properties 仅 2.8%）；零未解释发现，但"每格式 ≥72 CPU-hours"门槛未达。完成路径（`docs/fuzz-evidence-0.13.0.md` §7）：clang 主机对 17 个 cargo-fuzz target 跑 `cargo +nightly fuzz run`（corpus 进化），本机确定性协议续跑为备选；时长按追加式账本入 `runs.csv`，新 crash 清零该 target 计时；
-- **CI 9 job 已落盘、未在 GitHub 真跑（A-4/A-9/SEC-9，partial）**：推入后在干净 checkout 全矩阵全绿是收口项；semver job 对三个 crate 的 `enum_variant_added` 保持失败 + RFC 级批准记录（`docs/API-REVIEW-0.13.0.md` §3），allowlist 修改属 `.github` 域由 gatekeeper 推入时落定；
+- **72 CPU-hours RC fuzz 未完成（质量门禁 Q-7，partial）**：2026-08-07 会话结束快照累计 26.309 CPU-hours、4,063 次进程运行（`runs.csv`；快照口径——追加式账本以 runs.csv 为准），每格式家族最接近的 properties 仅 6.9%（4.964/72）；零未解释发现，但"每格式 ≥72 CPU-hours"门槛未达。完成路径（`docs/fuzz-evidence-0.13.0.md` §7）：clang 主机对 17 个 cargo-fuzz target 跑 `cargo +nightly fuzz run`（corpus 进化），本机确定性协议续跑为备选；时长按追加式账本入 `runs.csv`，新 crash 清零该 target 计时；
+- **CI 10 job 已落盘、未在 GitHub 真跑（A-4/A-9/SEC-9，partial）**：推入后在干净 checkout 全矩阵全绿是收口项；semver job 对三个 crate 的 `enum_variant_added` 保持失败 + RFC 级批准记录（`docs/API-REVIEW-0.13.0.md` §3），allowlist 修改属 `.github` 域由 gatekeeper 推入时落定；
 - **真实发布密钥未生成（C-3，partial）**：演练密钥（82301612…）与 scratch 仓库不进入发布记录；0.13.0 发布前按 `docs/release-process-0.13.0.md` §4.1 在默认 keyring 生成真实密钥 + 私钥备份 + 吊销证书，并执行 §7 发布检查单（含版本推进 0.8.0→0.13.0）；
 - 门禁 open backlog 保持：facade node-locator API（B-1/B-2，1.0.0 窗口）、每格式报告外部化（B-3）、失败 convert 形态（B-5，冻结语义）、每格式 edit 词表（B-7，0.14.0+）、`edit --write` 接线（B-8，usage 显式拒绝不漂移）；全部记录于 Feature-Complete Manifest 的 known_accepted_limitations；
 - M2 修复、fuzz/property/mutation 语料与三处性能修复已随 0.13.0 落地 commit 094f5d1（Harden and gate the Rust implementation）与 7e9de38（Record the 0.13.0 gate evidence）入库，不再处于工作树状态；manifest 证据行号按 7e9de38 提交树核验。
+
+### 落地记录（2026-08-07）
+
+- **版本推进**：workspace 版本 0.8.0→0.13.0（15 个 crate 全部 `version.workspace = true`，CLI `PRODUCT_VERSION` 走 `CARGO_PKG_VERSION` 自动跟随）；发布检查单（`docs/release-process-0.13.0.md` §7）第 1 项完成，其余项（真实密钥生成、签名 tag/artifact、SBOM/checksum 落盘、恢复演练复跑）属 C-3 开放，完成路径不变；
+- **五维交叉审计执行与修复**（哲学统一/语义一致/逻辑自洽/真实有效/完整可靠，六 agent 并行，对应路线图 §28 五要素终审）：共 5 P1 + 11 P2 + 4 P3，全部处置——README convert-request.json 损坏 JSON 修复（与 cookbook 一致）；Go core 值模型 8→15 kind 全契约（PVCE 七新标签字节对等，golden 向量经 scratch cargo 调 Rust 编码器生成验证，既有冻结字节零变动）；EncodeJSON 根节点重复计数边界修复；graph builder 非法 UTF-8 拦截；协议覆盖缺口测试（numberToken/unicodeEscape/不可达论证）；RFC 0016 §4.1 修订为 15-kind 映射（Status: Accepted）；CLI 帮助文本 `edit --write` 如实化（dry-run only）；cookbook Recovered 查询分层表述；conformance/README 18 套/508 cases 清单更新；路线图时间线与版本面同步；fuzz 账本统一回填（26.309 CPU-hours/4,063 次运行/10.994 亿变异，快照口径注明）；CI 10 job 计数与行号全库统一；聚合 sha256 算法文档化（值可精确复现）；waves.log 入库；0.1.0 日期修正；B-8 审计证据行同步；
+- **Go SDK 0.14.0 G0.1-G0.3 按决策记录 D-1 入库**（`go/`：core 15-kind + PVCE、graph + PGCE、protocol v1-v7 41 条/187 码 + CLI 记录；238 个 Go 测试，`go build/vet/test/race/gofmt/tidy` 全绿，零第三方依赖）：按 2026-08-07 owner 决策记录（`docs/fc-manifest-0.13.0.json` decisions[0]）与路线图 §0 冲突解决层级（改路线图、不静默缩小承诺）落地；**这不是 0.14.0 发布声明**——0.14.0 发布仍受 C-1/C-2/C-3 门禁，Go 里程碑顺序与验收门禁（`docs/go-implementation-plan.md` §6）不变；
+- **门禁复验实测（2026-08-07）**：Rust fmt/clippy `-D warnings`/workspace test/doc `-D warnings`（fresh target）/deny 四段/audit（1,189 advisories / 76 deps / 0 漏洞）全绿；Go 六项门禁全绿；mutation corpus 174,921 cases replay 通过；
+- **开放项**（完成路径不变，见 fc-manifest）：C-1（CI 10 job GitHub 干净 checkout 真跑全矩阵全绿）、C-2（每格式 ≥72 CPU-hours release-candidate fuzz，当前最接近 properties 6.9%）、C-3（真实发布密钥 + 签名 + SBOM/checksum + tag + 恢复演练复跑）。
 
 ## Unreleased — 0.12.0
 
@@ -381,7 +389,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 - 当前编辑面仅覆盖 TOML 标量，不包含结构编辑或 materialization；
 - YAML、INI、XML、Properties、plist、HCL 与 Go 尚未作为已实现能力发布。
 
-## 0.1.0 — 2026-08-03
+## 0.1.0 — 2026-08-04
 
 ### Added
 

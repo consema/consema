@@ -60,7 +60,7 @@
 
 ### F11 — `ini.duplicate-group@1`/`properties.duplicate-group@1` vs `plist.duplicate-key-group@1`
 
-**证据：** 同一概念（同键组扩展）两个查询操作词 id：`ini.duplicate-group`（`consema-core/src/query.rs:1056`、`consema-ini/src/query.rs:543`）、`java-properties` → `properties.duplicate-group`（`consema-core/src/query.rs:1107`）、`plist.duplicate-key-group@1`（`consema-plist/src/query.rs:11`）。`properties.duplicate-group@1` 被 `properties_v1.json:424` 钉死；plist 词表由 RFC 0013 冻结。
+**证据：** 同一概念（同键组扩展）两个查询操作词 id：`ini.duplicate-group`（`crates/consema-core/src/query.rs:1056`、`crates/consema-ini/src/query.rs:543`）、`java-properties` → `properties.duplicate-group`（`crates/consema-core/src/query.rs:1107`）、`plist.duplicate-key-group@1`（`crates/consema-plist/src/query.rs:11`）。`properties.duplicate-group@1` 被 `crates/consema-conformance/src/properties_v1.rs:424` 钉死；plist 词表由 RFC 0013 冻结。
 
 **Disposition：exempt-with-reason。** 查询操作词是 RFC 0003 冻结的语言无关词汇表；改名 plist 词需 RFC 0013 修订 + plist vector 修订（破坏性）。后续窗口：semantic-model v8 增加 `plist.duplicate-group@1` 别名操作词并弃用 `duplicate-key-group@1`。0.13.0 冻结。记入 FC manifest。
 
@@ -82,7 +82,7 @@
 
 ### Philosophy 1 — `execute_plist_native_query`/`execute_hcl_native_query` 的 `_native_` 中缀
 
-**证据：** 基线家族无 `_native_` 中缀：`execute_json_query`（`consema-json/src/query.rs:91`）、`execute_toml_query`（`toml/query.rs:89`）、`execute_yaml_query`（`yaml/query.rs:167`）、`execute_ini_query`（`ini/query.rs:117`）、`execute_properties_query`（`properties/query.rs:124`）、`execute_xml_query`（`xml/query.rs:223`）、`execute_*_syntax_query` 同式；新家族带中缀：`execute_hcl_native_query`（`consema-hcl/src/query.rs:189`）、`execute_plist_native_query`（`consema-plist/src/query.rs`）、`execute_plist_binary_query`。
+**证据：** 基线家族无 `_native_` 中缀：`execute_json_query`（`crates/consema-json/src/query.rs:91`）、`execute_toml_query`（`crates/consema-toml/src/query.rs:89`）、`execute_yaml_query`（`crates/consema-yaml/src/query.rs:167`）、`execute_ini_query`（`crates/consema-ini/src/query.rs:117`）、`execute_properties_query`（`crates/consema-properties/src/query.rs:124`）、`execute_xml_query`（`crates/consema-xml/src/query.rs:223`）、`execute_*_syntax_query` 同式；新家族带中缀：`execute_hcl_native_query`（`crates/consema-hcl/src/query.rs:189`）、`execute_plist_native_query`（`crates/consema-plist/src/query.rs:271`）、`execute_plist_binary_query`。
 
 **Disposition：exempt（0.13.0）+ 1.0.0 收敛。** 函数名是 Rust 公共 API，域 id 一致（`plist.native-semantic-query@1` 等）；`_native_` 中缀在 RFC 0013/0014 文档化。1.0.0 API 冻结时新增基线式别名（`execute_plist_query`、`execute_hcl_query`、`execute_plist_binary_structure_query`）并弃用 `_native_` 形式一个周期；migration guide 记录。conformance runner 同步迁移（runner 属本仓库域，随 1.0.0 窗口）。
 
@@ -107,7 +107,7 @@
 | B-5 | 失败 `cli.convert@1` 形态 report/target 为 null，失败事实只在诊断 | `convert_cmd.rs:252-268,417-436` | backlog（失败形态外部化各阶段 report） | **保持**：原子失败无 target 文档（null 是诚实形态）；各阶段 report 外部化归 1.0.0 |
 | B-6 | **java-properties 源 project/convert 不可达**（bug） | `query_cmd.rs:893-905`、`project_cmd.rs:48-90` | backlog 优先修复项 | **FIXED（本里程碑）**，见 §2.6 |
 | B-7 | edit/plan/apply 操作词表仅 INI family | `edit_cmd.rs:47-53,510-519` | backlog（每格式操作请求映射） | **保持 backlog**：M7 文档化边界；每格式映射表是增量大面，归 0.14.0+（facade `operation_registry` 已为每 profile 提供操作清单，映射表可直接挂接） |
-| B-8 | `edit --write` 未接线（dry-run only） | `edit_cmd.rs:1023,1063`；`tests/cli_m7_plan.rs:98` 钉死 usage；帮助文本仍宣称 "--write commit an edit" | backlog 优先修复项 | **保持 backlog（0.13.0 收口前处理）**：两条路径——(a) 接线 fsio 提交路径（属 M6/fsio 里程碑域，非 M4 域）；(b) 最小路径：修订帮助文本与 RFC 0015 §6.1 edit 行。行为（usage 拒绝）已由测试钉死，不会漂移。**注意**：帮助文本与行为不一致属文档缺陷，建议 fsio 里程碑顺带修订，0.13.0 收口（M9）复核 |
+| B-8 | `edit --write` 未接线（dry-run only） | `edit_cmd.rs:1023,1063`；`tests/cli_m7_plan.rs:98` 钉死 usage；帮助文本已于 2026-08-07 修订（`args.rs:194` 改为 "dry-run only"、`:214` 的 --write 行已删） | backlog 优先修复项 | **保持 backlog（0.13.0 收口前处理）**：两条路径——(a) 接线 fsio 提交路径（属 M6/fsio 里程碑域，非 M4 域）；(b) 最小路径：修订帮助文本（**已于 2026-08-07 完成**：`args.rs:194`/`:214`；RFC 0015 §6.1 edit 行冻结不动，CHANGELOG.md:45 边界记录同步——usage 显式拒绝不漂移）。行为（usage 拒绝）已由测试钉死，不会漂移 |
 | B-9 | **`inspect --profile` 对未注册格式本地 code 诊断 exit 5 内部错误**（bug） | `inspect.rs:355-395`（对比 `query_cmd.rs:150-166`） | backlog 优先修复项 | **FIXED（本里程碑）**，见 §2.9 |
 
 ### 2.6 B-6 修复记录（java-properties 源 project/convert 不可达）
@@ -161,7 +161,7 @@
 ## 3. cargo-semver-checks 基线解读（M4 视角）
 
 - **基线锚点**：`git tag v0.8.0` 存在（f79dd99，annotated 未签名），与 plan P-11 一致；baseline worktree 建于仓库外（`C:\Users\franck\Documents\consema-baseline-v0.8.0`，semver-checks 要求 baseline 不在当前 workspace 内）。
-- **CI semver job（M1 交付，`.github/workflows/ci.yml:149-183`）**：`obi1kenobi/cargo-semver-checks-action@v2`，`baseline-root: baseline`（v0.8.0 checkout），package 列表 = v0.8.0 时代已存在的 11 个 crate（consema、consema-core、consema-document、consema-graph、consema-ini、consema-json、consema-properties、consema-protocol、consema-pvce、consema-toml、consema-yaml）；consema-xml/plist/hcl 无基线，排除（R-4 覆盖边界显式记录）。
+- **CI semver job（M1 交付，`.github/workflows/ci.yml:207-245`）**：`obi1kenobi/cargo-semver-checks-action@v2`，`baseline-root: baseline`（v0.8.0 checkout），package 列表 = v0.8.0 时代已存在的 11 个 crate（consema、consema-core、consema-document、consema-graph、consema-ini、consema-json、consema-properties、consema-protocol、consema-pvce、consema-toml、consema-yaml）；consema-xml/plist/hcl 无基线，排除（R-4 覆盖边界显式记录）。
 - **本地实测（2026-08-07，`cargo install cargo-semver-checks --locked` 后逐包 `check-release --baseline-root`，与 CI job 等价）**：
 
 | crate | 结果 |

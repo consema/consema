@@ -18,6 +18,10 @@
 - `vectors/semantic-model-v6.json`：`consema.semantic-model-v6.conformance@1`，覆盖 v1-v5 registry 冻结、INI/Properties 外部 query payload、精确 Java UTF-16 code units、source encoding facts、错误码与 wire mutation，共 25 个 case；
 - `vectors/ini-v1.json`：`consema.ini.conformance@1`，覆盖 Portable、Windows、Python ConfigParser 三个显式 Profile 的 formation、encoding、query、projection、materialization、八类 edit 与 limits，共 20 个 case；
 - `vectors/java-properties-v1.json`：`consema.java-properties.conformance@1`，覆盖 Reader/Latin-1 Profile、自然行/逻辑行、Java UTF-16、query、projection、materialization、五类 edit 与 limits，共 22 个 case；
+- `vectors/xml-1-0-safe-v1.json`：`consema.xml-1-0-safe.conformance@1`，覆盖 namespace-aware 无损 Document、显式 source/encoding contract、bounded safe DOCTYPE、恢复与诊断、native/syntax query、三种 projection、canonical materialization、八类 edit 与 limits，共 34 个 case；
+- `vectors/plist-v1.json`：`consema.plist.conformance@1`，覆盖 XML/binary 双表示形成、全部值类型、双表示 round-trip 转换、native/syntax/binary query、projection、materialization、六类 edit 与 limits，共 45 个 case；
+- `vectors/hcl-v1.json`：`consema.hcl.conformance@1`，覆盖 formation、全部表达式/模板/heredoc 文法、恢复、双查询域、projection、materialization、六类（tfvars 四类）edit 与 limits，共 57 个 case；
+- `vectors/cli-v1.json`：`consema.cli.conformance@1`，覆盖 RFC 0015 的 11 个正式命令、exit-code 分类、`core.cli-output@1` 机器信封、plan/apply 批量状态机与 secret redaction，共 40 个 case；
 - `oracles/java-properties-v1/`：固定 Microsoft OpenJDK 25.0.4 的 `java.util.Properties` Reader/Latin-1 行为，共 11 个差分 case；
 - `oracles/python-configparser-v1/`：固定 CPython 3.14.6 默认 `ConfigParser` 的 formation、DEFAULT/raw view、Unicode `optionxform` 与异常分类，共 9 个差分 case；
 - `oracles/dotnet-ini-v1/`：固定 .NET SDK 10.0.302 / `IniConfigurationProvider` 10.0.10 的扁平化、大小写等价、引号与重复拒绝行为，共 7 个差分 case；
@@ -55,6 +59,10 @@ Rust runner 为：
 - `consema_conformance::run_semantic_model_v6()`；
 - `consema_conformance::run_ini_v1()`；
 - `consema_conformance::run_properties_v1()`；
+- `consema_conformance::run_xml_v1()`；
+- `consema_conformance::run_plist_v1()`；
+- `consema_conformance::run_hcl_v1()`；
+- `consema_conformance::run_cli_v1()`；
 - `consema_conformance::run_json5_reference_corpus()`；
 - `consema_conformance::run_properties_jdk25_oracle()`；
 - `consema_conformance::run_ini_python_oracle()`；
@@ -62,7 +70,7 @@ Rust runner 为：
 - `consema_conformance::run_ini_windows_oracle()`；
 - `consema_conformance::run_ini_qt_oracle()`。
 
-上述 14 套语言无关向量合计 332 个 case。独立外部 gate 包括 JSON5 83 项、YAML 官方 402 项（307 valid、94 invalid、1 个显式 Profile exclusion）、TOML 官方 679 项，以及 INI/Properties 五套固定运行时 oracle 合计 36 项。每个 runner 固定校验 suite/schema/semantic-model、case ID 唯一性与未知 action 拒绝；向量或 manifest 中的 input/expected 会实际驱动执行，防止把预期值硬编码进 runner。官方参考 gate 只继承其 manifest 明示的公开行为，不继承第三方 loader 的数值降精度、未声明 duplicate collapse、implicit merge、provider layering 或语言对象构造行为。
+上述 18 套语言无关向量合计 508 个 case。独立外部 gate 包括 JSON5 83 项、YAML 官方 402 项（307 valid、94 invalid、1 个显式 Profile exclusion）、TOML 官方 679 项，以及 INI/Properties 五套固定运行时 oracle 合计 36 项。每个 runner 固定校验 suite/schema/semantic-model、case ID 唯一性与未知 action 拒绝；向量或 manifest 中的 input/expected 会实际驱动执行，防止把预期值硬编码进 runner。官方参考 gate 只继承其 manifest 明示的公开行为，不继承第三方 loader 的数值降精度、未声明 duplicate collapse、implicit merge、provider layering 或语言对象构造行为。
 
 未来 Go 实现必须直接消费相同向量和 fixture。任何实现不得用序列化本地 AST、异常对象或第三方 parser 私有类型来替代向量中的公共字段。
 

@@ -994,7 +994,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
   ↓
 0.12.0 Rust SDK + CLI 产品集成                           Rust
   ↓
-0.13.0 Rust 生产加固与 Feature-Complete Gate             Rust 全通过
+0.13.0 Rust 生产加固与 Feature-Complete Gate      Rust 门禁进行中（C-1/C-2/C-3 开放）
   ↓
 0.14.0 Go core / PVCE / PGCE / protocol                  Go 开始
   ↓
@@ -1012,6 +1012,8 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
   ↓
 1.0.0  完整生产级产品
 ```
+
+> **决策注记（2026-08-07）**：owner 决定在 C-1/C-2/C-3 完成前启动 `0.14.0` 的 Go 实现（G0.1-G0.3：core/graph/protocol），这是经记录的路线图偏差，按 §0 冲突解决层级处理——修改路线图、不静默缩小 1.0.0 承诺；`0.13.0` 门禁判定以 docs/fc-manifest-0.13.0.json 为准（gate_open/not_closed，C-1/C-2/C-3 开放，decision record 见该 manifest）。
 
 版本数量可以在实际执行中增加，但不得压缩语义门禁。若某个阶段过大，可以拆成更多 minor 版本；不能为了保持编号漂亮而把未完成能力滚入下一阶段。
 
@@ -1368,7 +1370,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * 所有 public object 的 lifecycle、identity、completion 和 failure 已定义；
 * 没有依赖 Rust 类型名才能解释的语言无关行为；
 * 所有 provisional abstraction 已验证、修订或删除；
-* Go API mapping RFC 已通过，但 Go 实现尚未开始；
+* Go API mapping RFC 已接受（2026-08-07 修订为 15-kind 契约映射）；Go 实现 0.14.0 G0.1-G0.3 已按 2026-08-07 决策记录 D-1 启动（core/graph/protocol，见 fc-manifest decisions[0]；C-1/C-2/C-3 完成前不发布 0.14.0、不宣称里程碑关闭）；
 * 所有已知规范歧义有 resolution 或明确的阻断状态。
 
 ## 15.3 质量门禁
