@@ -1,6 +1,6 @@
-# Rust `0.8.0` 实现契约
+# Rust 实现契约（0.8.0–0.12.0）
 
-本文记录 Consema 0.8.0 的 crate 边界、版本化 registry、可验证入口和明确非目标。语义权威顺序为：
+本文记录 Consema 0.8.0–0.12.0 的 crate 边界、版本化 registry、可验证入口和明确非目标。语义权威顺序为：
 
 1. 根目录《配置内容统一处理标准与 Rust 参考实现》中的永久不变量；
 2. 已接受 RFC；
@@ -63,6 +63,8 @@ typed protocol object
 格式 crate 之间不互相依赖。`consema-core` 不依赖格式；`consema-document` 不理解 JSON/TOML/YAML/INI/Properties 语义；跨格式操作必须通过公共 projection/materialization contract 组合。`consema-graph` 是格式无关图模型，不依赖 YAML；YAML 只是首个验证它的格式。
 
 `consema-conformance` 依赖仓库根目录的语言无关向量、fixtures、upstream suite 与 runtime oracle，因此明确 `publish = false`。它是规范资产的仓库级执行器，不是可脱离这些资产独立发布的运行时库；其余 facade 与十三个支撑 crate 形成 14 个可发布归档，并通过解包后 current/MSRV 编译门禁验证。
+
+0.12.0 起 `consema` facade crate 内嵌正式 CLI bin（`[[bin]] name = "consema"`，`src/bin/consema/` 私有模块树，RFC 0015）。bin 与 lib 同包，只能访问 facade 的 public API——这是"CLI 与 SDK 使用同一语义入口"的编译期强制（cli-implementation-plan.md §0.3）：CLI 需要的任何格式知识都必须由 facade 公共类型提供，`src/bin/consema/` 中不存在 parse/query/project/materialize/edit/convert 的实现代码。bin 是 std-only，零新增外部依赖；可发布归档数保持 14 个不变。
 
 ## 2. 公共 document 事实
 
@@ -150,6 +152,48 @@ encoding 恒为 UTF-8：前导或他处 BOM → Recovered + `hcl.parse.byte-orde
 查询两域 `hcl.native-semantic-query@1` 与 `hcl.lossless-syntax-query@1` 共用执行骨架；`QueryDomain` 仅新增两个构造器，查询 wire 契约不进 consema-protocol 核心注册表。投影默认精确目标 `hcl.projection.body@1`（literal-complete 判定、类型化 members、顺序与重复 object key 保留），derived 表达式默认原子失败、显式 `ProjectExpression` 策略下以 authorized ExtendedValue `hcl.expression@1` 投影（版本化 payload + structural fingerprint，重解析比对指纹）。`hcl.canonical-document@1` materialization 生成字节必先重解析并逐节点比较闭包语义；六个版本化编辑操作按 profile 类型化（tfvars 只发布四个 attribute 操作），值以类型化 literal-complete 提供，绝不以 raw markup 或 unevaluated expression 文本。
 
 HCL 全程不求值：无 variable/function/template 求值与展开、无 Terraform/cty 语义、无 application schema（硬门禁 2）；`hcl.expression@1` 只承载语法事实，永不执行。
+
+## 4.6 XML family 与 namespace-aware 原生树语义
+
+0.9.0 发布 `xml.1.0-safe@1`：namespace-aware、side-effect-free 的 XML 1.0 well-formed 文档 Profile，带刻意缩小的 DTD/entity 表面。Profile 在 formation 前显式选择；`.xml` 扩展名不授权外部 I/O、schema lookup、DTD 校验或 application mapping，解析只消费一个完整文档实体，不打开任何 entity、file、URI、网络连接、registry、classpath 或 catalog。
+
+encoding 使用显式 source contract：UTF-8（BOM 可选）、UTF-16LE/BE（必须带 BOM）；无 BOM 默认 UTF-8，caller choice 是 evidence 而非 contradict 权限，UTF-16 无 BOM 一律拒绝，UTF-32/Latin-1/code page 为 v1 显式排除。unmodified render 精确返回原始字节（含 BOM、声明拼写、quote 选择与行尾）；XML 行尾归一化是语义而非破坏（raw CR/CRLF/LF 拼写保留在 source pieces，native 字符数据归一为 LF）。
+
+原生模型是 snapshot-bound 的 namespace-aware 树：`XmlDocument`/`XmlDeclaration`/`XmlDoctype`/`XmlElement`/`XmlAttribute`/`XmlNamespaceBinding`/`XmlText`/`XmlCdata`/`XmlComment`/`XmlProcessingInstruction`/`XmlEntityReference` 保留 prolog/根元素/epilog 顺序与每个精确 source span，child content 是有序 mixed-content 序列，永不按类型分组。QName 保留 original prefix/local name 与完整/分段 span，expanded-name 相等只比较 namespace URI 与 local name，prefix 只是 scoped source spelling；namespace declaration 是有序独立身份的 native association，不是普通 attribute。文本与 attribute value 保留有序 fragments（Literal/CharacterReference/PredefinedEntityReference/GeneralEntityReference），每个 reference 有独立 `NodeRef`、raw span、resolved string 与 declaration provenance。
+
+DOCTYPE 只允许无 DOCTYPE 或 internal-only bounded subset（注释/PI/whitespace 与替换文本不含 `<` 的 internal general parsed entity 声明）；external subset、参数实体、unparsed entity、notation、`ELEMENT`/`ATTLIST`/conditional-section 与可产生 markup 的内部实体 → Recovered + 稳定 security/profile diagnostic，无 callback 可 fetch 被排除内容。五个 predefined entity（lt/gt/amp/apos/quot）恒可用且不可覆盖；entity 膨胀按整个文档六维记账（declarations/references/depth/bytes/scalars/amplification），突破即 Recovered，绝不以截断文本或空树伪装成功。
+
+37 种 `XmlSyntaxKind` 对每个非空原始字节给出无空洞无重叠的有序 piece 覆盖（declaration/doctype/tag/QName 部件/attribute 部件/reference/CDATA/comment/PI 各自独立成 piece），UTF-16 piece 覆盖原始 code unit。Rust backend 精确固定 `xmlparser 0.13.6`（zero-allocation token/span，无 I/O，`unsafe_code = forbid`）；Profile 解析、source identity、namespace scope、native composition、recovery、query、projection、materialization 与 edit 全由 Consema 层拥有，任何 backend 类型不进公共 API。
+
+恢复语义：Recovered 文档保留不可变 source、穷尽 piece 覆盖、有序 diagnostics 与每个独立证明的 construct，只在确定性 markup 边界恢复，绝不虚构 closing tag、namespace binding、attribute value、entity replacement 或第二个 root；Recovered 文档可查询已证明的部分、可显式选择 error region，但不可 project/materialize/commit。查询两域 `xml.native-semantic-query@1` 与 `xml.lossless-syntax-query@1`：native 域覆盖 document/prolog/root/epilog 导航、child/descendant、ordered content、attribute、namespace declaration 与 in-scope binding、text/CDATA/comment/PI、reference、owner/parent，以及 QName prefix/local、expanded namespace/local、node kind、attribute value、PI target、reference kind/name filter；lossless 域提供 kind/text 过滤、source order、`core.take` 与 `core.distinct-by-identity`。native order 是 document order，descendant 为 bounded pre-order；任何查询不 resolve URI、不求值 XPath、不 load schema。`QueryDomain` 仅新增两个构造器，查询 wire 契约不进 consema-protocol 核心注册表。
+
+投影默认精确目标 `xml.projection.element-tree@1`（版本化 `xml.element-tree@1` record：declaration facts、admitted internal entity declarations、namespace-aware root、有序 namespace declaration/attribute/mixed content 与精确 text/reference fragments），显式次目标 `xml.projection.text-content@1`（恒 Transformed，必须显式选择 descendant text/CDATA 包含策略并报告每次丢弃）与 `xml.projection.simple-entry-mapping@1`（子树无 mixed content/comment/PI/重复 expanded child/namespace collision 才 admit；attribute prefix、text key、repeated-child、expanded-name key 与 collision policy 全部显式，省略即失败）；无 xml-to-json-default、自动 `@` 前缀、`#text` key、singular/plural heuristic 或 child grouping。
+
+`xml.safe-canonical-document@1` materialization 消费已校验的 `xml.element-tree@1` 值生成新 `xml.1.0-safe@1` Document，不是 W3C Canonical XML 也不声明 C14N 等价。style 确定性选择 declaration 拼写、quote、缩进、namespace 声明位置、empty-element 拼写、reference 拼写与 LF/CRLF；UTF-8/UTF-16LE/BE 输出均支持（UTF-16 恒带 BOM），encoding/newline/输出字节/深度/节点/attribute/namespace/entity/report/provenance 上限先于发布检查。生成字节必先重解析并逐节点比较 promise 的 input semantics，失败返回无 target Document、无 partial output。
+
+八个版本化编辑操作：`replace-text`、`insert-attribute`、`remove-attribute`、`rename-attribute`、`set-attribute-value`、`insert-element`、`remove-element`、`rename-element`。每个操作针对一个精确 `NodeRef`，placement 使用一个精确 parent 与可选 sibling/attribute anchor；duplicate expanded attribute、invalid/unbound namespace binding、保留前缀误用、ancestor/self placement、stale snapshot、overlap 与破坏 mixed-content/document-root 不变量在 commit 前失败。semantic replacement 接受 text 或 validated QName/expanded name 事实，绝不以 raw markup 提供；commit 保留 operation-owned span 外每个字节、重 parse 目标、产生 ChangeSet、derive `UntouchedByteProof` 与 replayable `SourcePatch`，dry-run/commit 替换集与 target digest 一致。
+
+XML 全程无副作用：不求值 XPath/XSLT、不执行 custom constructor、不 fetch 外部资源、不读 environment/locale；`xml.*` diagnostic code 由 RFC 0012 注册，不进 consema-protocol core error registry。新增 `consema.xml-1-0-safe.conformance@1` 语言无关 suite（34 个 case），使 15 套 suite 达到 366/366；W3C XML/Namespaces 上游 suite 按 release identifier 与 digest 钉版入 manifest，每个 exclusion 记录 suite case identity 与被排除的 Profile 规则，没有 upstream case 被静默忽略。
+
+## 4.7 Property List family 与双表示原生值模型
+
+0.10.0 发布 `plist.xml@1` 与 `plist.binary@1`：两个 Profile 共享一个 representation-independent 原生值模型与 immutable-snapshot/recovery/transaction/proof/patch 基础设施，但拥有不相交的语法系统——XML 表示是 tag 树，binary 表示是 object table（offset-table 与 trailer 事实，无文本/whitespace/token 虚构）。Profile 在 formation 前显式选择；`bplist00` magic 与 `.plist` 扩展名都不选择 Profile、representation 或 encoding，两 Profile 是 format identity 而非同一格式的 dialect（RFC 0012 §15 明确排除 plist 值语义，本家族是提供该语义的契约）。
+
+原生值模型是共享 identity 的 arena：`PlistDict`（有序 key/value association，重复 key 是有序 native facts，永不折叠）、`PlistArray`、`PlistString`（精确 UTF-16 code unit + `WellFormedUnicode | UnpairedSurrogate` 状态，沿 `core.java-utf16-string@1` wire 模式）、`PlistInteger`（signed 64-bit 精确）、`PlistReal`（IEEE 754 double 精确 bits，保留 Float32/Float64 width fact）、`PlistBoolean`、`PlistDate`（精确 double seconds since `2001-01-01T00:00:00Z`）、`PlistData`（精确 bytes）与 `PlistUid`（binary-only，unsigned 32-bit，永不 resolve 其引用语义）。binary object table 的 shared object identity 保留为一个 native node 多 owner，这是 plist Document 不能压成 plain tree of copies 的原因。
+
+`plist.xml@1` 复用 RFC 0012 的 frozen source contract（UTF-8/UTF-16LE/BE，UTF-16 必须带 BOM），但自有 DOCTYPE/element/value 规则：DOCTYPE 必须精确匹配 Apple identifier（无 external fetch、不处理 `%plistObject;` 参数实体），root 必须是 `<plist version="1.0">`，元素名大小写敏感且必须 unqualified；integer 接受 Foundation 的 decimal/hex 文法（signed 64-bit 范围外 Recovered），real 接受 nan/inf/infinity 拼写（exact double bits），date 文法 `[-]YYYY-MM-DDTHH:MM:SSZ` 要求 calendar 校验，data 是 strict base64（padding 必须精确，否则 Recovered）；string/key 只接受五个 predefined entity 与字符引用，无 internal entity 声明。XML lossless 语法 46 种 `PlistSyntaxKind` 对每个非空原始字节给出一对一 piece 覆盖（含 `PlistOpen`/`PlistVersionName`/`PlistVersionValue` 对 `<plist version="1.0">` 的切分）。
+
+`plist.binary@1` 无第三方 backend：`bplist00` header、marker 表（`0x08/0x09` boolean、`0x10–0x13` integer、`0x22/0x23` real、`0x33` date、`0x40–0x4F` data、`0x50–0x5F` ASCII string、`0x60–0x6F` UTF-16BE string、`0x80–0x8F` UID、`0xA0–0xAF` array、`0xD0–0xDF` dict）、extended size、offset table 与 32-byte trailer 全部 Consema-owned；1/2/4-byte integer 无符号、8-byte 有符号、负数恒 8 bytes，非最小宽度是合法输入事实（canonical materialization 归一化）；trailer sufficiency/integrity checks 与全部尺寸算术在分配前 checked，文档最小 42 bytes。null/URL/UUID/fill/16-byte integer/UTF-8 string/set 等 marker 为 v1 显式排除（Recovered + 稳定 diagnostic）；ASCII string 高位字节、非 string binary dict key 与越界 offset entry 都是记录在案的 divergence。
+
+双表示转换（`Document::convert_to`）是一等 transform：序列化目标表示字节、重解析并验证原生模型相等（reparse closure），每次转换报告 representation-change 与逐值映射事件；binary-only facts（UID、Float32 width、unpaired surrogate、分数秒/越界日期、shared identity）对 XML 目标原子失败并发布 `plist.conversion.inexpressible@1`，无 partial target、无静默降级（hard gate 3）。XML-sourced 文档永不包含这些事实，因此转 binary 恒可表达；recovered 文档不可转换。
+
+查询三域：`plist.native-semantic-query@1`（document-root/dict-entries/dict-entry-key/value/dict-key-equals/duplicate-key-group/array-elements/value-type-is 与类型化 value-as-integer/real/boolean/string/data/date/uid 访问器，类型不匹配是 query failure 而非 null）、`plist.lossless-syntax-query@1`（XML kind/decoded-text 过滤）与 `plist.binary-structure-query@1`（object-table/object-offset/object-refs/offset-table/trailer-facts/top-object，返回精确 byte span 的 structure facts，不虚构文本 trivia，hard gate 1）。查询 wire 契约不进 consema-protocol 核心注册表，按 RFC 0011 external-locator 模式随后续 semantic-model 版本以 `core.*` contract 注册。
+
+投影默认精确目标 `plist.projection.value-tree@1`（版本化 `plist.value-tree@1` record：一个 root、有序 dict association、有序 array elements 与 typed leaves；UID 只在显式 `IncludeUid` policy 下投影，绝不伪装成 integer；unpaired-surrogate string 原子失败）。显式次目标 `plist.projection.require-object@1`：仅当每个 key 都是 string 且每个 value 都是 string/integer/real/boolean，并显式选择 `Reject | First | Last` loss policy；date/data/UID 以 diagnostic 失败而非渲染成 string。Materialization 双 style：`plist.xml-canonical@1` 输出 UTF-8 无 BOM、Apple header 拼写、四空格缩进、LF 与末尾换行，dict key 保持输入顺序（与 Apple writer 排序的已记录 divergence）、data 标准 base64 76 列换行（indent 计入 budget）、integer 恒十进制、real 最短往返、date 整秒拼写（分数秒需显式 `TruncateWithReport`，绝不静默截断）；`plist.binary-canonical@1` 输出 minimal integer 宽度（负数恒 8 bytes）、`Float32` width 保留、identical scalar 按首次出现 dedup（容器恒新写）、minimal offset/ref sizes 与 `sortVersion = 0x00`。两种 style 都先完整校验、再重解析生成字节并比较原生模型，失败返回无 target Document、无 partial bytes、无 partial provenance。
+
+六个版本化编辑操作按 profile 类型化：`set-value`、`insert-dict-entry`、`remove-dict-entry`、`rename-dict-key`、`insert-array-element`、`remove-array-element`。XML 编辑按 RFC 0012 语义只在 operation-owned span 内替换并重 parse 验证；binary 编辑是结构性的：`set-value` 重写目标 object 的 marker/payload，insert/remove 重写 owner 容器的 reference block、offset table 与 trailer；shared reference 保留（删除 entry 不删除仍被引用的 object），cycle 拒绝，全部 offset/size/reference 算术在输出前 checked。值以 typed native facts（integer/real/boolean/date/data/string/UID）提供，绝不以 raw markup 或 raw bytes；成功返回新 Document、ChangeSet、`UntouchedByteProof` 与 replayable `SourcePatch`，失败无其中任何一项。
+
+plist 全程无副作用：不 fetch Apple DTD 或任何 URI、不 resolve UID/archive key path、不求值表达式、不读 environment/locale、不写文件；`plist.*` diagnostic code 由 RFC 0013 注册（`plist.parse.*@1`/`plist.binary.*@1`/`plist.limit.*@1` 命名），不进 consema-protocol core error registry。新增 `consema.plist.conformance@1` 语言无关 suite（45 个 case），使 16 套 suite 达到 411/411；mandatory differential gate 在钉版 macOS runner 上以 `plutil -lint`/`-convert xml1|binary1`/`-p` 与 Foundation `PropertyListSerialization` 双向比较，exclusion 列表记录本 RFC 的全部 divergence，差分分歧不经 RFC 不得改 Consema 行为；CPython `plistlib`/libplist 只在非 Apple CI 上做次级结构 cross-check，不是语义权威。
 
 ## 5. Query registries
 
@@ -321,13 +365,16 @@ TOML exact literal 必须恰好是一个 scalar span：前后 trivia、comment�
 | `yaml/yaml-test-suite data-2022-01-17`, valid byte-exact | 307/307 |
 | `yaml/yaml-test-suite data-2022-01-17`, invalid atomic rejection | 94/94 |
 | YAML profile-contract exclusions | 1/1（`%YAML 1.3`） |
+| `consema.xml-1-0-safe.conformance@1` | 34/34 |
+| `consema.plist.conformance@1` | 45/45 |
+| `consema.hcl.conformance@1` | 57/57 |
 | OpenJDK 25.0.4 Properties oracle | 11/11 |
 | CPython 3.14.6 ConfigParser oracle | 9/9 |
 | .NET 10.0.10 INI provider oracle | 7/7 |
 | Windows wide profile API oracle | 5/5 |
 | Qt 6.10.2 QSettings INI oracle | 4/4 |
 
-14 套语言无关向量共 332 个。0.8.0 新增 semantic-model v6 25 个、INI 20 个、Properties 22 个案例，并把 core/source-v2 回归补至 30 个；覆盖 v1-v5 registry 冻结、38/166 v6 manifest、code page/BOM policy、Java UTF-16 wire、三种 INI 与两种 Properties Profile、query、projection、materialization、edit 和 limits。五套固定 runtime oracle 共 36 项，只比较各自 manifest 声明的共享语义；native Document 仍保留第三方 provider/table 会折叠的信息。INI/Properties 自有工程夹具完成 byte-exact render、coverage、projection/materialization closure 与 edit proof/patch；hardening 覆盖逐字节 mutation、截断、malformed escape/continuation、Unicode/code-page 边界、长行/深度/数量限制和 atomic publication boundary。既有 JSON5/TOML/YAML 上游门禁保持完整通过。
+18 套语言无关向量共 508 个。0.8.0 新增 semantic-model v6 25 个、INI 20 个、Properties 22 个案例，并把 core/source-v2 回归补至 30 个；0.9.0 新增 XML 34 个、0.10.0 新增 plist 45 个、0.11.0 新增 HCL 57 个、0.12.0 新增 CLI 40 个；覆盖 v1-v5 registry 冻结、38/166 v6 manifest、code page/BOM policy、Java UTF-16 wire、三种 INI 与两种 Properties Profile、XML namespace/entity、plist 双表示、HCL body/expression、v7 信封/exit 分类/batch 状态机/redaction/检测事实、query、projection、materialization、edit 和 limits。五套固定 runtime oracle 共 36 项，只比较各自 manifest 声明的共享语义；native Document 仍保留第三方 provider/table 会折叠的信息。INI/Properties 自有工程夹具完成 byte-exact render、coverage、projection/materialization closure 与 edit proof/patch；hardening 覆盖逐字节 mutation、截断、malformed escape/continuation、Unicode/code-page 边界、长行/深度/数量限制和 atomic publication boundary。既有 JSON5/TOML/YAML 上游门禁保持完整通过。0.12.0 的 `consema.cli.conformance@1`（v7 CLI payload 套件，40 个 case）见第 14 章 CLI 章节。
 
 ## 11. PVCE/1 固定项
 
@@ -393,8 +440,31 @@ RFC 0011 的 `ContractRegistry::v6()` 增至 38 条记录，新增八个 contrac
 
 `ErrorCodeRegistry::v6()` 在 v5 的 132 条上增加 34 条 source/INI/Properties code，共 166 条。`RegistryManifest::current()` 在 0.8.0 指向 v6；v1-v5 的 contract/error arrays、manifest 与 frozen constructor 精确不变。所有 nested contract version、digest/encoding/BOM/boundary、UTF16BE bytes/code-unit/status、domain/role/ordinal/completion 交叉约束都在 decoder 中重验，不能仅凭 schema discriminator 绕过。
 
+### Semantic model v7
+
+RFC 0015 的 `ContractRegistry::v7()` 增至 41 条记录：v6 的 38 条精确不变，新增三个 CLI 稳定 payload contract——`core.cli-output@1`（统一机器输出信封：command/exit_class/product_version/payload/diagnostics/redaction）、`core.batch-plan@1`（只读批量规划 manifest：逐文件 path/profile/source_digest/operations/source_patch/target_digest，计划条目 planned/failed）与 `core.batch-result@1`（批量应用结果：逐文件 completed/failed/pending/skipped-stale 状态与 failure_code/target_digest/redacted）。每个 payload 都是固定字段 PortableValue，canonical JSON/PVCE 双传输，typed decoder 重验交叉约束（command/exit_class/payload 一致性、digest 表示、状态机合法迁移、limits）——不能仅凭 schema discriminator 绕过。
+
+`ErrorCodeRegistry::v7()` 在 v6 的 166 条上增加 20 条 `cli.*` code，共 186 条：usage 7（unknown-command/unknown-argument/invalid-argument/invalid-format/missing-required/missing-plan/redaction-pattern）、data 2（io/invalid-request）、detection 1（ambiguous）、limit 3（file-size/batch-count/manifest-size）、write 5（io/permission/read-only/symlink-policy/target-is-directory）、interrupted 1（signal）与 internal 1（unclassified）。exit-code 分类是纯函数（`classify_error_code`，RFC 0015 §5.2）：usage→1、data/detection→2、limit→3、write/interrupted→4、internal→5、其余成功 0；CLI 二进制只映射该分类，绝不手选码。
+
+`RegistryManifest::current()` 在 0.12.0 指向 v7；v1-v6 的 contract/error arrays、manifest 与 frozen constructor 精确不变。v7 的 CLI payload 是语言无关语义模型契约：Go CLI（路线图 §22.6）实现同一 machine schema，payload 内不出现 Rust 类型名或 process-local 身份（RFC 0015 §15.2）。
+
 ## 13. 0.8.0 明确边界
 
 本版本没有 XML、XML Properties、plist、HCL、Schema、semantic diff/merge、Formatter、Live Query、增量解析、跨对象 member move/table move、文件系统原子替换、稳定进程插件协议或 Go 实现。JSON5 不执行 JavaScript 表达式、import、computed key、method、regex、template literal、`undefined` 或 bigint。YAML 不执行 custom constructor、merge、include/import、remote tag 或 alias expansion；不提供跨 document anchor、general formatter、graph diff/merge 或跨容器 node move。INI 不执行 interpolation、provider precedence、registry redirect、environment/default lookup 或 typed getter；Properties 不执行 defaults chain、Hashtable mutation、ResourceBundle lookup、XML、classpath 或 time-dependent store。`SourcePatch` 仍只声明精确 raw-byte transition；`EditPlan` 仍只声明已验证计划，二者都不授予文件系统写入权限。
 
 这些不是“隐藏支持”或文档遗漏；它们是路线图后续版本的显式工作。0.8.0 只声明已由代码、语言无关向量、adversarial tests、真实夹具、固定基准、上游 suite 和 runtime oracle 共同证明的 capability。
+
+## 14. consema CLI（0.12.0）
+
+0.12.0 发布正式 `consema` CLI（RFC 0015），作为 facade crate 的 `[[bin]]` 目标内置（`src/bin/consema/`，std-only，零新外部依赖）。11 个命令：`inspect`、`capabilities`、`query`、`project`、`materialize`、`convert`、`edit`、`plan`、`apply`、`conformance`、`explain`。命令面、机器 schema、exit-code 分类、batch 状态机与 redaction 政策由 RFC 0015 冻结为 v1 candidate；CLI 的机器输出是 `core.cli-output@1` 信封 payload（第 12 章 semantic-model v7），Go CLI 实现同一契约。
+
+- **stdout/stderr 分流**（RFC 0015 §3.3）：`--json` 下 stdout 只有一行规范 JSON 信封（`--pretty` 时确定性缩进渲染，仅空白变化、字节语义不变）；非 `--json` 下 stdout 只有命令结果数据。全部诊断、进度、redaction 提示走 stderr。
+- **默认只读/dry-run**：没有命令在无显式参数时写目标文件；写入必须显式 `--write`（edit）、`--apply`（apply 只消费先前 `plan` 的 manifest）或 `--output`（materialize/convert 目标、plan/apply manifest）。materialize/convert 默认把目标字节写到 stdout。
+- **facts-only auto-detection**（RFC 0015 §7，硬门禁 2）：`inspect` 只报告字节事实（大小/SHA-256）、编码事实（BOM）、结构 marker 事实、候选 Profile（每个附理由）与歧义（一等结果，exit 0）；永不输出“这是 X 格式”的单一结论。parse 类命令必须显式 `--profile`，歧义不可解析时是 data 类失败（exit 2）。
+- **批量工作流**（RFC 0015 §8-§9）：`plan` 逐文件 parse + edit dry-run 产出 `core.batch-plan@1` manifest（只读；单文件失败作为 manifest 内容记录，exit 0）；`apply` 逐文件重读重验 base digest 与 original-bytes 双前置条件，同目录临时文件 + 原子替换 + 读回验证 target digest，产出 `core.batch-result@1`。任何 Failed/SkippedStale 文件 → exit 4（precondition）；全部 completed → 0。中断恢复：每文件写入前先落 pending 标记、完成后落 completed，重跑 completed 跳过、pending 重做；中断后 stdout 不再输出字节，pending manifest 留在磁盘。
+- **redaction**（RFC 0015 §4.4，presentation-only）：human 视图与 plan 视图默认按保守键名模式脱敏（`$REDACTED$` 占位 + stderr 提示 + 机器 `redaction` 事实）；`--show-secrets` 是唯一取消通道。plan manifest 记录本身（apply 的原始字节前置条件）永不脱敏（硬门禁 3）。
+- **CLI 层资源上限**（RFC 0015 §12）：每文件读取预算（`--max-bytes`，默认协议 64 MiB）超限 = `cli.limit.file-size@1`；批量文件数（`--max-files`，默认 1000）超限 = `cli.limit.batch-count@1`；请求/manifest 大小超限 = `cli.limit.manifest-size@1`。全部 limit 类失败（exit 3），不截断伪装成功。
+- **零新依赖与零新实现**：参数解析（`args.rs`）、规范 JSON 缩进渲染（`output.rs`）、原子写引擎（`fsio.rs`）、secret 检测（`redact.rs`）全部自写；bin 内不存在任何 parse/query/project/materialize/edit/convert 的实现，命令是“参数 → facade public API → 渲染”的薄驱动。机器输出与 SDK 直接 encode 字节相等由测试常设断言（R-8 门禁）。
+- **conformance 命令**：`consema conformance` 执行内嵌自检子集（信封双传输 round-trip、exit 分类、redact 自检，3 项全过 exit 0），随发布物运行；完整语言无关 suite（`consema.cli.conformance@1` 向量，40 个 case）由 `cargo test -p consema-conformance` 仓库级执行（发布物不含仓库 fixtures）。
+
+0.12.0 CLI 的已知边界（详见 CHANGELOG 0.12.0 Boundaries 与 0.13.0 gate plan §4 M4 的 API 评审 backlog）：query 只接线 `core.portable-value-query@1`（native 域与 xml/plist/hcl 源需 facade 的 node-locator 外部化 API）；project 报告外部化仅 json/toml；materialize/convert 的 provenance map 为空；edit/plan/apply 操作词表仅 INI family 且 `edit --write` 未接线；信封只携带注册 code，格式本地 code 绑定注册 fallback、stderr 保留真码。

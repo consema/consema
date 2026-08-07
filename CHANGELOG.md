@@ -2,6 +2,47 @@
 
 Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发布能力。
 
+## Unreleased — 0.12.0
+
+### Added
+
+- 实现 RFC 0015，发布正式 `consema` CLI（11 个命令：inspect/capabilities/query/project/materialize/convert/edit/plan/apply/conformance/explain），作为 facade crate 的 `[[bin]]` 目标内置（`cargo install consema` 同时获得 SDK 与 CLI，可发布归档数不变）；CLI 是产品入口，不是第三个实现——bin 与 lib 同包，只能访问 facade public API，机器输出与 SDK 直接 encode 字节相等；
+- 发布 semantic-model v7：v6 的 38 条 contract 记录冻结不变，追加 `core.cli-output@1`、`core.batch-plan@1`、`core.batch-result@1` 三个 CLI 稳定 payload（固定字段 PortableValue + canonical JSON/PVCE 双传输 + typed decoder 重验交叉约束）；v6 的 166 个 error code 冻结不变，追加 20 个 `cli.*` code（usage 7/data 2/detection 1/limit 3/write 5/interrupted 1/internal 1），共 41 条 contract 与 186 个 code；`RegistryManifest::current()` 指向 v7；
+- 机器协议：全部命令统一输出 `core.cli-output@1` 信封（command/exit_class/product_version/payload/diagnostics/redaction），stdout 只有一行规范 JSON（`--json`）或命令结果数据，诊断与进度全部走 stderr；exit code 0-5 稳定分类（success/usage/data/limit/precondition/internal），分类是纯函数，每个错误族都有穷尽映射测试；
+- facts-only auto-detection：inspect 只报告字节大小/SHA-256/BOM/marker/候选 Profile（每个候选附理由）/歧义，永不输出"这是 X 格式"的单一结论；parse 类命令必须显式 `--profile`，歧义是可报告的一等结果而不是猜测；
+- plan/apply 批量工作流：`plan` 逐文件 parse + edit dry-run，产出 `core.batch-plan@1` manifest（source_digest/operations/source_patch/target_digest），单文件失败作为 manifest 内容如实记录、不整批失败也不伪装成功；`apply` 逐文件重读重验 base digest 与 original-bytes 双前置条件，通过后同目录临时文件 + 原子替换 + 读回验证 target digest，产出 `core.batch-result@1`（completed/failed/pending/skipped-stale 状态机）；中断恢复：每文件写入前先落 pending 标记、完成后落 completed，重跑 completed 跳过、pending 重做（`CONSEMA_APPLY_INTERRUPT_AFTER`/`CONSEMA_APPLY_WRITE_FAILURE` 注入 seam）；
+- secret redaction：保守键名模式集 + `--redact-keys <glob>` 追加，human 视图/plan 视图默认脱敏（`$REDACTED$` 占位 + stderr 提示 + 机器 `redaction` 事实），`--show-secrets` 是唯一展示取消通道；只影响展示，绝不触碰 SourcePatch 应用所需的字节前置条件；
+- 零新外部依赖：参数解析、人类可读的规范 JSON 缩进渲染、原子写引擎、secret 检测全部自写（std-only；deny.toml 与 workspace 依赖政策不变）；
+- 默认只读/dry-run：没有任何命令在无显式参数时写目标文件，写入必须显式 `--write`/`--apply`/`--output`；`apply` 只消费先前 `plan` 产生的 manifest，不接受裸操作；
+- 新增 `consema.cli.conformance@1` 语言无关 suite（40 个 case，套件总数 17→18 达 508/508），覆盖 v7 信封双传输等价、exit-code 分类矩阵、batch-plan/batch-result 状态迁移（含非法迁移负例）、redaction 展示策略与检测事实矩阵；`consema conformance` 内嵌自检子集（信封 round-trip、exit 分类、redact 自检）随发布物执行，完整语言无关 suite 保持仓库级运行。
+
+### Correctness
+
+- CLI 全部格式知识来自 facade：`src/bin/consema/` 无任何 parse/query/project/materialize/edit/convert 实现代码，命令是"参数 → facade 调用 → 渲染"的薄驱动（编译期强制，硬门禁 1）；`capabilities` 清单由 facade 类型派生，不重复声明；
+- 便利性不改变核心语义：duplicate/lossy/encoding/mapping 等 policy 全部由请求 payload 或显式参数给定，CLI 不发明默认策略（未授权 loss 即失败）；
+- apply 的写入前重验（stale digest + original-bytes 双前置条件）与写入后 target digest 读回验证，与 plan 的 replacements/target digest 严格一致（dry-run/commit 等价契约的进程级落实）；CLI 层文件大小/批量文件数上限是 limit 类失败（exit 3），绝不截断伪装成功；
+- redaction 是 presentation-only：脱敏值只出现在 human/机器展示层，SourcePatch 的 `original`/`replacement` 字节前置条件与 plan manifest 记录本身永不脱敏（硬门禁 3）；
+- plan manifest 是产物不是授权：`plan` 永不写任何目标文件，manifest 记录（stdout 或 `--output`）与其在 `--json` 信封中的 payload 字节相同；
+- 默认无文件写入与无副作用链：inspect/query/project/materialize/convert（默认）/plan/conformance/explain 全部只读；materialize/convert 的目标字节默认只到 stdout；进程中断的优雅路径先落 manifest 再退出。
+
+### Verified
+
+- Rust 1.97.1 下 workspace `--all-targets --all-features` 的 1,564 项 tests 与 strict Clippy、rustfmt 通过；doc-tests 与 rustdoc `-D warnings` 通过（发布门禁体例）；
+- 18 套语言无关 suite 共 508/508 cases 通过（其中 semantic-model v6 25/25、INI 20/20、Java Properties 22/22、XML 34/34、plist 45/45、HCL 57/57、CLI 40/40；semantic-model v7 与 `consema.cli.conformance@1` 见上）；
+- RustSec 使用本地 1,189 条 advisory 数据扫描 Cargo.lock 的 42 个 crate dependencies，无已知漏洞；cargo-deny advisories、bans、licenses、sources 四类门禁通过；
+- 14 个可发布 `.crate`（consema 归档现含 CLI bin）完成路径安全、内部 checksum/归档 SHA-256 一致性检查，并在 Rust 1.97.1 与 MSRV 1.85.0 下从解包内容通过全 target/全 feature 编译；repository-only 的 `consema-conformance` 明确设为不可发布；
+- CLI 进程级 e2e 与 hardening 覆盖：参数矩阵、stdout/stderr 分流、exit code 矩阵、机器输出与 SDK encode 字节相等、plan→apply 全流程、stale/篡改 original/只读/目录/symlink/权限/磁盘/中断注入（`tests/cli_*.rs`，env!(`CARGO_BIN_EXE_consema`) 启动二进制，零 dev-dependency）；
+- 本机 CLI 性能基线（冷启动 inspect、parse-path query、批 100 文件 plan/apply、信封 round-trip）记录于 `docs/BENCHMARKS-0.12.0.md`，方法学与 BENCHMARKS-0.9.0/0.11.0 同纪律。
+
+### Boundaries
+
+- `consema query` 只接线 `core.portable-value-query@1`：native 查询域需要调用方外部化的 node locator，facade 尚未暴露该 API（xml/plist/hcl 源因此不可经便携域查询，显式拒绝而非不完整结果）——0.13.0 API 评审项；
+- `consema project` 的报告/来源外部化仅 json/toml 两家族（TOML 非空报告同样拒绝）；其余家族显式拒绝，绝不输出不完整记录——0.13.0 API 评审项；
+- materialize/convert 结果的 provenance map 为空（facade 无 locator API，无法真实外部化），envelope 携带空 map——0.13.0 API 评审项；
+- edit/plan/apply 的操作词表仅接线 INI family（consema-ini operation registry），其余格式的版本化编辑操作尚未映射；`edit --write` 仍拒绝（dry-run only），单文件提交路径未接线——0.13.0 API 评审项；
+- 信封只能携带注册 code：XML/plist/HCL 等格式本地诊断在信封中绑定注册 fallback（`core.source.invalid-sequence@1`），stderr 行保留真码，人可读信息不丢失（RFC 0015 §4.3 冻结语义）；
+- 本版本不提供原生查询域的进程级 locator、跨格式 edit 词表、`edit --write` 单文件提交、shell 补全、watch/live 模式或 Go 实现。
+
 ## Unreleased — 0.11.0
 
 ### Added

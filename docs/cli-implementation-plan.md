@@ -487,6 +487,7 @@ files: [{ path, status: completed | failed | pending | skipped-stale,
 | 打包/解包验证（14 个可发布 crate，consema 含 bin） | scripts/verify-package-archives.ps1 | M10 |
 | 性能基线文档 BENCHMARKS-0.12.0.md（CLI 冷启动/批量 plan-apply） | docs/BENCHMARKS-0.9.0.md 等 | M10 |
 | 临时文件权限与 redaction 跨平台验证 | §15.4 第 1399 行——**0.12.0 实现并 Windows 验证；Linux/macOS 全量验证归 0.13.0** | M6、M8（0.12）/0.13 门 |
+| M5/M7/M8 边界 API 评审（M10 移交 8 项：native 域 locator、provenance 空 map、project 报告 json/toml 限定、格式 code fallback、失败记录形态、java-properties 族前缀 bug、edit 词表 INI 限定、`edit --write` 未接线） | 逐项 disposition 已记录于 `docs/0.13.0-gate-plan.md` §4 M4（B-1..B-8）；修复项 B-6/B-8 为 0.13.0 优先 | M10（评审）+ 0.13.0 M4 |
 
 ## 11. 兼容性说明：CLI 不是第三个实现
 

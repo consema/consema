@@ -29,7 +29,7 @@ Consema 是《配置内容统一处理标准与 Rust 参考实现》的 Rust `0.
 - JSON 8 个、TOML 7 个、YAML 8 个、INI 8 个、Properties 5 个、XML 8 个、plist 6 个及 HCL 6 个（tfvars 4 个）版本化编辑操作；格式间相同抽象操作不共享 trivia、delimiter、duplicate 或 encoding 规则；
 - snapshot-bound 原子事务、dry-run `EditPlan`、`UntouchedByteProof` 与可重放 `SourcePatch`；
 - semantic-model v6 发布 38 条 contract registry 记录与 166 个公共 error code，同时精确冻结 v1/v2/v3/v4/v5；
-- 17 套语言无关 conformance suite 共 468/468 cases，其中 semantic-model v6 为 25/25、INI family 为 20/20、Java Properties 为 22/22、XML 为 34/34、plist 为 45/45、HCL 为 57/57；
+- 18 套语言无关 conformance suite 共 508/508 cases，其中 semantic-model v6 为 25/25、INI family 为 20/20、Java Properties 为 22/22、XML 为 34/34、plist 为 45/45、HCL 为 57/57、CLI 为 40/40；
 - 官方 JSON5 v2.2.3 参考语料 43 valid + 39 invalid 与完整 `package.json5` 夹具共 83/83；
 - 官方 `toml-test v2.2.0` TOML 1.0 decoder gate：205 valid + 474 invalid 全部通过；
 - 官方 `yaml/yaml-test-suite data-2022-01-17` 完整 402-case gate：307 valid byte-exact、94 invalid atomic rejection、1 个明确 Profile exclusion；
@@ -55,12 +55,16 @@ TOML table、inline table、array-of-tables、dotted key 和 array 拥有各自�
 - XML 1.0 safe Profile：[RFC 0012](docs/rfcs/0012-xml-1.0-safe-profile-v1.md)
 - plist family Profiles：[RFC 0013](docs/rfcs/0013-plist-family-profiles-v1.md)
 - HCL family Profiles：[RFC 0014](docs/rfcs/0014-hcl-family-profiles-v1.md)
+- CLI machine protocol 与 batch apply：[RFC 0015](docs/rfcs/0015-cli-machine-protocol-and-batch-apply-v1.md)
+- CLI 任务配方（每命令真实输出与请求文件）：[Cookbook](docs/cookbook.md)
+- 0.8.0 时代 API → 0.12.0 facade + CLI：[迁移指南](docs/migration-guide.md)
 - JSON family 0.6.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.6.0.md)
 - YAML 0.7.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.7.0.md)
 - INI/Properties 0.8.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.8.0.md)
 - XML 0.9.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.9.0.md)
 - plist 0.10.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.10.0.md)
 - HCL 0.11.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.11.0.md)
+- consema CLI 0.12.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.12.0.md)
 - 0.8.0 迁移、安全、制品边界与发布记录：[Release record](docs/RELEASE-0.8.0.md)
 - 0.7.0 迁移、安全与发布记录：[Release record](docs/RELEASE-0.7.0.md)
 - JSON5 v2.2.3 上游参考门禁：[Reference corpus provenance](docs/UPSTREAM-JSON5-REFERENCE.md)
@@ -86,7 +90,7 @@ TOML table、inline table、array-of-tables、dotted key 和 array 拥有各自�
 - `consema-hcl`：native/tfvars 无损文档、body/expression 原生语义、查询、投影、materialization 与原子编辑；
 - `consema-protocol`：语言无关固定 schema、公共注册表、canonical JSON/PVCE transport 与严格 payload validation；
 - `consema-conformance`：仓库内、不可发布的语言无关向量 runner、上游语料、固定 runtime oracle、真实配置夹具、硬化与基准工具；
-- `consema`：公共 facade，导出 `core/document/graph/hcl/ini/json/plist/properties/toml/xml/yaml/protocol/pvce`。
+- `consema`：公共 facade，导出 `core/document/graph/hcl/ini/json/plist/properties/toml/xml/yaml/protocol/pvce`；0.12.0 起内嵌正式 `consema` CLI（11 个命令，只消费 facade public API，零新外部依赖）。
 
 ## JSON5 到 strict JSON 示例
 
@@ -373,6 +377,49 @@ commit.untouched_proof.verify(
     commit.source_patch.replacements(),
 ).unwrap();
 ```
+
+## CLI 工作流示例（0.12.0）
+
+正式 `consema` CLI 内置于 facade crate（11 个命令：inspect/capabilities/query/project/materialize/convert/edit/plan/apply/conformance/explain）。跨格式转换是"投影 + 物化"两阶段的显式组合：先检查源文件事实，再按显式 Profile 与两阶段请求转换。
+
+```text
+$ consema inspect package.json
+consema inspect package.json
+  bytes: 424 bytes sha256:06d760863d6c0c66e119747d74a116c12a365315cb423ce3108f4f2b10089a13
+  bom: none
+  symlink: no
+  markers: first non-whitespace '{'
+  candidates: json.strict@1 (first non-whitespace byte is '{'); json5.standard@1 (first non-whitespace byte is '{'); jsonc.bounded@1 (first non-whitespace byte is '{')
+  ambiguous: yes: first non-whitespace '{' is consistent with multiple profiles of the json family
+```
+
+```text
+$ consema convert package.json --profile json.strict --request-file convert-request.json
+"name" = "consema-fixture-app"
+"version" = "1.0.0"
+"private" = true
+"type" = "module"
+"scripts" = { "build" = "tsc -p tsconfig.json", "check" = "tsc --noEmit", "test" = "node --test" }
+"engines" = { "node" = ">=20" }
+"dependencies" = { "fastify" = "4.28.1" }
+"devDependencies" = { "typescript" = "5.6.3" }
+"tooling" = { "coverage" = true, "thresholds" = [90, 85, 80] }
+```
+
+`convert-request.json` 是 RFC 0015 §3.2 的严格 canonical tagged JSON
+（`cli.convert-request@1`：`json.projection.best-exact-core@1` →
+`toml.1.0`/`toml.canonical-document`，映射政策
+`UniqueStringEntriesToObject`，ExactOnly）：
+
+```json
+{"schema":"core.portable-value-json@1","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"cli.convert-request@1"}},{"key":"projection_request","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.projection-request@1"}},{"key":"target","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"json.projection.best-exact-core"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"default_policy","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"core.projection.exact-or-reject"}},{"key":"version","value":{"type":"Integer","value":"1"}},{"key":"arguments","value":{"type":"Object","entries":[]}}]}},{"key":"rules","value":{"type":"Sequence","items":[]}},{"key":"limits","value":{"type":"Object","entries":[]}}]}},{"key":"materialization_request","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.materialization-request@2"}},{"key":"target_profile","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"toml.1.0"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"style","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"toml.canonical-document"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"encoding","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"core.source-encoding@1"}},{"key":"kind","value":{"type":"String","value":"Utf8"}},{"key":"windows_code_page","value":{"type":"Null"}}]}},{"key":"newline","value":{"type":"String","value":"Lf"}},{"key":"mapping_policy","value":{"type":"String","value":"UniqueStringEntriesToObject"}},{"key":"representability","value":{"type":"String","value":"ExactOnly"}},{"key":"limits","value":{"type":"Object","entries":[{"key":"max_input_nodes","value":{"type":"Integer","value":"1000000"}},{"key":"max_output_bytes","value":{"type":"Integer","value":"67108864"}},{"key":"max_depth","value":{"type":"Integer","value":"256"}},{"key":"max_report_entries","value":{"type":"Integer","value":"100000"}},{"key":"max_provenance_entries","value":{"type":"Integer","value":"2000000"}}]}}]}}]}}]}
+```
+
+请求文件不能带尾随换行（canonical 字节形式严格判定）。CLI 默认不写
+文件：目标字节在 stdout，`--output <path>` 显式落盘；机器模式 `--json`
+时 stdout 只有一行 `core.cli-output@1` 信封。批量修改（plan/apply）、
+secret 脱敏、每格式能力矩阵与 loss policy 真实示例见
+[docs/cookbook.md](docs/cookbook.md)。
 
 ## 验证
 
