@@ -53,13 +53,16 @@ typed protocol object
 | `consema-yaml` | core、document、graph |
 | `consema-ini` | core、document |
 | `consema-properties` | core、document |
+| `consema-xml` | core、document |
+| `consema-plist` | core、document |
+| `consema-hcl` | core、document |
 | `consema-protocol` | core、document、graph、json、pvce |
-| `consema-conformance` | facade、core、document、graph、json、pvce、protocol、toml、yaml |
-| `consema` | core、document、graph、ini、json、properties、pvce、protocol、toml、yaml |
+| `consema-conformance` | facade、core、document、graph、hcl、json、plist、pvce、protocol、toml、xml、yaml |
+| `consema` | core、document、graph、hcl、ini、json、plist、properties、pvce、protocol、toml、xml、yaml |
 
 格式 crate 之间不互相依赖。`consema-core` 不依赖格式；`consema-document` 不理解 JSON/TOML/YAML/INI/Properties 语义；跨格式操作必须通过公共 projection/materialization contract 组合。`consema-graph` 是格式无关图模型，不依赖 YAML；YAML 只是首个验证它的格式。
 
-`consema-conformance` 依赖仓库根目录的语言无关向量、fixtures、upstream suite 与 runtime oracle，因此明确 `publish = false`。它是规范资产的仓库级执行器，不是可脱离这些资产独立发布的运行时库；其余 facade 与十个支撑 crate 形成 11 个可发布归档，并通过解包后 current/MSRV 编译门禁验证。
+`consema-conformance` 依赖仓库根目录的语言无关向量、fixtures、upstream suite 与 runtime oracle，因此明确 `publish = false`。它是规范资产的仓库级执行器，不是可脱离这些资产独立发布的运行时库；其余 facade 与十三个支撑 crate 形成 14 个可发布归档，并通过解包后 current/MSRV 编译门禁验证。
 
 ## 2. 公共 document 事实
 
@@ -133,6 +136,20 @@ Document 分离 physical line、logical record、section/entry occurrence 与 ap
 Document 保留每个有序 property association，而不是把文件伪装成 JDK Hashtable。重复 key 不在 parse 时覆盖；FirstWins/LastWinsJdkTable 只作为显式 lossy projection policy。native `JavaString` 以精确 `u16` code unit 表示，允许 `\uD800` 等未配对 surrogate；只有 well-formed Unicode 才能进入 PortableValue String，失败不使用 U+FFFD。`UTF16BE/1` 是无 BOM、network-order 的固定协议表示。
 
 Properties parser 不访问 defaults chain、classpath、system properties、locale、XML、环境或文件系统；不调用 `Properties.store`，因此 canonical output 不含时间戳或隐式 comment。
+
+## 4.5 HCL family 与原生 body/expression 语义
+
+0.11.0 发布 `hcl.native@1` 与 `hcl.tfvars@1`。两 Profile 共享同一语法系统与原生模型；tfvars 只是顶层仅 attributes 的 profile 结构限制（顶层 block → Recovered + `hcl.tfvars.block-not-allowed@1`，block 保留为 Recovered 文档的 native item）。Profile 必须在 parse 前显式选择，`.tf`/`.tfvars` 扩展名不选择 Profile、representation 或 encoding。
+
+原生模型是每 occurrence 独立身份的 body 树（非共享身份 arena）：`HclBody`/`HclAttribute`/`HclBlock`/`HclBlockLabel` 有序装配，`HclExpression` 是 AST + 精确 span 双保留的一等公民。duplicate attribute 在 formation 排除、永不进入 native 模型；重复 object key、重复 block occurrence 与 attribute/block 同名共享保留为有序 native facts（独立 span，永不折叠）。
+
+encoding 恒为 UTF-8：前导或他处 BOM → Recovered + `hcl.parse.byte-order-mark@1`（BOM 字节以 ErrorRegion 收容，无 Bom kind），invalid UTF-8 → `FatalFormationFailure` + `hcl.parse.invalid-utf8@1`，lone CR → Recovered + `hcl.parse.lone-cr@1`。lexer 全部自研（无第三方 HCL 后端），标识符按 UAX #31（`unicode-ident` 钉版），30 种 `HclSyntaxKind` 对每个非空原始字节给出无空洞无重叠的有序 piece 覆盖；引号模板/heredoc 内的插值与指令在 piece 层不展开，由 parser 二次解析。
+
+恢复语义：expression 失败、未终止 string/bracket/heredoc 以错误区域收容（行尾或 `max_heredoc_len` 等上限边界），Recovered 后 body 从下一行继续，绝不虚构 closing delimiter/equals/value；Recovered 文档可查询、不可 project/materialize/commit。canonical decimal 归一化是纯十进制字符串运算（无浮点），受 `max_number_digits` 限制。
+
+查询两域 `hcl.native-semantic-query@1` 与 `hcl.lossless-syntax-query@1` 共用执行骨架；`QueryDomain` 仅新增两个构造器，查询 wire 契约不进 consema-protocol 核心注册表。投影默认精确目标 `hcl.projection.body@1`（literal-complete 判定、类型化 members、顺序与重复 object key 保留），derived 表达式默认原子失败、显式 `ProjectExpression` 策略下以 authorized ExtendedValue `hcl.expression@1` 投影（版本化 payload + structural fingerprint，重解析比对指纹）。`hcl.canonical-document@1` materialization 生成字节必先重解析并逐节点比较闭包语义；六个版本化编辑操作按 profile 类型化（tfvars 只发布四个 attribute 操作），值以类型化 literal-complete 提供，绝不以 raw markup 或 unevaluated expression 文本。
+
+HCL 全程不求值：无 variable/function/template 求值与展开、无 Terraform/cty 语义、无 application schema（硬门禁 2）；`hcl.expression@1` 只承载语法事实，永不执行。
 
 ## 5. Query registries
 

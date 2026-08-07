@@ -32,7 +32,7 @@
 
 ## 0.1 已确认的起点
 
-当前 Rust `0.1.0` 已完成：
+Rust `0.1.0` 于 2026-07 完成（历史快照，下文数字为当时状态）：
 
 * PortableValue v1 全类型与 strict equality/hash；
 * PVCE/1 canonical encode/strict decode；
@@ -44,7 +44,7 @@
 * semantic/literal scalar replacement、transaction 与 ChangeSet；
 * resource limits 与语言无关 conformance vectors。
 
-当前仓库约有 17 个 Rust source files、7,383 行 Rust、30 个测试函数和 20 个语言无关 conformance cases。基线已通过 workspace tests、Clippy `-D warnings` 和 rustfmt check。
+当时仓库约有 17 个 Rust source files、约 7,966 行 Rust（`v0.1.0` tag 实测）、30 个测试函数和 20 个语言无关 conformance cases；基线通过 workspace tests、Clippy `-D warnings` 和 rustfmt check。
 
 ## 0.2 当前已完成阶段
 
@@ -60,7 +60,7 @@ Rust `0.2.0` 已在不改写 0.1.0 永久不变量的前提下完成第二格式
 
 Rust `0.3.0` 已完成跨格式 contract/protocol 闭合：冻结 RFC 0002、Semantic Model v1 identity、15 个稳定 payload、canonical JSON/PVCE 双传输、55 个公共 error code、全量 typed payload validation，以及 process-local identity 的拒绝边界。全部 15 个稳定 payload 均由语言无关向量证明双传输等价。
 
-当前仓库为 40 个 Rust source files、19,220 行 Rust、78 个 `#[test]` 函数、70 个语言无关 conformance cases。0.3.0 仍不是生产级 1.0.0；它证明核心公共行为已有不依赖 Rust 私有类型的跨语言 wire contract，下一阶段是 0.4.0 原始内容 Source/Document 平台。
+当时仓库为 40 个 Rust source files、19,220 行 Rust、78 个 `#[test]` 函数、70 个语言无关 conformance cases。0.3.0 仍不是生产级 1.0.0；它证明核心公共行为已有不依赖 Rust 私有类型的跨语言 wire contract，下一阶段是 0.4.0 原始内容 Source/Document 平台。
 
 这些阶段证明核心哲学可以跨两个格式并通过语言无关协议成立，但尚未证明：
 
@@ -984,9 +984,9 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
   ↓
 0.7.0  YAML family + PortableGraph/PGCE                  已完成
   ↓
-0.8.0  INI family + Properties family                    Rust
+0.8.0  INI family + Properties family                 已完成
   ↓
-0.9.0  XML                                               Rust
+0.9.0  XML（实现与证据完成，待发布归档）               Rust 已完成
   ↓
 0.10.0 plist XML/binary                                  Rust
   ↓
@@ -1141,7 +1141,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * SourcePatch 基础摘要不匹配时必须失败；
 * Materialization 与 Formatter 的边界写入规范。
 
-完成证据：35/35 operations v1、合计 163/163 language-neutral cases；Rust 1.97 与声明的 MSRV Rust 1.85 均通过 189 项 workspace 全 target/all features tests 和 strict Clippy；rustfmt、doctest、rustdoc `-D warnings`、10 项 adversarial/property tests、RustSec、cargo-deny 与官方 TOML 205 valid/474 invalid suite 全部通过。semantic-model v1 的 16/55、v2 的 18/62 保持冻结，v3 发布 25 条 contract registry 记录与 90 个 error code；失败 materialization/transaction 不产生 partial Document，成功 edit 的 patch 重放与 untouched proof 均完成验证。
+完成证据：35/35 operations v1、合计 173/173 language-neutral cases；Rust 1.97 与声明的 MSRV Rust 1.85 均通过 189 项 workspace 全 target/all features tests 和 strict Clippy；rustfmt、doctest、rustdoc `-D warnings`、10 项 adversarial/property tests、RustSec、cargo-deny 与官方 TOML 205 valid/474 invalid suite 全部通过。semantic-model v1 的 16/55、v2 的 18/62 保持冻结，v3 发布 25 条 contract registry 记录与 90 个 error code；失败 materialization/transaction 不产生 partial Document，成功 edit 的 patch 重放与 untouched proof 均完成验证。
 
 ## 14.5 `0.6.0`：JSON family 生产完成
 
@@ -1162,7 +1162,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 
 硬门禁：JSON family 的第 8 节 capability matrix 在 Rust 中全部为绿色。
 
-完成证据：JSON family v2 为 33/33，8 套 language-neutral suites 合计 196/196；固定 JSON5 v2.2.3 gate 的 43/43 valid、39/39 invalid 与 1/1 完整夹具全部通过，4 份典型项目配置与 12 项 adversarial/property tests 通过。Rust 1.97 与声明的 MSRV Rust 1.85 均通过 208 项 workspace 全 target/all features tests 和 strict Clippy；当前工具链另通过 rustfmt、doctest、rustdoc `-D warnings`，RustSec、cargo-deny 四类门禁与官方 TOML 205 valid/474 invalid suite 保持通过。semantic-model v4 发布 25 条 contract 与 92 个 error code，v1-v3 精确冻结；固定 JSON5 夹具的 parse/query/projection/materialization/edit release baseline 已记录环境、digest 与全部样本。
+完成证据：JSON family v2 为 33/33，8 套 language-neutral suites 合计 206/206；固定 JSON5 v2.2.3 gate 的 43/43 valid、39/39 invalid 与 1/1 完整夹具全部通过，4 份典型项目配置与 12 项 adversarial/property tests 通过。Rust 1.97 与声明的 MSRV Rust 1.85 均通过 208 项 workspace 全 target/all features tests 和 strict Clippy；当前工具链另通过 rustfmt、doctest、rustdoc `-D warnings`，RustSec、cargo-deny 四类门禁与官方 TOML 205 valid/474 invalid suite 保持通过。semantic-model v4 发布 25 条 contract 与 92 个 error code，v1-v3 精确冻结；固定 JSON5 夹具的 parse/query/projection/materialization/edit release baseline 已记录环境、digest 与全部样本。
 
 ## 14.6 `0.7.0`：YAML family 与 PortableGraph
 
@@ -1192,9 +1192,9 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * 图 identity、query order、PGCE 在所有执行中确定；
 * 资源耗尽不能返回截断图或伪成功 Document。
 
-状态：已完成（2026-08-04）。
+落实状态：已完成（2026-08-04）。规范见 `docs/rfcs/0006-portable-graph-and-pgce-v1.md`、`docs/rfcs/0007-yaml-family-profiles-and-safety-v1.md` 与 `docs/rfcs/0008-semantic-model-v5.md`，实现见 `consema-graph` 与 `consema-yaml`，语言无关证据见 `conformance/vectors/portable-graph-v1.json`、`semantic-model-v5.json` 与 `yaml-v1.json`，上游证据见 `docs/UPSTREAM-YAML-TEST-SUITE.md`，性能基线见 `docs/BENCHMARKS-0.7.0.md`。
 
-完成证据：RFC 0006/0007/0008 已接受并落地；PortableGraph、semantic-model v5、YAML 三套新增语言无关 suite 分别为 10/10、22/22、27/27，使 11 套 suite 合计达到 255/255。官方 `yaml/yaml-test-suite data-2022-01-17` 的 402 项全部核算：307 valid byte-exact、94 invalid atomic rejection、1 个未来 `%YAML 1.3` 的明确 Profile-contract exclusion。Kubernetes、GitHub Actions、Compose 与 anchor-heavy 四类工程夹具完成 source/graph/PGCE/materialization closure；mutation/resource corpus 覆盖 Unicode、truncation、alias bomb、depth、cycle、custom tag 和 PGCE canonicality。Rust 1.97 与 MSRV 1.85 均通过 312 项 workspace 全 target/all features tests 和 strict Clippy；rustfmt、doctest、rustdoc、RustSec、cargo-deny、固定 YAML 性能基线及既有 JSON5/TOML 上游门禁均通过。semantic-model v5 发布 30 条 contract 与 132 个 error code，v1-v4 精确冻结。
+完成证据：RFC 0006/0007/0008 已接受并落地；PortableGraph、semantic-model v5、YAML 三套新增语言无关 suite 分别为 10/10、22/22、27/27，使 11 套 suite 合计达到 265/265。官方 `yaml/yaml-test-suite data-2022-01-17` 的 402 项全部核算：307 valid byte-exact、94 invalid atomic rejection、1 个未来 `%YAML 1.3` 的明确 Profile-contract exclusion。Kubernetes、GitHub Actions、Compose 与 anchor-heavy 四类工程夹具完成 source/graph/PGCE/materialization closure；mutation/resource corpus 覆盖 Unicode、truncation、alias bomb、depth、cycle、custom tag 和 PGCE canonicality。Rust 1.97 与 MSRV 1.85 均通过 312 项 workspace 全 target/all features tests 和 strict Clippy；rustfmt、doctest、rustdoc、RustSec、cargo-deny、固定 YAML 性能基线及既有 JSON5/TOML 上游门禁均通过。semantic-model v5 发布 30 条 contract 与 132 个 error code，v1-v4 精确冻结。
 
 ## 14.7 `0.8.0`：INI family 与 Properties family
 
@@ -1219,7 +1219,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * Latin-1、Unicode escape 和 Reader semantics 可重放；
 * 三个 INI Profile 的差异均有反例向量。
 
-状态：已完成（2026-08-05）。
+落实状态：已完成（2026-08-05）。规范见 `docs/rfcs/0009-ini-family-profiles-v1.md`、`docs/rfcs/0010-java-properties-profiles-v1.md` 与 `docs/rfcs/0011-semantic-model-v6.md`，实现见 `consema-ini` 与 `consema-properties`，语言无关证据见 `conformance/vectors/ini-v1.json`、`java-properties-v1.json` 与 `semantic-model-v6.json`，发布记录见 `docs/RELEASE-0.8.0.md`，性能基线见 `docs/BENCHMARKS-0.8.0.md`。
 
 完成证据：RFC 0009/0010/0011 已接受并落地；`ini.portable@1`、`ini.windows@1`、`ini.python-configparser@1` 与 `java-properties.reader@1`、`java-properties.latin1@1` 均覆盖无损 formation、原生/语法查询、EntryMapping 优先投影、canonical materialization 和快照绑定编辑。semantic-model v6 发布 38 条 contract 与 166 个 error code，v1-v5 精确冻结；14 套语言无关 suite 合计 332/332。OpenJDK 25.0.4、CPython 3.14.6、.NET 10.0.10、Windows wide profile API 与 Qt 6.10.2 五套固定 runtime oracle 合计 36/36；真实工程夹具与 mutation/resource corpus 覆盖 duplicate、case、separator、continuation、escape、未配对 surrogate、BOM/code-page 边界、recovery 与 atomic publication。Rust 1.97 与 MSRV 1.85 均通过 452 项 workspace 全 target/all features tests 和 strict Clippy；rustfmt、doctest、rustdoc、RustSec、cargo-deny、固定性能基线及既有 JSON5/TOML/YAML 外部门禁均通过。11 个可发布 `.crate` 的路径、内部 checksum、解包内容及 current/MSRV 编译全部验证；仓库级 `consema-conformance` 明确不发布。
 
@@ -1249,7 +1249,11 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * XML-to-Object 不存在默认映射；
 * UTF-8/UTF-16 未修改字节精确往返。
 
+落实状态：实现与证据已完成（待 0.9.0 发布归档）。规范已冻结（`docs/rfcs/0012-xml-1.0-safe-profile-v1.md`）；实现覆盖 formation（UTF-8/UTF-16 显式 source contract、safe internal DTD、六维实体膨胀限制、恢复与诊断）、namespace-aware 原生树、37 种细粒度 lossless syntax kinds、native/syntax query、element-tree/text-content/entry-mapping projection、`xml.safe-canonical-document@1` materialization（重解析闭包验证）与 8 个版本化结构编辑操作。语言无关证据见 `conformance/vectors/xml-1-0-safe-v1.json`（34 case）；对抗门禁见 `crates/consema-conformance/tests/xml_hardening.rs`（mutation/truncation/nesting/namespace/entity-amplification/count/long-value）；生产夹具见 `conformance/fixtures/xml/`（Maven/Spring/logging/app-server/namespaced，含投影→物化→重解析不动点门禁）；性能基线见 `docs/BENCHMARKS-0.9.0.md`；`.crate` 打包与解包验证门禁已对 12 个可发布 crate 全量通过。剩余发布动作：W3C XML/Namespaces suite 核算、encoding corpus 归档与 0.9.0 发布记录。
+
 ## 14.9 `0.10.0`：Property List
+
+落实状态：实现完成（M1-M10 全里程碑交付），待 0.10.0 发布归档。规范已冻结（`docs/rfcs/0013-plist-family-profiles-v1.md`，16 节，格式事实经 Apple 官方源码/DTD 与 CPython plistlib/libplist 五源交叉核实）；实现覆盖 `plist.xml@1`/`plist.binary@1` 双表示 formation（UTF-8/UTF-16 显式 source contract 与 binary object/offset/ref/trailer facts）、共享原生值模型（有序 dict/array/data/date/UID 等全部值类型）、双表示 round-trip 转换（representation change 报告）、native/syntax/binary query、`plist.value-tree@1` projection、canonical materialization（重解析闭包验证）与 6 个版本化编辑操作；facade 导出 `consema::plist` 与 `Document::parse_plist`/`as_plist`，conversion 支持 plist 目标。语言无关证据见 `conformance/vectors/plist-v1.json`（45 case）；性能基线见 `docs/BENCHMARKS-0.10.0.md`。剩余发布动作：0.10.0 发布记录与发布证据归档。
 
 目标：覆盖 Apple 平台常用配置，并验证 text/binary 两种 representation 共享值语义但不共享虚假语法树。
 
@@ -1273,6 +1277,8 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * object reference、offset 和 size 计算有溢出与资源限制保护。
 
 ## 14.10 `0.11.0`：HCL family
+
+落实状态：实现完成（M1-M10 全里程碑交付），待 0.11.0 发布归档。规范已冻结（`docs/rfcs/0014-hcl-family-profiles-v1.md`，16 节，文法经 HashiCorp hclsyntax spec 与 Go 参考实现源码双源核实，一元/二元复合等 9 类 spec-vs-implementation 分歧已冻结定案）；实现覆盖 `hcl.native@1`/`hcl.tfvars@1` 双 profile formation（UTF-8 显式 source contract、BOM/lone CR/invalid UTF-8/duplicate attribute 恢复与诊断）、自研 lexer + parser（UAX #31 标识符、引号模板/heredoc/插值/指令文法、30 种 lossless syntax kind 穷尽覆盖）、body/expression AST 原生模型（AST 与精确 span 双保留）、native/syntax 双查询域、`hcl.projection.body@1` 精确投影与 `hcl.expression@1` 授权 ExtendedValue（显式 ProjectExpression 策略）、`hcl.canonical-document@1` materialization（重解析闭包验证）与 6 个版本化编辑操作（tfvars 只发布 4 个 attribute 操作）；facade 导出 `consema::hcl` 与 `Document::parse_hcl`/`as_hcl`，conversion 支持 HCL 目标（derived 表达式按默认精确目标原子失败）。语言无关证据见 `conformance/vectors/hcl-v1.json`（57 case）；对抗门禁见 `crates/consema-conformance/tests/hcl_hardening.rs`；生产夹具见 `conformance/fixtures/hcl/`（tf/ 与 tfvars/）；性能基线见 `docs/BENCHMARKS-0.11.0.md`。剩余发布动作：0.11.0 发布记录与发布证据归档。
 
 目标：覆盖基础设施配置，同时严格守住 Document 与 Evaluation 的边界。
 

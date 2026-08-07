@@ -1,6 +1,6 @@
 # RFC 0009: INI family profiles v1
 
-- Status: Accepted for Consema 0.8.0 implementation
+- Status: Implemented in Consema 0.8.0
 - Date: 2026-08-04
 - Scope: three explicit INI profiles, source and encoding contracts, lossless
   document and native line semantics, query, projection, materialization,

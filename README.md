@@ -11,6 +11,9 @@ Consema 是《配置内容统一处理标准与 Rust 参考实现》的 Rust `0.
 - YAML family：`yaml.1.2-core@1`、`yaml.1.1-compat@1`，支持 UTF-8/UTF-16、空流与多文档 stream；
 - INI family：`ini.portable@1`、`ini.windows@1`、`ini.python-configparser@1`，不做扩展名猜测或方言自动选择；
 - Java Properties：`java-properties.reader@1`、`java-properties.latin1@1`，精确保留 Java UTF-16 code unit 与重复属性身份；
+- XML：`xml.1.0-safe@1`，namespace-aware 无损 Document（UTF-8/UTF-16 显式 source contract、bounded safe DOCTYPE、六维实体膨胀限制）、恢复与诊断、native/syntax query、三种 projection、canonical materialization 与 8 个版本化编辑操作；
+- Property List：`plist.xml@1`、`plist.binary@1`，共享原生值模型与不相交语法系统、双表示 round-trip 转换（representation change 报告）、native/syntax/binary query、projection、canonical materialization 与 6 个版本化编辑操作；
+- HCL family：`hcl.native@1`、`hcl.tfvars@1`，body/expression/template 原生模型（AST 与精确 span 双保留）、native/syntax 双查询域、`hcl.body@1` 投影与 `hcl.expression@1` ExtendedValue、canonical materialization 与 6 个（tfvars 4 个）版本化编辑操作；
 - PortableValue 全部 15 类核心值与 strict equality/hash；
 - PVCE/1 canonical encode 与 strict bounded decode；
 - PortableGraph@1：保留 tag、任意/重复 mapping key、共享、cycle 与多 root，提供 strict graph equality/hash、PGCE/1 和确定性 graph query；
@@ -23,10 +26,10 @@ Consema 是《配置内容统一处理标准与 Rust 参考实现》的 Rust `0.
 - versioned typed query、完整 projection/report/provenance；
 - JSON/JSONC/JSON5 compact/pretty、TOML canonical、YAML block/flow、INI 三种 Profile canonical 与 Properties Reader/Latin-1 canonical materialization，显式 style/newline/encoding/mapping/representability policy；
 - JSON、TOML、YAML、INI 与 Properties 的 audited conversion 均由 Projection 与 Materialization 组合，保留两阶段 fidelity、report 与 provenance；
-- JSON 8 个、TOML 7 个、YAML 8 个、INI 8 个及 Properties 5 个版本化编辑操作；格式间相同抽象操作不共享 trivia、delimiter、duplicate 或 encoding 规则；
+- JSON 8 个、TOML 7 个、YAML 8 个、INI 8 个、Properties 5 个、XML 8 个、plist 6 个及 HCL 6 个（tfvars 4 个）版本化编辑操作；格式间相同抽象操作不共享 trivia、delimiter、duplicate 或 encoding 规则；
 - snapshot-bound 原子事务、dry-run `EditPlan`、`UntouchedByteProof` 与可重放 `SourcePatch`；
 - semantic-model v6 发布 38 条 contract registry 记录与 166 个公共 error code，同时精确冻结 v1/v2/v3/v4/v5；
-- 14 套语言无关 conformance suite 共 332/332 cases，其中 semantic-model v6 为 25/25、INI family 为 20/20、Java Properties 为 22/22；
+- 17 套语言无关 conformance suite 共 468/468 cases，其中 semantic-model v6 为 25/25、INI family 为 20/20、Java Properties 为 22/22、XML 为 34/34、plist 为 45/45、HCL 为 57/57；
 - 官方 JSON5 v2.2.3 参考语料 43 valid + 39 invalid 与完整 `package.json5` 夹具共 83/83；
 - 官方 `toml-test v2.2.0` TOML 1.0 decoder gate：205 valid + 474 invalid 全部通过；
 - 官方 `yaml/yaml-test-suite data-2022-01-17` 完整 402-case gate：307 valid byte-exact、94 invalid atomic rejection、1 个明确 Profile exclusion；
@@ -50,9 +53,14 @@ TOML table、inline table、array-of-tables、dotted key 和 array 拥有各自�
 - Java Properties Reader/Latin-1：[RFC 0010](docs/rfcs/0010-java-properties-profiles-v1.md)
 - semantic-model v6 line-format 协议：[RFC 0011](docs/rfcs/0011-semantic-model-v6.md)
 - XML 1.0 safe Profile：[RFC 0012](docs/rfcs/0012-xml-1.0-safe-profile-v1.md)
+- plist family Profiles：[RFC 0013](docs/rfcs/0013-plist-family-profiles-v1.md)
+- HCL family Profiles：[RFC 0014](docs/rfcs/0014-hcl-family-profiles-v1.md)
 - JSON family 0.6.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.6.0.md)
 - YAML 0.7.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.7.0.md)
 - INI/Properties 0.8.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.8.0.md)
+- XML 0.9.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.9.0.md)
+- plist 0.10.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.10.0.md)
+- HCL 0.11.0 性能基线：[Benchmark baseline](docs/BENCHMARKS-0.11.0.md)
 - 0.8.0 迁移、安全、制品边界与发布记录：[Release record](docs/RELEASE-0.8.0.md)
 - 0.7.0 迁移、安全与发布记录：[Release record](docs/RELEASE-0.7.0.md)
 - JSON5 v2.2.3 上游参考门禁：[Reference corpus provenance](docs/UPSTREAM-JSON5-REFERENCE.md)
@@ -73,9 +81,12 @@ TOML table、inline table、array-of-tables、dotted key 和 array 拥有各自�
 - `consema-yaml`：YAML 1.2 Core/1.1 compat 无损 stream、原生图语义、查询、投影、materialization 与原子编辑；
 - `consema-ini`：Portable/Windows/Python ConfigParser 无损文档、Profile 原生语义、查询、投影、materialization 与原子编辑；
 - `consema-properties`：Reader/Latin-1 无损文档、Java UTF-16 原生语义、查询、投影、materialization 与原子编辑；
+- `consema-xml`：XML 1.0 safe 无损文档、namespace 原生语义、查询、投影、materialization 与原子编辑；
+- `consema-plist`：XML/binary 双表示无损文档、共享原生值模型、查询、投影、materialization 与原子编辑；
+- `consema-hcl`：native/tfvars 无损文档、body/expression 原生语义、查询、投影、materialization 与原子编辑；
 - `consema-protocol`：语言无关固定 schema、公共注册表、canonical JSON/PVCE transport 与严格 payload validation；
 - `consema-conformance`：仓库内、不可发布的语言无关向量 runner、上游语料、固定 runtime oracle、真实配置夹具、硬化与基准工具；
-- `consema`：公共 facade，导出 `core/document/graph/ini/json/properties/toml/yaml/protocol/pvce`。
+- `consema`：公共 facade，导出 `core/document/graph/hcl/ini/json/plist/properties/toml/xml/yaml/protocol/pvce`。
 
 ## JSON5 到 strict JSON 示例
 
@@ -113,6 +124,64 @@ assert_eq!(
 ```
 
 `Infinity`、`NaN` 只映射到四种冻结的 BinaryFloat64 位模式；转换到 strict JSON 时显式失败，不会改写为字符串或 `null`。
+
+## XML 示例
+
+```rust
+use consema::document::{
+    MaterializationRequest, MaterializationResult, MaterializationStyleId, ProfileId,
+};
+use consema::xml::{
+    ContentPlacement, EditTransactionBuilder, NameFacts, ProjectionRequest, ProjectionResult,
+    XmlEncodingSelection, XmlParseLimits, XmlProfile, materialize, parse,
+};
+
+let source = br#"<service xmlns:cfg="urn:cfg" cfg:port="8080"><name>catalog</name></service>"#;
+let document = parse(
+    source.as_slice(),
+    XmlProfile::SafeV1,
+    XmlEncodingSelection::ProfileDefault,
+    XmlParseLimits::default(),
+)
+.expect("well-formed namespaced XML");
+assert_eq!(document.render(), source);
+
+let ProjectionResult::Complete(projected) = document.project(ProjectionRequest::element_tree())
+else {
+    panic!("exact projection");
+};
+let MaterializationResult::Complete(converted) = materialize(
+    &projected.value,
+    &MaterializationRequest::new(
+        ProfileId::new("xml.1.0-safe", 1),
+        MaterializationStyleId::new("xml.safe-canonical-document", 1),
+    ),
+) else {
+    panic!("canonical materialization");
+};
+assert_eq!(
+    converted.document.render(),
+    br#"<service xmlns:cfg="urn:cfg" cfg:port="8080"><name>catalog</name></service>
+"#
+    .as_slice(),
+);
+
+let mut transaction = EditTransactionBuilder::new(&document);
+transaction.insert_element(
+    document.root().expect("root").node_ref(),
+    NameFacts::new(None, "replica".to_owned(), None),
+    Some("backup".to_owned()),
+    ContentPlacement::End,
+);
+let commit = document.commit(&transaction.build()).expect("commit");
+assert_eq!(
+    commit.document.render(),
+    br#"<service xmlns:cfg="urn:cfg" cfg:port="8080"><name>catalog</name><replica>backup</replica></service>"#
+        .as_slice(),
+);
+```
+
+XML Profile 必须在 formation 前由调用方选择；扩展名不授权 DTD 校验、schema 或 application mapping。canonical materialization 生成新文档（含尾换行），结构编辑只替换操作自有 span 内文本并保留未触及字节。
 
 ## TOML 示例
 
@@ -317,6 +386,9 @@ cargo deny check
 cargo run --locked --offline --release -p consema-conformance --example json_family_baseline -- 20000
 cargo run --locked --offline --release -p consema-conformance --example yaml_baseline -- 20000
 cargo run --locked --offline --release -p consema-conformance --example line_formats_baseline -- 20000
+cargo run --locked --offline --release -p consema-conformance --example xml_baseline -- 5000
+cargo run --locked --offline --release -p consema-conformance --example plist_baseline -- 5000
+cargo run --locked --offline --release -p consema-conformance --example hcl_baseline -- 5000
 ```
 
 固定上游格式 gate：
@@ -331,4 +403,4 @@ cargo run --locked --offline --release -p consema-conformance --example line_for
 ./scripts/run-qt-ini-oracle.ps1
 ```
 
-当前未实现 XML、plist、HCL、semantic diff/merge、formatter、跨对象 member move/通用 table move、文件系统写入事务和 Go。JSON family/TOML Profile 仍按各自入口接受 UTF-8；YAML、INI 与 Properties 各自使用已冻结的显式 source/encoding contract。后续能力按路线图逐阶段落地，不以 README 声明代替完成证据。
+当前未实现 semantic diff/merge、formatter、跨对象 member move/通用 table move、文件系统写入事务和 Go。JSON family/TOML Profile 仍按各自入口接受 UTF-8；YAML、INI、Properties 与 XML 各自使用已冻结的显式 source/encoding contract；HCL 恒为 UTF-8。后续能力按路线图逐阶段落地，不以 README 声明代替完成证据。

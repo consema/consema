@@ -25,6 +25,7 @@
     "compile": "javac -Xlint:all -Werror -d <work> scripts/oracles/PropertiesOracle.java",
     "invoke": "java -cp <work> PropertiesOracle <reader|latin1> <bytes|hex> <input>",
     "transport": "ASCII TSV; lowercase big-endian UTF-16 code-unit hex",
+    "input_sha256_basis": "input_sha256 = SHA-256 of the consumed input bytes: file bytes for .properties inputs, decoded bytes for .hex inputs (after hex decode)",
     "ordering": "Java String natural order"
   },
   "comparison": {

@@ -1,6 +1,6 @@
 # RFC 0010: Java Properties profiles v1
 
-- Status: Accepted for Consema 0.8.0 implementation
+- Status: Implemented in Consema 0.8.0
 - Date: 2026-08-04
 - Scope: Java Properties Reader and Latin-1 profiles, natural/logical lines,
   exact UTF-16 string semantics, lossless source facts, query, projection,

@@ -63,7 +63,7 @@ project's 1.0.0 scope or start the Go implementation.
 
 ## Evidence manifest
 
-- language-neutral suites: 11 suites, 255/255 cases;
+- language-neutral suites: 11 suites, 265/265 cases;
 - official YAML suite: 402/402 accounted, with 307 valid, 94 invalid, and one
   explicit `%YAML 1.3` Profile-contract exclusion;
 - official TOML suite: 205 valid and 474 invalid cases passed;

@@ -13,7 +13,8 @@
     "source": "scripts/oracles/WindowsIniOracle.cs",
     "source_sha256": "74527cfca16d5197d82d30a9b8dc2805d9ff0a8d5b99e05da8d92f31ff7a2c82",
     "invoke": "PowerShell Add-Type CompilerParameters(TreatWarningsAsErrors=true,WarningLevel=4); GUID absolute UTF-16LE file; GetPrivateProfileStringW",
-    "transport": "lowercase big-endian UTF-16 code-unit hex"
+    "transport": "lowercase big-endian UTF-16 code-unit hex",
+    "input_sha256_basis": "input_sha256 = SHA-256 of the decoded bytes (after hex decode), not of the stored .hex file text"
   },
   "comparison": {
     "value": "first ASCII-case-equivalent section, then first ASCII-case-equivalent key, otherwise caller default",

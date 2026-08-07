@@ -2,6 +2,67 @@
 
 Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发布能力。
 
+## Unreleased — 0.11.0
+
+### Added
+
+- 实现 RFC 0014，发布 `hcl.native@1` 与 `hcl.tfvars@1`：两 Profile 共享同一语法系统与原生模型（有序 body/attribute/block/label 与完整 expression AST + 精确 span 双保留），tfvars 只是顶层仅 attributes 的 profile 结构限制（顶层 block → Recovered + `hcl.tfvars.block-not-allowed@1`）；
+- 自研 lexer + parser（无第三方 HCL 后端、无求值器）：UAX #31 标识符（unicode-ident 钉版）、引号模板/heredoc/插值/指令文法、30 种 lossless syntax kind 的穷尽 piece 覆盖；前导 BOM（Recovered，无 Bom kind）、lone CR、invalid UTF-8（fatal）、duplicate attribute 等恢复与诊断语义；
+- `hcl.native-semantic-query@1` 与 `hcl.lossless-syntax-query@1` 两查询域（RFC 0014 §7.1 全操作符 + 30 种 kind/text 过滤）；`QueryDomain` 仅新增两个构造器，查询 wire 契约不进 consema-protocol 核心注册表；
+- `hcl.projection.body@1` 精确投影：literal-complete 判定、类型化 members（string/integer/real/boolean/null/tuple/object）、attribute/block/label 序与重复 object key 全保留；derived 表达式默认原子失败，显式 `ProjectExpression` 策略下投影为 authorized ExtendedValue `hcl.expression@1`（type_id/version/版本化 payload codec/structural fingerprint，重解析比对指纹）；
+- `hcl.canonical-document@1` materialization：UTF-8 无 BOM、两空格缩进、label 恒加引号、数字 canonical 拼写（`1.50`/`15e-1` → `1.5`），生成字节必先重解析并逐节点比较闭包语义（数字按 canonical-decimal 值相等、其余按结构相等）；
+- 6 个版本化编辑操作：`set-attribute-value`、`insert-attribute`、`remove-attribute`、`rename-attribute`、`insert-block`、`remove-block`，值以类型化 literal-complete 提供；tfvars Profile 只发布前四个 attribute 操作；
+- 新增 `consema-hcl` 公共 crate（可发布）与 facade 导出（`consema::hcl`、`Document::parse_hcl`/`as_hcl`、`convert_hcl` 跨格式转换目标）；从 HCL 转换遇 derived 表达式按默认精确目标原子失败；
+- 新增 `consema.hcl.conformance@1` 语言无关 suite（57 个 case），使 17 套 suite 达到 468/468；覆盖 formation、全部表达式/模板/heredoc 文法、恢复、双查询域、projection、materialization、六类 edit 与 limits。
+
+### Correctness
+
+- HCL Profile 在 formation 前选择；`.tf`/`.tfvars` 扩展名不选择 Profile、representation 或 encoding，encoding 恒为 UTF-8，BOM 是 Recovered 而非 fatal；
+- parse/query/project/edit 全程不求值：无 variable/function/template 求值与展开、无 Terraform/cty 语义、无 application schema（硬门禁 2）；`hcl.expression@1` 只承载语法事实，永不执行；
+- duplicate attribute 在 formation 排除、永不进入 native 模型；重复 object key、重复 block occurrence 与 attribute/block 同名共享保留为有序 native facts（独立 span，永不折叠）；
+- 恢复语义：expression 失败/未终止构造以错误区域收容（string/heredoc 到行尾或上限边界），Recovered 后 body 从下一行继续，绝不虚构 closing delimiter/equals/value；Recovered 文档可查询、不可 project/materialize/commit；
+- canonical materialization 生成字节必先重解析并逐节点比较闭包语义，失败返回无目标 Document、无 partial bytes、无 partial provenance；
+- 全部尺寸算术在分配前 checked（expression/template/heredoc depth、number digits、item/label/attribute counts、recovery regions、syntax pieces），limit 失败绝不伪装成空 body、截断表达式或缩短查询；
+- 未修改 Document 字节精确往返；数字 canonical-decimal 归一为纯十进制字符串运算，零浮点计算。
+
+## Unreleased — 0.10.0
+
+### Added
+
+- 实现 RFC 0013，发布 `plist.xml@1` 与 `plist.binary@1`：两个 Profile 共享一个原生值模型（有序 dict/array/string/integer/real/boolean/date/data/UID），但拥有不相交的语法系统；XML 表示是无损 tag 树（UTF-8/UTF-16 显式 source contract），binary 表示是 object table（offset-table 与 trailer 事实，不伪造文本 token/trivia）；
+- XML/binary 双表示 round-trip 转换：序列化目标表示字节、重解析并验证原生模型相等（reparse closure），每次转换报告 representation change 与逐值映射事件；目标表示无法表达的原生事实（UID、Float32 width、未配对 surrogate、分数秒/越界日期等）原子失败并发布 `plist.conversion.inexpressible@1`，无部分目标文档；
+- `plist.value-tree@1` 精确 projection、`plist.xml-canonical@1`/`plist.binary-canonical@1` materialization（生成字节重解析闭包验证）与 native/syntax/binary-structure query；
+- 6 个版本化编辑操作：`set-value`、`insert-dict-entry`、`remove-dict-entry`、`rename-dict-key`、`insert-array-element`、`remove-array-element`；
+- 新增 `consema-plist` 公共 crate（可发布）与 facade 导出（`consema::plist`、`Document::parse_plist`/`as_plist`、plist materialization 转换目标）；
+- 新增 `consema.plist.conformance@1` 语言无关 suite（45 个 case），使 16 套 suite 达到 411/411；覆盖 formation、全部值类型、双表示转换、query、projection、materialization、六类 edit 与 limits。
+
+### Correctness
+
+- plist Profile 在 formation 前选择；`bplist00` magic number 与 `.plist` 扩展名都不选择 Profile、representation 或 encoding，encoding selection 与 Profile 不一致是 formation 时的 source-contract 冲突；
+- XML 与 binary 共享值语义但不共享语法树；XML 文档永不暴露 binary object/offset/ref/trailer 事实，binary 文档永不暴露文本 token/trivia（硬门禁 1）；
+- formation 无副作用：不 fetch Apple DTD 或任何 URI，不解析 UID archive key path，不求值表达式，不读环境/locale 状态，不写文件，不调用应用代码；
+- date、data 与 integer 不通过字符串降维；binary object reference、offset 与 size 计算有溢出与资源限制保护；
+- 恢复文档不进入 projection、materialization 或 edit；canonical materialization 生成字节必先重解析并逐节点比较闭包语义，失败返回无目标 Document、无部分字节；
+- 未修改 Document 字节精确往返；XML 原始 code unit 与 binary 原始字节全部保留。
+
+## Unreleased — 0.9.0
+
+### Added
+
+- 实现 RFC 0012，发布 `xml.1.0-safe@1`：namespace-aware 无损 Document（prolog/DOCTYPE/元素/attribute/namespace/text/CDATA/comment/PI/mixed content）、predefined/character/admitted internal entity 与六维文档级实体膨胀限制、外部 subset/entity 与参数实体 deny-by-default、UTF-8/UTF-16LE/BE 显式 source contract（UTF-16 必须带 BOM）、native/syntax query、element-tree/text-content/entry-mapping projection、`xml.safe-canonical-document@1` materialization（生成字节重解析闭包验证）与 8 个版本化结构编辑操作；
+- 新增 `consema-xml` 公共 crate（可发布）与 facade 导出（`consema::xml`、`Document::parse_xml`/`as_xml`、XML materialization 转换目标）；
+- 新增 34 个语言无关 XML 案例，使 15 套 suite 达到 366/366；
+- XML 语法覆盖扩展为 37 种细粒度 syntax kind（declaration/doctype/tag/qname 部件/attribute 部件/reference/CDATA/comment/PI 全部独立成 piece）。
+
+### Correctness
+
+- XML Profile 在 formation 前选择；扩展名不授权 I/O、schema、DTD 校验或 application mapping；解析只消费单文档实体，不打开任何外部实体、文件、URI、网络连接或 catalog；
+- DOCTYPE 仅允许 bounded internal subset；外部/参数实体、notation 与 validation 声明恢复并发布诊断；内部 subset 注释不会被误读为排除声明；
+- entity 膨胀按整个文档记账（declarations/references/depth/bytes/scalars/amplification 六维），突破即恢复，绝不以截断文本或空树伪装成功；
+- namespace 声明与 expanded name 分离；重复 expanded attribute、unbound prefix、保留前缀误用均恢复或拒绝编辑；编辑不猜测、不伪造 xmlns 声明；
+- 恢复文档永不投影或编辑；materialization 生成字节必先重解析并逐节点比较闭包语义，失败返回无目标 Document；
+- 未修改 Document 字节精确往返；UTF-16 原始 code unit 与 BOM 全部保留。
+
 ## 0.8.0 — 2026-08-05
 
 ### Added
@@ -9,7 +70,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 - 实现 RFC 0009，发布 `ini.portable@1`、`ini.windows@1` 与 `ini.python-configparser@1` 三个显式 Profile；覆盖 raw source/encoding、physical/logical line、section/entry identity、native/syntax query、EntryMapping 优先投影、三种 canonical materialization 与 8 个版本化编辑操作；
 - 实现 RFC 0010，发布 `java-properties.reader@1` 与 `java-properties.latin1@1`；覆盖 natural/logical line、separator/continuation/escape、重复 property identity、精确 Java UTF-16 code unit、query、projection、canonical materialization 与 5 个版本化编辑操作；
 - 实现 RFC 0011，发布 `core.semantic-model@6`：38 条 contract registry 记录与 166 个稳定 error code；新增 source encoding/snapshot/patch v2、materialization request/result v2、Java UTF-16 string 与外部定位的 INI/Properties query result，并精确冻结 v1-v5；
-- 新增 `consema-ini`、`consema-properties` 公共 crate 与 facade 导出；新增 77 个语言无关案例，使 14 套 suite 达到 332/332；
+- 新增 `consema-ini`、`consema-properties` 公共 crate 与 facade 导出；新增 67 个语言无关案例，使 14 套 suite 达到 332/332；
 - 固定 OpenJDK、CPython、.NET、Windows wide profile API 与 Qt 五套 runtime oracle 共 36 个差分案例，并加入真实 INI/Properties 工程夹具、adversarial corpus、可复现性能基线及最终 `.crate` 解包验证门禁。
 
 ### Correctness
@@ -44,7 +105,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 - 实现 RFC 0007，发布 `yaml.1.2-core@1` 与 `yaml.1.1-compat@1`：UTF-8/UTF-16 stream、multi-document、完整 lossless/native view、tag/anchor/alias 图语义、native/syntax query、graph/value projection、block/flow materialization 与 8 个 YAML 编辑操作；
 - JSON↔YAML audited conversion 通过显式 PortableValue projection/materialization 组合，YAML sharing、cycle、tag 与 mapping policy 保持可观察；
 - 实现 RFC 0008，发布 `core.semantic-model@5`：30 条 contract、132 个稳定 error code，以及 PortableGraph、graph query/provenance/projection 和外部化 YAML query payload；v1-v4 精确冻结；
-- 新增 10 个 PortableGraph、22 个 semantic-model v5 与 27 个 YAML language-neutral cases，使 11 套 suite 合计达到 255/255；
+- 新增 10 个 PortableGraph、22 个 semantic-model v5 与 27 个 YAML language-neutral cases，使 11 套 suite 合计达到 265/265；
 - 固定官方 `yaml/yaml-test-suite data-2022-01-17` 完整 402-case gate，新增 Kubernetes、GitHub Actions、Compose、anchor-heavy 四类工程夹具、YAML/PGCE adversarial corpus 与可复现性能基线。
 
 ### Correctness
@@ -59,7 +120,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 ### Verified
 
 - Rust 1.97 与声明的 MSRV Rust 1.85 均通过 workspace `--all-targets --all-features` 的 312 项 tests 与 strict Clippy；当前工具链另通过 rustfmt、doctest 与 rustdoc `-D warnings`；
-- 11 套语言无关 suite 共 255/255 cases 通过；PortableGraph 10/10、semantic-model v5 22/22、YAML family 27/27；
+- 11 套语言无关 suite 共 265/265 cases 通过；PortableGraph 10/10、semantic-model v5 22/22、YAML family 27/27；
 - YAML 官方 gate 完整核算 402 项：307/307 valid byte-exact、94/94 invalid atomic rejection、1/1 明确 Profile exclusion；四类 YAML 工程夹具均完成 source/graph/PGCE/materialization closure；
 - `toml-test v2.2.0` 的 205/205 valid 与 474/474 invalid，以及 JSON5 v2.2.3 的 83/83 外部门禁保持通过；
 - RustSec 使用本地 1,189 条 advisory 数据扫描 Cargo.lock 的 35 个 crate dependencies，无已知漏洞；cargo-deny advisories、bans、licenses、sources 四类门禁通过；
@@ -93,7 +154,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 ### Verified
 
 - Rust 1.97 与声明的 MSRV Rust 1.85 均通过 workspace `--all-targets --all-features` 的 208 项 tests 与 strict Clippy；当前工具链另通过 rustfmt、doctest 与 rustdoc `-D warnings`；
-- 8 套语言无关 suite 共 196/196 cases 通过，其中 JSON family v2 为 33/33；
+- 8 套语言无关 suite 共 206/206 cases 通过，其中 JSON family v2 为 33/33；
 - JSON5 v2.2.3 外部门禁 43/43 valid、39/39 invalid 与 1/1 完整配置夹具通过，共 83/83；4 份典型 JSON/JSONC/JSON5 项目配置与 12 项 adversarial/property tests 通过；
 - `toml-test v2.2.0` 的 205/205 valid 与 474/474 invalid cases 保持通过；
 - RustSec 扫描 Cargo.lock 的 25 个 crate dependencies 无已知漏洞；cargo-deny advisories、bans、licenses、sources 四类门禁通过；
@@ -132,7 +193,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 
 - Rust 1.97 下 workspace `--all-targets --all-features` 共 189 个 tests 通过，rustfmt、strict Clippy、doctest 与 rustdoc `-D warnings` 通过；
 - Rust 1.85 下同一组 189 个 tests 与 strict Clippy 通过；
-- 7 套语言无关 suite 共 163/163 cases 通过，其中 operations v1 为 35/35；
+- 7 套语言无关 suite 共 173/173 cases 通过，其中 operations v1 为 35/35；
 - 10 个 adversarial/property tests 覆盖 materialization、结构事务、proof/patch、v3 mutation/truncation、source/encoding、JSON/TOML/PVCE 与 cancellation；
 - `toml-test v2.2.0` 的 205/205 valid 与 474/474 invalid TOML 1.0 decoder cases 通过；
 - RustSec 扫描 24 个依赖无已知漏洞；cargo-deny advisories、bans、licenses、sources 四类门禁通过。
@@ -153,7 +214,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 - 新增 `json.lossless-syntax-query@1` 与 `toml.lossless-syntax-query@1`，以及 Completed/Cancelled/Failed ordered cursor terminal；
 - 新增可验证、原子应用的 raw-byte `SourcePatch` 与 redacted review presentation；
 - 新增 `core.semantic-model@2`、`ContractRegistry::v2()`、`ErrorCodeRegistry::v2()`、`core.source-snapshot@1` 与 `core.source-patch@1`，同时保持 v1 精确冻结；
-- 新增 28 个 source、19 个 shared syntax-query 与 11 个 protocol v2 语言无关 conformance cases。
+- 新增 28 个 source、19 个 shared syntax-query、11 个 protocol v2 与 10 个 core/JSON 编辑表示保持、查询 limit/终态、投影来源及 PVCE 边界语言无关 conformance cases。
 
 ### Correctness
 
@@ -166,7 +227,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 ### Verified
 
 - workspace `--all-targets --all-features` 共 141 个 Rust tests 通过，fmt、strict Clippy、doctest 与 `-D warnings` rustdoc 通过；
-- 20 个 core/JSON、18 个 TOML、32 个 protocol v1、28 个 source、19 个 syntax-query 与 11 个 protocol v2 cases 全部通过，共 128 个语言无关案例；
+- 30 个 core/JSON、18 个 TOML、32 个 protocol v1、28 个 source、19 个 syntax-query 与 11 个 protocol v2 cases 全部通过，共 138 个语言无关案例；
 - SourceSnapshot/SourcePatch 均通过 semantic-model v2 canonical JSON/PVCE envelope 往返；
 - adversarial source decoding、patch offset/count/allocation、协议变异与既有 JSON/TOML/PVCE hardening 语料通过；
 - `toml-test v2.2.0`：205 valid、474 invalid TOML 1.0 decoder cases 保持通过；

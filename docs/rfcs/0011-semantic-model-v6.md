@@ -1,6 +1,6 @@
 # RFC 0011: Semantic model v6 for line-oriented formats
 
-- Status: Accepted for Consema 0.8.0 implementation
+- Status: Implemented in Consema 0.8.0
 - Date: 2026-08-04
 - Scope: additive semantic-model v6 contracts for versioned source encodings,
   source snapshots/patches and materialization using Windows code pages, exact
@@ -419,7 +419,24 @@ The semantic-model v6 suite must prove at least:
 10. INI and Properties query domain/role matrices, ordinals, completion counts,
     diagnostics, limits, and raw-handle rejection are exhaustive;
 11. all 34 new error codes are reachable from their promised public failure or
-    explicitly classified as protocol validation codes;
+    explicitly classified as protocol validation codes. Classification:
+    `core.source.code-page-required@1`/`core.source.unsupported-code-page@1`
+    fire from `core.source-encoding@1` typed decoding;
+    `java-properties.java-string.invalid-wire@1`/`non-canonical-wire@1` fire
+    from `core.java-utf16-string@1` typed decoding (structure vs canonical
+    re-verification). The remaining seven are format query/materialization
+    refinement codes — `ini.query.invalid-name-mode@1`,
+    `java-properties.query.invalid-code-unit-filter@1`,
+    `ini.profile.mismatch@1`, `java-properties.profile.mismatch@1`,
+    `ini.projection.duplicate-collapsed@1`,
+    `ini.materialization.round-trip-mismatch@1`,
+    `java-properties.materialization.round-trip-mismatch@1` — classified as
+    reserved refinement slots: the v6 typed decoders currently surface their
+    failures through the registered generic codes
+    (`core.query.invalid-argument@1` for query parameters,
+    `core.materialization.invalid-request@1` for profile/round-trip checks),
+    and the refinement codes are reserved for the format-specific protocol
+    messages that will carry those failures verbatim;
 12. unknown/missing/reordered fields, unknown enums, integer boundaries,
     mutated bytes, noncanonical transports, and resource limits fail without a
     partial object.
