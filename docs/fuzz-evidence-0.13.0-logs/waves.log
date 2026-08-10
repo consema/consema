@@ -3564,3 +3564,21 @@
 [2026-08-10T22:12:17+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
 [2026-08-10T23:28:30+08:00] INCIDENT NOTE: session 192 ran with 136 rows (all exit 0) but its log writes failed silently - root cause: orphaned tail.exe (PID 57336) from Monitor bq05gzjfp held waves.log exclusively from 22:12:20; tail killed, lock released. Session 192 start line restored below for numbering continuity.
 [2026-08-10T22:12:16+08:00] session start: session=192 waves=4 copies=2 wave_timeout=1800s (restored)
+[2026-08-10T23:28:24+08:00] session start: session=193 waves=4 copies=2 wave_timeout=1800s
+[2026-08-10T23:28:24+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-10T23:28:24+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=6dad7efca23149b0e53b9fbf6bd315962cd7244e
+[2026-08-10T23:28:24+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-10T23:28:24+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-45b97b2322ebeb26.exe mtime 2026-08-10 19:49:00)
+[2026-08-10T23:28:25+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-10T23:28:58+08:00] wave 1 done: procs=34 wall_max=33.7s cpu_total_s=539.1 cpu_hours=0.15 failures=0
+[2026-08-10T23:28:58+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-10T23:28:58+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-10T23:29:31+08:00] wave 2 done: procs=34 wall_max=33.1s cpu_total_s=536.3 cpu_hours=0.149 failures=0
+[2026-08-10T23:29:31+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-10T23:29:32+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-10T23:30:04+08:00] wave 3 done: procs=34 wall_max=32.6s cpu_total_s=537.9 cpu_hours=0.149 failures=0
+[2026-08-10T23:30:04+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-10T23:30:04+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-10T23:30:37+08:00] wave 4 done: procs=34 wall_max=33s cpu_total_s=546 cpu_hours=0.152 failures=0
+[2026-08-10T23:30:38+08:00] session done: 27761 ledger rows; total CPU-hours=163.694 failures=0
+[2026-08-10T23:30:38+08:00] FINAL
