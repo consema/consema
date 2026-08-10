@@ -166,7 +166,7 @@
 
 ## 9. 开放事项
 
-- `crates/consema-conformance/examples/gen_mutation_corpus.rs:623` 硬编码 `"regressions": []`——M2 后续需改为保留 regressions 数组，否则 `--check` 与手工 regressions 条目冲突（本文档 §4 工作流不受影响，replay 测试已覆盖 regressions）。
+- `crates/consema-conformance/examples/gen_mutation_corpus.rs` regressions 保留事项已解决：修复已随 commit 92a244a 落地——`generate()` 接收 regressions 文本并原样写入输出（不再硬编码 `[]`），`extract_regressions` 从已提交 corpus 逐字提取既有数组，新文件仍为 `[]`；`--check` 与手工 regressions 条目不再冲突（本文档 §4 工作流不变，replay 测试已覆盖 regressions）。
 - M2-F1/M2-F2 修复的工作树状态→提交事项已解决：修复已随 0.13.0 落地 commit 094f5d1/7e9de38 提交入库（§8 记录 session 8 结束时的 workspace 门禁 1,617 passed / 0 failed；CHANGELOG.md:46 同步）。
 - session 10/11 驱动已结束：waves 1-65 全部入账并计入 §3.2.1 会话结束快照（原"wave 43 于 17:32:44 入账、waves 44+ 持续入账"事项已解决）。
 - session 7 的 wall_s 是"launch→波次结束"（该会话脚本尚未记录进程自身退出时刻；cpu_s 均为真实测量），session 8 起 wall_s 为进程自身存活时长——两段口径已在 runs.csv 中如实区分（§3.1 时间线）。

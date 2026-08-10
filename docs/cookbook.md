@@ -453,6 +453,17 @@ backlog（2026-08-07 复核，disposition 见 `docs/0.13.0-gate-plan.md` §4 M4�
    json.strict 目标要求 `newline: None`。请求违反契约时材料化原子失败
    （`core.conversion.materialization-failed@1`，exit 2），不会静默改写
    编码或换行（实测见第 12.6 节）。
+10. **XML ReplaceText 词表不含 CDATA（RoleXmlText only）**：ReplaceText
+    只接受文本 occurrence（`NodeRole::XmlText` only），CDATA 内容不在
+    操作词表——双语言一致契约行为（Rust `text_for` 同语义，
+    pilot-go-0.19.0.md F-1）；CDATA 文本更新属文档边界（record 保持面），
+    RFC 0012 §6 冻结（CDATA 是独立 child occurrence，即使语义字符与
+    Text 相等也不自动合并）。出处：`docs/rc-1.0.0-candidate.md` §5 P2-1。
+11. **JSONC/JSON5 插入元素为 canonical 片段拼写**：如 `[80, 100]` 插入
+    120 后为 `[80, 100,120]`（无空格填充）——插入元素是 canonical
+    片段，语义插入而非格式化；caller 字符串总是被转义（RFC 0005 §10），
+    断言应按语义内容而非字面格式比对。出处：`docs/rc-1.0.0-candidate.md`
+    §5 P2-3（pilot-go-0.19.0.md F-3）。
 
 ## 11. exit code 速查（RFC 0015 §5.1，实测对应）
 
