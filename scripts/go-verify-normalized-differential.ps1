@@ -5,27 +5,58 @@ param(
 
 # ---------------------------------------------------------------------------
 # Cross-language normalized-result differential verification (milestone
-# 0.15.0 G1.5; docs/go-implementation-plan.md §4.4 and §2.2; roadmap §16.2
-# line 1488; §11.2 lines 849-861).
+# 0.15.0 G1.5, bidirectional since 0.19.0 G5.2; docs/go-implementation-plan.md
+# §4.4 and §2.6; roadmap §16.2 line 1488, §16.6 line 1548, §11.2 lines
+# 849-861).
 #
-# Pipeline (Go never imports or calls Rust, RFC 0016 §1.1):
+# Bidirectional pipeline (Go never imports or calls Rust, RFC 0016 §1.1):
 #   1. builds the minimal Rust evidence example
 #      (crates/consema-conformance/examples/emit_normalized_results.rs);
-#   2. runs it over the checked-in case set
+#   2. forward direction: runs it over the checked-in case set
 #      (go/conformance/differential/normalized/cases.json) into <OutDir> as
 #      one `<case-id>.txt` normalized-facts file per case;
-#   3. runs the Go side (`go test ./conformance/differential/normalized/`
-#      with CONSEMA_DIFFERENTIAL_NORMALIZED_RUST_DIR set) which computes the
-#      Go normalized results for the same input set and compares them field
-#      by field with the Rust evidence files (case id + field + both values
-#      on divergence).
+#   3. forward comparison + reverse emission: runs the Go side
+#      (`go test ./conformance/differential/normalized/` with
+#      CONSEMA_DIFFERENTIAL_NORMALIZED_RUST_DIR set), which computes the Go
+#      normalized results for the same input set and compares them field by
+#      field with the Rust evidence files (case id + field + both values on
+#      divergence), and emits the Go-side evidence files into the Go
+#      evidence directory (CONSEMA_DIFFERENTIAL_NORMALIZED_GO_DIR);
+#   4. reverse direction: runs the Rust example's consume mode
+#      (`--consume <go-evidence-dir>`), which recomputes the Rust results
+#      and compares them field by field with the Go evidence files.
+#
+# Any divergence in either direction exits non-zero: forward via the Go
+# test, reverse via the consume mode's exit 1.
 #
 # The compared facts are the language-neutral behavior surface of roadmap
 # §11.2: parse formation, diagnostic code/order (never text), query
 # count/identity/order, projection/materialization reports, edit result
 # bytes or failure codes, and resource-limit completion semantics. A
-# divergence is a finding for the roadmap §11.3 process, never a silent
-# Rust-side "fix".
+# divergence is a finding for the roadmap §11.3 process (minimal
+# cross-language reproducer -> classify as implementation/test/spec gap),
+# never a silent Rust-side "fix".
+#
+# --- Differential corpus append discipline (roadmap §17.4 line 1615;
+# docs/go-implementation-plan.md §4.4) ---
+# Any differential case found by a pilot or audit joins the input set:
+#   1. triage the finding per roadmap §11.3 and reduce it to a minimal
+#      cross-language reproducer;
+#   2. append the minimal case to cases.json in this directory
+#      (go/conformance/differential/normalized/cases.json) using the same
+#      schema as the existing entries (kind/format/profile/source/steps);
+#      the integrity guards are automatic and enforced by
+#      TestCaseFileIntegrity on every `go test ./...` run: the manifest id
+#      must stay consema.differential.normalized@1, ids must be unique, and
+#      the case count must stay >= 104. The case then runs in both
+#      directions of this script forever.
+#   3. a language-neutral defect exposed by the finding (a real bug, not a
+#      harness artifact) additionally goes into the regression corpus: the
+#      `regressions` array of conformance/corpora/mutation-v1.json,
+#      following the existing workflow in conformance/corpora/README.md
+#      ("Adding a fuzz finding to the corpus"), which the mutation_corpus
+#      replay test covers. That corpus is read-only here: this script never
+#      writes it.
 #
 # Requirements: cargo (or $env:CONSEMA_CARGO) and go on PATH. Windows
 # PowerShell 5.1 compatible, no third-party dependencies.
@@ -72,7 +103,7 @@ if (-not (Get-Command $cargo -ErrorAction SilentlyContinue)) {
     Write-Error "cargo is not available ('$cargo')"
     exit 1
 }
-Write-Host "[1/3] building the Rust evidence example (emit_normalized_results)..."
+Write-Host "[1/4] building the Rust evidence example (emit_normalized_results)..."
 & $cargo build --locked -p consema-conformance --example emit_normalized_results
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
@@ -85,24 +116,30 @@ if (-not (Test-Path $example)) {
 if ($OutDir -eq '') {
     $OutDir = Join-Path $targetDir 'go-differential-normalized'
 }
-# The env var is consumed by `go test` from the package directory, so it
-# must be absolute.
+# The env vars are consumed by `go test` from the package directory, so
+# they must be absolute.
 $OutDir = [System.IO.Path]::GetFullPath($OutDir)
 if (Test-Path $OutDir) { Remove-Item $OutDir -Recurse -Force }
 New-Item -ItemType Directory -Force $OutDir | Out-Null
 
-Write-Host "[2/3] running the Rust example over $caseCount cases -> $OutDir"
+# --- forward direction: Rust emits, Go compares ------------------------------
+Write-Host "[2/4] forward: running the Rust example over $caseCount cases -> $OutDir"
 & $example $CaseFile $OutDir
 if ($LASTEXITCODE -ne 0) {
     Write-Error "emit_normalized_results failed (exit $LASTEXITCODE)"
     exit $LASTEXITCODE
 }
 
-# --- Go side -----------------------------------------------------------------
-Write-Host "[3/3] running the Go differential test (normalized_test.go)..."
+# --- Go side: forward comparison + reverse emission ---------------------------
+$goEvidenceDir = Join-Path $targetDir 'go-differential-normalized-go'
+$goEvidenceDir = [System.IO.Path]::GetFullPath($goEvidenceDir)
+if (Test-Path $goEvidenceDir) { Remove-Item $goEvidenceDir -Recurse -Force }
+Write-Host "[3/4] running the Go differential test (normalized_test.go) + emitting the Go evidence files -> $goEvidenceDir"
 $env:CONSEMA_DIFFERENTIAL_NORMALIZED_RUST_DIR = $OutDir
-# Capture files live outside $OutDir: that directory must contain only the
-# Rust example's `<case-id>.txt` files (the Go test rejects any other file).
+$env:CONSEMA_DIFFERENTIAL_NORMALIZED_GO_DIR = $goEvidenceDir
+# Capture files live outside $OutDir and $goEvidenceDir: those directories
+# must contain only the `<case-id>.txt` evidence files (the Go test and the
+# consume mode each reject any other file).
 $logDir = Join-Path $env:TEMP 'consema-go-normalized'
 New-Item -ItemType Directory -Force $logDir | Out-Null
 $stdoutFile = Join-Path $logDir 'go-test.stdout.txt'
@@ -120,14 +157,20 @@ if (Test-Path $stderrFile) {
     Get-Content $stderrFile | ForEach-Object { Write-Host $_ }
 }
 
-# The differential test must have RUN (not skipped) and passed.
+# The differential test must have RUN (not skipped) and passed; the Go
+# emitter must have RUN too.
 $output = Get-Content $stdoutFile -Raw
 if ($output -match '--- SKIP: TestNormalizedDifferential') {
     Write-Error 'the differential test skipped: the Rust evidence directory was not provisioned'
     exit 1
 }
-if ($output -notmatch '--- PASS: TestNormalizedDifferential') {
-    Write-Error "the differential test did not pass (go test exit $testCode)"
+if ($output -match '--- SKIP: TestEmitGoNormalizedResults') {
+    Write-Error 'the Go evidence emitter skipped: the Go evidence directory was not provisioned'
+    exit 1
+}
+if ($output -notmatch '--- PASS: TestNormalizedDifferential' -or
+    $output -notmatch '--- PASS: TestEmitGoNormalizedResults') {
+    Write-Error "the Go differential tests did not pass (go test exit $testCode)"
     if ($testCode -eq 0) { exit 1 } else { exit $testCode }
 }
 if ($testCode -ne 0) {
@@ -136,10 +179,32 @@ if ($testCode -ne 0) {
 
 $summary = [regex]::Match($output, 'normalized-result differential: \d+/\d+ equal')
 if ($summary.Success) {
-    Write-Host "RESULT: $($summary.Value)"
+    Write-Host "RESULT (forward): $($summary.Value)"
 } else {
     Write-Error 'cannot find the normalized-result differential summary line in the test output'
     exit 1
 }
-Write-Host "normalized-result differential verification complete (exit 0)"
+
+# --- reverse direction: Rust consumes and compares the Go evidence ------------
+Write-Host "[4/4] reverse: running the Rust consume mode against the Go evidence files ($goEvidenceDir)"
+$reverseLog = Join-Path $logDir 'rust-consume.stdout.txt'
+$reverseErr = Join-Path $logDir 'rust-consume.stderr.txt'
+& $example $CaseFile $OutDir --consume $goEvidenceDir 1> $reverseLog 2> $reverseErr
+$consumeCode = $LASTEXITCODE
+Get-Content $reverseLog | ForEach-Object { Write-Host $_ }
+if (Test-Path $reverseErr) {
+    Get-Content $reverseErr | ForEach-Object { Write-Host $_ }
+}
+if ($consumeCode -ne 0) {
+    Write-Error "the Rust consume mode found divergences or failed (exit $consumeCode)"
+    exit $consumeCode
+}
+$reverseSummary = [regex]::Match((Get-Content $reverseLog -Raw), 'reverse normalized-result differential: \d+/\d+ equal')
+if ($reverseSummary.Success) {
+    Write-Host "RESULT (reverse): $($reverseSummary.Value)"
+} else {
+    Write-Error 'cannot find the reverse normalized-result differential summary line in the consume-mode output'
+    exit 1
+}
+Write-Host "bidirectional normalized-result differential verification complete (exit 0)"
 exit 0
