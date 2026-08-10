@@ -22,7 +22,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 ### Boundaries
 
 - **C-1（CI GitHub 真跑）**：11 job 落盘（含 go-1.26），未推入 GitHub 真跑；推入后干净 checkout 全矩阵全绿是收口项；
-- **C-2（72 CPU-hours fuzz）**：账本 26.309/72 CPU-hours（最接近 properties 6.9%），完成路径不变（clang 主机 cargo-fuzz 17 target 为主）；
+- **C-2（72 CPU-hours fuzz）**：账本 27.852/72 CPU-hours（4,335 行，2026-08-10 会话 12 快照；最接近 properties-parse 4.8%；快照口径——追加式账本以 runs.csv 为准），完成路径不变（clang 主机 cargo-fuzz 17 target 为主）；
 - **C-3（真实发布密钥与发布执行）**：真实密钥 + 签名 tag/artifact + SBOM/checksum 落盘 + 恢复演练复跑未执行（D-1：checksum manifest 须从干净发布 commit 重新生成；D-2：演练密钥无持久公钥）；
 - **RC soak**：§22 中部分权限/磁盘失败演练列为 RC soak 必做（rc-1.0.0-candidate.md §2）；
 - 依赖序（终审记录）：F-A → F-B → C-1 → C-2 → C-3 → RC soak → P2-7 → **1.0.0**。

@@ -78,7 +78,9 @@
 
 按格式家族（parse+ops 汇总）：json 2.610 / toml 1.556 / yaml 3.473 / ini 3.435 / properties 4.023 / xml 0.957 / plist 1.306 / hcl 2.616 CPU-hours；protocol（单 target）1.388。
 
-### 3.2.1 2026-08-07 会话结束快照（追加；runs.csv 为唯一权威账本，发布记录数字以本表快照为准）
+### 3.2.1 2026-08-07 会话结束快照（追加；runs.csv 为唯一权威账本
+**2026-08-10 会话 12 快照（追加式）**：8 waves × 2 copies，零失败；账本 4,335 行 / 27.852 CPU-hours；最接近的 properties-parse 4.8%（3.429/72）。发布记录数字以本表快照为准。
+，发布记录数字以本表快照为准）
 
 驱动结束后按 §4.4 协议把 session 10 的 wave 43 与 waves 44-65 全部并入：**4,063 行** = session 7 的 17 + session 8 的 1530 + session 9 的 102 + session 10 全量 + session 11 全量（waves 1-65 全部入账）。其中 4,053 行 exit_code=0，10 行 exit=-1（session 9 wave 3 外部终止、已分类非 fuzz finding，见 §3.1）。每 target 239 次运行；累计计划变异 **1,099,400,000（10.994 亿）次**。时钟状态：全部 running（clean）——本日无任何新 crash/panic/hang/limit bypass，无 target 清零。
 
