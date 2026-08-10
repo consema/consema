@@ -152,6 +152,55 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 - 演练二进制与 worktree 均为临时目录，不进入任何发布记录；0.13.0 发布按
   release-process §7 用真实密钥执行。
 
+### 3.5 RC soak 阶段 1 演练记录（2026-08-10，真实执行）
+
+**演练 4：部分权限失败（只读目录 apply）— 已闭环**
+
+- 环境：`target/release/consema.exe` v0.13.0；临时目录 `%TEMP%\consema-rc-drill1-perm-*`
+  （已清理）；素材 = conformance/fixtures/ini/desktop-settings.ini 真实夹具副本 ×5
+  （base sha256 `b01f173b…`）；edit 请求 = cookbook §6 规范示例
+  （`ini.edit.replace-semantic-value@1`，window:width→1600）。
+- 步骤与结果：
+
+| 步骤 | 操作 | 结果 |
+|---|---|---|
+| 1 | `plan` 5 文件 | exit 0，5/5 planned（base `b01f173b…` / target `98b89205…`，与 pilot W8 相同 digest） |
+| 2 | `icacls targets /deny franck:(WD,AD,WEA)` | exit 0（目录级 DENY ACE 生效） |
+| 3 | `apply plan.json` | **exit 4**，5/5 `failed cli.write.permission@1`；stderr 原文：`permission denied writing '<path>': 拒绝访问。 (os error 5) (code cli.write.permission@1)` |
+| 4 | `apply --json` 机器信封 | exit 4，`exit_class: "precondition"`，payload 5 条 failed（per-file 失败作为 manifest 内容，envelope diagnostics: []，符合 RFC 0015） |
+| 5 | 字节核验 | 5/5 目标仍为 base digest（零字节写入）；无 `*.tmp` 残留 |
+| 6 | 恢复：`icacls /remove:d` → 同一 plan 重跑 | exit 0，5/5 completed（target `98b89205…`） |
+
+- **原子性判定（混合场景）**：同批 4 文件跨 2 目录（2 可写 + 2 icacls 只读）→ apply
+  exit 4，可写侧 2/2 completed、只读侧 2/2 failed；只读侧字节未动、可写侧已写。
+  **结论：拒绝是逐文件原子的，批处理无整体原子性**——与 RFC 0015 §10「单文件原子
+  替换、批原子性 = manifest 状态机可恢复性」一致。
+- **失败分类**：exit 4 = precondition 类（RFC 0015 §5.1 表：permission/disk failures
+  明确列于 precondition）；诊断码 `cli.write.permission@1`（§13.1 注册表）→ §5.2
+  规则 `cli.write.* → 4`。补充实测：Windows 只读文件属性（非 ACL）路径为独立码
+  `cli.write.read-only@1`（`target '…' is read-only`），同 exit 4——两个检测路径
+  映射两个注册码，同属 precondition 类。
+- 结论：P2-6 的"部分权限失败演练未记录"缺口已闭（§22.7 四类演练中 stale/中断/
+  部分权限已闭环）。
+
+**演练 5：磁盘失败 — 环境阻塞记录（如实）**
+
+- 约束实测：非 admin（IsInRole(Administrator)=False）；`New-VHD`/`Mount-VHD` →
+  CommandNotFoundException（Hyper-V 模块未安装）；`diskpart /?` → The requested
+  operation requires elevation；卷清单：C: NTFS 952.8 GB（27.6% free，禁止填盘）、
+  无名 NTFS 0.9 GB 无盘符（系统恢复类，不可寻址）、D: Ventoy exFAT 57.7 GB
+  （59% free）、E: VTOYEFI（Ventoy 保留）。**无可行小卷路径**。
+- 完成路径：随 C-1 在 Linux runner 上用临时小卷（tmpfs/loop）执行（真实填盘 →
+  apply 预期 exit 4 + `cli.write.io@1` per-file failed → 释放空间后同一 plan 重跑
+  恢复）；或授权（admin）环境 New-VHD + Mount-VHD + Format-Volume 后同流程。
+- **诚实佐证（非真实填盘）**：RFC 0015 §5.4 注入 seam `CONSEMA_APPLY_WRITE_FAILURE=io`
+  （临时目录实测）：首个目标写失败 `cli.write.io@1`（§10「disk full →
+  cli.write.io@1」同一注册码）→ exit 4，批内其余文件照常 completed，清除 env 后
+  同一 plan 重跑全 completed（exit 0）。证明 io 类失败分类与恢复语义完整；真实填盘
+  演练本身仍记录为环境阻塞。
+- 结论：演练 5 在 §3.4 演练边界体例下记录为"未演练（环境阻塞：非 admin + 无
+  Hyper-V + 无可寻址小卷），完成路径已定，随 C-1/授权环境执行"。
+
 ## 4. RC soak 计划
 
 目标：§22 全部门禁除 RC soak 本身全部通过（§16.6 第 1557 行硬门禁）。
@@ -177,6 +226,33 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
   无 P0/P1 与 contract ambiguity → 发布 1.0.0-rc.1
   RC 期间发现 P0/P1/ambiguity → 新 RC + 相应 clean-run 重做（第 1942 行）
 ```
+
+### 4.1 阶段 1 当前进展（2026-08-10）
+
+- 磁盘失败演练 → 环境阻塞（见 §3.5 演练 5，完成路径随 C-1）
+- 部分权限失败演练 → **已完成**（§3.5 演练 4，2026-08-10 实测闭环）
+- 双语言 differential corpus 追加运行 → 四 harness 已复跑（P2-7，
+  83/83+108/108+68/68；追加 corpus 待 C-2 关账后随收口执行）
+- Go 侧 release-candidate fuzz clean-run 记录 → 已有（2026-08-10，
+  go/README.md:661-763，16 targets 30s）
+- 每格式真实 corpus 抽检巡检 → **已完成**（2026-08-10：钉版 12 文件 digest 12/12
+  一致；508 核对一致；regressions 空数组符合预期；9 家族来源与覆盖足够；
+  4 条观察见下）
+- 性能基线复测 → 待 C-2 关账后执行（避免与 fuzz 抢构建锁）
+- 每 48h fuzz 账本检查 → 进行中（账本 ~96+ CPU-hours，零新 crash）
+
+### 4.2 巡检 4 条观察记录（P2 级）
+
+1. pilot-go-0.19.0.md §1 标题"12 个文件"而表含 13 行（logback.xml 为"—"）——与
+   go/pilot/pilot_test.go:157-170 的 12 文件注册一致，接受；
+2. vectors/toml-v1.json 的 toml.corpus.cargo-manifest fixture 路径为裸
+   `"Cargo.toml"`（仓库根，非 fixtures 下），Rust runner 用 include_bytes! 解析
+   （crates/consema-conformance/src/toml_v1.rs:27）——Go runner 落地时需继承同一
+   解析约定；
+3. json5/ 与 toml/ 目录无独立 README（其余 7 家族有）——来源声明由
+   conformance/README 与 corpora 元数据承担，体例不一致可接受；
+4. fixtures 层负向文件覆盖不均（json5/xml/hcl 的负向在 vectors/corpora/oracle
+   层，体系层面满足）——接受，维持文档化替代载体。
 
 soak 退出标准：本清单 §2 全部 ⏳ 转 ✓（或显式 judgment 记录）；§5 P2 清单逐项
 disposition。
