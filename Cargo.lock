@@ -52,7 +52,7 @@ checksum = "9330f8b2ff13f34540b44e946ef35111825727b38d33286ef986142615121801"
 
 [[package]]
 name = "consema"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema-core",
  "consema-document",
@@ -71,7 +71,7 @@ dependencies = [
 
 [[package]]
 name = "consema-conformance"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema",
  "consema-core",
@@ -92,11 +92,11 @@ dependencies = [
 
 [[package]]
 name = "consema-core"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 
 [[package]]
 name = "consema-document"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema-core",
  "encoding_rs",
@@ -105,14 +105,14 @@ dependencies = [
 
 [[package]]
 name = "consema-graph"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema-core",
 ]
 
 [[package]]
 name = "consema-hcl"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema-core",
  "consema-document",
@@ -121,7 +121,7 @@ dependencies = [
 
 [[package]]
 name = "consema-ini"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema-core",
  "consema-document",
@@ -130,7 +130,7 @@ dependencies = [
 
 [[package]]
 name = "consema-json"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema-core",
  "consema-document",
@@ -139,7 +139,7 @@ dependencies = [
 
 [[package]]
 name = "consema-plist"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema-core",
  "consema-document",
@@ -148,7 +148,7 @@ dependencies = [
 
 [[package]]
 name = "consema-properties"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema-core",
  "consema-document",
@@ -157,7 +157,7 @@ dependencies = [
 
 [[package]]
 name = "consema-protocol"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema-core",
  "consema-document",
@@ -168,14 +168,14 @@ dependencies = [
 
 [[package]]
 name = "consema-pvce"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema-core",
 ]
 
 [[package]]
 name = "consema-toml"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema-core",
  "consema-document",
@@ -184,7 +184,7 @@ dependencies = [
 
 [[package]]
 name = "consema-xml"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema-core",
  "consema-document",
@@ -193,7 +193,7 @@ dependencies = [
 
 [[package]]
 name = "consema-yaml"
-version = "0.13.0"
+version = "1.0.0-rc.1"
 dependencies = [
  "consema-core",
  "consema-document",

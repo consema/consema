@@ -180,6 +180,17 @@ rules:
   must be externalized to caller-stable locators; SECURITY.md line 28).
 - `product_version` is the release version string (workspace version),
   without git hashes or build metadata.
+
+> **2026-08-10 revision (product-version validation extended to full SemVer
+> syntax)**: the product-version validation is extended from strict
+> `MAJOR.MINOR.PATCH` to the full SemVer 2.0 core syntax — prerelease
+> suffixes such as `1.0.0-rc.1` and `1.0.0-beta.2` are accepted; all other
+> constraints are unchanged (no git hashes, no build metadata; the `+`
+> suffix is rejected). Rationale: the roadmap §13/§12.1 product-version
+> sequence ships `1.0.0-rc.n` as prerelease versions; the cli-v1 vectors
+> pin no prerelease rejection, so the vectors stay valid. Implemented by
+> the identical `is_semantic_version` extension in
+> `crates/consema-protocol/src/cli.rs` and `go/protocol/cli.go`.
 - Ordering: `files` arrays follow the command-line argument order;
   diagnostics follow a deterministic order (source order/argument order);
   `DiagnosticMessage.arguments` is a sorted map (existing contract
@@ -234,7 +245,8 @@ The `core.cli-output@1` typed decoder revalidates cross-constraints:
 
 - `command` is in the closed set; `exit_class` is in the closed set;
 - `product_version` is shaped like a semantic version
-  (`MAJOR.MINOR.PATCH`, no leading zeros in numeric segments);
+  (`MAJOR.MINOR.PATCH` with an optional `-prerelease` suffix per SemVer
+  2.0; no leading zeros in numeric segments; no build metadata);
 - `redaction.redacted == (count > 0)`;
 - the payload's schema matches `command` (inspect → `cli.inspect@1`,
   query → the corresponding query-result contract, ...); unknown or

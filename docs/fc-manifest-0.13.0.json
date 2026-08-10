@@ -35,9 +35,9 @@
     "conformance_suite": {
       "suites": 18,
       "cases": 508,
-      "aggregate_sha256": "e3d6578858fa1fdcab0c19ee0094cd246923dca76e9be4679aabf86b482b68c8",
+      "aggregate_sha256": "35bebc8d384d71740f7c1a886bc50f4e095ff52fe05d2a407f04b842ee6922fa",
       "evidence": "conformance/vectors/*.json（18 文件，2026-08-07 脚本实测 18 suites / 508 cases）；.github/workflows/ci.yml:155-173（conformance job 的 suite-count 断言 18/508）；README.md:33",
-      "note": "聚合方式（2026-08-07 复核可精确复现）：按文件名字节序排序，逐文件 sha256（小写 hex），每行格式 '{basename}:{digest}'，各行以 '\\n' 连接（无尾换行），聚合 sha256 即对该 UTF-8 字节串再 sha256。当前 18 文件实测聚合 = e3d6578858…（与 M1 的 suite-count 断言同源，gate plan §8）。"
+      "note": "聚合方式（2026-08-10 复核，2026-08-07 初记）：按文件名字节序排序，逐文件 sha256（小写 hex），每行格式 '{basename}:{digest}'，各行以 '\\n' 连接（无尾换行），聚合 sha256 即对该 UTF-8 字节串再 sha256。当前 18 文件实测聚合 = 35bebc8d…。digest 以规范 checkout（.gitattributes eol=lf，git 存储的 LF 规范态）字节为准；2026-08-10 修订前记录值 e3d6578858… 是在 2026-08-07 的 CRLF 工作树（本机 core.autocrlf=true）上记录，已被规范态值取代（本机 CRLF 工作树下逐文件 sha256 不同属预期，本地开发用 git config core.autocrlf false 或接受该差异）。（与 M1 的 suite-count 断言同源，gate plan §8。）"
     },
     "corpus_test_suite_revisions": {
       "value": [
@@ -314,7 +314,7 @@
           "evidence": [
             "docs/rfcs/0016-go-api-mapping-v1.md（Accepted，§4.1 15-kind 值映射冻结）",
             "go/：0.14.0 G0.1-G0.5（core 15-kind+PVCE、graph+PGCE、protocol v1-v7 41/187+CLI 记录、go/conformance 18-suite runner、6 fuzz target、differential 字节 harness），2026-08-07 实测 go build/vet/test/race/gofmt/tidy 全绿",
-            "conformance runner 实测：适用 case 149/149 通过、359 documented skip、聚合 digest e3d6578858... 精确一致",
+            "conformance runner 实测：适用 case 149/149 通过、359 documented skip、聚合 digest 35bebc8d... 精确一致（规范 checkout 实测；2026-08-07 CRLF 工作树记录 e3d6578858... 已被规范态值取代）",
             "跨语言字节 parity 实测：68/68（51 PVCE + 17 PGCE）双向相等（scripts/go-verify-byte-parity.ps1）",
             "docs/go-implementation-plan.md:319-342（§6 验收门禁表）、§7 修订条款（D-1 决策记录）"
           ],

@@ -2,6 +2,31 @@
 
 Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发布能力。
 
+## 1.0.0-rc.1 — 2026-08-10
+
+1.0.0 的第一个 release candidate（路线图 §13：0.19.0 → 1.0.0-rc.n → 1.0.0）。workspace 版本推进 0.13.0→1.0.0-rc.1（15 crate `version.workspace = true`，Go CLI `product_version` 同步，Go module 版本随 release train 走 git tag，RFC 0016 §9）；release candidate 只收 blockers/security/docs errors（§12.1）。
+
+### Added
+
+- **RFC 0020（R-20）**：1.0 compatibility/support policy（`docs/rfcs/0020-compatibility-and-support-policy-v1.md`，Status: Accepted）——1.0 兼容承诺（patch/minor/major 语义边界、output order/default loss policy/acceptance-recovery 边界为兼容性、contract @N 永不重释）、支持周期（Rust MSRV、Go 版本窗口、三平台、安全 SLA、EOL/弃用流程）、契约版本治理；与 `docs/support-policy.md`/SECURITY.md/RFC 0015/0016 逐项一致（support-policy §2 的 Go 冻结措辞演进已在 RFC §9.2 调和）；
+- **§28 五要素终审记录**（`docs/five-element-review-1.0.0.md`）：哲学统一/语义一致/逻辑自洽/真实有效 **PASS**，完整可靠 **PARTIAL**（C-1/C-2/C-3 开放）；历史 findings 全部关账或标豁免；实测核验 14 项（Go 508/0/0、Rust 1,629 passed、差分 108×2、交换 83/83、parity 68/68、capability parity）；
+- **RFC 0015 §3.3 契约修订**：product_version 校验从严格 MAJOR.MINOR.PATCH 扩展为完整 SemVer 2.0 核心语法（接受 `-rc.1`/`-beta.2` prerelease；无 git hash、无 build metadata；cli-v1 向量保持有效）——Rust/Go 两语言校验器同语义扩展 + 双向接受/拒绝测试；
+- **聚合 digest 规范态重算**：conformance 向量聚合 sha256 以规范 LF 字节重算（`git show` 规范 blob），新值 `35bebc8d…` 取代 CRLF 工作树记录的 `e3d6578858…`（fc-manifest/go-implementation-plan/conformance_test/脚本全部更新；`git archive` 干净 checkout 全绿复现，含 race）。
+
+### Verified（2026-08-10 实测）
+
+- Go：19 包全绿（LF 规范态含 race）；runner 508 passed / 0 skipped / 0 failed；capability parity PASS；16 fuzz targets 30s clean-run；差分 108/108 双向；协议交换 83/83；字节 parity 68/68；CLI（`go build ./cmd/consema`）11 命令 + plan→apply 全流程 exit 0-5 矩阵；Go pilot 14 测试（Rust/Go mismatch 0）；升级/回滚演练（D-1/D-2 记录）。
+- Rust：`cargo test --workspace --locked` 1,629 passed / 0 failed；consema-protocol 100/100（含新 prerelease 测试）；fmt 干净。
+- 发布流程复核：rc-1.0.0-candidate.md 的 §22 逐行核对表（22.2/22.3/22.5/22.7 达成）。
+
+### Boundaries
+
+- **C-1（CI GitHub 真跑）**：11 job 落盘（含 go-1.26），未推入 GitHub 真跑；推入后干净 checkout 全矩阵全绿是收口项；
+- **C-2（72 CPU-hours fuzz）**：账本 26.309/72 CPU-hours（最接近 properties 6.9%），完成路径不变（clang 主机 cargo-fuzz 17 target 为主）；
+- **C-3（真实发布密钥与发布执行）**：真实密钥 + 签名 tag/artifact + SBOM/checksum 落盘 + 恢复演练复跑未执行（D-1：checksum manifest 须从干净发布 commit 重新生成；D-2：演练密钥无持久公钥）；
+- **RC soak**：§22 中部分权限/磁盘失败演练列为 RC soak 必做（rc-1.0.0-candidate.md §2）；
+- 依赖序（终审记录）：F-A → F-B → C-1 → C-2 → C-3 → RC soak → P2-7 → **1.0.0**。
+
 ## 0.13.0 — 2026-08-07
 
 0.13.0 是 Rust 生产加固与 Feature-Complete Gate 版本（路线图 §14.12/§15，执行计划 `docs/0.13.0-gate-plan.md`）：不新增格式，把 §15 门禁逐条落成可复现证据。全部条目状态与证据见 Feature-Complete Manifest（`docs/fc-manifest-0.13.0.json`）。本版本随 2026-08-07 落地：workspace 版本推进 0.8.0→0.13.0（发布检查单第 1 项）；五维交叉审计（哲学统一/语义一致/逻辑自洽/真实有效/完整可靠）findings 全部处置；Go SDK 0.14.0 G0.1-G0.3 按决策记录 D-1 入库（见本条目「落地记录」与 Boundaries）。门禁开放项 C-1/C-2/C-3 **尚未全部关闭**，Boundaries 如实列出完成路径。
