@@ -12,7 +12,7 @@
 | 阻塞项 | 状态 | 证据 | 完成路径 |
 |---|---|---|---|
 | C-1：CI 10 job 在 GitHub 干净 checkout 全矩阵全绿 | **partial** | .github/workflows/ci.yml（lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package）；本地等效全流程已实测（0.13.0-gate-plan §4 M1），GitHub 真跑未发生 | 推入 GitHub 后对 main 全矩阵真跑；oracle pin 与 hosted runner 不符时保持文档化 skip=成功；结果回填 manifest |
-| C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §7-§8 快照：26.309 CPU-hours（2026-08-07 会话结束）；runs.csv 4,063 行（本次复核一致，零新 crash） | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
+| C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §3.2.1/§8 快照：78.971 CPU-hours（2026-08-10 session 78 会话结束快照，15:53:39）；runs.csv 12,937 行（零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈20%，完成路径不变） | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
 | C-3：真实发布密钥与 0.13.0 发布执行 | **partial** | 演练密钥 82301612…（隔离 keyring）验证过全流程；**默认 keyring 尚无真实发布密钥**；docs/release 只有 0.8.0 演练产物 | 按 release-process-0.13.0.md §7 十项检查单顺序执行；版本推进 0.8.0→0.13.0；真实密钥+备份+吊销证书；**manifest 必须从干净发布 commit 重新生成**（见 §4 D-1） |
 
 ## 2. §22 门禁核对表（逐行状态，2026-08-10）
@@ -53,8 +53,9 @@
 ### 22.4 安全与质量 — 部分（C-1/C-2 阻塞）
 
 - Rust+Go 全测试矩阵：本地全绿；GitHub 真跑 = C-1。⏳
-- release-candidate fuzz clean-run：Rust 26.309/72 CPU-hours = C-2；Go fuzz targets
-  （G5.4 矩阵）需 release-candidate clean-run 记录。⏳
+- release-candidate fuzz clean-run：Rust 78.971/72 CPU-hours = C-2（2026-08-10 session 78
+  快照 15:53:39，runs.csv 12,937 行，零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈20%）；
+  Go fuzz targets（G5.4 矩阵）需 release-candidate clean-run 记录。⏳
 - 无未解决 P0/P1：当前 0。✓
 - 无未接受 critical/high dependency vulnerability：deny/audit 门禁。✓
 - XML/YAML/HCL/binary plist 专项 threat tests：Rust security matrix + Go

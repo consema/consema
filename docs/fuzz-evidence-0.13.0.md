@@ -80,6 +80,7 @@
 
 ### 3.2.1 2026-08-07 会话结束快照（追加；runs.csv 为唯一权威账本
 **2026-08-10 会话 12-68 累计（追加式）**：总量跨 72 CPU-hours（11,815 行 / 72.275 CPU-hours，零失败）；每格式 72h 门槛仍开放（最接近家族 properties ~17%），完成路径不变（§7：clang 主机 cargo-fuzz 为主，本机确定性协议续跑为备选）。发布���录数字以本表快照为准。
+**2026-08-10 会话 69-78 累计（追加式）**：账本 12,937 行 / **78.971 CPU-hours**（session 78 的 session done 快照，2026-08-10 15:53:39；零失败——除 session 9 已分类 10 行 exit=-1）。每格式家族累计（CPU-hours，本机复算）：json 9.6 / toml 5.8 / yaml 13.0 / ini 12.6 / properties 14.7 / xml 3.6 / plist 4.9 / hcl 9.6；protocol（单 target）5.1。相对每格式 72h 门槛最接近 properties **20.4%**（14.7/72；其余：yaml 18.0%、ini 17.5%、hcl/json 13.4%、toml 8.0%、protocol 7.2%、plist 6.8%、xml 5.0%）；**每格式 72h 门槛仍开放，完成路径不变（§7）**。session 79+ 驱动中（waves.log 持续追加）；发布记录数字以本快照为准。
 
 **2026-08-10 会话 12 快照（追加式）**：8 waves × 2 copies，零失败；账本 4,335 行 / 27.852 CPU-hours；最接近的 properties-parse 4.8%（3.429/72）。发布记录数字以本表快照为准。
 ，发布记录数字以本表快照为准）
@@ -161,6 +162,7 @@
 - 剩余工作：每格式累计至 72 CPU-hours 且零未解释问题；M2-F1/M2-F2 修复提交（工作树状态）后复核 trip-wire/严格断言继续全绿。
 - **2026-08-07 会话结束快照（追加；runs.csv 为唯一权威账本，发布记录数字以本快照为准）**：驱动结束后 session 10/11 全部波次已入账，runs.csv 现为 4,063 行（waves 1-65 全部入账）：**26.309 CPU-hours**（94,713.0 真实 CPU 秒；4,053 行 exit 0、10 行 exit=-1（session 9 wave 3 外部终止、非 fuzz finding，见 §3.1），10.994 亿次计划变异）。每格式家族累计（CPU-hours）：json **3.206** / toml **1.914** / yaml **4.295** / ini **4.232** / properties **4.964** / xml **1.178** / plist **1.601** / hcl **3.214** / protocol（单 target）**1.704**。
 - 相对每格式 72 CPU-hours 门槛（§15.3，按格式家族），最接近的 properties 也仅 **6.9%**（4.964/72；其余：yaml 6.0%、ini 5.9%、hcl/json 4.5%、protocol 2.4%、toml 2.7%、plist 2.2%、xml 1.6%）；**72h 门槛未完成**，剩余部分按 §7 完成路径累计（clang 主机 cargo-fuzz 为主，本机协议续跑为备选）。
+- **2026-08-10 会话 69-78 累计（追加式；runs.csv 为唯一权威账本，发布记录数字以本快照为准）**：session 78 的 session done 快照（15:53:39）——runs.csv 12,937 行 / **78.971 CPU-hours**（12,927 行 exit 0、10 行 exit=-1（session 9 wave 3 外部终止、非 fuzz finding，见 §3.1））。每格式家族累计（CPU-hours，本机复算）：json **9.6** / toml **5.8** / yaml **13.0** / ini **12.6** / properties **14.7** / xml **3.6** / plist **4.9** / hcl **9.6** / protocol（单 target）**5.1**。相对每格式 72h 门槛，最接近的 properties **20.4%**（14.7/72；其余：yaml 18.0%、ini 17.5%、hcl/json 13.4%、toml 8.0%、protocol 7.2%、plist 6.8%、xml 5.0%）；**72h 门槛仍开放**，剩余部分按 §7 完成路径累计（clang 主机 cargo-fuzz 为主，本机协议续跑为备选）。session 79+ 驱动中，后续会话数字随 §3.2.1 快照继续追加。
 
 ## 9. 开放事项
 
