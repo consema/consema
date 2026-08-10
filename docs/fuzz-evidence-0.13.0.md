@@ -51,6 +51,8 @@
 
 > **快照基准（诚实口径）**：§3.2/§8 的累计数字以 session 11 的 session done 快照（17:32:22）为基准：3,281 行 = session 7 的 17 + session 8 的 1530 + session 9 的 102 + session 10（waves 1-42）的 1428 + session 11 的 204。快照后 session 10 的驱动仍在运行：wave 43（34 行，717.9 s = 0.199 CPU-hours）于 17:32:44 入账，waves 44+ 持续入账中（截至本文档更新时已至 wave 48，见 waves.log）——这些行不在本累计内，按 §4.4 协议在驱动结束后的会话更新中计入。
 
+> **编号规则与标签偏差说明（2026-08-10 追加，诚实记录）**：会话编号由 `run_waves.ps1:111-113` 生成——`$sessionNum = (waves.log 中 'session start' 行计数) + 1`，即按 waves.log 的 start 行计数，而非 runs.csv 数据行。2026-08-10 16:39:29 的 session-90 驱动调用在 wave 1 启动后被杀（外部终止）：waves.log 第 1806 行已写入 `session start: session=90`，但零数据行入账；16:40:40 的重启（waves.log 第 1812 行）按该计数规则自动续号为 **91**。因此 16:40 之后运行的各会话实际编号比"按调用顺序假设"大 1：主 agent 自提交 220801d 起的约 18 条提交信息中的 `session N` 标签与 waves.log 编号差一（例：17:30:25 的 100.703 CPU-hours 快照，waves.log 标 session 105、提交信息标 session 104）。**权威声明**：runs.csv 为唯一权威账本（数据），waves.log 编号为会话标识权威（session 列即由此写入 runs.csv）；提交信息标签仅描述性，数据本身无影响——100.703 快照在 §3.2.1/§8 已按 waves.log 正确标注为 session 105。
+
 ### 3.2 每 target 累计账本（数据源 runs.csv，3281 行 = session 7 的 17 行 + session 8 的 1530 行 + session 9 的 102 行 + session 10（waves 1-42）的 1428 行 + session 11 的 204 行；其中 3271 行 exit_code=0，10 行 exit=-1——session 9 wave 3 外部终止、已分类非 fuzz finding，见 §3.1）
 
 每 target 193 次运行（session 7 1 次 + session 8 30 波 × 3 copy 的 90 次 + session 9 3 波 × 2 copy 的 6 次 + session 10（waves 1-42）× 2 copy 的 84 次 + session 11 4 波 × 3 copy 的 12 次）。累计变异数 = 193 × 每 target 单次迭代常数（parse 400,000 / ops 75,000 / protocol 800,000；session 9 wave 3 的 10 行按计划常数计入但实际变异未完成，见 §3.1）；全部 target 合计 **887,800,000 次变异**。时钟状态：全部 running（clean）——本日无任何新 crash/panic/hang/limit bypass，无 target 清零。
