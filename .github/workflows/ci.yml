@@ -241,8 +241,13 @@ jobs:
   # only match a pinned Windows host, so hosted runners take the skip path.
   # run-plist-macos-oracle.ps1: runs on macOS (plutil + pinned Swift
   # toolchain per manifest runtime pins) and exits 3 on Windows/Linux
-  # (documented skip). Exit 3 is wired as success per the manifests'
-  # "skip_path" records; any other non-zero exit fails the job.
+  # (documented skip). On the macOS leg the runner label is the unpinned
+  # macos-latest image, so a host pin drift (macOS/Xcode/Swift version
+  # mismatch against the manifest runtime pins, plan risk R-2) also takes
+  # the documented skip (exit 3 with a stderr note) instead of failing;
+  # pinned hosts run the differential and any genuine failure still exits
+  # non-zero. Exit 3 is wired as success per the manifests' "skip_path"
+  # records; any other non-zero exit fails the job.
   oracles:
     name: differential oracles (${{ matrix.os }})
     runs-on: ${{ matrix.os }}

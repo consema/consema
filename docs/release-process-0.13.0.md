@@ -55,7 +55,11 @@ MSRV build leg: rustc 1.85.0 for all 14 crates
   逐行列出现场脏文件（cargo package 拒绝脏树，门禁不静默绕过）；`-AllowDirty` 只
   是本地逃生口，CI 恒在干净 checkout 运行。
 - 14 个可发布 crate 集合由 cargo metadata 计算（workspace member 且 `publish`
-  为空）；`consema-conformance` 等 `publish = false` crate 只进仓库，不打进归档。
+  为空）；`consema-conformance` 等 `publish = false` crate 只进仓库，不打进发布
+  归档集合。注：该表述仅对 verify 脚本/签名步骤的 cargo metadata 集合成立——
+  裸 `cargo package --workspace --locked --no-verify` 会打出含
+  consema-conformance 的 15 个归档；发布时归档集合以 verify 脚本/签名步骤
+  计算为准（14 个），裸打包多出的 repository-only crate 不写进 SHA256SUMS。
 
 ### 2.2 CI package job（常设载体，`.github/workflows/ci.yml:285-303`）
 

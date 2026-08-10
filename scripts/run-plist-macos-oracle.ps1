@@ -55,30 +55,38 @@ if (-not (Test-Path -LiteralPath '/usr/bin/xcodebuild')) {
 }
 
 # Runtime facts: macOS product version, Xcode version, Swift version must
-# match the pins exactly. The Foundation facts reported by the driver
-# (os.version, corefoundation.version) are recorded in the report but not
-# compared: Apple build numbers are not documented publicly, and the
-# product/toolchain versions above pin the platform already.
+# match the pins exactly. A host pin mismatch takes the documented skip path
+# instead of failing: the CI macOS leg runs on the unpinned macos-latest
+# image whose point versions drift (plan risk R-2), so a mismatch is
+# recorded as a skip (exit 3 with a stderr note), mirroring how
+# run-hcl-go-oracle.ps1 skips. Matching pins run the differential; any
+# genuine execution failure still exits non-zero. The Foundation facts
+# reported by the driver (os.version, corefoundation.version) are recorded
+# in the report but not compared: Apple build numbers are not documented
+# publicly, and the product/toolchain versions above pin the platform
+# already.
+function Assert-OrSkipHostPin {
+    param([string]$Component, [string]$Expected, [string]$Actual)
+    if ($Actual -cne $Expected) {
+        [Console]::Error.WriteLine("Plist macOS differential: SKIPPED (host $Component pin mismatch: expected '$Expected', got '$Actual'; documented skip path, plan risk R-2, mirroring run-hcl-go-oracle.ps1 exit-3 skip)")
+        exit 3
+    }
+}
+
 $macosVersion = (& /usr/bin/sw_vers -productVersion)
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 $macosVersion = $macosVersion.Trim()
-if ($macosVersion -cne $manifest.runtime.'macos.product_version') {
-    throw "macOS version mismatch: expected $($manifest.runtime.'macos.product_version'), got $macosVersion"
-}
+Assert-OrSkipHostPin 'macOS' $manifest.runtime.'macos.product_version' $macosVersion
 
 $xcodeLines = @(& /usr/bin/xcodebuild -version)
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 $xcodeVersion = $xcodeLines[0] -replace '^Xcode\s+', ''
-if ($xcodeVersion -cne $manifest.runtime.'xcode.version') {
-    throw "Xcode version mismatch: expected $($manifest.runtime.'xcode.version'), got $xcodeVersion"
-}
+Assert-OrSkipHostPin 'Xcode' $manifest.runtime.'xcode.version' $xcodeVersion
 
 $swiftLines = @(& $swift --version)
 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 $swiftVersion = ($swiftLines[0] -replace '^.*Swift version ', '') -replace '\s+\(.*$', ''
-if ($swiftVersion -cne $manifest.runtime.'swift.version') {
-    throw "Swift version mismatch: expected $($manifest.runtime.'swift.version'), got $swiftVersion"
-}
+Assert-OrSkipHostPin 'Swift' $manifest.runtime.'swift.version' $swiftVersion
 
 # Compile the pinned driver once; per-case invocations run the binary.
 $driverBin = Join-Path $oracleRoot 'plist-macos-oracle-bin'

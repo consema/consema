@@ -238,7 +238,29 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 - 每格式真实 corpus 抽检巡检 → **已完成**（2026-08-10：钉版 12 文件 digest 12/12
   一致；508 核对一致；regressions 空数组符合预期；9 家族来源与覆盖足够；
   4 条观察见下）
-- 性能基线复测 → 待 C-2 关账后执行（避免与 fuzz 抢构建锁）
+- 性能基线复测 → **Go 侧已执行**（2026-08-10：8×2 benchmarks；9/16 项比值
+  >1.10，全部标注"疑似回退（fuzz 负载下测得，需空闲复测确认）"，无代码回退
+  结论——同会话 7 项更快、无代码改动、GC 争抢特征）；Go 侧无冻结预算
+  （go/README.md:750），仅趋势记录；Rust 侧 -Check 复验（BENCHMARKS §11）
+  建议 fuzz 关账后空闲环境执行（避免 ~40% CPU 负载假阳性 fail）
+- 发布路径预检（C-3 非密钥机械步骤）→ **已实测**（2026-08-10，干净 worktree）：
+  `cargo package --workspace --locked --no-verify` 15 归档 exit 0；
+  verify-package-archives.ps1 14 crate 归档门禁 + MSRV 1.85 腿 exit 0（14 行
+  sha256 与 SHA256SUMS 体例逐字节同构）；release-sbom.ps1 离线 SPDX-2.3 42
+  packages exit 0；剩余阻塞仅真实密钥（§7 项 5-8）。注意事项：裸 `cargo
+  package --workspace` 含 publish=false 的 consema-conformance（14 集合同步
+  由 verify 脚本/签名步骤保证）；脚本须从原生 PowerShell 运行（GNU tar 会
+  误报 Windows 路径）；与 fuzz 共享 cargo 锁时机械步骤约 40 分钟
+- coverage -Trend 平台差处置 → 入库基线 86.51/82.82/87.91 为 Windows 本机
+  测得（docs/COVERAGE-0.13.0.md:15,17），CI coverage job 在 ubuntu 测，
+  跨平台差 >1.0pp 时 C-1 首跑可能 -Trend 首红。处置：若红，按脚本政策在
+  ubuntu 等效环境刷新入库报告并附处置记录（release 里程碑刷新许可，
+  coverage.ps1:524）；不阻塞 C-1 推入
+- CI 就绪审计 → **已完成**（2026-08-10，只读审计 10 job + go-1.26）：8 job
+  静态 PASS；3 项首跑风险：msrv clippy（1.85 特有 warning，**已修复**——见
+  任务 A）、oracles macOS 腿 pin 不符 throw（**已补文档化 skip** exit 3——
+  见任务 B）、coverage -Trend 平台差（处置见上条）。结论：3 项处置后 C-1
+  就绪（除 remote/凭据）
 - 每 48h fuzz 账本检查 → 进行中（账本 ~96+ CPU-hours，零新 crash）
 
 ### 4.2 巡检 4 条观察记录（P2 级）
