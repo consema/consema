@@ -3600,3 +3600,21 @@
 [2026-08-10T23:46:23+08:00] wave 4 done: procs=34 wall_max=33.6s cpu_total_s=546.2 cpu_hours=0.152 failures=0
 [2026-08-10T23:46:23+08:00] session done: 27897 ledger rows; total CPU-hours=164.292 failures=0
 [2026-08-10T23:46:23+08:00] FINAL
+[2026-08-10T23:59:23+08:00] session start: session=195 waves=4 copies=2 wave_timeout=1800s
+[2026-08-10T23:59:23+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-10T23:59:23+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=7ef445c1ff9c16508393f4ce919de9420a7eb6d6
+[2026-08-10T23:59:23+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-10T23:59:23+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-45b97b2322ebeb26.exe mtime 2026-08-10 19:49:00)
+[2026-08-10T23:59:23+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-10T23:59:54+08:00] wave 1 done: procs=34 wall_max=31.2s cpu_total_s=513.3 cpu_hours=0.143 failures=0
+[2026-08-10T23:59:54+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-10T23:59:55+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-11T00:00:27+08:00] wave 2 done: procs=34 wall_max=32.7s cpu_total_s=535.8 cpu_hours=0.149 failures=0
+[2026-08-11T00:00:27+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-11T00:00:27+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-11T00:01:00+08:00] wave 3 done: procs=34 wall_max=32.6s cpu_total_s=540 cpu_hours=0.15 failures=0
+[2026-08-11T00:01:00+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-11T00:01:00+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-11T00:01:33+08:00] wave 4 done: procs=34 wall_max=33.3s cpu_total_s=549.2 cpu_hours=0.153 failures=0
+[2026-08-11T00:01:34+08:00] session done: 28033 ledger rows; total CPU-hours=164.886 failures=0
+[2026-08-11T00:01:34+08:00] FINAL
