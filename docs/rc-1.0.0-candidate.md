@@ -185,12 +185,12 @@ disposition。
 | # | 项 | 出处 | judgment 建议 |
 |---|---|---|---|
 | P2-1 | XML ReplaceText 词表不含 CDATA（RoleXmlText only） | 本 pilot F-1 | 双语言一致契约行为，文档化边界；随 rc.1 发布并在 cookbook 注明 |
-| P2-2 | YAML family 无 dry-run 面（PlanEdit 显式拒绝） | 本 pilot F-2；G2.1 gap | 已知公共 API 形态，文档化；1.0.0 前评估补面或转 API 政策记录 |
+| P2-2 | YAML family 无 dry-run 面（PlanEdit 显式拒绝） | 本 pilot F-2；G2.1 gap | **judgment 定案（2026-08-10）**：按 rc 纪律（§12.1 只收 blockers/security/docs errors）转 API 政策记录——补面是功能而非 blocker，移至 1.0.0 后窗口（RFC 0020 兼容承诺面记录）；拒绝行为已文档化 pin（`core.edit.operation-unsupported@1`） |
 | P2-3 | JSONC/JSON5 插入元素为 canonical 片段拼写（`[80, 100,120]`） | 本 pilot F-3 | 契约行为（语义插入非格式化）；发布判断：接受 |
 | P2-4 | 0.8.0 checksum manifest 不可从 git 历史复现（脏树记录） | 本 drill D-1 | **发布流程修正项**（发布时从干净 commit 生成），不阻塞 rc.1 本身 |
 | P2-5 | 演练签名密钥无持久公钥可复验 | 本 drill D-2 | 随 C-3 真实密钥解决 |
 | P2-6 | 部分权限失败与磁盘失败演练未记录 | §22.7 | RC soak 阶段 1 必做（§4） |
-| P2-7 | Go CLI beta 合入前的 exchange 复跑 | §22.2 | 随 G5.6 合入闭环 |
+| P2-7 | Go CLI beta 合入前的 exchange 复跑 | §22.2 | **已闭环（2026-08-10）**：G5.6 合入后四 harness 复跑——协议交换 83/83（40 accept + 43 reject）、双向差分 108/108、字节 parity 68/68；shared-conformance 步骤 1 在本机 CRLF 工作树按 F-B 文档化行为报 digest 差异（规范 checkout 绿，CI 不受影响） |
 
 ## 6. 相关文件
 
