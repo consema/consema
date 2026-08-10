@@ -1989,3 +1989,22 @@
 [2026-08-10T17:14:35+08:00] wave 4 done: procs=34 wall_max=52.8s cpu_total_s=747.4 cpu_hours=0.208 failures=0
 [2026-08-10T17:14:35+08:00] session done: 15793 ledger rows; total CPU-hours=96.843 failures=0
 [2026-08-10T17:14:35+08:00] FINAL
+[2026-08-10T17:14:42+08:00] session start: session=101 waves=4 copies=2 wave_timeout=1800s
+[2026-08-10T17:14:42+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-10T17:14:42+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ed33e441bd3f75e1881e3c81fe626c3c176f470a
+[2026-08-10T17:14:43+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-10T17:14:44+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-45b97b2322ebeb26.exe mtime 2026-08-10 12:06:09)
+[2026-08-10T17:14:44+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-10T17:15:39+08:00] wave 1 done: procs=34 wall_max=55.5s cpu_total_s=757.9 cpu_hours=0.211 failures=0
+[2026-08-10T17:15:40+08:00] wave 2: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-10T17:15:40+08:00] wave 2: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-45b97b2322ebeb26.exe mtime 2026-08-10 12:06:09)
+[2026-08-10T17:15:40+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-10T17:16:30+08:00] wave 2 done: procs=34 wall_max=49.7s cpu_total_s=730.6 cpu_hours=0.203 failures=0
+[2026-08-10T17:16:30+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-10T17:16:30+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-10T17:17:11+08:00] wave 3 done: procs=34 wall_max=41s cpu_total_s=663.7 cpu_hours=0.184 failures=0
+[2026-08-10T17:17:11+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-10T17:17:11+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-10T17:17:52+08:00] wave 4 done: procs=34 wall_max=41.2s cpu_total_s=676.9 cpu_hours=0.188 failures=0
+[2026-08-10T17:17:52+08:00] session done: 15929 ledger rows; total CPU-hours=97.629 failures=0
+[2026-08-10T17:17:52+08:00] FINAL
