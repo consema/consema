@@ -26,9 +26,9 @@
 
 - 概念 (a) "编辑被禁止于 Recovered 文档"：`crates/consema-ini/src/edit.rs:1756`（`RecoveredDocument => "core.edit.incomplete-target@1"`）、`crates/consema-properties/src/edit.rs:239`（同）、`crates/consema-plist/src/edit.rs:447`（`IncompleteTarget`）、`crates/consema-hcl/src/edit.rs:603`（同）、`crates/consema-xml/src/edit.rs:328-329`（"The base document is not `Complete`, so no target can be edited"）。
 - 概念 (b) "target 不是完整字面量语法节点"：`crates/consema-json/src/edit.rs:264-265`（"Target is not a complete literal syntax node"）。
-- code 注册于 `crates/consema-protocol/src/error_registry.rs:490`（0.5.0 起），被 5 个 conformance vector 钉死：`hcl-v1.json`、`ini-v1.json`、`java-properties-v1.json`、`plist-v1.json`、`xml-1-0-safe-v1.json`（均含 `core.edit.incomplete-target@1`）。
+- code 注册于 `crates/consema-protocol/src/error_registry.rs:490`（0.5.0 起），被 4 个 conformance vector 钉死：`ini-v1.json:42`、`java-properties-v1.json:58`、`plist-v1.json:1559`、`hcl-v1.json:1642`（均含 `core.edit.incomplete-target@1`）。
 
-**Disposition：exempt-with-reason（冻结 + 提交 v8 拆分提案）。** code 由 RFC 0011（semantic-model v6 contract registry）冻结、vector 钉死；拆分为 `core.edit.recovered-document@1`（Recovered 门）与 `core.edit.incomplete-literal-target@1`（json 字面量完整性）需要 semantic-model v8 RFC 修订 + 5 个 vector 修订（破坏性），不属于 0.13.0。后续窗口：semantic-model v8（0.14.0+，与 Go 对齐的破坏性窗口）；在 v8 落地前保持单 code 并在文档（IMPLEMENTATION.md 编辑章节）中标注双语义。记入 FC manifest known-accepted-limitations。
+**Disposition：exempt-with-reason（冻结 + 提交 v8 拆分提案）。** code 由 RFC 0011（semantic-model v6 contract registry）冻结、vector 钉死；拆分为 `core.edit.recovered-document@1`（Recovered 门）与 `core.edit.incomplete-literal-target@1`（json 字面量完整性）需要 semantic-model v8 RFC 修订 + 4 个 vector 修订（破坏性），不属于 0.13.0。后续窗口：semantic-model v8（0.14.0+，与 Go 对齐的破坏性窗口）；在 v8 落地前保持单 code 并在文档（IMPLEMENTATION.md 编辑章节）中标注双语义。记入 FC manifest known-accepted-limitations。
 
 ### F3 — edit 冲突词汇漂移（Rust 枚举名）
 
@@ -76,7 +76,7 @@
 
 ### F15 — syntax-kind 大小写约定
 
-**证据：** xml/plist kebab-case：`XmlSyntaxKind::as_str`（`consema-xml/src/document.rs:804-843`，如 `"tag-close"`）、`PlistSyntaxKind::as_str`（`consema-plist/src/parser_xml.rs:176+`，如 `"plist-open"`）；hcl/yaml PascalCase：`HclSyntaxKind::as_str`（`consema-hcl/src/native.rs:403-435`，如 `"TagClose"`）、`YamlSyntaxKind::as_str`（`consema-yaml/src/lib.rs:169+`，如 `"DocumentStart"`）。kebab 拼写是 lossless-syntax-query 的 match-role 词汇（`line_query.rs` 角色绑定），被各家族 vector 钉死。
+**证据：** xml/plist kebab-case：`XmlSyntaxKind::as_str`（`consema-xml/src/document.rs:804-843`，如 `"tag-close"`）、`PlistSyntaxKind::as_str`（`consema-plist/src/parser_xml.rs:176+`，如 `"plist-open"`）；hcl/yaml PascalCase：`HclSyntaxKind::as_str`（`consema-hcl/src/native.rs:403-435`，如 `"BraceOpen"`）、`YamlSyntaxKind::as_str`（`consema-yaml/src/lib.rs:169+`，如 `"DocumentStart"`）。kebab 拼写是 lossless-syntax-query 的 match-role 词汇（`line_query.rs` 角色绑定），被各家族 vector 钉死。
 
 **Disposition：exempt-with-reason。** hcl 的 PascalCase 拼写由 RFC 0014 + hcl vector 冻结；改拼写即破坏 match-role 词汇。后续窗口：下一个破坏性窗口（semantic-model v8）为 `HclSyntaxKind::from_name` 增加 kebab 别名并弃用 PascalCase 拼写；RFC 0016 要求 Go 侧逐字节匹配 Rust 拼写。0.13.0 冻结。记入 FC manifest。
 

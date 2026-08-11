@@ -107,7 +107,7 @@
       },
       {
         "id": "F15",
-        "limitation": "hcl PascalCase syntax-kind 拼写（TagClose）vs xml/plist kebab-case（tag-close）；v8 增加 kebab 别名",
+        "limitation": "hcl PascalCase syntax-kind 拼写（BraceOpen）vs xml/plist kebab-case（tag-close）；v8 增加 kebab 别名",
         "evidence": "docs/API-REVIEW-0.13.0.md:76-80"
       },
       {

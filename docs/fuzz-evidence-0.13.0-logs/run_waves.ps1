@@ -14,7 +14,12 @@
 #   * tree-hash check (git HEAD + porcelain status): if the working tree
 #     changed since the last build (e.g. fix agents landing), rebuild the
 #     consema-conformance test binaries first, so every wave runs the current
-#     release candidate;
+#     release candidate; git is resolved once per session, PATH first then
+#     known absolute installs (codex runtime git, Git for Windows; the machine
+#     git was removed 2026-08-11 with the hermes bundle). If no git exists
+#     anywhere, the check degrades loudly instead of silently: an INCIDENT
+#     NOTE is logged once and the tree-hash is salted per call, forcing a
+#     rebuild every wave (a needless rebuild beats a false "unchanged");
 #   * start <Copies> concurrent copies of every long fuzz test, each in its own
 #     process (`--test-threads=1`, one core per process);
 #   * sample per-process CPU time (real, via .NET Process) until exit; a wave
@@ -89,12 +94,47 @@ function Get-LatestExe([string]$pattern) {
     return $null
 }
 
+function Get-GitExe {
+    # Resolves a working git: PATH first, then known absolute installs (the
+    # machine's system git was removed 2026-08-11 with the hermes bundle, so
+    # PATH may come up empty; the codex runtime ships its own git). Re-probes
+    # every call so a git appearing or disappearing mid-session is noticed
+    # (a cached path that vanished is dropped and probed again). Returns ''
+    # when no git exists anywhere.
+    if ($script:gitExe -and -not (Test-Path -LiteralPath $script:gitExe)) {
+        $script:gitExe = $null  # cached path vanished (e.g. runtime deleted)
+    }
+    if ($null -eq $script:gitExe) {
+        $script:gitExe = @(
+            (Get-Command git -ErrorAction SilentlyContinue).Source,
+            'C:\Users\franck\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\cmd\git.exe',
+            'C:\Program Files\Git\cmd\git.exe',
+            "$env:LOCALAPPDATA\Programs\Git\cmd\git.exe"
+        ) | Where-Object { $_ -and (Test-Path -LiteralPath $_) } | Select-Object -First 1
+    }
+    if (-not $script:gitExe) { return '' }
+    return $script:gitExe
+}
+
 function Get-TreeHash {
     # Only code inputs change what the fuzz binaries contain: the crate
     # sources, the lockfile, the conformance corpus and the test drivers.
     # Docs and this evidence directory never trigger a rebuild.
-    $head = & git -C $root rev-parse HEAD 2>$null
-    $status = (& git -C $root status --porcelain -- crates Cargo.toml Cargo.lock conformance 2>$null | Out-String)
+    $git = Get-GitExe
+    if (-not $git) {
+        # No git anywhere: never silently degrade the code-state guard (a
+        # bare `& git` failing under 2>$null returned "|" and skipped real
+        # rebuilds). One loud note per session, then a clock-salted hash so
+        # the tree always looks changed and every wave rebuilds: conservative
+        # and honest - a needless rebuild beats a false "unchanged".
+        if (-not $script:gitIncidentLogged) {
+            $script:gitIncidentLogged = $true
+            Write-Log 'INCIDENT NOTE: git unavailable; tree-hash check degraded, waves cannot verify code-state guard; treating tree as changed'
+        }
+        return "$((Get-Date).Ticks)|"
+    }
+    $head = & $git -C $root rev-parse HEAD 2>$null
+    $status = (& $git -C $root status --porcelain -- crates Cargo.toml Cargo.lock conformance 2>$null | Out-String)
     return "$head|$status"
 }
 

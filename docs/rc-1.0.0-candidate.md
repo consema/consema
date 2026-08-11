@@ -12,7 +12,7 @@
 | 阻塞项 | 状态 | 证据 | 完成路径 |
 |---|---|---|---|
 | C-1：CI 10 job 在 GitHub 干净 checkout 全矩阵全绿 | **partial** | .github/workflows/ci.yml（lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package）；本地等效全流程已实测（0.13.0-gate-plan §4 M1），GitHub 真跑未发生 | 推入 GitHub 后对 main 全矩阵真跑；oracle pin 与 hosted runner 不符时保持文档化 skip=成功；结果回填 manifest |
-| C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §3.2.1/§8 快照：188.336 CPU-hours（session 234 时点复算，2026-08-11）；runs.csv 33,337 行（零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈48%，完成路径不变） | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
+| C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §3.2.1/§8 快照：258.327 CPU-hours（session 297 时点复算，2026-08-11）；runs.csv 41,939 行（零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈66.8%，完成路径不变） | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
 | C-3：真实发布密钥与 0.13.0 发布执行 | **partial** | 演练密钥 82301612…（隔离 keyring）验证过全流程；**默认 keyring 尚无真实发布密钥**；docs/release 只有 0.8.0 演练产物 | 按 release-process-0.13.0.md §7 十项检查单顺序执行；版本推进 0.8.0→0.13.0；真实密钥+备份+吊销证书；**manifest 必须从干净发布 commit 重新生成**（见 §4 D-1） |
 
 ## 2. §22 门禁核对表（逐行状态，2026-08-10）
@@ -94,7 +94,8 @@
 - 迁移未授权损失为零：迁移 1-3 断言（0 未授权字节）。✓
 - 未选择文件和 byte ranges 不变：迁移 3 源树断言 + untouched proofs。✓
 - stale file、部分权限失败、进程中断、磁盘失败演练：stale + 中断已演练（0.13.0
-  pilot 与本 pilot）；**部分权限失败与磁盘失败未记录**——RC soak 必做项（§5）。⏳
+  pilot 与本 pilot），部分权限已闭环（§3.5 演练 4，2026-08-10）；**仅磁盘失败未记录**
+  （§3.5 演练 5 环境阻塞，完成路径随 C-1）——RC soak 待办项（§5 P2-6）。⏳
 - Rust 与 Go 分别至少一个端到端 SDK pilot：pilot-0.13.0.md（Rust）+ 本 pilot
   （Go）。✓
 - pilot 缺陷入回归：F-2 已修复并入 BENCHMARKS 回归网；本 pilot 零缺陷（契约行为
@@ -147,7 +148,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 
 ### 3.4 演练边界（诚实记录）
 
-- 未演练：磁盘满（需真实填盘条件，RC soak 计划内）、部分权限失败（RC soak 计划内）、
+- 未演练：磁盘满（需真实填盘条件，环境阻塞——§3.5 演练 5，完成路径随 C-1）、
   远程篡改（不在 §19.4 范围）。
 - 演练二进制与 worktree 均为临时目录，不进入任何发布记录；0.13.0 发布按
   release-process §7 用真实密钥执行。
@@ -261,7 +262,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
   任务 A）、oracles macOS 腿 pin 不符 throw（**已补文档化 skip** exit 3——
   见任务 B）、coverage -Trend 平台差（处置见上条）。结论：3 项处置后 C-1
   就绪（除 remote/凭据）
-- 每 48h fuzz 账本检查 → 进行中（账本 ~96+ CPU-hours，零新 crash）
+- 每 48h fuzz 账本检查 → 进行中（账本 258.327 CPU-hours，41,939 行，零新 crash，最近快照 session 297，2026-08-11）
 
 ### 4.2 巡检 4 条观察记录（P2 级）
 
@@ -284,11 +285,11 @@ disposition。
 | # | 项 | 出处 | judgment 建议 |
 |---|---|---|---|
 | P2-1 | XML ReplaceText 词表不含 CDATA（RoleXmlText only） | 本 pilot F-1 | 双语言一致契约行为，文档化边界；随 rc.1 发布并在 cookbook 注明 |
-| P2-2 | YAML family 无 dry-run 面（PlanEdit 显式拒绝） | 本 pilot F-2；G2.1 gap | **judgment 定案（2026-08-10）**：按 rc 纪律（§12.1 只收 blockers/security/docs errors）转 API 政策记录——补面是功能而非 blocker，移至 1.0.0 后窗口（RFC 0020 兼容承诺面记录）；拒绝行为已文档化 pin（`core.edit.operation-unsupported@1`） |
+| P2-2 | YAML family 无 dry-run 面（PlanEdit 显式拒绝） | 本 pilot F-2；G2.1 gap | **judgment 定案（2026-08-10）**：按 rc 纪律（§12.1 只收 blockers/security/docs errors）转 API 政策记录——补面是功能而非 blocker，移至 1.0.0 后窗口（RFC 0020 §3 兼容承诺面 revision note，2026-08-11）；拒绝行为已文档化 pin（`core.edit.operation-unsupported@1`） |
 | P2-3 | JSONC/JSON5 插入元素为 canonical 片段拼写（`[80, 100,120]`） | 本 pilot F-3 | 契约行为（语义插入非格式化）；发布判断：接受 |
 | P2-4 | 0.8.0 checksum manifest 不可从 git 历史复现（脏树记录） | 本 drill D-1 | **发布流程修正项**（发布时从干净 commit 生成），不阻塞 rc.1 本身 |
 | P2-5 | 演练签名密钥无持久公钥可复验 | 本 drill D-2 | 随 C-3 真实密钥解决 |
-| P2-6 | 部分权限失败与磁盘失败演练未记录 | §22.7 | RC soak 阶段 1 必做（§4） |
+| P2-6 | 部分权限失败与磁盘失败演练未记录 | §22.7 | 部分权限 leg 已闭环（2026-08-10，§3.5 演练 4）；仅磁盘失败 leg 待办（环境阻塞——§3.5 演练 5，完成路径随 C-1），RC soak 阶段 1 必做（§4） |
 | P2-7 | Go CLI beta 合入前的 exchange 复跑 | §22.2 | **已闭环（2026-08-10）**：G5.6 合入后四 harness 复跑——协议交换 83/83（40 accept + 43 reject）、双向差分 108/108、字节 parity 68/68；shared-conformance 步骤 1 在本机 CRLF 工作树按 F-B 文档化行为报 digest 差异（规范 checkout 绿，CI 不受影响） |
 
 ## 6. 相关文件

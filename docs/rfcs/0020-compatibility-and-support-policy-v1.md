@@ -151,6 +151,18 @@ Class rules:
   stable `code`/`category`/`fields` do not change casually (§21.3,
   line 1846; RFC 0011 registry validation).
 
+> **2026-08-11 revision (yaml dry-run surface boundary recorded)**: on the
+> Go public API surface, the yaml family intentionally has no dry-run
+> entry point in this window — `PlanEdit` explicitly rejects yaml
+> transactions with the registered `core.edit.operation-unsupported@1`
+> (RFC 0004 §17; `crates/consema-protocol/src/error_registry.rs:502`).
+> The Rust yaml family publishes `dry_run`
+> (`crates/consema-yaml/src/edit.rs:554`); the Go-side boundary is a
+> deliberate, documented API shape (go-implementation-plan §2.6 G5.5;
+> go/edits.go). Adding a Go yaml dry-run surface is a feature for the
+> post-1.0.0 window, not a blocker — recorded per the 2026-08-10 P2-2
+> judgment (docs/rc-1.0.0-candidate.md §5).
+
 ## 4. Version semantics from 1.0.0
 
 From `1.0.0` (§21.3):
