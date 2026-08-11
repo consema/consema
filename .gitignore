@@ -8,3 +8,7 @@
 Thumbs.db
 .idea/
 .vscode/
+
+# Node.js
+typescript/node_modules/
+node_modules/
