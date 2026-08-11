@@ -71,9 +71,27 @@ jobs:
           [System.IO.File]::AppendAllText($env:GITHUB_ENV, "CONSEMA_JAVA_HOME=$env:JAVA_HOME`r`n")
           [System.IO.File]::AppendAllText($env:GITHUB_ENV, "KOTLIN_WORK=$env:RUNNER_TEMP\kotlin-work`r`n")
           Write-Output "kotlinc 2.2.0 provisioned at $kotlincRoot"
+      # kotlin-test-2.2.0.jar is not bundled with the kotlinc distribution
+      # (kotlinc ships the unversioned lib\kotlin-test.jar instead), so the
+      # gates module compile provisions the pinned version into the
+      # repo-local verify lib (the scripts/kotlin-verify-*.ps1 download
+      # idiom; the run-tests step below consumes the same jar).
+      - name: provision kotlin-test 2.2.0 jar (repo verify lib)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $ProgressPreference = 'SilentlyContinue'
+          $lib = Join-Path $env:GITHUB_WORKSPACE 'kotlin\build\verify\lib'
+          New-Item -ItemType Directory -Force $lib | Out-Null
+          $kotlinTestJar = Join-Path $lib 'kotlin-test-2.2.0.jar'
+          if (-not (Test-Path $kotlinTestJar)) {
+            Write-Output 'downloading kotlin-test-2.2.0.jar (not bundled with kotlinc)...'
+            Invoke-WebRequest -UseBasicParsing -Uri 'https://repo1.maven.org/maven2/org/jetbrains/kotlin/kotlin-test/2.2.0/kotlin-test-2.2.0.jar' -OutFile $kotlinTestJar
+          }
+          Write-Output "kotlin-test-2.2.0.jar provisioned at $kotlinTestJar"
       # Compiles every main and test source into one module (internal
       # visibility) together with the module-local kotlin.test.Test shim
-      # (kotlin/build/verify/lib/TestShim.kt), exactly the L4 scaffolding
+      # (kotlin/verify/TestShim.kt), exactly the L4 scaffolding
       # pattern of kotlin/build/work/compile_tests.ps1.
       - name: compile main + test sources (K2JVMCompiler, single module + shim)
         shell: pwsh
@@ -91,7 +109,7 @@ jobs:
           New-Item -ItemType Directory -Force $shimOut | Out-Null
           $lib = Join-Path $kotlinDir 'build\verify\lib'
           $kotlinTestJar = Join-Path $lib 'kotlin-test-2.2.0.jar'
-          $shim = Join-Path $lib 'TestShim.kt'
+          $shim = Join-Path $kotlinDir 'verify\TestShim.kt'
           if (-not (Test-Path $kotlinTestJar)) { throw "kotlin-test jar not found: $kotlinTestJar" }
           if (-not (Test-Path $shim)) { throw "TestShim.kt not found: $shim" }
           $stdlib = Join-Path $kotlinc 'lib\kotlin-stdlib.jar'
@@ -245,6 +263,25 @@ jobs:
           [System.IO.File]::AppendAllText($env:GITHUB_ENV, "CONSEMA_JAVA_HOME=$env:JAVA_HOME`r`n")
           [System.IO.File]::AppendAllText($env:GITHUB_ENV, "KOTLIN_WORK=$env:RUNNER_TEMP\kotlin-work`r`n")
           Write-Output "kotlinc 2.2.0 provisioned at $kotlincRoot"
+      # junit-jupiter-api-5.10.2.jar is required at test compile time
+      # (kotlin.test resolves @Test through the kotlin-test-junit5 typealias
+      # to org.junit.jupiter.api.Test). kotlinc bundles kotlin-test.jar and
+      # kotlin-test-junit5.jar, so only this jar is provisioned into the
+      # repo-local verify lib (the scripts/kotlin-verify-*.ps1 download
+      # idiom; the compile step below guards on the same path).
+      - name: provision junit-jupiter-api 5.10.2 jar (repo verify lib)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $ProgressPreference = 'SilentlyContinue'
+          $lib = Join-Path $env:GITHUB_WORKSPACE 'kotlin\build\verify\lib'
+          New-Item -ItemType Directory -Force $lib | Out-Null
+          $junitJar = Join-Path $lib 'junit-jupiter-api-5.10.2.jar'
+          if (-not (Test-Path $junitJar)) {
+            Write-Output 'downloading junit-jupiter-api-5.10.2.jar (needed by kotlin-test-junit5)...'
+            Invoke-WebRequest -UseBasicParsing -Uri 'https://repo1.maven.org/maven2/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar' -OutFile $junitJar
+          }
+          Write-Output "junit-jupiter-api-5.10.2.jar provisioned at $junitJar"
       - name: compile main sources (K2JVMCompiler)
         shell: pwsh
         run: |
