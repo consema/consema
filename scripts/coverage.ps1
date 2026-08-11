@@ -158,7 +158,7 @@ $rustcVersion = (& rustc --version).Trim()
 $cargoVersion = (& $cargo --version).Trim()
 $llvmCovVersion = (& cargo llvm-cov --version).Trim()
 $hostName = $env:COMPUTERNAME
-$osInfo = if ($IsWindows) { @(Get-CimInstance Win32_OperatingSystem -ErrorAction SilentlyContinue) } else { @() }
+$osInfo = @(if ($IsWindows) { Get-CimInstance Win32_OperatingSystem -ErrorAction SilentlyContinue })
 $osCaption = if ($osInfo.Count -gt 0) {
     $osInfo[0].Caption
 } else {

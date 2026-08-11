@@ -212,15 +212,16 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: checkout v0.8.0 baseline
-        uses: actions/checkout@v4
-        with:
-          path: baseline
-          ref: v0.8.0
-          fetch-depth: 1
+      # The baseline is the v0.8.0 tag in this repository (the crates are not
+      # published to crates.io), compared in place via baseline-rev: the
+      # checkout above has fetch-depth: 0, so the tag is present. A nested
+      # baseline/ checkout would put the consema package in two manifests
+      # under the scanned root and cargo-semver-checks 0.36+ refuses to run;
+      # per the action's README, baseline-root is omitted when baseline-rev
+      # is used.
       - uses: obi1kenobi/cargo-semver-checks-action@v2
         with:
-          baseline-root: baseline
+          baseline-rev: v0.8.0
           package: >-
             consema,
             consema-core,
@@ -279,6 +280,11 @@ jobs:
               exit $code
             }
           }
+          # The loop can end on a documented skip, leaving $LASTEXITCODE at 3;
+          # the runner dot-sources this inline script, so without an explicit
+          # exit the leftover code would fail the step. Exit 0 here — a
+          # genuine failure already exited non-zero in the loop above.
+          exit 0
 
   # Package-archive verification (§15.6 "release artifact 可从干净环境重建",
   # scripts/verify-package-archives.ps1): on a clean checkout the script
