@@ -9,6 +9,19 @@ Thumbs.db
 .idea/
 .vscode/
 
+# Kotlin / Gradle build output
+kotlin/build/
+*.class
+
+# Python caches, virtualenvs, packaging
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+*.egg-info/
+
 # Node.js
 typescript/node_modules/
 node_modules/
