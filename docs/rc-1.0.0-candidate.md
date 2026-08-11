@@ -11,8 +11,8 @@
 
 | 阻塞项 | 状态 | 证据 | 完成路径 |
 |---|---|---|---|
-| C-1：CI 10 job 在 GitHub 干净 checkout 全矩阵全绿 | **closed** | GitHub Actions run #5（2026-08-11，head 437fd35，main push）：149/149 steps 全绿，10+1 job（lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package/go-1-26）在 windows/ubuntu/macos 全矩阵通过；run 历史：run#1 workflow-parse fail（job id go-1.26 含点号）→ run#2 5 根因（symlink_dir 移除、oracles ParserError、coverage Get-CimInstance guard、package 工具链顺序、tags 未推）→ run#3 4 根因（macOS /var→/private/var 临时路径 symlink、oracles 缺 exit 0、semver 嵌套 baseline 歧义、coverage 数组 guard $null）→ run#4 fmt import 顺序 → run#5 全绿；结果已回填 manifest（C-1 → closed） | 已闭环（2026-08-11，run #5 全绿） |
-| C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §3.2.1/§8 快照：258.327 CPU-hours（session 297 时点复算，2026-08-11）；runs.csv 41,939 行（零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈66.8%，完成路径不变）；**2026-08-12 快照（runs.csv 权威复算）**：55,879 行 / 391.7 CPU-hours，零新 crash（非零退出仅 10 行 = 已知 session-9 外部终止分类，非 fuzz finding）；**properties 73.6h 首个突破 72h 门槛（102.2%）**；yaml 65.2h（90.6%）、ini 62.7h（87.1%）最接近；其余 8 个门槛单位（7 格式家族 + protocol-decode）仍开放，完成路径不变 | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
+| C-1：CI 10 job 在 GitHub 干净 checkout 全矩阵全绿 | **closed** | GitHub Actions run #5（2026-08-11，head 437fd35，main push）：132/132 steps 全绿，10+1 job（lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package/go-1-26）在 windows/ubuntu/macos 全矩阵通过；run 历史：run#1 workflow-parse fail（job id go-1.26 含点号）→ run#2 5 根因（symlink_dir 移除、oracles ParserError、coverage Get-CimInstance guard、package 工具链顺序、tags 未推）→ run#3 4 根因（macOS /var→/private/var 临时路径 symlink、oracles 缺 exit 0、semver 嵌套 baseline 歧义、coverage 数组 guard $null）→ run#4 fmt import 顺序 → run#5 全绿；结果已回填 manifest（C-1 → closed） | 已闭环（2026-08-11，run #5 全绿） |
+| C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §3.2.1/§8 快照：258.327 CPU-hours（session 297 时点复算，2026-08-11）；runs.csv 41,939 行（零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈66.8%，完成路径不变）；**2026-08-12 快照（runs.csv 权威复算）**：55,879 行 / 391.7 CPU-hours，零新 crash（非零退出仅 10 行 = 已知 session-9 外部终止分类，非 fuzz finding）；**properties 73.6h 首个突破 72h 门槛（102.2%）**；yaml 65.2h（90.6%）、ini 62.7h（87.1%）最接近；其余 8 个门槛单位（7 格式家族 + protocol-decode）仍开放，完成路径不变（快照口径：55,879 行 / 391.7h 为 session 400 中段截取——wave 3/4 已完成，2026-08-12 时点，非会话结束快照；runs.csv 为唯一权威账本） | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
 | C-3：真实发布密钥与 0.13.0 发布执行 | **partial** | 演练密钥 82301612…（隔离 keyring）验证过全流程；**默认 keyring 尚无真实发布密钥**；docs/release 只有 0.8.0 演练产物 | 按 release-process-0.13.0.md §7 十项检查单顺序执行；版本推进 0.8.0→0.13.0；真实密钥+备份+吊销证书；**manifest 必须从干净发布 commit 重新生成**（见 §4 D-1） |
 
 ## 2. §22 门禁核对表（逐行状态，2026-08-10）
@@ -52,7 +52,7 @@
 
 ### 22.4 安全与质量 — 部分（C-2 阻塞；C-1 已闭环 2026-08-11）
 
-- Rust+Go 全测试矩阵：本地全绿；GitHub 真跑 = C-1——**已闭环（2026-08-11，run #5，head 437fd35，149/149 steps 全绿，10+1 job windows/ubuntu/macos）**。✓
+- Rust+Go 全测试矩阵：本地全绿；GitHub 真跑 = C-1——**已闭环（2026-08-11，run #5，head 437fd35，132/132 steps 全绿，10+1 job windows/ubuntu/macos）**。✓
 - release-candidate fuzz clean-run：Rust 188.336/72 CPU-hours = C-2（session 234 时点复算，
   2026-08-11，runs.csv 33,337 行，零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈48%）；
   Go fuzz targets（G5.4 矩阵）需 release-candidate clean-run 记录。⏳
@@ -208,7 +208,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 
 ```text
 阶段 0（RC 构建前，阻塞）：
-  C-1 推入 GitHub 真跑 10 job 全矩阵全绿，回填 manifest → **已完成（2026-08-11，run #5 149/149 全绿，head 437fd35，已回填 manifest）**
+  C-1 推入 GitHub 真跑 10 job 全矩阵全绿，回填 manifest → **已完成（2026-08-11，run #5 132/132 全绿，head 437fd35，已回填 manifest）**
   C-2 完成每格式 72 CPU-hours fuzz 账本，零未解释问题
   C-3 真实密钥 + 备份 + 吊销证书；按 release-process §7 顺序执行发布，
      checksum manifest 从干净发布 commit 生成（D-1 处置）
@@ -264,7 +264,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
   见任务 B）、coverage -Trend 平台差（处置见上条）。结论：3 项处置后 C-1
   就绪（除 remote/凭据）——**已随 run #5 闭环（2026-08-11，见下条）**
 - CI 真跑（C-1）→ **已闭环（2026-08-11，GitHub Actions run #5，head 437fd35）**：
-  149/149 steps 全绿，10+1 job（lint/test/coverage/msrv/conformance/deny/audit/
+  132/132 steps 全绿，10+1 job（lint/test/coverage/msrv/conformance/deny/audit/
   semver/oracles/package/go-1-26）在 windows/ubuntu/macos 全矩阵通过；run 历史
   run#1 workflow-parse fail → run#2 5 根因 → run#3 4 根因 → run#4 fmt import
   顺序 → run#5 全绿（明细见 §1 C-1 行）；结果已回填 fc-manifest（C-1 → closed）

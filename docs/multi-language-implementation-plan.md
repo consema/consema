@@ -130,6 +130,19 @@ JDK 17.0.20 + kotlinc 2.2.0（Kt，直接 JVM 调用 K2JVMCompiler）、cargo 1.
 每个 L 关闭同理（先验证后宣称）。任何 agent 的派发受本 GATE 约束；
 GATE 未过期间的代码统称"盲写产物"，不得进入任何发布证据。
 
+### 7.1 L0-L5 关账状态（2026-08-12 更新：三语言 L0-L5 已全部关闭）
+
+| 批次 | 载体 commit | 证据 |
+|---|---|---|
+| L0-L4（三语言） | 5cf680b（实现入库；errata 见 CHANGELOG 2026-08-12 勘误） | 每语言 conformance 508/508（18 套 / digest 35bebc8d 共钉）+ capability parity；CHANGELOG 勘误记录 commit message 仅标注 fuzz 账本、实际携带三语言实现 |
+| Python 补充 | a0c318b | .gitignore 排除 node_modules（CHANGELOG 勘误同述） |
+| L5 harnesses + CI | 2f981df | 跨语言差分 harness（normalized/protocol exchange）+ 各语言 CI workflow；差分发现的 wire-codec 缺陷随本 commit 修复（五要素终审 §3.2 关账表） |
+| CI 修复 | dbba9a4 | 五语言 CI 全绿（python fixtures 路径、kotlin jar 供给等首跑缺陷修复；ci.yml run#9 + ci-typescript/ci-python/ci-kotlin 各 run#2，见 rc-1.0.0-candidate.md §4.1） |
+
+- 每语言 conformance 508/508 + 差分（68/108/83）全绿；五语言 CI 在 dbba9a4 全绿。
+- 未来工作（诚实记录）：fc-manifest 扩展 `languages` 节（five-language-ci-design.md §7.4 提案）尚未落地，
+  随 1.0.0 发布收口执行。
+
 ## 8. 相关文件
 
 - 体例：`docs/go-implementation-plan.md`（§1-§7 平移）

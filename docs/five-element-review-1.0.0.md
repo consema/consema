@@ -48,6 +48,12 @@
 | 6 | YAML graph、XML tree 和 HCL expression 都有合法归属 | PortableGraph / `xml.element-tree@1` / `hcl.expression@1`（§1.1 第 2 行证据）；Go 侧同名记录实现（go/README.md:183-189、298-301、402-408） | 通过 |
 | 7 | Rust 先行与 Go 反向审计没有权威循环 | PVCE/PGCE 字节权威 = Rust 编码器（go/README.md:559-590"Rust side is the authority for the bytes"）；golden 向量由 Rust 编码器生成、Go 逐字节转录，既有冻结字节零变动（CHANGELOG.md:76）；差分 harness 双向（Go 发射 → Rust consume）构成对 Rust 的独立反审计而非循环依赖；cgo 禁令排除 FFI 作弊（go/README.md:771-773） | 通过 |
 
+**Kotlin ChangeSet 结构差异（终审记录 F-28.3-1，2026-08-12，LOW）**：Kotlin 在 7/8 family 无一等公民 ChangeSet
+（kotlin/json/Edit.kt:244-255 标注 "L4 milestone"——EditCommit 以有序 edit diagnostics 作为 fallback 事件代替）；
+`core.change-set@1` 向量经 runner 本地 wire builder（镜像 Rust 构造器）通过，协议线格式面闭环；
+功能闭合不受影响（conformance 508/508）。处置：不重构 Kotlin edit 管线（属 1.0.0 API 冻结决策，留待
+冻结前评估）；建议在 1.0.0 API 冻结前对齐（见 §6.2 收口项）。
+
 ### 1.4 §28.4 真实有效（第 2304-2314 行）— **PASS**
 
 | # | 通过条件 | 最终状态证据 | 核验结论 |
@@ -78,7 +84,7 @@
 
 | 开放项 | 状态（fc-manifest open_items / rc-1.0.0-candidate） | 依赖它的 §28 条件 | 影响判定 |
 |---|---|---|---|
-| C-1：CI 10 job GitHub 干净 checkout 全矩阵全绿 | **已闭环（2026-08-11：GitHub Actions run #5，head 437fd35，149/149 steps 全绿，10+1 job windows/ubuntu/macos 全矩阵；fc-manifest open_items C-1 → closed）** | §28.5 条件 1/3/4（三平台全矩阵、SEC-9 Linux/macOS 验证、A-4 msrv 真验证、A-9 package 真跑、semver approved-failure 落定） | **C-1 腿阻塞已解除**（run #5 真跑全绿：三平台全矩阵、SEC-9、A-4、A-9 随 manifest C-1.closes 满足）；§28.5 仍 **PARTIAL**——C-2/C-3 开放；**延伸（2026-08-12，head dbba9a4）**：五语言 CI 全绿（ci.yml run#9 Rust 10+1 + ci-typescript/ci-python/ci-kotlin 各 run#2 全绿）——§28.5 条件 1（标准/Rust/Go/CLI/suite 同时完成）的证据由双语言扩展到五语言在 CI 中 live（five-language-ci-design.md §10） |
+| C-1：CI 10 job GitHub 干净 checkout 全矩阵全绿 | **已闭环（2026-08-11：GitHub Actions run #5，head 437fd35，132/132 steps 全绿，10+1 job windows/ubuntu/macos 全矩阵；fc-manifest open_items C-1 → closed）** | §28.5 条件 1/3/4（三平台全矩阵、SEC-9 Linux/macOS 验证、A-4 msrv 真验证、A-9 package 真跑、semver approved-failure 落定） | **C-1 腿阻塞已解除**（run #5 真跑全绿：三平台全矩阵、SEC-9、A-4、A-9 随 manifest C-1.closes 满足）；§28.5 仍 **PARTIAL**——C-2/C-3 开放；**延伸（2026-08-12，head dbba9a4）**：五语言 CI 全绿（ci.yml run#9 Rust 10+1 + ci-typescript/ci-python/ci-kotlin 各 run#2 全绿）——§28.5 条件 1（标准/Rust/Go/CLI/suite 同时完成）的证据由双语言扩展到五语言在 CI 中 live（five-language-ci-design.md §10） |
 | C-2：每格式 ≥72 CPU-hours release-candidate fuzz | partial（runs.csv 13,005 行 / 79.427 CPU-hours，截取自 session 79 期间，2026-08-10；最接近格式 properties ≈20.6%（14.8/72）；零新 crash；Go 16 targets 30s clean-run 已有记录）；**2026-08-12 快照（runs.csv 权威复算）**：55,879 行 / 391.7 CPU-hours，零新 crash（非零退出仅已知 session-9 分类）；**properties 73.6h 首个突破 72h 门槛（102.2%）**，yaml 65.2h（90.6%）、ini 62.7h（87.1%）最接近；其余门槛单位（7 格式家族 + protocol-decode）仍开放 | §28.5 条件 3（P0/P1=0 的 fuzz clean-run 证据完整性，§22.4:1905） | **阻塞 §28.5 通过**（Q-7 未闭）；不依赖其他四要素 |
 | C-3：真实发布密钥与 0.13.0 发布执行 | partial（演练密钥仅流程验证；默认 keyring 无真实密钥；docs/release 仅 0.8.0 演练产物；D-1/D-2 处置随本项） | §28.5 条件 5（生产发布物可验证/可重建/可升级——发布物、SBOM、签名、checksum、build provenance 真跑）；§28.4 条件 6 的供应链侧 | **阻塞 §28.5 通过**；D-1 要求"manifest 必须从干净发布 commit 重新生成"（rc-1.0.0-candidate.md:16）与 F-B 同源纪律（干净 checkout 复现） |
 | RC soak 阶段 1（磁盘失败、部分权限失败演练、differential 追加、Go RC fuzz 记录、corpus 巡检、性能复测） | 部分权限失败演练已闭环（rc-1.0.0-candidate.md §3.5 演练 4，2026-08-10）；磁盘失败演练环境阻塞（演练 5；C-1 已闭环 2026-08-11 后 Linux runner 完成路径可用，演练本身仍待执行）；differential 追加、Go RC fuzz 记录、corpus 巡检、性能复测状态按 rc-1.0.0-candidate.md §4.1 | §28.5 条件 6（failure/limits 演练完整性，§22.7"stale/部分权限/中断/磁盘四类演练"——仅磁盘失败未记录，部分权限已闭环） | 阻塞 §28.5 的 RC 收口（RC soak 本身是 §16.6 硬门禁的法定例外） |
@@ -123,6 +129,7 @@
 | Go fuzz 4 缺陷（G5.4） | ① plist.binary trailer limit 越界报 false Complete（无 native model、无诊断）② json strict trailing-comma 诊断 category panic ③ yaml plain-block 无限循环（`e0: e0\n s:[a,t`）④ plist.xml 恢复循环 OOB panic + tokenizer 卡死循环 | ①P0（伪成功）②③④P1 | 937b330（每个失败输入钉入 testdata/fuzz/ 回归种子；①保留 Foundation 冻结事实） | 关闭（30s×16 target clean-run 实测 2026-08-10） |
 | G5.5 F1 | §21.2 最低版本 CI 腿未落（go-1-26 job） | P2 | 937b330（ci.yml go-1-26 job） | 关闭（F-B 已修复，该 job 不受影响） |
 | D-1 / D-2（G5.7 drill） | 0.8.0 checksum manifest 从 git 历史不可复现（脏树记录，0/14 匹配）；演练密钥无持久公钥 | P1（发布流程） | 处置已定：0.13.0 发布时从干净发布 commit 重新生成 checksum manifest（release-process §7 items 3+5）；真实密钥+备份随 C-3 | **待 C-3 关闭**（非代码缺陷，流程证据缺陷） |
+| L5 差分 harness findings（TS/Python/Kotlin） | 跨语言 exchange 发现的 wire-codec 缺陷：ValuePath schema-less wire 格式与 AssociationLocation 位置面缺失（TS/Python）；materialization-request version:0 拒绝语义缺失（TS/Python/Kotlin）；yaml tag `'!'` 前缀与 yaml provenance ordinal/role 缺失（Python） | P1 | 2f981df（L5 差分 harnesses + 修复）+ dbba9a4（CI 验证收口） | 关闭（三语言 differential 83/83 exchange 全绿；conformance 508/508 不变） |
 
 **P0/P1 清零声明核验**：全周期 P0（M2-F2、Go fuzz ①）与 P1 全部修复并有回归钉死；关账后新增的 **F-A**（§5.1）与 **F-B**（§5.2）两项 P1 级证据缺陷已于 2209582 处置并审计验证——"无未解决 P0/P1"的声明恢复成立（§18.4 第 1689 行）。
 
@@ -210,7 +217,7 @@
 | §28.2 语义一致 | **PASS** | 18 概念在 registry 与跨语言面上行为一致；命名漂移全部冻结、属 1.0.0 窗口命名清理而非语义不一致 |
 | §28.3 逻辑自洽 | **PASS** | 三条操作链闭合、无隐藏同步、无权威循环（byte 权威单一 = Rust 编码器 + 双向差分反审计） |
 | §28.4 真实有效 | **PASS** | corpus/迁移/pilot/零静默损失全部实测成立；供应链流程落地（真跑归 §28.5 口径） |
-| §28.5 完整可靠 | **PARTIAL** | 实测 508/0/0、1,629 Rust 测试、108×2/68/83 全过（提交态 74e336e，历史记录）；F-A/F-B 已由 2209582 处置并审计验证；PARTIAL 理由：C-2/C-3 开放（C-3 含 D-1/D-2）+ RC soak 两项演练未记录（C-1 已闭环 2026-08-11，run #5 149/149 全绿） |
+| §28.5 完整可靠 | **PARTIAL** | 实测 508/0/0、1,629 Rust 测试、108×2/68/83 全过（提交态 74e336e，历史记录）；F-A/F-B 已由 2209582 处置并审计验证；PARTIAL 理由：C-2/C-3 开放（C-3 含 D-1/D-2）+ RC soak 两项演练未记录（C-1 已闭环 2026-08-11，run #5 132/132 全绿） |
 
 ### 6.2 1.0.0 前剩余收口项（按依赖序）
 
@@ -220,7 +227,7 @@
 2. **修 F-B**（vector digest 复现性）——已验证（2209582，审计 PASS）：从干净 LF checkout 重算并回填
    fc-manifest 与断言，与 D-1 纪律合并为"一切门禁证据以干净 checkout 为准"（干净 LF worktree 上 digest
    断言/复算/shared-conformance 6/6 全绿）；
-3. **C-1**：推入 GitHub 真跑 10 job 全矩阵；回填 manifest——**已闭环（2026-08-11，run #5 149/149 steps 全绿，head 437fd35，10+1 job windows/ubuntu/macos；结果已回填 fc-manifest，C-1 → closed）**；
+3. **C-1**：推入 GitHub 真跑 10 job 全矩阵；回填 manifest——**已闭环（2026-08-11，run #5 132/132 steps 全绿，head 437fd35，10+1 job windows/ubuntu/macos；结果已回填 fc-manifest，C-1 → closed）**；
 4. **C-2**：每格式 72 CPU-hours fuzz 账本（clang 主机 cargo-fuzz 为主）；
 5. **C-3**：真实密钥 + 备份 + 吊销证书；从干净发布 commit 按 release-process §7 十项顺序执行发布
    （checksum/SBOM/签名/tag/恢复演练复跑）；
