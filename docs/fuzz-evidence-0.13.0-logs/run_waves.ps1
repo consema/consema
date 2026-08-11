@@ -159,7 +159,7 @@ $cpuInfo = Get-CimInstance Win32_Processor | Select-Object -First 1
 $osInfo = Get-CimInstance Win32_OperatingSystem
 Write-Log "session start: session=$sessionNum waves=$Waves copies=$Copies wave_timeout=${WaveTimeoutSec}s"
 Write-Log "machine: $($cpuInfo.Name); $($cpuInfo.NumberOfCores) physical / $($cpuInfo.NumberOfLogicalProcessors) logical cores; $($osInfo.Caption) $($osInfo.Version)"
-Write-Log "toolchain: $(rustc --version) | HEAD=$(& git -C $root rev-parse HEAD)"
+$headVal = ''; $g = Get-GitExe; if ($g) { $headVal = (& $g -C $root rev-parse HEAD 2>$null) }; Write-Log "toolchain: $(rustc --version) | HEAD=$headVal"
 
 # --- waves ------------------------------------------------------------------
 $prevTree = ''
