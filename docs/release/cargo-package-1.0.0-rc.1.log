@@ -1,0 +1,103 @@
+﻿cargo : warning: manifest has no documentation, homepage or repository
+At line:1 char:347
++ ... review-wt"; cargo package --workspace --locked --no-verify 2>&1 | Tee ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (warning: manife...e or repository:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-core v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-core)
+    Packaged 11 files, 185.8KiB (31.5KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-document v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-document)
+    Updating crates.io index
+    Blocking waiting for file lock on package cache
+    Packaged 11 files, 164.8KiB (33.2KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-graph v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-graph)
+    Blocking waiting for file lock on package cache
+    Updating crates.io index
+    Blocking waiting for file lock on package cache
+    Packaged 7 files, 79.9KiB (15.2KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-hcl v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-hcl)
+    Updating crates.io index
+    Blocking waiting for file lock on package cache
+    Packaged 16 files, 903.2KiB (163.6KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-ini v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-ini)
+    Blocking waiting for file lock on package cache
+    Updating crates.io index
+    Blocking waiting for file lock on package cache
+    Packaged 12 files, 295.0KiB (51.4KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-json v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-json)
+    Updating crates.io index
+    Blocking waiting for file lock on package cache
+    Packaged 11 files, 281.0KiB (48.6KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-plist v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-plist)
+    Updating crates.io index
+    Blocking waiting for file lock on package cache
+    Packaged 14 files, 868.9KiB (161.8KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-properties v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-properties)
+    Updating crates.io index
+    Packaged 11 files, 224.3KiB (42.5KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-pvce v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-pvce)
+    Updating crates.io index
+    Packaged 5 files, 48.5KiB (9.7KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-protocol v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-protocol)
+    Updating crates.io index
+    Packaged 31 files, 651.7KiB (107.8KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-toml v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-toml)
+    Updating crates.io index
+    Packaged 11 files, 208.0KiB (39.1KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-xml v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-xml)
+    Updating crates.io index
+    Packaged 14 files, 472.3KiB (82.8KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-yaml v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-yaml)
+    Updating crates.io index
+    Packaged 14 files, 417.2KiB (75.7KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema)
+    Updating crates.io index
+    Packaged 41 files, 854.0KiB (171.2KiB compressed)
+warning: manifest has no documentation, homepage or repository
+  |
+  = note: see https://doc.rust-lang.org/cargo/reference/manifest.html#package-metadata for more info
+   Packaging consema-conformance v1.0.0-rc.1 (C:\Users\franck\AppData\Local\Temp\release-preview-wt\crates\consema-conformance)
+    Updating crates.io index
+    Packaged 63 files, 1.4MiB (246.4KiB compressed)

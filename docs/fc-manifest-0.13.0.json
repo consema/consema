@@ -809,7 +809,7 @@
         ],
         "evidence": [
           "docs/fuzz-evidence-0.13.0.md:139-145（§7 完成路径）",
-          "docs/fuzz-evidence-0.13.0.md:158-159（§8 会话结束快照：26.309 CPU-hours、4,063 行、10.994 亿次变异，最接近格式家族 properties 6.9%；快照口径，runs.csv 为唯一权威账本）"
+          "docs/fuzz-evidence-0.13.0.md:158-159（§8 会话结束快照：188.336 CPU-hours、33,337 行、90.206 亿次变异，最接近格式家族 properties 48.3%；session 234 时点复算（2026-08-11）；快照口径，runs.csv 为唯一权威账本）"
         ],
         "completion_path": "见 quality.Q-7.completion_path（clang 主机 cargo-fuzz 为主，本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时）。",
         "owner": "fuzz 证据账本（agent H 延续）+ 0.13.0 gatekeeper"

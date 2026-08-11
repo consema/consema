@@ -1,0 +1,17 @@
+MSRV build leg: rustc 1.85.0 for all 14 crates
+verified 14 publishable package archives
+415ad8255d73a2d381acf73303f16803415a72495835842f6dc7cdb7e59b0b74  consema-1.0.0-rc.1.crate
+62baaf5466dfb9c894a11fd1d8318f5b0d75cee6e4213216658132f126627940  consema-core-1.0.0-rc.1.crate
+ba51dc8295c8f2ec9ed6366a83d5b6775124b7f7bab969a4d5f71de89bf6b560  consema-document-1.0.0-rc.1.crate
+0d382e508843ad75c74e842b15cd349a3fd1684df1027655c98ac2bd64e19ef6  consema-graph-1.0.0-rc.1.crate
+20fc3bca1e4a3dacda9a5994040b5c5d0eb3c0de566551588a059692a166a2d4  consema-hcl-1.0.0-rc.1.crate
+9818856220a0835051f23084cc1db1fd6a571d42ba312c8a29e29b23116b636e  consema-ini-1.0.0-rc.1.crate
+fe4deb03f988be884873b6813df28e0cda21d406323b648d7636a41f09b4a5a0  consema-json-1.0.0-rc.1.crate
+0bd6a47f836689317cd41899b86522df74646816bc57a55a04cb25c579831c41  consema-plist-1.0.0-rc.1.crate
+06b3dd648708abfb9de11a29878b8c95f010a88dc77a625d31c1449dcc21bbbe  consema-properties-1.0.0-rc.1.crate
+d07f33500692fec3938e26552c544a13ad1e019093405ec0a1d0fc538b2e508b  consema-protocol-1.0.0-rc.1.crate
+a3a9e45a0b31271cda25578db00f3669c73d3dc86ac71eeeebcf64fb31c8f3d2  consema-pvce-1.0.0-rc.1.crate
+3420c316effb036feec0857e4406315efb12b3971750836175a1e23cdefe4fdb  consema-toml-1.0.0-rc.1.crate
+fca8fcf9576af143dfe7e528e638cd848eff25f04a80ab35cf0e3f6c01bea23b  consema-xml-1.0.0-rc.1.crate
+f5537fac7d610bc20f5e0ee056ba5e82bccc017888c06f59079365a20ea94074  consema-yaml-1.0.0-rc.1.crate
+repository-only packages: consema-conformance
