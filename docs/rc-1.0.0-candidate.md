@@ -11,7 +11,7 @@
 
 | 阻塞项 | 状态 | 证据 | 完成路径 |
 |---|---|---|---|
-| C-1：CI 10 job 在 GitHub 干净 checkout 全矩阵全绿 | **partial** | .github/workflows/ci.yml（lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package）；本地等效全流程已实测（0.13.0-gate-plan §4 M1），GitHub 真跑未发生 | 推入 GitHub 后对 main 全矩阵真跑；oracle pin 与 hosted runner 不符时保持文档化 skip=成功；结果回填 manifest |
+| C-1：CI 10 job 在 GitHub 干净 checkout 全矩阵全绿 | **closed** | GitHub Actions run #5（2026-08-11，head 437fd35，main push）：149/149 steps 全绿，10+1 job（lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package/go-1-26）在 windows/ubuntu/macos 全矩阵通过；run 历史：run#1 workflow-parse fail（job id go-1.26 含点号）→ run#2 5 根因（symlink_dir 移除、oracles ParserError、coverage Get-CimInstance guard、package 工具链顺序、tags 未推）→ run#3 4 根因（macOS /var→/private/var 临时路径 symlink、oracles 缺 exit 0、semver 嵌套 baseline 歧义、coverage 数组 guard $null）→ run#4 fmt import 顺序 → run#5 全绿；结果已回填 manifest（C-1 → closed） | 已闭环（2026-08-11，run #5 全绿） |
 | C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §3.2.1/§8 快照：258.327 CPU-hours（session 297 时点复算，2026-08-11）；runs.csv 41,939 行（零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈66.8%，完成路径不变） | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
 | C-3：真实发布密钥与 0.13.0 发布执行 | **partial** | 演练密钥 82301612…（隔离 keyring）验证过全流程；**默认 keyring 尚无真实发布密钥**；docs/release 只有 0.8.0 演练产物 | 按 release-process-0.13.0.md §7 十项检查单顺序执行；版本推进 0.8.0→0.13.0；真实密钥+备份+吊销证书；**manifest 必须从干净发布 commit 重新生成**（见 §4 D-1） |
 
@@ -50,9 +50,9 @@
 - untouched bytes exact：pilot metric 2 + 迁移 1/2/3 证明。✓
 - resource limit/cancellation 不产生伪成功：limits 矩阵 + exit 分类。✓
 
-### 22.4 安全与质量 — 部分（C-1/C-2 阻塞）
+### 22.4 安全与质量 — 部分（C-2 阻塞；C-1 已闭环 2026-08-11）
 
-- Rust+Go 全测试矩阵：本地全绿；GitHub 真跑 = C-1。⏳
+- Rust+Go 全测试矩阵：本地全绿；GitHub 真跑 = C-1——**已闭环（2026-08-11，run #5，head 437fd35，149/149 steps 全绿，10+1 job windows/ubuntu/macos）**。✓
 - release-candidate fuzz clean-run：Rust 188.336/72 CPU-hours = C-2（session 234 时点复算，
   2026-08-11，runs.csv 33,337 行，零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈48%）；
   Go fuzz targets（G5.4 矩阵）需 release-candidate clean-run 记录。⏳
@@ -60,9 +60,9 @@
 - 无未接受 critical/high dependency vulnerability：deny/audit 门禁。✓
 - XML/YAML/HCL/binary plist 专项 threat tests：Rust security matrix + Go
   security_matrix_test。✓
-- Windows/Linux/macOS 全部正式 target：本地 Windows 实测；Linux/macOS = C-1。⏳
+- Windows/Linux/macOS 全部正式 target：本地 Windows 实测；Linux/macOS = C-1——已闭环（2026-08-11，run #5 三 OS 全矩阵全绿）。✓
 - race/overflow/deep recursion/OOM amplification/path handling：双语言矩阵。✓
-- security audit findings 全部关闭或公开接受：SEC-1..SEC-9（除 SEC-9 随 C-1）。✓/⏳
+- security audit findings 全部关闭或公开接受：SEC-1..SEC-9（SEC-9 已随 C-1 闭环——run #5 三 OS cli 测试矩阵全绿，2026-08-11）。✓
 
 ### 22.5 性能 — 达成（Rust）+ Go 侧随 RC soak 复核
 
@@ -95,7 +95,7 @@
 - 未选择文件和 byte ranges 不变：迁移 3 源树断言 + untouched proofs。✓
 - stale file、部分权限失败、进程中断、磁盘失败演练：stale + 中断已演练（0.13.0
   pilot 与本 pilot），部分权限已闭环（§3.5 演练 4，2026-08-10）；**仅磁盘失败未记录**
-  （§3.5 演练 5 环境阻塞，完成路径随 C-1）——RC soak 待办项（§5 P2-6）。⏳
+  （§3.5 演练 5 环境阻塞；完成路径已随 C-1 闭环（2026-08-11）可用——Linux runner 临时小卷）——RC soak 待办项（§5 P2-6）。⏳
 - Rust 与 Go 分别至少一个端到端 SDK pilot：pilot-0.13.0.md（Rust）+ 本 pilot
   （Go）。✓
 - pilot 缺陷入回归：F-2 已修复并入 BENCHMARKS 回归网；本 pilot 零缺陷（契约行为
@@ -148,7 +148,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 
 ### 3.4 演练边界（诚实记录）
 
-- 未演练：磁盘满（需真实填盘条件，环境阻塞——§3.5 演练 5，完成路径随 C-1）、
+- 未演练：磁盘满（需真实填盘条件，环境阻塞——§3.5 演练 5；完成路径已随 C-1 闭环（2026-08-11）可用）、
   远程篡改（不在 §19.4 范围）。
 - 演练二进制与 worktree 均为临时目录，不进入任何发布记录；0.13.0 发布按
   release-process §7 用真实密钥执行。
@@ -191,7 +191,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
   operation requires elevation；卷清单：C: NTFS 952.8 GB（27.6% free，禁止填盘）、
   无名 NTFS 0.9 GB 无盘符（系统恢复类，不可寻址）、D: Ventoy exFAT 57.7 GB
   （59% free）、E: VTOYEFI（Ventoy 保留）。**无可行小卷路径**。
-- 完成路径：随 C-1 在 Linux runner 上用临时小卷（tmpfs/loop）执行（真实填盘 →
+- 完成路径：C-1 已闭环（2026-08-11，run #5 全绿），Linux runner 路径现可用——在该 runner 上用临时小卷（tmpfs/loop）执行（真实填盘 →
   apply 预期 exit 4 + `cli.write.io@1` per-file failed → 释放空间后同一 plan 重跑
   恢复）；或授权（admin）环境 New-VHD + Mount-VHD + Format-Volume 后同流程。
 - **诚实佐证（非真实填盘）**：RFC 0015 §5.4 注入 seam `CONSEMA_APPLY_WRITE_FAILURE=io`
@@ -200,7 +200,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
   同一 plan 重跑全 completed（exit 0）。证明 io 类失败分类与恢复语义完整；真实填盘
   演练本身仍记录为环境阻塞。
 - 结论：演练 5 在 §3.4 演练边界体例下记录为"未演练（环境阻塞：非 admin + 无
-  Hyper-V + 无可寻址小卷），完成路径已定，随 C-1/授权环境执行"。
+  Hyper-V + 无可寻址小卷），完成路径已定——C-1 已闭环（2026-08-11）后 Linux runner 路径可用，或授权环境执行"。
 
 ## 4. RC soak 计划
 
@@ -208,7 +208,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 
 ```text
 阶段 0（RC 构建前，阻塞）：
-  C-1 推入 GitHub 真跑 10 job 全矩阵全绿，回填 manifest
+  C-1 推入 GitHub 真跑 10 job 全矩阵全绿，回填 manifest → **已完成（2026-08-11，run #5 149/149 全绿，head 437fd35，已回填 manifest）**
   C-2 完成每格式 72 CPU-hours fuzz 账本，零未解释问题
   C-3 真实密钥 + 备份 + 吊销证书；按 release-process §7 顺序执行发布，
      checksum manifest 从干净发布 commit 生成（D-1 处置）
@@ -230,7 +230,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 
 ### 4.1 阶段 1 当前进展（2026-08-10）
 
-- 磁盘失败演练 → 环境阻塞（见 §3.5 演练 5，完成路径随 C-1）
+- 磁盘失败演练 → 环境阻塞（见 §3.5 演练 5）；完成路径已随 C-1 闭环（2026-08-11）可用（Linux runner 临时小卷），演练本身待执行
 - 部分权限失败演练 → **已完成**（§3.5 演练 4，2026-08-10 实测闭环）
 - 双语言 differential corpus 追加运行 → 四 harness 已复跑（P2-7，
   83/83+108/108+68/68；追加 corpus 待 C-2 关账后随收口执行）
@@ -256,12 +256,18 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
   测得（docs/COVERAGE-0.13.0.md:15,17），CI coverage job 在 ubuntu 测，
   跨平台差 >1.0pp 时 C-1 首跑可能 -Trend 首红。处置：若红，按脚本政策在
   ubuntu 等效环境刷新入库报告并附处置记录（release 里程碑刷新许可，
-  coverage.ps1:524）；不阻塞 C-1 推入
+  coverage.ps1:524）；不阻塞 C-1 推入（实测：run #5 coverage job 全绿，未触发
+  -Trend 红，2026-08-11）
 - CI 就绪审计 → **已完成**（2026-08-10，只读审计 10 job + go-1-26）：8 job
   静态 PASS；3 项首跑风险：msrv clippy（1.85 特有 warning，**已修复**——见
   任务 A）、oracles macOS 腿 pin 不符 throw（**已补文档化 skip** exit 3——
   见任务 B）、coverage -Trend 平台差（处置见上条）。结论：3 项处置后 C-1
-  就绪（除 remote/凭据）
+  就绪（除 remote/凭据）——**已随 run #5 闭环（2026-08-11，见下条）**
+- CI 真跑（C-1）→ **已闭环（2026-08-11，GitHub Actions run #5，head 437fd35）**：
+  149/149 steps 全绿，10+1 job（lint/test/coverage/msrv/conformance/deny/audit/
+  semver/oracles/package/go-1-26）在 windows/ubuntu/macos 全矩阵通过；run 历史
+  run#1 workflow-parse fail → run#2 5 根因 → run#3 4 根因 → run#4 fmt import
+  顺序 → run#5 全绿（明细见 §1 C-1 行）；结果已回填 fc-manifest（C-1 → closed）
 - 每 48h fuzz 账本检查 → 进行中（账本 258.327 CPU-hours，41,939 行，零新 crash，最近快照 session 297，2026-08-11）
 
 ### 4.2 巡检 4 条观察记录（P2 级）
@@ -289,7 +295,7 @@ disposition。
 | P2-3 | JSONC/JSON5 插入元素为 canonical 片段拼写（`[80, 100,120]`） | 本 pilot F-3 | 契约行为（语义插入非格式化）；发布判断：接受 |
 | P2-4 | 0.8.0 checksum manifest 不可从 git 历史复现（脏树记录） | 本 drill D-1 | **发布流程修正项**（发布时从干净 commit 生成），不阻塞 rc.1 本身 |
 | P2-5 | 演练签名密钥无持久公钥可复验 | 本 drill D-2 | 随 C-3 真实密钥解决 |
-| P2-6 | 部分权限失败与磁盘失败演练未记录 | §22.7 | 部分权限 leg 已闭环（2026-08-10，§3.5 演练 4）；仅磁盘失败 leg 待办（环境阻塞——§3.5 演练 5，完成路径随 C-1），RC soak 阶段 1 必做（§4） |
+| P2-6 | 部分权限失败与磁盘失败演练未记录 | §22.7 | 部分权限 leg 已闭环（2026-08-10，§3.5 演练 4）；仅磁盘失败 leg 待办（环境阻塞——§3.5 演练 5；C-1 已闭环（2026-08-11）后 Linux runner 完成路径现可用，演练本身仍待执行），RC soak 阶段 1 必做（§4） |
 | P2-7 | Go CLI beta 合入前的 exchange 复跑 | §22.2 | **已闭环（2026-08-10）**：G5.6 合入后四 harness 复跑——协议交换 83/83（40 accept + 43 reject）、双向差分 108/108、字节 parity 68/68；shared-conformance 步骤 1 在本机 CRLF 工作树按 F-B 文档化行为报 digest 差异（规范 checkout 绿，CI 不受影响） |
 
 ## 6. 相关文件

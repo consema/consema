@@ -69,7 +69,7 @@
 | 3 | P0/P1 为零 | 通过：F-A/F-B 已修复并验证（2209582，审计 PASS），"无未解决 P0/P1"恢复成立——rc-1.0.0-candidate.md:58 记录"当前 0"（本次核验当时发现的 F-B 提交态证据缺陷与 F-A 工作树回归已分别处置，见 §5.1/§5.2） | **通过** |
 | 4 | 两语言 observable mismatch 为零 | normalized differential 108/108 ×2、byte parity 68/68、protocol exchange 83/83（2026-08-10 全部重跑通过，§4）；pilot metric 12 = 0（pilot-go-0.19.0.md:164）；Go fuzz 4 缺陷修复后双语言契约一致（go/README.md:683-714） | 通过 |
 | 5 | 生产发布物可验证、可重建、可升级 | 发布流程与演练已落地（release-process-0.13.0.md、rc-1.0.0-candidate.md §3：升级/回滚逐字节兼容）；**但真实发布未执行（C-3 开放）**：无真实密钥、无发布 commit 上的 checksum/SBOM/签名；演练发现 D-1（0.8.0 checksum manifest 从 git 历史不可复现，脏树记录）与 D-2（演练密钥无持久公钥） | **部分（C-3 + D-1/D-2 阻塞）** |
-| 6 | failure、recovery、cancellation、limits 和 conflict 都有正式语义 | RFC 0015 exit code 0-5 分类（穷尽映射测试）；limits 矩阵（Rust SECURITY.md + Go limits_matrix_test.go 91 行 + security_matrix_test.go 32 行）；batch 状态机 completed/failed/pending/skipped-stale；中断注入 seam（CONSEMA_APPLY_INTERRUPT_AFTER）；RC soak 待补：**仅磁盘失败演练未记录**（rc-1.0.0-candidate.md:96，P2-6，RC soak 阶段 1 必做：部分权限演练已闭环——演练 4，2026-08-10；磁盘失败环境阻塞——演练 5，完成路径随 C-1） | 通过（仅磁盘失败演练归 RC soak 收口） |
+| 6 | failure、recovery、cancellation、limits 和 conflict 都有正式语义 | RFC 0015 exit code 0-5 分类（穷尽映射测试）；limits 矩阵（Rust SECURITY.md + Go limits_matrix_test.go 91 行 + security_matrix_test.go 32 行）；batch 状态机 completed/failed/pending/skipped-stale；中断注入 seam（CONSEMA_APPLY_INTERRUPT_AFTER）；RC soak 待补：**仅磁盘失败演练未记录**（rc-1.0.0-candidate.md:96，P2-6，RC soak 阶段 1 必做：部分权限演练已闭环——演练 4，2026-08-10；磁盘失败环境阻塞——演练 5：C-1 已闭环（2026-08-11）后 Linux runner 完成路径可用，演练本身仍待执行） | 通过（仅磁盘失败演练归 RC soak 收口） |
 | 7 | 没有通过 experimental 标签隐藏未完成的 1.0 承诺 | F-8 门禁 complete：无 mandatory capability 标记 experimental/stub/partial（fc-manifest-0.13.0.json:241-250）；全部边界是显式拒绝而非 stub（CHANGELOG.md:40-45） | 通过 |
 
 ---
@@ -78,11 +78,11 @@
 
 | 开放项 | 状态（fc-manifest open_items / rc-1.0.0-candidate） | 依赖它的 §28 条件 | 影响判定 |
 |---|---|---|---|
-| C-1：CI 10 job GitHub 干净 checkout 全矩阵全绿 | partial（.github/workflows/ci.yml 10 job 落盘；本地等效实测；GitHub 真跑未发生） | §28.5 条件 1/3/4（三平台全矩阵、SEC-9 Linux/macOS 验证、A-4 msrv 真验证、A-9 package 真跑、semver approved-failure 落定） | **阻塞 §28.5 通过**（F-B 已修复，干净 checkout 绿，不再构成完成路径硬阻塞） |
+| C-1：CI 10 job GitHub 干净 checkout 全矩阵全绿 | **已闭环（2026-08-11：GitHub Actions run #5，head 437fd35，149/149 steps 全绿，10+1 job windows/ubuntu/macos 全矩阵；fc-manifest open_items C-1 → closed）** | §28.5 条件 1/3/4（三平台全矩阵、SEC-9 Linux/macOS 验证、A-4 msrv 真验证、A-9 package 真跑、semver approved-failure 落定） | **C-1 腿阻塞已解除**（run #5 真跑全绿：三平台全矩阵、SEC-9、A-4、A-9 随 manifest C-1.closes 满足）；§28.5 仍 **PARTIAL**——C-2/C-3 开放 |
 | C-2：每格式 ≥72 CPU-hours release-candidate fuzz | partial（runs.csv 13,005 行 / 79.427 CPU-hours，截取自 session 79 期间，2026-08-10；最接近格式 properties ≈20.6%（14.8/72）；零新 crash；Go 16 targets 30s clean-run 已有记录） | §28.5 条件 3（P0/P1=0 的 fuzz clean-run 证据完整性，§22.4:1905） | **阻塞 §28.5 通过**（Q-7 未闭）；不依赖其他四要素 |
 | C-3：真实发布密钥与 0.13.0 发布执行 | partial（演练密钥仅流程验证；默认 keyring 无真实密钥；docs/release 仅 0.8.0 演练产物；D-1/D-2 处置随本项） | §28.5 条件 5（生产发布物可验证/可重建/可升级——发布物、SBOM、签名、checksum、build provenance 真跑）；§28.4 条件 6 的供应链侧 | **阻塞 §28.5 通过**；D-1 要求"manifest 必须从干净发布 commit 重新生成"（rc-1.0.0-candidate.md:16）与 F-B 同源纪律（干净 checkout 复现） |
-| RC soak 阶段 1（磁盘失败、部分权限失败演练、differential 追加、Go RC fuzz 记录、corpus 巡检、性能复测） | 部分权限失败演练已闭环（rc-1.0.0-candidate.md §3.5 演练 4，2026-08-10）；磁盘失败演练环境阻塞（演练 5，完成路径随 C-1）；differential 追加、Go RC fuzz 记录、corpus 巡检、性能复测状态按 rc-1.0.0-candidate.md §4.1 | §28.5 条件 6（failure/limits 演练完整性，§22.7"stale/部分权限/中断/磁盘四类演练"——仅磁盘失败未记录，部分权限已闭环） | 阻塞 §28.5 的 RC 收口（RC soak 本身是 §16.6 硬门禁的法定例外） |
-| Go CLI 合入后的 cross-language exchange 复跑（P2-7） | 已闭环（2026-08-10，rc-1.0.0-candidate.md:293：G5.6 合入后四 harness 复跑 83/83 + 108/108 + 68/68） | §22.2（rc-1.0.0-candidate.md:38 边界）→ §28.5 条件 4 的 CLI 侧核对 | 不阻塞（SDK 面 83/83 已实测；CLI 侧已闭环） |
+| RC soak 阶段 1（磁盘失败、部分权限失败演练、differential 追加、Go RC fuzz 记录、corpus 巡检、性能复测） | 部分权限失败演练已闭环（rc-1.0.0-candidate.md §3.5 演练 4，2026-08-10）；磁盘失败演练环境阻塞（演练 5；C-1 已闭环 2026-08-11 后 Linux runner 完成路径可用，演练本身仍待执行）；differential 追加、Go RC fuzz 记录、corpus 巡检、性能复测状态按 rc-1.0.0-candidate.md §4.1 | §28.5 条件 6（failure/limits 演练完整性，§22.7"stale/部分权限/中断/磁盘四类演练"——仅磁盘失败未记录，部分权限已闭环） | 阻塞 §28.5 的 RC 收口（RC soak 本身是 §16.6 硬门禁的法定例外） |
+| Go CLI 合入后的 cross-language exchange 复跑（P2-7） | 已闭环（2026-08-10，rc-1.0.0-candidate.md:299：G5.6 合入后四 harness 复跑 83/83 + 108/108 + 68/68） | §22.2（rc-1.0.0-candidate.md:38 边界）→ §28.5 条件 4 的 CLI 侧核对 | 不阻塞（SDK 面 83/83 已实测；CLI 侧已闭环） |
 | 版本推进 `1.0.0-rc.1`（F-A） | 已随 2209582 提交（Cargo.toml:31 / go/cmd/consema/version.go:15）并通过两语言门禁（审计实测） | §28.5 条件 5 的发布准备、C-3 阶段 0 执行 | 不阻塞（F-A 已修复，§5.1） |
 | vector 聚合 digest 干净 checkout 不可复现（F-B，提交态） | 已修复（2209582）：干净 LF checkout 重算 35bebc8d… 并回填 fc-manifest:38 与 conformance_test.go:106，与 D-1 纪律合并记录（一切门禁证据以干净 checkout 为准） | §28.5 条件 5（可重建证据）、C-1（go-1-26 job）、fc-manifest"值可精确复现"声称 | 不阻塞（已修复；C-1 推入与 C-3 发布按原路径执行） |
 
@@ -184,7 +184,7 @@
   （recorded），两处实测一致；fc-manifest:40 note 已注明规范 checkout（LF）为权威口径、历史 CRLF 值被取代。
   审计验证：干净 LF worktree 上 go test digest 断言 PASS、手工复算 MATCH、shared-conformance 脚本 6/6 exit 0。
 - **补注（本机差异，文档化）**：本机 CRLF 工作树（`core.autocrlf=true`）上仍算出 e3d6578858…，属文档化
-  本机差异（rc-1.0.0-candidate.md:293 同述）；规范 checkout（LF）为权威口径，CI 不受影响。
+  本机差异（rc-1.0.0-candidate.md:299 同述）；规范 checkout（LF）为权威口径，CI 不受影响。
 - **修复前状态（历史记录）**：
   - 现象：干净 checkout（LF，`.gitattributes` 第 1 行 `* text=auto eol=lf`）下
     `go/conformance` 的 `TestRunIsConformant`/`TestDigestAlgorithmMatchesManifest` FAIL、
@@ -210,7 +210,7 @@
 | §28.2 语义一致 | **PASS** | 18 概念在 registry 与跨语言面上行为一致；命名漂移全部冻结、属 1.0.0 窗口命名清理而非语义不一致 |
 | §28.3 逻辑自洽 | **PASS** | 三条操作链闭合、无隐藏同步、无权威循环（byte 权威单一 = Rust 编码器 + 双向差分反审计） |
 | §28.4 真实有效 | **PASS** | corpus/迁移/pilot/零静默损失全部实测成立；供应链流程落地（真跑归 §28.5 口径） |
-| §28.5 完整可靠 | **PARTIAL** | 实测 508/0/0、1,629 Rust 测试、108×2/68/83 全过（提交态 74e336e，历史记录）；F-A/F-B 已由 2209582 处置并审计验证；PARTIAL 理由：C-1/C-2/C-3 开放（C-3 含 D-1/D-2）+ RC soak 两项演练未记录 |
+| §28.5 完整可靠 | **PARTIAL** | 实测 508/0/0、1,629 Rust 测试、108×2/68/83 全过（提交态 74e336e，历史记录）；F-A/F-B 已由 2209582 处置并审计验证；PARTIAL 理由：C-2/C-3 开放（C-3 含 D-1/D-2）+ RC soak 两项演练未记录（C-1 已闭环 2026-08-11，run #5 149/149 全绿） |
 
 ### 6.2 1.0.0 前剩余收口项（按依赖序）
 
@@ -220,22 +220,22 @@
 2. **修 F-B**（vector digest 复现性）——已验证（2209582，审计 PASS）：从干净 LF checkout 重算并回填
    fc-manifest 与断言，与 D-1 纪律合并为"一切门禁证据以干净 checkout 为准"（干净 LF worktree 上 digest
    断言/复算/shared-conformance 6/6 全绿）；
-3. **C-1**：推入 GitHub 真跑 10 job 全矩阵；回填 manifest（C-1 仍开放）；
+3. **C-1**：推入 GitHub 真跑 10 job 全矩阵；回填 manifest——**已闭环（2026-08-11，run #5 149/149 steps 全绿，head 437fd35，10+1 job windows/ubuntu/macos；结果已回填 fc-manifest，C-1 → closed）**；
 4. **C-2**：每格式 72 CPU-hours fuzz 账本（clang 主机 cargo-fuzz 为主）；
 5. **C-3**：真实密钥 + 备份 + 吊销证书；从干净发布 commit 按 release-process §7 十项顺序执行发布
    （checksum/SBOM/签名/tag/恢复演练复跑）；
 6. **RC soak 阶段 1**：磁盘失败与部分权限失败演练（§22.7）、differential 追加、Go RC fuzz 记录、corpus 巡检、
    性能复测（每 48h 查 fuzz 账本）；
-7. **P2-7**：Go CLI 合入后 exchange 复跑闭环——已闭环（rc-1.0.0-candidate.md:293，2026-08-10）；
+7. **P2-7**：Go CLI 合入后 exchange 复跑闭环——已闭环（rc-1.0.0-candidate.md:299，2026-08-10）；
 8. 处置完成后重跑本终审：§28.5 条件 3/5 转 ✓ 即五要素全 PASS，进入 §29 最终确认。
 
 ### 6.3 诚实声明
 
-- 三平台矩阵仅 Windows 实测（Linux/macOS = C-1）；72 CPU-hours 账本已续跑至 session 79 在途（runs.csv
+- 三平台矩阵：Windows 本地实测，Linux/macOS 腿已随 C-1 闭环（2026-08-11，run #5 windows/ubuntu/macos 全矩阵全绿）；72 CPU-hours 账本已续跑至 session 79 在途（runs.csv
   13,005 行 / 79.427 CPU-hours，截取自 2026-08-10 session 79 期间；session 78 结束快照 12,937 行 /
   78.971 CPU-hours，15:53:39）；
 - F-B 已修复（2209582）：干净 LF checkout 重算 35bebc8d… 并回填，"记录值在记录机（CRLF）复现"与
-  "干净 checkout 不可复现"两侧差异现为文档化本机行为（§4 第 12/13 行，rc-1.0.0-candidate.md:293），
+  "干净 checkout 不可复现"两侧差异现为文档化本机行为（§4 第 12/13 行，rc-1.0.0-candidate.md:299），
   规范 checkout 绿、CI 不受影响；
 - F-A 已修复（2209582）：RFC 0015 §3.3 修订接受 pre-release 后缀，1.0.0-rc.1 已提交；本核验时点提交
   `74e336e`（历史）的 Go CLI 与 Rust 全部门禁实测通过（§4 第 1/6/7 行）。

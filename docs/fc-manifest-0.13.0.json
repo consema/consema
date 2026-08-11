@@ -785,7 +785,7 @@
       {
         "id": "C-1",
         "name": "CI 第一次真跑：10 job 在 GitHub 上干净 checkout 全矩阵全绿",
-        "status": "partial",
+        "status": "closed",
         "closes": [
           "A-4（msrv job 真验证）",
           "A-9（package job 真跑）",
@@ -795,9 +795,10 @@
         ],
         "evidence": [
           ".github/workflows/ci.yml（10 job：lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package）",
-          "gate plan §4 M1 验证记录（本地等效全流程实测；GitHub 真跑未发生）"
+          "gate plan §4 M1 验证记录（本地等效全流程实测；GitHub 真跑未发生）",
+          "GitHub Actions run #5（2026-08-11，head 437fd35，main push）：149/149 steps 全绿，10+1 job（lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package/go-1-26）在 windows/ubuntu/macos 全矩阵通过；run 历史：run#1 workflow-parse fail（job id go-1.26 含点号）→ run#2 5 根因（symlink_dir 移除、oracles ParserError、coverage Get-CimInstance guard、package 工具链顺序、tags 未推）→ run#3 4 根因（macOS /var→/private/var 临时路径 symlink、oracles 缺 exit 0、semver 嵌套 baseline 歧义、coverage 数组 guard $null）→ run#4 fmt import 顺序 → run#5 全绿"
         ],
-        "completion_path": "推入 GitHub 后对 main 分支跑全矩阵；修复任何 runner 环境差异（R-2/R-3：oracle pin 与 hosted runner 不符时保持文档化 skip=成功）；记录 10 job 全绿结果到本 manifest 与发布记录。",
+        "completion_path": "推入 GitHub 后对 main 分支跑全矩阵；修复任何 runner 环境差异（R-2/R-3：oracle pin 与 hosted runner 不符时保持文档化 skip=成功）；记录 10 job 全绿结果到本 manifest 与发布记录。——已闭环（2026-08-11，run #5 149/149 steps 全绿，head 437fd35；结果已回填本 manifest，C-1 → closed）。",
         "owner": "0.13.0 gatekeeper（release-process §7 item 2）"
       },
       {
