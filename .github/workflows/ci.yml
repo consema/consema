@@ -271,11 +271,11 @@ jobs:
             & $path
             $code = $LASTEXITCODE
             if ($code -eq 3) {
-              Write-Output "$script: documented skip (exit 3) treated as success"
+              Write-Output "${script}: documented skip (exit 3) treated as success"
               continue
             }
             if ($code -ne 0) {
-              Write-Output "$script: failed with exit code $code"
+              Write-Output "${script}: failed with exit code $code"
               exit $code
             }
           }
@@ -293,8 +293,8 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
       - uses: dtolnay/rust-toolchain@1.85.0
+      - uses: dtolnay/rust-toolchain@stable
       - uses: swatinem/rust-cache@v2
       - name: cargo fetch --locked
         run: cargo fetch --locked
