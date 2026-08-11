@@ -15,7 +15,7 @@
 ### 0.1 现状核查（2026-08-11 调研）
 
 - **CI**：`.github/workflows/ci.yml` 单一 workflow，11 个 job = 10 个 Rust 门禁（lint/test/coverage/
-  msrv/conformance/deny/audit/semver/oracles/package，ci.yml:25-307）+ `go-1.26`（ci.yml:314-324）。
+  msrv/conformance/deny/audit/semver/oracles/package，ci.yml:25-307）+ `go-1-26`（ci.yml:314-324）。
   C-1 开放项记录此 10 job 需在 GitHub 干净 checkout 全矩阵全绿（fc-manifest-0.13.0.json:786-802）。
 - **差分 harness 现状（关键事实）**：`scripts/go-verify-byte-parity.ps1`、`go-verify-normalized-
   differential.ps1`、`go-verify-protocol-exchange.ps1`、`go-verify-shared-conformance.ps1` 目前**未接入
@@ -82,7 +82,7 @@
 | semver（cargo-semver-checks，:201-235） | Rust API 稳定性 | **Rust 专属**。三语言 API 稳定性门禁属 1.0.0 收口（路线图 §22.2 第 1887 行"Rust/Go public API 都完成稳定性审查"扩展至五语言；multi-language-implementation-plan.md:105-106）：TS exports 冻结审查 / Python `__all__` 审查 / Kotlin public API dump（kotlinx binary-compatibility-validator 属 dev 依赖，政策允许），全部 L5+ |
 | oracles（差分 oracle 3 OS，:251-281） | 语言无关（第三方行为钉） | **不变**，仍由 Rust job 执行。注意：java-properties-v1 oracle 钉 OpenJDK 25.0.4（conformance/README.md:25）、python-configparser-v1 钉 CPython 3.14.6（:26）——这是第三方行为 pin，与 SDK 工具链（Kotlin JVM 17 / Python 3.12）是两回事，不得混淆 |
 | package（verify-package-archives，:283-307） | Rust 归档验证 | Rust 专属。每语言打包验证为 L5/1.0.0 门禁（§5）：TS `npm pack` + 干净目录安装；Python build wheel + 干净 venv 安装；Kotlin gradle jar + 干净 JVM 运行 |
-| go-1.26（:314-324） | Go 门禁（最低版本） | **保持原位**（不迁移，见 §5.2 决策）；是三个新语言 gates job 的直接模板 |
+| go-1-26（:314-324） | Go 门禁（最低版本） | **保持原位**（不迁移，见 §5.2 决策）；是三个新语言 gates job 的直接模板 |
 
 ### 1.2 新语言 job 定义（每语言三个 job，L0 版）
 
@@ -271,7 +271,7 @@ multi-language-implementation-plan.md:119-125 §7 START GATE：工具链就绪�
 
 ### 5.2 推荐 CI 形状：每语言一个 workflow 文件（拒绝单矩阵）
 
-**推荐：`ci.yml` 保持不变（Rust 10 job + go-1.26 原位），新增三个文件**：
+**推荐：`ci.yml` 保持不变（Rust 10 job + go-1-26 原位），新增三个文件**：
 `ci-typescript.yml`、`ci-python.yml`、`ci-kotlin.yml`。理由：
 
 1. **START GATE 分期**：语言 L 的 workflow 文件随 L 的 L0 关闭同批新增——不触碰 Rust 门禁文件，
@@ -300,7 +300,7 @@ multi-language-implementation-plan.md:119-125 §7 START GATE：工具链就绪�
 | 1.0.0 收口 | 每语言 API 稳定性门禁（§1.1 semver 行）；五语言全部 job 全绿入 §22/五要素审计（multi-language-implementation-plan.md:105-106） |
 
 **语言间并行**：三语言 L0-L5 完全并行（multi-language-implementation-plan.md:38-39 "三语言之间
-完全并行"）；各语言独立按自己门禁上线，先过先上。go-1.26 job 保持原位（迁移它需要触碰 ci.yml，
+完全并行"）；各语言独立按自己门禁上线，先过先上。go-1-26 job 保持原位（迁移它需要触碰 ci.yml，
 无收益；其存在已满足 Go 最低版本 CI 验证，go/README.md:493-497）。
 
 ---
@@ -309,7 +309,7 @@ multi-language-implementation-plan.md:119-125 §7 START GATE：工具链就绪�
 
 | # | 风险 | 缓解 |
 |---|---|---|
-| R-1 | **跨平台**：新语言仅 ubuntu（估计） | 三语言均跨平台（无 Windows 专属 API 面）；单 OS 照 go-1.26 先例（ci.yml:309-324）；3-OS 全矩阵属 L5/1.0.0（路线图 §22.4 第 1909 行），按 Go 先例文档化完成路径（go/README.md:814-850）。差分脚本均为 pwsh（ubuntu runner 可用，ci.yml:90 先例） |
+| R-1 | **跨平台**：新语言仅 ubuntu（估计） | 三语言均跨平台（无 Windows 专属 API 面）；单 OS 照 go-1-26 先例（ci.yml:309-324）；3-OS 全矩阵属 L5/1.0.0（路线图 §22.4 第 1909 行），按 Go 先例文档化完成路径（go/README.md:814-850）。差分脚本均为 pwsh（ubuntu runner 可用，ci.yml:90 先例） |
 | R-2 | **Kotlin Gradle 依赖下载**（首次构建拉 Gradle 发行版 + Kotlin 插件 + JUnit，估计 2-5 分钟，网络不稳定时更长） | gradle wrapper 入库 + `distributionSha256Sum` 钉版（当前 wrapper 缺失，§0.1 缺口）；gradle/actions/setup-gradle@v4 缓存；gradle.lockfile 依赖锁定；timeout 60 分钟余量 |
 | R-3 | **Python 版本钉**：CI 误用最新版（3.14+）掩盖 3.12 最低版本语义 | setup-python 显式 '3.12.x'；pyproject.toml:20 requires-python >= 3.12 为声明 + CI 钉为验证（"really verified" 由构造满足）；注意与 python-configparser-v1 oracle 的 CPython 3.14.6 pin（conformance/README.md:26）区分——那是第三方行为钉，不是 SDK 工具链 |
 | R-4 | **npm registry 访问 / 供应链** | package-lock.json 必须入库（npm ci 前置，当前缺失 §0.1）；devDeps 仅 2 项（package.json:25-28）；npm audit 于 L5 收口；引擎钉 node '26.x'（package.json:8 engines >= 26） |
@@ -328,7 +328,7 @@ multi-language-implementation-plan.md:119-125 §7 START GATE：工具链就绪�
 
 | 文件 | 动作 | 内容 |
 |---|---|---|
-| `.github/workflows/ci.yml` | **不改**（Rust 门禁域 + go-1.26 原位） | 现 11 job 全保留（§1.1 映射表） |
+| `.github/workflows/ci.yml` | **不改**（Rust 门禁域 + go-1-26 原位） | 现 11 job 全保留（§1.1 映射表） |
 | `.github/workflows/ci-typescript.yml` | 新增（L0 关闭批次） | `ts-gates`、`ts-conformance`、`ts-differential`（§1.2）；L5 加 `ts-package` |
 | `.github/workflows/ci-python.yml` | 新增（L0 关闭批次） | `python-gates`、`python-conformance`、`python-differential`；L5 加 `python-package` |
 | `.github/workflows/ci-kotlin.yml` | 新增（L0 关闭批次） | `kotlin-gates`、`kotlin-conformance`、`kotlin-differential`；L5 加 `kotlin-package` |
@@ -386,7 +386,7 @@ multi-language-implementation-plan.md:119-125 §7 START GATE：工具链就绪�
 ## 8. 设计决策汇总
 
 1. **CI 形状**：每语言一个 workflow 文件（ci-typescript.yml / ci-python.yml / ci-kotlin.yml），
-   ci.yml 一字不动（Rust 10 job + go-1.26 原位）；拒绝单矩阵（§5.2 四条理由）。
+   ci.yml 一字不动（Rust 10 job + go-1-26 原位）；拒绝单矩阵（§5.2 四条理由）。
 2. **digest 共享**：SHA-256 聚合（算法 fc-manifest-0.13.0.json:40）只覆盖语言无关向量文件 → 五
    runner 各算各的必得同一值；钉值两处：fc-manifest `digests.conformance_suite`（运行期校验）+
    每语言 runner 测试内硬钉常量（变更即红）；向量变更五处同批更新（§4）。

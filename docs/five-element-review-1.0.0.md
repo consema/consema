@@ -84,7 +84,7 @@
 | RC soak 阶段 1（磁盘失败、部分权限失败演练、differential 追加、Go RC fuzz 记录、corpus 巡检、性能复测） | 部分权限失败演练已闭环（rc-1.0.0-candidate.md §3.5 演练 4，2026-08-10）；磁盘失败演练环境阻塞（演练 5，完成路径随 C-1）；differential 追加、Go RC fuzz 记录、corpus 巡检、性能复测状态按 rc-1.0.0-candidate.md §4.1 | §28.5 条件 6（failure/limits 演练完整性，§22.7"stale/部分权限/中断/磁盘四类演练"——仅磁盘失败未记录，部分权限已闭环） | 阻塞 §28.5 的 RC 收口（RC soak 本身是 §16.6 硬门禁的法定例外） |
 | Go CLI 合入后的 cross-language exchange 复跑（P2-7） | 已闭环（2026-08-10，rc-1.0.0-candidate.md:293：G5.6 合入后四 harness 复跑 83/83 + 108/108 + 68/68） | §22.2（rc-1.0.0-candidate.md:38 边界）→ §28.5 条件 4 的 CLI 侧核对 | 不阻塞（SDK 面 83/83 已实测；CLI 侧已闭环） |
 | 版本推进 `1.0.0-rc.1`（F-A） | 已随 2209582 提交（Cargo.toml:31 / go/cmd/consema/version.go:15）并通过两语言门禁（审计实测） | §28.5 条件 5 的发布准备、C-3 阶段 0 执行 | 不阻塞（F-A 已修复，§5.1） |
-| vector 聚合 digest 干净 checkout 不可复现（F-B，提交态） | 已修复（2209582）：干净 LF checkout 重算 35bebc8d… 并回填 fc-manifest:38 与 conformance_test.go:106，与 D-1 纪律合并记录（一切门禁证据以干净 checkout 为准） | §28.5 条件 5（可重建证据）、C-1（go-1.26 job）、fc-manifest"值可精确复现"声称 | 不阻塞（已修复；C-1 推入与 C-3 发布按原路径执行） |
+| vector 聚合 digest 干净 checkout 不可复现（F-B，提交态） | 已修复（2209582）：干净 LF checkout 重算 35bebc8d… 并回填 fc-manifest:38 与 conformance_test.go:106，与 D-1 纪律合并记录（一切门禁证据以干净 checkout 为准） | §28.5 条件 5（可重建证据）、C-1（go-1-26 job）、fc-manifest"值可精确复现"声称 | 不阻塞（已修复；C-1 推入与 C-3 发布按原路径执行） |
 
 其余开放项（B-1/B-2/B-3/B-5/B-7/B-8 backlog、P2-1..P2-6 发布判断清单、BENCH-NOHARNESS 等）均为文档化边界或带 judgment 的 P2，不依赖任何 §28 通过条件，随 1.0.0 窗口处置。
 
@@ -121,7 +121,7 @@
 | G4.2 finding | go/plist materialization provenance 面缺失（direct/generated 关系） | P1 | 79df437（照 Rust build_provenance） | 关闭 |
 | G5.3 exchange findings | core.query-result@1 Native match wire 字段等 6 项（unknown-field、Bytes replacement wrong-type、batch-plan profile_default:null、stale doc comments） | P1 | ada5020（83/83 双向通过；2 个遗留 documented skip 翻转为执行，508 全执行） | 关闭 |
 | Go fuzz 4 缺陷（G5.4） | ① plist.binary trailer limit 越界报 false Complete（无 native model、无诊断）② json strict trailing-comma 诊断 category panic ③ yaml plain-block 无限循环（`e0: e0\n s:[a,t`）④ plist.xml 恢复循环 OOB panic + tokenizer 卡死循环 | ①P0（伪成功）②③④P1 | 937b330（每个失败输入钉入 testdata/fuzz/ 回归种子；①保留 Foundation 冻结事实） | 关闭（30s×16 target clean-run 实测 2026-08-10） |
-| G5.5 F1 | §21.2 最低版本 CI 腿未落（go-1.26 job） | P2 | 937b330（ci.yml go-1.26 job） | 关闭（F-B 已修复，该 job 不受影响） |
+| G5.5 F1 | §21.2 最低版本 CI 腿未落（go-1-26 job） | P2 | 937b330（ci.yml go-1-26 job） | 关闭（F-B 已修复，该 job 不受影响） |
 | D-1 / D-2（G5.7 drill） | 0.8.0 checksum manifest 从 git 历史不可复现（脏树记录，0/14 匹配）；演练密钥无持久公钥 | P1（发布流程） | 处置已定：0.13.0 发布时从干净发布 commit 重新生成 checksum manifest（release-process §7 items 3+5）；真实密钥+备份随 C-3 | **待 C-3 关闭**（非代码缺陷，流程证据缺陷） |
 
 **P0/P1 清零声明核验**：全周期 P0（M2-F2、Go fuzz ①）与 P1 全部修复并有回归钉死；关账后新增的 **F-A**（§5.1）与 **F-B**（§5.2）两项 P1 级证据缺陷已于 2209582 处置并审计验证——"无未解决 P0/P1"的声明恢复成立（§18.4 第 1689 行）。
@@ -194,7 +194,7 @@
     CRLF）上按文档化算法算出的；git 提交内容为 LF（`git show HEAD:conformance/vectors/cli-v1.json` 实测 LF）。
     干净 checkout 产出 LF，逐文件 sha256 即不同 → 聚合 digest 不同。记录值只在"与记录机 checkout 状态相同"
     的机器上可复现，与 fc-manifest 第 40 行"值可精确复现"与 §28.5"可重建"声称不符。
-  - 影响（当时，P1 级）：(a) C-1 的 go-1.26 CI job（ci.yml:306-317，`go test ./...` 于 ubuntu）在干净
+  - 影响（当时，P1 级）：(a) C-1 的 go-1-26 CI job（ci.yml:306-317，`go test ./...` 于 ubuntu）在干净
     checkout 必红，C-1 完成路径硬阻塞；(b) 任何第三方 clone 复跑 shared-conformance 脚本必红；(c) 与 D-1
     同源纪律（"manifest 必须从干净发布 commit 重新生成"）在 vector 域同样适用。
 

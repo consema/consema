@@ -257,7 +257,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
   跨平台差 >1.0pp 时 C-1 首跑可能 -Trend 首红。处置：若红，按脚本政策在
   ubuntu 等效环境刷新入库报告并附处置记录（release 里程碑刷新许可，
   coverage.ps1:524）；不阻塞 C-1 推入
-- CI 就绪审计 → **已完成**（2026-08-10，只读审计 10 job + go-1.26）：8 job
+- CI 就绪审计 → **已完成**（2026-08-10，只读审计 10 job + go-1-26）：8 job
   静态 PASS；3 项首跑风险：msrv clippy（1.85 特有 warning，**已修复**——见
   任务 A）、oracles macOS 腿 pin 不符 throw（**已补文档化 skip** exit 3——
   见任务 B）、coverage -Trend 平台差（处置见上条）。结论：3 项处置后 C-1

@@ -311,7 +311,7 @@ jobs:
   # gofmt/vet/build/test/race gates all enter the release gate (§21.2 line
   # 1832; plan §6). Single OS (ubuntu-latest); the three-OS matrix is the
   # documented G5.4 completion path.
-  go-1.26:
+  go-1-26:
     name: Go 1.26 gates (gofmt + vet + build + test + race)
     runs-on: ubuntu-latest
     timeout-minutes: 30
