@@ -329,9 +329,9 @@ multi-language-implementation-plan.md:119-125 §7 START GATE：工具链就绪�
 | 文件 | 动作 | 内容 |
 |---|---|---|
 | `.github/workflows/ci.yml` | **不改**（Rust 门禁域 + go-1-26 原位） | 现 11 job 全保留（§1.1 映射表） |
-| `.github/workflows/ci-typescript.yml` | 新增（L0 关闭批次） | `ts-gates`、`ts-conformance`、`ts-differential`（§1.2）；L5 加 `ts-package` |
-| `.github/workflows/ci-python.yml` | 新增（L0 关闭批次） | `python-gates`、`python-conformance`、`python-differential`；L5 加 `python-package` |
-| `.github/workflows/ci-kotlin.yml` | 新增（L0 关闭批次） | `kotlin-gates`、`kotlin-conformance`、`kotlin-differential`；L5 加 `kotlin-package` |
+| `.github/workflows/ci-typescript.yml` | 已新增（2026-08-12 上线全绿，见 §10） | `ts-gates`、`ts-conformance`、`ts-differential`（§1.2）；L5 加 `ts-package` |
+| `.github/workflows/ci-python.yml` | 已新增（2026-08-12 上线全绿，见 §10） | `python-gates`、`python-conformance`、`python-differential`；L5 加 `python-package` |
+| `.github/workflows/ci-kotlin.yml` | 已新增（2026-08-12 上线全绿，见 §10） | `kotlin-gates`、`kotlin-conformance`、`kotlin-differential`；L5 加 `kotlin-package` |
 
 ### 7.2 scripts/ 新增（命名照 go-verify-* 惯例；自包含、pwsh、零第三方依赖）
 
@@ -409,3 +409,45 @@ multi-language-implementation-plan.md:119-125 §7 START GATE：工具链就绪�
 - 记录：`docs/fc-manifest-0.13.0.json`（digest 第 35-41 行、C-1 第 786-802 行）
 - 验证证据：`docs/five-element-review-1.0.0.md:35`（108/108、83/83、68/68 实测）
 - 三语言 scaffold：`typescript/package.json`、`python/pyproject.toml`、`kotlin/build.gradle.kts`
+
+---
+
+## 10. 实施状态（2026-08-12 更新：三个新语言 workflow 已上线全绿）
+
+本文档为规划阶段产物，§7 为规划表（保留为历史记录）；本节追加实施实况。
+数据来源：GitHub Actions API 核验（head dbba9a4，2026-08-12）+ 本机复核（workflow/
+脚本/文件存在性）。
+
+- **三个新语言 workflow 全部 LIVE 且全绿**（每语言 3 job，与 §1.2/§7.1 设计一致）：
+  - `.github/workflows/ci-typescript.yml` run#2：ts-gates / ts-conformance /
+    ts-differential（differential = byte parity + normalized + protocol exchange
+    三个脚本，windows-latest，ci-typescript.yml:102-137）
+  - `.github/workflows/ci-python.yml` run#2：python-gates / python-conformance /
+    python-differential
+  - `.github/workflows/ci-kotlin.yml` run#2：kotlin-gates / kotlin-conformance /
+    kotlin-differential（无 gradle wrapper，按 ci-kotlin.yml:1-21 设计直驱
+    K2JVMCompiler + kotlin.test shim）
+  - `.github/workflows/ci.yml` run#9：Rust 10+1 job 保持全绿——§5.2 的文件级失败
+    隔离在实跑中成立（新语言上线未触碰 Rust 门禁域）
+- **首跑缺陷（均在 dbba9a4 修复）**：
+  - python 测试夹具硬编码路径 8 处 → 仓库相对路径（本机复核：pytest 收集面
+    `test_*.py`/`*_test.py` 与 `python/src/` 已无硬编码路径；`python/tests/yaml/
+    _verify_*.py` 为下划线前缀的非门禁 ad-hoc 脚本，pytest 默认不收集，其硬编码
+    路径不影响 CI 绿）
+  - kotlin jar 供给：`kotlin-test-2.2.0.jar` 与 `junit-jupiter-api-5.10.2.jar` 自
+    Maven Central（repo1.maven.org）供给至 `kotlin/build/verify/lib/`
+    （kotlin-test jar 不随 kotlinc 发行版、junit-jupiter-api 为 kotlin-test-junit5
+    编译所需，ci-kotlin.yml:74-91/266-284）；测试 shim `kotlin/verify/TestShim.kt`
+    入库（单模块编译含 shim，ci-kotlin.yml:96-116）
+- **仍属未来批次（§5.3/§7.2/§7.3 原计划项，如实记录）**：
+  - `scripts/{ts,python,kotlin}-verify-shared-conformance.ps1` 尚未合入（2026-08-12
+    复核不存在）；workflow 头注释明示其随 runner-CLI 批次作为第四个 differential
+    step 落地（ci-typescript.yml:13-15）——**runner-CLI slot 仍为未来项**
+  - `L-package` job、零 documented skip 断言、3-OS 矩阵处置属 §5.3 L5 批次，未上线；
+    kotlin `gradlew`/wrapper 仍缺失（§7.3 L0 批次后续项，workflow 按无 wrapper 设计
+    直驱 K2JVMCompiler）；`conformance/differential/` 共享 case 集迁移（§3.5/§7.3）
+    未执行
+- **证据链影响**：三语言 job 全绿把 C-1"GitHub 干净 checkout 全绿"证据由 Rust/Go
+  扩展到 TS/Python/Kotlin（rc-1.0.0-candidate.md §4.1 已增补，2026-08-12）；§0.1 的
+  "无测试目录 / 无 package-lock.json"缺口已被首批运行吸收（package-lock.json 已入库、
+  npm ci 实跑，ci-typescript.yml:42-44）
