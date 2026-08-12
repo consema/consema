@@ -1,10 +1,15 @@
 # Consema
 
 ![CI](https://img.shields.io/github/actions/workflow/status/consema/consema/ci.yml?branch=main)
+![Docs](https://img.shields.io/github/deployments/consema/consema/github-pages?label=docs)
 ![Version](https://img.shields.io/github/v/tag/consema/consema)
 ![License](https://img.shields.io/github/license/consema/consema)
 
 Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、INI、Java Properties、XML、Property List 与 HCL 八个格式家族提供无损文档、格式原生语义、公共值、查询、显式投影、来源映射和原子编辑，默认拒绝未经授权的转换、截断或信息损失。规范与设计语言无关，由五个独立实现（Rust、Go、TypeScript、Python、Kotlin）共同证明（2026-08-11 决策：五语言同等地位，见 `docs/multi-language-implementation-plan.md` 与 `docs/five-language-ci-design.md`）。
+
+## 文档站
+
+[consema.github.io/consema](https://consema.github.io/consema/)：本仓文档的 GitHub Pages 发布视图（mdbook，源码在 `docs-site/`，构建部署见 `.github/workflows/docs-site.yml`）。本站把 `docs/` 与根目录的规范、RFC、路线图、指南与审计证据变成可浏览、可引用的站点；**权威文档始终以本仓 `docs/` 与根目录为准**，站点是发布视图。
 
 ## 六仓结构
 

@@ -1,0 +1,17 @@
+# Consema docs site (docs-site/) — mdBook configuration.
+#
+# This site is a PUBLISH VIEW of the authoritative documents in this
+# repository (docs/ and repo root). Authority always lives in the repository;
+# the site exists to make the spec browsable and citable
+# (docs.consema.dev-class goal). See src/index.md for the full statement.
+[book]
+title = "Consema 规范站"
+authors = ["Consema"]
+description = "Consema：配置格式统一处理规范（语言无关权威）。RFC、路线图、指南、设计记录与审计证据的发布视图。"
+language = "zh"
+
+[output.html]
+# Current deployment: GitHub Pages of the consema/consema repository
+# (docs.consema.dev custom domain can be added later via the Pages settings).
+site-url = "https://consema.github.io/consema/"
+git-repository-url = "https://github.com/consema/consema"

@@ -1,0 +1,84 @@
+# Consema docs site (docs-site/): build the mdBook documentation site and
+# deploy it to GitHub Pages via actions/deploy-pages (GitHub Pages source
+# must be set to "GitHub Actions" in the repository settings).
+#
+# The site is a PUBLISH VIEW of the authoritative documents in this
+# repository (docs/ and repo root); the source lives in docs-site/.
+# No repository secrets are required (deployment uses the OIDC id-token).
+#
+# Pins: every action pinned to a commit SHA with a `# vX.Y.Z` comment
+# (supply-chain drift guard, per the repo engineering standard).
+name: Docs site
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'docs-site/**'
+      - '.github/workflows/docs-site.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: docs-site-${{ github.ref }}
+  cancel-in-progress: true
+
+# Minimal token scope: build reads contents only; deploy gets pages:write
+# and the OIDC id-token (required by actions/deploy-pages) at the job level.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: build mdBook site
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+      - uses: peaceiris/actions-mdbook@ee69d230fe19748b7abf22df32acaa93833fad08 # v2.0.0
+        with:
+          mdbook-version: '0.5.4'
+      - name: build book
+        working-directory: docs-site
+        run: mdbook build
+      - name: upload pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: docs-site/book
+
+  deploy:
+    name: deploy to GitHub Pages
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
+    steps:
+      - name: deploy
+        id: deployment
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0
+
+  # Alls-green aggregate gate (tokio/pydantic pattern, same as ci.yml):
+  # `if: always()` is mandatory — otherwise GitHub skips this job when a
+  # dependency fails and a skipped check can be treated as success.
+  # Named distinctly from ci.yml's "check (all gates green)" so required
+  # check matching on branch protection stays unambiguous.
+  check:
+    name: docs-site (all gates green)
+    if: always()
+    needs: [build, deploy]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@05ac9388f0aebcb5727afa17fcccfecd6f8ec5fe # v1.2.2
+        with:
+          allowed-failures: ''
+          jobs: ${{ toJSON(needs) }}
