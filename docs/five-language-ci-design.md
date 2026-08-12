@@ -77,7 +77,7 @@
 | test（cargo test --workspace，3 OS，:48-61） | Rust 专属 | TS = `npm ci` + `npm test`（node --test）；Python = `pip install -e '.[dev]'` + `pytest`；Kotlin = `./gradlew --no-daemon test` |
 | coverage（cargo-llvm-cov 硬地板 + -Trend，:77-113） | Rust 专属 | 三语言**无覆盖地板**（multi-language-implementation-plan.md §6 验收门禁无覆盖项）；每语言覆盖率趋势为 L5 可选，估计量：非 1.0.0 门禁项 |
 | msrv（Rust 1.85 全门禁，:118-144） | Rust 专属 | 每语言最低版本验证（§1.2）：TS node >= 26（package.json:8 engines；CI 钉 '26.x'）；Python 3.12（pyproject.toml:20；CI 钉 '3.12.x'）；Kotlin 2.2.0 + JVM 17（build.gradle.kts:6-7, 13-15）。注意与 Rust 的差别：Rust 的 stable ≠ msrv 是两套工具链；三语言 CI 钉的版本**就是**最低版本（"really verified in CI" 由构造满足，路线图 §21.2 第 1833 行精神） |
-| conformance（cargo test -p consema-conformance + suite-count 断言，:145-173） | Rust runner 腿 | 每语言独立 conformance job（§2）：TS/Python/Kotlin 各一，runner 内做 18/508 + digest 断言（不复制 ci.yml:155-173 的内联 PS 脚本——断言进各语言 runner 测试，单一来源） |
+| conformance（cargo test -p consema-conformance + suite-count 断言，:145-173） | Rust runner 腿 | 每语言独立 conformance job（§2）：TS/Python/Kotlin 各一，runner 内做 18/519 + digest 断言（不复制 ci.yml:155-173 的内联 PS 脚本——断言进各语言 runner 测试，单一来源） |
 | deny（cargo deny check，:175-184） | Rust 依赖政策 | 每语言零运行时依赖断言 + 开发依赖审计（§1.3）：TS `npm ls --omit=dev` 空 + `npm audit`（L5）；Python `dependencies = []`（pyproject.toml:22）断言 + `pip check`；Kotlin runtimeClasspath 空断言 + gradle 依赖锁定/验证（L5） |
 | audit（cargo audit / RustSec，:186-199） | Rust 供应链 | 同 deny 行。安全面 = 运行时零依赖 → 供应链面只剩 dev 工具（typescript/@types/node、pytest、kotlin.test+junit-jupiter）；L5 收口时逐语言审计并记录（照 SEC-6 体例，fc-manifest-0.13.0.json:510-518） |
 | semver（cargo-semver-checks，:201-235） | Rust API 稳定性 | **Rust 专属**。三语言 API 稳定性门禁属 1.0.0 收口（路线图 §22.2 第 1887 行"Rust/Go public API 都完成稳定性审查"扩展至五语言；multi-language-implementation-plan.md:111）：TS exports 冻结审查 / Python `__all__` 审查 / Kotlin public API dump（kotlinx binary-compatibility-validator 属 dev 依赖，政策允许），全部 L5+ |
@@ -93,7 +93,7 @@
 | job 名 | name | runs-on | 步骤（L0 版） |
 |---|---|---|---|
 | `L-gates` | "L gates (fmt/type + unit tests + zero-dep)" | ubuntu-latest，timeout 30 | checkout → 工具链（TS: actions/setup-node@v4 node-version '26.x' + cache npm；Python: actions/setup-python@v5 python-version '3.12.x'；Kotlin: actions/setup-java@v4 Temurin 17 + gradle/actions/setup-gradle@v4 cache）→ 静态/类型检查（TS: `npm ci` + `npm run check`；Kotlin: `./gradlew --no-daemon compileKotlin` 或 build 前段）→ 单元测试（`npm test` / `pytest` / `./gradlew --no-daemon test`）→ 零依赖断言（§1.3） |
-| `L-conformance` | "L conformance runner (18 suites / 508 cases)" | ubuntu-latest，timeout 60 | checkout → 工具链 → 运行该语言 runner（§2.2）。runner 内部完成：digest 校验 + 18/508 计数断言 + 逐 case 执行 + documented skip 报告；L5 起零 skip 断言 |
+| `L-conformance` | "L conformance runner (18 suites / 519 cases)" | ubuntu-latest，timeout 60 | checkout → 工具链 → 运行该语言 runner（§2.2）。runner 内部完成：digest 校验 + 18/519 计数断言 + 逐 case 执行 + documented skip 报告；L5 起零 skip 断言 |
 | `L-differential` | "L differential vs Rust (byte parity [+ normalized] [+ protocol exchange])" | ubuntu-latest，timeout 60 | checkout → cargo（swatinem/rust-cache@v2）→ 工具链 → 逐脚本运行 `scripts/L-verify-byte-parity.ps1`（L0 起）、`scripts/L-verify-normalized-differential.ps1`（L1 起）、`scripts/L-verify-protocol-exchange.ps1`（L4 起）、`scripts/L-verify-shared-conformance.ps1`（L4 起，§3.6）；脚本内断言"测试必须 RUN 而非 SKIP"（照 go-verify-byte-parity.ps1:117-124 体例） |
 
 ### 1.3 零运行时依赖政策的 CI 强制（deny/audit 的五语言等价物）
@@ -111,7 +111,7 @@
 
 - **同一向量、五个 runner**：Rust（crates/consema-conformance）、Go（go/conformance + cmd/
   consema-conformance）、TS、Python、Kotlin 各自独立实现、各自执行全部 18 套共享向量
-  （conformance/vectors/，18 文件 / 508 cases，2026-08-11 实测）。权威五元扩展为七元
+  （conformance/vectors/，18 文件 / 519 cases，2026-08-12 实测）。权威五元扩展为七元
   （multi-language-implementation-plan.md:6-7：normative prose + contract registry + machine-readable
   vectors + raw fixtures + independent runners × 5）。"Rust 测试通过不能代替 Go 测试"（路线图 §17.1
   第 1575 行）平移为"任何语言 runner 的通过都不能代替其他语言 runner"。
@@ -134,7 +134,7 @@
   run-plist-macos-oracle.ps1，38 + 28 cases，exit 3 = documented skip）+ Go（plist-macos-v1 28 cases）
   执行，再加 §3 双向差分 harness（byte parity / normalized / protocol exchange，对照 Rust 发射器）
   保证；
-  TS/Py/Kt 的同一行为面由 508 共享向量 + fixture round-trip 门禁（2026-08-12 审计批次，
+  TS/Py/Kt 的同一行为面由 519 共享向量 + fixture round-trip 门禁（2026-08-12 审计批次，
   TS `typescript/src/conformance/fixtures.test.ts`、Python `python/tests/{yaml,ini,properties}/
   test_fixtures.py`、Kotlin `kotlin/src/test/kotlin/consema/conformance/FixtureRoundTripTest.kt`）覆盖。
 
@@ -145,7 +145,7 @@
 | TS | `typescript/src/conformance/`：node:test 驱动（package.json:17 的 `node --test src/` 即覆盖），每 suite 一个 test 文件（protocol_v1.test.ts…照 crates/consema-conformance/src/lib.rs:3-25 模块清单对偶）；`npm run conformance` 脚本可选（CLI 形式） |
 | Python | `python/src/consema/conformance/` runner 模块 + `python/tests/conformance/` pytest 套件（pyproject.toml:30-32 testpaths 即覆盖）；可选 `python -m consema.conformance` CLI（照 cmd/consema-conformance 先例） |
 | Kotlin | `kotlin/src/test/kotlin/consema/conformance/` kotlin.test/JUnit5 套件（build.gradle.kts:24-26 useJUnitPlatform 即覆盖） |
-| 固定校验（每 runner 必做） | suite id 前缀 `consema.*` 校验（ci.yml:164-166 体例）；case id 去重；**case 计数断言 18/508**（conformance/README.md:81-82 第 4 条"每个 suite 必须验证 case 数量"）；聚合 digest 断言（§4.2）；未知 action 拒绝 |
+| 固定校验（每 runner 必做） | suite id 前缀 `consema.*` 校验（ci.yml:164-166 体例）；case id 去重；**case 计数断言 18/519**（conformance/README.md:81-82 第 4 条"每个 suite 必须验证 case 数量"）；聚合 digest 断言（§4.2）；未知 action 拒绝 |
 | 数据驱动 | input/expected 实际驱动执行；禁止把期望值硬编码进 runner（conformance/README.md:73、:80 第 3 条"runner 只是执行器"） |
 | skip 纪律 | 未实现 capability 的 case 进 documented skip（带 capability + 原因，绝不静默；RFC 0016 §7 第 191 行，go-implementation-plan.md:273）；L5 起零 skip |
 | 报告形态 | 与 Rust/Go 同构的共享报告（§2.3）：suite file、case id、passed/skipped/failed 计数、skip 原因；机器可读输出照 RFC 0015 信封语义（go-implementation-plan.md:281） |
@@ -263,12 +263,12 @@
 ### 4.2 钉值位置与双重校验
 
 1. **manifest 记录（运行期校验）**：`docs/fc-manifest-0.13.0.json` `digests.conformance_suite`
-   （第 35-41 行：suites=18 / cases=508 / aggregate_sha256=`35bebc8d384d71740f7c1a886bc50f4e095ff52fe05d2a407f04b842ee6922fa`）。
+   （第 35-41 行：suites=18 / cases=519 / aggregate_sha256=`cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`）。
    每个新语言 runner 启动时校验 computed == 记录值（照 Go runner 的 -manifest 行为，cmd/
    consema-conformance/main.go:27-29；Rust runner 无此检查，由共享 conformance 脚本补齐一次，
    go-verify-shared-conformance.ps1:16-17）。
-2. **每 runner 测试内硬钉（变更即红）**：每个语言的 runner 测试把聚合值 `35bebc8d…` 与计数
-   18/508 作为常量断言（"双语言共钉"扩展到"五语言共钉"，multi-language-implementation-plan.md:15）。
+2. **每 runner 测试内硬钉（变更即红）**：每个语言的 runner 测试把聚合值 `cfd6e296…` 与计数
+   18/519 作为常量断言（"双语言共钉"扩展到"五语言共钉"，multi-language-implementation-plan.md:15）。
    该硬钉是 suite-count 断言（ci.yml:155-173）的语言内等价物——向量增删而不更新五处 = CI 红。
 
 ### 4.3 变更纪律（同批五处）
@@ -311,11 +311,11 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
 
 | 里程碑关闭 | 该语言 CI 内容（L-differential job 逐步加脚本） |
 |---|---|
-| L0（core+PVCE/PGCE+protocol） | `L-gates`（构建+单测+零依赖）、`L-conformance`（runner 全 18 套、未实现 capability 进 documented skip；digest+18/508 硬钉）、`L-differential` = byte parity + shared-conformance |
+| L0（core+PVCE/PGCE+protocol） | `L-gates`（构建+单测+零依赖）、`L-conformance`（runner 全 18 套、未实现 capability 进 documented skip；digest+18/519 硬钉）、`L-differential` = byte parity + shared-conformance |
 | L1（document+json+toml） | `L-differential` += normalized differential（json/toml 面使然） |
 | L2/L3（yaml/ini/properties/xml/plist/hcl） | 无新 job；conformance job 的 skip 数随 capability 收敛 |
 | L4（全操作 parity + capability parity） | `L-differential` += protocol exchange；`L-conformance` 断言 capability parity（照 go/capability_parity_test.go 体例，go/README.md:797-809） |
-| L5（runner 全 508 + fuzz/bench/security + CLI beta） | `L-conformance` 断言**零 documented skip**；新增 `L-package`（§1.1 package 行）；fuzz/bench/security 冒烟进 CI（短时长）；三平台矩阵按 Go 先例走文档化完成路径（go/README.md:814-850，"completion path documented, not a CI job"）或显式 3-OS 矩阵 job——二选一在 L5 批次记录 |
+| L5（runner 全 519 + fuzz/bench/security + CLI beta） | `L-conformance` 断言**零 documented skip**；新增 `L-package`（§1.1 package 行）；fuzz/bench/security 冒烟进 CI（短时长）；三平台矩阵按 Go 先例走文档化完成路径（go/README.md:814-850，"completion path documented, not a CI job"）或显式 3-OS 矩阵 job——二选一在 L5 批次记录 |
 | 1.0.0 收口 | 每语言 API 稳定性门禁（§1.1 semver 行）；五语言全部 job 全绿入 §22/五要素审计（multi-language-implementation-plan.md:111） |
 
 **语言间并行**：三语言 L0-L5 完全并行（multi-language-implementation-plan.md:38-39 "三语言之间
@@ -387,7 +387,7 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
 
 | 字段 | 内容 |
 |---|---|
-| `digests.conformance_suite.evidence` | 追加"五 runner 共钉"注记（值 35bebc8d… 不变） |
+| `digests.conformance_suite.evidence` | 追加"五 runner 共钉"注记（值 cfd6e296… 不变） |
 | 新顶层 `languages` | 每语言一节：toolchain pin（node 26.x / python 3.12.x / kotlin 2.2.0+JVM 17）、里程碑状态（blind_writing / l0_open / l0_closed / … / l5_closed）、每里程碑证据与 owner（照 rust_compiler_msrv 记录体例，fc-manifest-0.13.0.json:58-63）、CI 上线批次 decision record |
 | `corpus_test_suite_revisions.value` | 追加差分 case 集记录（byte-parity 68 / normalized 108 / protocol-exchange 83，含迁移后共享路径） |
 | `capability_set` 相关门禁 | 每语言 capability parity 记录（L4 起，"无 Rust only mandatory"，multi-language-implementation-plan.md:115） |
@@ -426,7 +426,7 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
 - 体例：`docs/go-implementation-plan.md`（§4/§6/§7 平移）、`docs/multi-language-implementation-plan.md`
 - 现状 CI：`.github/workflows/ci.yml`（10+2 job：10 Rust + go-1-26 + go-differential）
 - 差分现状：`scripts/go-verify-*.ps1` 四个脚本、`go/README.md:766-850`
-- 向量权威：`conformance/README.md`、`conformance/vectors/`（18 套 / 508 cases）
+- 向量权威：`conformance/README.md`、`conformance/vectors/`（18 套 / 519 cases）
 - 记录：`docs/fc-manifest-0.13.0.json`（digest 第 35-41 行、C-1 第 786-802 行）
 - 验证证据：`docs/five-element-review-1.0.0.md:35`（108/108、83/83、68/68 实测）
 - 三语言 scaffold：`typescript/package.json`、`python/pyproject.toml`、`kotlin/build.gradle.kts`
@@ -467,10 +467,10 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
     step 落地（ci-typescript.yml:13-15）——**runner-CLI slot 仍为未来项**
   - `L-package` job 与 3-OS 矩阵处置属 §5.3 L5 批次，未上线；零 documented
     skip 断言已部分上线——**Kotlin 已上线**（kotlin/src/test/kotlin/consema/
-    conformance/ConformanceRunnerTest.kt:58-59 显式断言 508 passed / 0 skipped）、
+    conformance/ConformanceRunnerTest.kt:58-59 显式断言 519 passed / 0 skipped）、
     **Python 已上线**（每 suite 适用面 (passed,0,0) 共钉，python/tests/conformance/
     test_runner.py:32-51,89——任何 documented skip 即红）、**TS 未上线**
-    （typescript/src/conformance/runner.test.ts:23 允许 passed+skipped=508，
+    （typescript/src/conformance/runner.test.ts:23 允许 passed+skipped=519，
     documented skip 仍被接受）；
     kotlin `gradlew`/wrapper 仍缺失（§7.3 L0 批次后续项，workflow 按无 wrapper 设计
     直驱 K2JVMCompiler）
