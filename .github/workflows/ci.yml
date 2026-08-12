@@ -30,6 +30,12 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+# Top-tier P0: minimal token scope. Every job here only reads repository
+# contents (checkout + running repo scripts); none uploads artifacts or
+# writes check runs, so the global minimum is sufficient for all jobs.
+permissions:
+  contents: read
+
 jobs:
   # Differential oracles with documented skip paths (§14.12 "differential").
   # run-hcl-go-oracle.ps1: requires the pinned Go toolchain under
@@ -121,3 +127,27 @@ jobs:
             echo "::error::aggregate digest mismatch: expected $expected, got $digest"
             exit 1
           fi
+
+  # Alls-green aggregate gate (tokio/pydantic pattern): `check (all gates
+  # green)` is the SINGLE required check for branch protection on this
+  # repository; every other job stays non-required. `if: always()` is
+  # mandatory — otherwise GitHub skips this job when a dependency fails and
+  # a skipped check can be treated as success. `jobs: ${{ toJSON(needs) }}`
+  # is the action's mandatory input (it does not read the needs context
+  # automatically). No job here uses continue-on-error or allowed-failures
+  # semantics (the oracles exit-3 skip path is handled inside the job's
+  # step), so no allowed-failures entry is needed.
+  check:
+    name: check (all gates green)
+    if: always()
+    needs: [oracles, shared-conformance-digest]
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - name: decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@v1
+        with:
+          allowed-failures: ''
+          jobs: ${{ toJSON(needs) }}
