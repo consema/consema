@@ -121,6 +121,22 @@
   权威源）；runner 通过显式仓库相对路径读取 `conformance/vectors/` 与 `conformance/fixtures/`。
   Rust runner 保持现状（嵌入向量、无 digest check——该缺口由共享 conformance 脚本补，
   go-verify-shared-conformance.ps1:16-17）；Go 与三新语言 runner 每次执行自验 digest（§4.2）。
+- **oracle 套件执行边界（2026-08-12 审计决策，rc 前六角色审计 P2）**：`conformance/oracles/` 的 7 套件
+  / 102 cases（java-properties-v1 11、python-configparser-v1 9、dotnet-ini-v1 7、windows-ini-v1 5、
+  qt-ini-v1 4、plist-macos-v1 28、hcl-go-v1 38）是外部运行时行为钉（OpenJDK 25.0.4、CPython 3.14.6
+  embeddable、.NET SDK 10.0.302、Windows wide profile API、Qt 6.10.2 MinGW、macOS Foundation/plutil、
+  HCL v2.21.0 Go module），**不扩展给 TS/Py/Kt runner**：三语言 CI 无法原生运行被钉的外部运行时；
+  且每个 oracle 的 comparison 契约（ConfigParser defaults/raw 视图与 casefold、异常分类映射、
+  plist five-leg 对比表、HCL accept/reject 映射、TSV 传输与 hex digest）是随录制运行时冻结的适配器
+  语义，逐语言复刻 = 复制 Rust runner 逻辑，违反"runner 只是执行器"（conformance/README.md 第 3 条）。
+  oracle 的跨语言覆盖由 Rust（java-properties / python-configparser / dotnet-ini / windows-ini /
+  qt-ini 五套件 36 cases，权威）+ 规范仓 CI oracles job（run-hcl-go-oracle.ps1 /
+  run-plist-macos-oracle.ps1，38 + 28 cases，exit 3 = documented skip）+ Go（plist-macos-v1 28 cases）
+  执行，再加 §3 双向差分 harness（byte parity / normalized / protocol exchange，对照 Rust 发射器）
+  保证；
+  TS/Py/Kt 的同一行为面由 508 共享向量 + fixture round-trip 门禁（2026-08-12 审计批次，
+  TS `typescript/src/conformance/fixtures.test.ts`、Python `python/tests/{yaml,ini,properties}/
+  test_fixtures.py`、Kotlin `kotlin/src/test/kotlin/consema/conformance/FixtureRoundTripTest.kt`）覆盖。
 
 ### 2.2 每语言 runner 设计（镜像 go/conformance 体例，go-implementation-plan.md:275-282）
 
