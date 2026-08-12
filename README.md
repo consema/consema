@@ -15,6 +15,8 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 | [consema-py](https://github.com/consema/consema-py) | Python 实现 |
 | [consema-kt](https://github.com/consema/consema-kt) | Kotlin 实现 |
 
+拆分决策与执行记录（对齐修复 → 差分集迁移 → subtree split → 五仓组装 → 母仓瘦身 → CI 修复链 → semver 门禁真空修正 → 驱动迁移）：[six-repo-split-2026-08-12.md](docs/six-repo-split-2026-08-12.md)。
+
 ## 本仓内容
 
 **规范文档**（根目录，权威载体）：
