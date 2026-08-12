@@ -1,2 +1,0 @@
-anchor: &a {x: 1}
-alias: *a

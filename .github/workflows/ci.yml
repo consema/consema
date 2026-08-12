@@ -1,7 +1,18 @@
-# Consema 0.13.0 gate: three-OS CI (roadmap §14.12 "Windows、Linux、macOS CI",
-# §15.6 "MSRV 在 manifest 中声明并在 CI 真正验证"). Every step maps to an
-# existing repository command or script; no repository secrets are required
-# (the audit job uses only the automatic GITHUB_TOKEN).
+# Consema (spec/conformance authority repo) CI after the six-repo split
+# (2026-08-12): this repo holds the language-independent spec, RFCs,
+# roadmap, audit evidence and the conformance arbitration layer
+# (conformance/). The language implementations (consema-rs/go/ts/py/kt) run
+# their own CI in their own repositories; this workflow only runs what this
+# repo itself owns:
+#
+#   - oracles: differential oracles with documented skip paths (roadmap
+#     §14.12 "differential"), three-OS matrix.
+#   - shared-conformance-digest: recompute the aggregate sha256 of
+#     conformance/vectors/*.json and assert it equals the frozen record
+#     (docs/fc-manifest-0.13.0.json "conformance_suite.aggregate_sha256") so
+#     a vector added or removed without updating the record fails CI.
+#
+# No repository secrets are required.
 #
 # Oracle skip contract: run-hcl-go-oracle.ps1 and run-plist-macos-oracle.ps1
 # exit 3 when their documented skip path applies (conformance/oracles/
@@ -19,223 +30,7 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  CARGO_TERM_COLOR: always
-
 jobs:
-  lint:
-    name: fmt + clippy + rustdoc (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 30
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: rustfmt, clippy
-      - name: cargo fmt --check
-        run: cargo fmt --all -- --check
-      - name: cargo clippy (workspace, all-targets, -D warnings)
-        run: cargo clippy --workspace --all-targets --locked -- -D warnings
-      - name: rustdoc (workspace, no-deps, -D warnings)
-        env:
-          RUSTDOCFLAGS: -D warnings
-        run: cargo doc --workspace --no-deps --locked
-
-  test:
-    name: cargo test --workspace (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 60
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: swatinem/rust-cache@v2
-      - name: cargo test --workspace --locked
-        run: cargo test --workspace --locked
-
-  # Coverage trend gate (gate plan §4 M3 standing toolchain; roadmap §18.3
-  # "Coverage 不替代语义证明"): scripts/coverage.ps1 measures the workspace
-  # with cargo-llvm-cov over the test job's target set
-  # (--workspace --all-targets --locked) and enforces the hard floors
-  # (regions >= 70 / functions >= 70 / lines >= 80, --fail-under-* on every
-  # invocation). -Trend additionally compares the workspace totals against
-  # the report committed at HEAD (docs/COVERAGE-0.13.0.md) and fails when any
-  # metric drops >= 1.0 pp -- the standing executor for the frozen trend
-  # gate. The measured report is uploaded as an artifact (also on gate
-  # failure, per the script's "evidence for the disposition" rule) and the
-  # committed report is then restored, so this job gates regressions without
-  # ever rewriting the committed numbers; per the script's own policy the
-  # committed report is refreshed only by a release-milestone
-  # `powershell -File scripts/coverage.ps1 -Trend` run.
-  coverage:
-    name: coverage (hard floors + -Trend vs committed report)
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-        with:
-          components: llvm-tools-preview
-      - uses: swatinem/rust-cache@v2
-      - name: cargo install cargo-llvm-cov
-        run: cargo install cargo-llvm-cov
-      - name: scripts/coverage.ps1 -Trend (gate, keep artifact, restore committed report)
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $coverageScript = Join-Path $env:GITHUB_WORKSPACE 'scripts/coverage.ps1'
-          $report = Join-Path $env:GITHUB_WORKSPACE 'docs/COVERAGE-0.13.0.md'
-          $artifactDir = Join-Path $env:GITHUB_WORKSPACE 'target/coverage'
-          New-Item -ItemType Directory -Path $artifactDir -Force | Out-Null
-          & $coverageScript -Trend
-          $code = $LASTEXITCODE
-          # Preserve the measured report for the artifact, then restore the
-          # committed report: this job measures and gates only, it never
-          # rewrites the numbers committed at HEAD.
-          if (Test-Path -LiteralPath $report) {
-            Copy-Item -LiteralPath $report -Destination (Join-Path $artifactDir 'COVERAGE-0.13.0.md') -Force
-          }
-          git -C $env:GITHUB_WORKSPACE checkout -- docs/COVERAGE-0.13.0.md
-          exit $code
-      - name: upload measured coverage report (also on gate failure)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: target/coverage/COVERAGE-0.13.0.md
-          if-no-files-found: warn
-
-  # MSRV leg: rust-version = "1.85" is declared in the workspace manifest
-  # (Cargo.toml rust-version) and must be really verified in CI (§15.6). It
-  # runs the same gates as the stable legs on one OS.
-  msrv:
-    name: MSRV 1.85 gates (ubuntu-latest)
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.85.0
-        with:
-          components: rustfmt, clippy
-      - uses: swatinem/rust-cache@v2
-      - name: cargo fmt --check
-        run: cargo fmt --all -- --check
-      - name: cargo clippy (workspace, all-targets, -D warnings)
-        run: cargo clippy --workspace --all-targets --locked -- -D warnings
-      - name: rustdoc (workspace, no-deps, -D warnings)
-        env:
-          RUSTDOCFLAGS: -D warnings
-        run: cargo doc --workspace --no-deps --locked
-      - name: cargo test --workspace --locked
-        run: cargo test --workspace --locked
-
-  # The repository freezes 18 language-neutral conformance suites with
-  # 508/508 cases (README.md "18 套语言无关 conformance suite 共 508/508
-  # cases"; CHANGELOG.md). The explicit job runs the crate's full test set
-  # (lib suites + per-format hardening/fixtures/publication integration
-  # tests) and then asserts the frozen counts from the vector files so a
-  # vector added or removed without updating the record fails CI.
-  conformance:
-    name: conformance + hardening + fixtures (18 suites / 508 cases)
-    runs-on: ubuntu-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: swatinem/rust-cache@v2
-      - name: cargo test -p consema-conformance --locked
-        run: cargo test -p consema-conformance --locked
-      - name: suite-count assertions
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $vectorDir = Join-Path $env:GITHUB_WORKSPACE 'conformance/vectors'
-          $suites = 0
-          $cases = 0
-          foreach ($file in Get-ChildItem -LiteralPath $vectorDir -Filter '*.json') {
-            $vector = Get-Content -LiteralPath $file.FullName -Raw -Encoding utf8 | ConvertFrom-Json
-            if (-not ($vector.suite -like 'consema.*')) {
-              throw "unexpected suite id in $($file.Name): $($vector.suite)"
-            }
-            $suites += 1
-            $cases += @($vector.cases).Count
-          }
-          if ($suites -ne 18 -or $cases -ne 508) {
-            throw "suite-count mismatch: expected 18 suites / 508 cases, got $suites suites / $cases cases"
-          }
-          Write-Output "suite-count: $suites suites, $cases cases"
-
-  deny:
-    name: cargo deny check
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    steps:
-      - uses: actions/checkout@v4
-      - uses: embarkstudios/cargo-deny-action@v2
-        with:
-          command: check
-          command-arguments: advisories bans licenses sources
-
-  # No-fetch cargo audit: rustsec/audit-check pins the RustSec advisory
-  # database through the action instead of letting cargo-audit fetch it.
-  audit:
-    name: cargo audit (RustSec advisory DB)
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    permissions:
-      contents: read
-      checks: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: rustsec/audit-check@v2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-
-  # API/semver gate (§15.6 "Rust public API 完成独立审查"): the workspace
-  # version is 1.0.0-rc.1 (Cargo.toml) and the semver baseline is still the
-  # v0.8.0 git tag (the last released state; the crates are not published to
-  # crates.io), so the baseline is the tagged source tree. The 11 crates that
-  # already existed at v0.8.0 are checked for breaking changes since the tag;
-  # the three crates added after 0.8.0 (consema-xml/plist/hcl) have no
-  # baseline and are excluded.
-  semver:
-    name: cargo-semver-checks (baseline v0.8.0)
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      # The baseline is the v0.8.0 tag in this repository (the crates are not
-      # published to crates.io), compared in place via baseline-rev: the
-      # checkout above has fetch-depth: 0, so the tag is present. A nested
-      # baseline/ checkout would put the consema package in two manifests
-      # under the scanned root and cargo-semver-checks 0.36+ refuses to run;
-      # per the action's README, baseline-root is omitted when baseline-rev
-      # is used.
-      - uses: obi1kenobi/cargo-semver-checks-action@v2
-        with:
-          baseline-rev: v0.8.0
-          package: >-
-            consema,
-            consema-core,
-            consema-document,
-            consema-graph,
-            consema-ini,
-            consema-json,
-            consema-properties,
-            consema-protocol,
-            consema-pvce,
-            consema-toml,
-            consema-yaml
-
   # Differential oracles with documented skip paths (§14.12 "differential").
   # run-hcl-go-oracle.ps1: requires the pinned Go toolchain under
   # target/oracles/go-1.26.5; when absent it exits 3 (documented skip). The
@@ -287,89 +82,42 @@ jobs:
           # genuine failure already exited non-zero in the loop above.
           exit 0
 
-  # Package-archive verification (§15.6 "release artifact 可从干净环境重建",
-  # scripts/verify-package-archives.ps1): on a clean checkout the script
-  # packages every publishable crate, verifies tar-path safety and lockfile
-  # checksums, checks each unpacked crate offline, and builds each crate
-  # with the declared MSRV (1.85, from workspace rust-version) because the
-  # MSRV leg is part of the 0.13.0 gate. cargo fetch warms the offline
-  # cache that the script's --offline invocations rely on.
-  package:
-    name: verify-package-archives (with MSRV leg)
+  # Conformance authority gate: recompute the aggregate sha256 over
+  # conformance/vectors/*.json (byte-order sorted basenames, per-file sha256,
+  # '{basename}:{digest}' joined by '\n' with no trailing newline, then
+  # sha256 of that UTF-8 byte string; canonical checkout bytes, eol=lf per
+  # .gitattributes) and assert it equals the frozen record
+  # (docs/fc-manifest-0.13.0.json "conformance_suite.aggregate_sha256").
+  # A vector added, removed or edited without updating the record fails CI —
+  # the standing executor for the language-neutral conformance freeze
+  # (18 suites / 508 cases).
+  shared-conformance-digest:
+    name: conformance vectors aggregate digest (18 suites / 508 cases)
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@1.85.0
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: swatinem/rust-cache@v2
-      - name: cargo fetch --locked
-        run: cargo fetch --locked
-      - name: scripts/verify-package-archives.ps1
-        shell: pwsh
+      - name: recompute aggregate digest and assert frozen record
+        shell: bash
         run: |
-          $ErrorActionPreference = 'Stop'
-          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts/verify-package-archives.ps1'
-          & $script
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-
-  # Go implementation leg (§21.2 "最低版本 CI 验证"): go.mod freezes
-  # `go 1.26` (docs/go-implementation-plan.md §1.3) and the
-  # gofmt/vet/build/test/race gates all enter the release gate (§21.2 line
-  # 1832; plan §6). Single OS (ubuntu-latest); the three-OS matrix is the
-  # documented G5.4 completion path.
-  go-1-26:
-    name: Go 1.26 gates (gofmt + vet + build + test + race)
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.26.5'
-      - name: gofmt -l . && go vet && go build && go test && go test -race
-        run: cd go && gofmt -l . && go vet ./... && go build ./... && go test ./... && go test -race ./...
-
-  # Go differential gate (roadmap §16.1 "Rust 与 Go 的 PVCE/PGCE bytes 完全
-  # 一致", §16.2 line 1488, §16.6 line 1549; docs/go-implementation-plan.md
-  # §4.4; the §14.12 "differential" gate plan): the go-verify-*.ps1 harnesses
-  # build the pinned Rust emitter examples (cargo build --locked -p
-  # consema-conformance --example …), provision the golden/evidence
-  # directories, run the Go differential tests with the golden env vars set,
-  # close the reverse directions, and fail on any divergence. The scripts are
-  # Windows PowerShell 5.1 compatible and locate the Rust example binary
-  # under target\debug\examples, so the job runs on windows-latest (the
-  # ts-differential precedent, ci-typescript.yml). A script failure fails
-  # the job (no continue-on-error).
-  go-differential:
-    name: go differential vs Rust (byte parity + normalized + protocol exchange)
-    runs-on: windows-latest
-    timeout-minutes: 60
-    steps:
-      - uses: actions/checkout@v4
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: swatinem/rust-cache@v2
-      - uses: actions/setup-go@v5
-        with:
-          go-version: '1.26.5'
-      - name: scripts/go-verify-byte-parity.ps1
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts/go-verify-byte-parity.ps1'
-          & $script
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: scripts/go-verify-normalized-differential.ps1
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts/go-verify-normalized-differential.ps1'
-          & $script
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-      - name: scripts/go-verify-protocol-exchange.ps1
-        shell: pwsh
-        run: |
-          $ErrorActionPreference = 'Stop'
-          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts/go-verify-protocol-exchange.ps1'
-          & $script
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          set -euo pipefail
+          expected='35bebc8d384d71740f7c1a886bc50f4e095ff52fe05d2a407f04b842ee6922fa'
+          vector_dir='conformance/vectors'
+          : > /tmp/digest-input
+          for f in $(LC_ALL=C ls "$vector_dir"/*.json | LC_ALL=C sort); do
+            name=$(basename "$f")
+            d=$(sha256sum "$f" | cut -d' ' -f1)
+            printf '%s:%s\n' "$name" "$d" >> /tmp/digest-input
+          done
+          count=$(wc -l < /tmp/digest-input)
+          digest=$(head -c -1 /tmp/digest-input | sha256sum | cut -d' ' -f1)
+          echo "suites: $count"
+          echo "aggregate sha256: $digest"
+          if [ "$count" -ne 18 ]; then
+            echo "::error::suite-count mismatch: expected 18 vector files, got $count"
+            exit 1
+          fi
+          if [ "$digest" != "$expected" ]; then
+            echo "::error::aggregate digest mismatch: expected $expected, got $digest"
+            exit 1
+          fi
