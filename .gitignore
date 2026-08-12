@@ -8,6 +8,12 @@
 Thumbs.db
 .idea/
 .vscode/
+*.swp
+
+# Monorepo split leftovers (2026-08-12: sources moved to consema-rs/-go/-ts/-py/-kt)
+/crates/
+/python/
+/typescript/
 
 # Kotlin / Gradle build output
 kotlin/build/
