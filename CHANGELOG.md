@@ -9,7 +9,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 ### Added
 
 - **RFC 0020（R-20）**：1.0 compatibility/support policy（`docs/rfcs/0020-compatibility-and-support-policy-v1.md`，Status: Accepted）——1.0 兼容承诺（patch/minor/major 语义边界、output order/default loss policy/acceptance-recovery 边界为兼容性、contract @N 永不重释）、支持周期（Rust MSRV、Go 版本窗口、三平台、安全 SLA、EOL/弃用流程）、契约版本治理；与 `docs/support-policy.md`/SECURITY.md/RFC 0015/0016 逐项一致（support-policy §2 的 Go 冻结措辞演进已在 RFC §9.2 调和）；
-- **§28 五要素终审记录**（`docs/five-element-review-1.0.0.md`）：哲学统一/语义一致/逻辑自洽/真实有效 **PASS**，完整可靠 **PARTIAL**（C-1/C-2/C-3 开放）；历史 findings 全部关账或标豁免；实测核验 14 项（Go 508/0/0、Rust 1,629 passed、差分 108×2、交换 83/83、parity 68/68、capability parity）；
+- **§28 五要素终审记录**（`docs/five-element-review-1.0.0.md`）：哲学统一/语义一致/逻辑自洽/真实有效 **PASS**，完整可靠 **PARTIAL**（C-1 已闭环 2026-08-11、C-2 fuzz 推进中、C-3 开放）；历史 findings 全部关账或标豁免；实测核验 14 项（Go 508/0/0、Rust 1,629 passed、差分 108×2、交换 83/83、parity 68/68、capability parity）；
 - **RFC 0015 §3.3 契约修订**：product_version 校验从严格 MAJOR.MINOR.PATCH 扩展为完整 SemVer 2.0 核心语法（接受 `-rc.1`/`-beta.2` prerelease；无 git hash、无 build metadata；cli-v1 向量保持有效）——Rust/Go 两语言校验器同语义扩展 + 双向接受/拒绝测试；
 - **聚合 digest 规范态重算**：conformance 向量聚合 sha256 以规范 LF 字节重算（`git show` 规范 blob），新值 `35bebc8d…` 取代 CRLF 工作树记录的 `e3d6578858…`（fc-manifest/go-implementation-plan/conformance_test/脚本全部更新；`git archive` 干净 checkout 全绿复现，含 race）。
 
@@ -21,11 +21,20 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 
 ### Boundaries
 
-- **C-1（CI GitHub 真跑）**：11 job 落盘（含 go-1-26），未推入 GitHub 真跑；推入后干净 checkout 全矩阵全绿是收口项；
-- **C-2（72 CPU-hours fuzz）**：账本 27.852/72 CPU-hours（4,335 行，2026-08-10 会话 12 快照；最接近 properties-parse 4.8%；快照口径——追加式账本以 runs.csv 为准），完成路径不变（clang 主机 cargo-fuzz 17 target 为主）；
+- **C-1（CI GitHub 真跑）**：**已闭环**——2026-08-11 GitHub Actions run #5（head 437fd35）132/132 steps 全绿，10+1 job 定义（增补前；go-differential 2026-08-12 增补后 ci.yml 为 10+2 job / 12 定义）/ 三 OS 矩阵 17 次执行在 windows/ubuntu/macos 全矩阵通过，2026-08-12 经 GitHub Actions API 在线核实，结果已回填 fc-manifest（C-1 → closed）；五语言 CI 全绿（2026-08-12，ci.yml run#9 + ci-typescript/ci-python/ci-kotlin 各 run#2）将 C-1 证据由双语言扩展到 TS/Python/Kotlin；
+- **C-2（72 CPU-hours fuzz）**：账本 391.7 CPU-hours（55,879 行，2026-08-12 快照——runs.csv 权威复算 391.681h 精确复现；properties 73.6h 首个突破 72h 门槛（102.2%），yaml 65.2h（90.6%）、ini 62.7h（87.1%）最接近；其余门槛单位仍开放；快照口径——追加式账本以 runs.csv 为准），完成路径不变（clang 主机 cargo-fuzz 17 target 为主）；
 - **C-3（真实发布密钥与发布执行）**：真实密钥 + 签名 tag/artifact + SBOM/checksum 落盘 + 恢复演练复跑未执行（D-1：checksum manifest 须从干净发布 commit 重新生成；D-2：演练密钥无持久公钥）；
 - **RC soak**：§22 中部分权限/磁盘失败演练列为 RC soak 必做（rc-1.0.0-candidate.md §2）；
 - 依赖序（终审记录）：F-A → F-B → C-1 → C-2 → C-3 → RC soak → P2-7 → **1.0.0**。
+
+### 落地记录（2026-08-11/2026-08-12 补录：C-1 闭环与五语言时间线）
+
+- **2026-08-12 · a0c318b**：Python 实现 L0-L4 入库（core/graph/protocol/document + 8 格式家族 + root facade + conformance runner）；a0c318b 同时补充 .gitignore 排除 node_modules；
+- **2026-08-12 · 5cf680b + cd26af3 勘误**：TS/Python/Kotlin 三语言 L0-L4 实现实际由 5cf680b 携带（commit message 仅标注 fuzz 账本）；每语言 conformance 508/508（18 套 / digest 35bebc8d 共钉）+ capability parity；cd26af3 为勘误归因记录（5cf680b 树计数 533/475/18,467 含构建产物，5a040be purge 后真实 tracked 数 255/243/229，历史事实不变）；
+- **2026-08-12 · 2f981df**：L5 差分 harness（TS/Python/Kotlin 跨语言 byte-parity/normalized/protocol-exchange）+ 五语言 CI workflow（ci-typescript/ci-python/ci-kotlin 各 3 job）；差分发现的 wire-codec 缺陷随本 commit 修复（ValuePath schema-less wire 与 AssociationLocation 位置面、materialization-request version:0 拒绝语义、yaml tag/provenance 面）；
+- **2026-08-12 · dbba9a4**：五语言 CI 首跑缺陷修复（python 测试夹具路径仓库相对化、kotlin jar 供给 + TestShim.kt 入库）；四 workflow 全绿（ci.yml run#9 + 三语言各 run#2）；
+- **2026-08-11 · c6c89bb**：C-1 闭环（GitHub Actions run #5，head 437fd35，132/132 steps 全绿，10+1 job 定义（增补前）/三 OS 矩阵 17 次执行；结果回填 fc-manifest，C-1 → closed）；
+- **2026-08-12 · 8d00c4f**：五要素终审 findings 处置（run #5 steps 132/132 在线核实修正、L5 差分 closure 记录、L0-L5 closure 表、Kotlin ChangeSet 注记、快照截止注记）。
 
 ## 0.13.0 — 2026-08-07
 

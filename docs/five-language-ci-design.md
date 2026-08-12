@@ -5,7 +5,7 @@
   本设计是 `docs/multi-language-implementation-plan.md` §5/§7 的 CI 落地面
 - 范围声明：本文是规划阶段唯一交付物（只读调研产出）；不修改任何仓库文件、不运行 git commit
 - 权威输入：`docs/multi-language-implementation-plan.md`、`docs/go-implementation-plan.md` §4/§6/§7、
-  `.github/workflows/ci.yml`（现 10+1 job）、`conformance/README.md`、`docs/fc-manifest-0.13.0.json`、
+  `.github/workflows/ci.yml`（现 10+2 job：10 Rust + go-1-26 + go-differential）、`conformance/README.md`、`docs/fc-manifest-0.13.0.json`、
   路线图 §17.1（第 1565-1575 行）/§21.2（第 1825-1834 行）/§22.2（第 1879-1887 行）/§22.4（第 1902-1910 行）
 
 ---
@@ -68,7 +68,7 @@
 
 ## 1. CI 矩阵设计
 
-### 1.1 既有 10+1 job 到五语言映射
+### 1.1 既有 10+2 job 到五语言映射
 
 | 既有 job（ci.yml 行） | 性质 | 五语言等价物 / 处置 |
 |---|---|---|
@@ -83,6 +83,7 @@
 | oracles（差分 oracle 3 OS，:251-281） | 语言无关（第三方行为钉） | **不变**，仍由 Rust job 执行。注意：java-properties-v1 oracle 钉 OpenJDK 25.0.4（conformance/README.md:25）、python-configparser-v1 钉 CPython 3.14.6（:26）——这是第三方行为 pin，与 SDK 工具链（Kotlin JVM 17 / Python 3.12）是两回事，不得混淆 |
 | package（verify-package-archives，:283-307） | Rust 归档验证 | Rust 专属。每语言打包验证为 L5/1.0.0 门禁（§5）：TS `npm pack` + 干净目录安装；Python build wheel + 干净 venv 安装；Kotlin gradle jar + 干净 JVM 运行 |
 | go-1-26（:314-324） | Go 门禁（最低版本） | **保持原位**（不迁移，见 §5.2 决策）；是三个新语言 gates job 的直接模板 |
+| go-differential（:333-376，2026-08-12 增补，见 §10） | Go 差分 gate（byte parity + normalized + protocol exchange） | **保持原位**；是三个新语言 differential job 的直接模板 |
 
 ### 1.2 新语言 job 定义（每语言三个 job，L0 版）
 
@@ -403,7 +404,7 @@ multi-language-implementation-plan.md:119-125 §7 START GATE：工具链就绪�
 ## 9. 相关文件
 
 - 体例：`docs/go-implementation-plan.md`（§4/§6/§7 平移）、`docs/multi-language-implementation-plan.md`
-- 现状 CI：`.github/workflows/ci.yml`（10+1 job）
+- 现状 CI：`.github/workflows/ci.yml`（10+2 job：10 Rust + go-1-26 + go-differential）
 - 差分现状：`scripts/go-verify-*.ps1` 四个脚本、`go/README.md:766-850`
 - 向量权威：`conformance/README.md`、`conformance/vectors/`（18 套 / 508 cases）
 - 记录：`docs/fc-manifest-0.13.0.json`（digest 第 35-41 行、C-1 第 786-802 行）
@@ -427,7 +428,8 @@ multi-language-implementation-plan.md:119-125 §7 START GATE：工具链就绪�
   - `.github/workflows/ci-kotlin.yml` run#2：kotlin-gates / kotlin-conformance /
     kotlin-differential（无 gradle wrapper，按 ci-kotlin.yml:1-21 设计直驱
     K2JVMCompiler + kotlin.test shim）
-  - `.github/workflows/ci.yml` run#9：Rust 10+1 job 保持全绿——§5.2 的文件级失败
+  - `.github/workflows/ci.yml` run#9：Rust 10+1 job（增补前——go-differential
+    2026-08-12 增补后为 10+2 job / 12 定义）保持全绿——§5.2 的文件级失败
     隔离在实跑中成立（新语言上线未触碰 Rust 门禁域）
 - **首跑缺陷（均在 dbba9a4 修复）**：
   - python 测试夹具硬编码路径 8 处 → 仓库相对路径（本机复核：pytest 收集面
@@ -443,10 +445,25 @@ multi-language-implementation-plan.md:119-125 §7 START GATE：工具链就绪�
   - `scripts/{ts,python,kotlin}-verify-shared-conformance.ps1` 尚未合入（2026-08-12
     复核不存在）；workflow 头注释明示其随 runner-CLI 批次作为第四个 differential
     step 落地（ci-typescript.yml:13-15）——**runner-CLI slot 仍为未来项**
-  - `L-package` job、零 documented skip 断言、3-OS 矩阵处置属 §5.3 L5 批次，未上线；
+  - `L-package` job 与 3-OS 矩阵处置属 §5.3 L5 批次，未上线；零 documented
+    skip 断言已部分上线——**Kotlin 已上线**（kotlin/src/test/kotlin/consema/
+    conformance/ConformanceRunnerTest.kt:58-59 显式断言 508 passed / 0 skipped）、
+    **Python 已上线**（每 suite 适用面 (passed,0,0) 共钉，python/tests/conformance/
+    test_runner.py:32-51,89——任何 documented skip 即红）、**TS 未上线**
+    （typescript/src/conformance/runner.test.ts:23 允许 passed+skipped=508，
+    documented skip 仍被接受）；
     kotlin `gradlew`/wrapper 仍缺失（§7.3 L0 批次后续项，workflow 按无 wrapper 设计
     直驱 K2JVMCompiler）；`conformance/differential/` 共享 case 集迁移（§3.5/§7.3）
     未执行
+- **ci.yml 新增 go-differential job（2026-08-12）**：Go 差分 gate 进 CI——
+  `go-differential`（ci.yml:344-376，windows-latest）串行执行
+  scripts/go-verify-byte-parity.ps1 / go-verify-normalized-differential.ps1 /
+  go-verify-protocol-exchange.ps1（脚本失败即 job 失败，无 continue-on-error）；
+  §0.1 的「go-verify 未接入 CI」表述自此过时（Go 差分由本地执行 + 文档化完成
+  路径变为 CI 常设 gate）；ci.yml 由 10+1 job 增至 10+2 job（12 定义：10 Rust +
+  go-1-26 + go-differential）；§5.2 的「ci.yml 一字不动」设计决策由此部分让渡——
+  与 go-1-26 同例（Go 门禁 job 由 gatekeeper 落盘，.github 域纪律不变；§7.1 规划表
+  的 ci.yml「不改」行保留为历史规划，以本节记录为准）
 - **证据链影响**：三语言 job 全绿把 C-1"GitHub 干净 checkout 全绿"证据由 Rust/Go
   扩展到 TS/Python/Kotlin（rc-1.0.0-candidate.md §4.1 已增补，2026-08-12）；§0.1 的
   "无测试目录 / 无 package-lock.json"缺口已被首批运行吸收（package-lock.json 已入库、

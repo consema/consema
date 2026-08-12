@@ -199,11 +199,12 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
   # API/semver gate (§15.6 "Rust public API 完成独立审查"): the workspace
-  # version is 0.8.0 (Cargo.toml) and the last released state is the v0.8.0
-  # git tag, so the baseline is the tagged source tree (the crates are not
-  # published to crates.io). The 11 crates that already existed at v0.8.0
-  # are checked for breaking changes since the tag; the three crates added
-  # after 0.8.0 (consema-xml/plist/hcl) have no baseline and are excluded.
+  # version is 1.0.0-rc.1 (Cargo.toml) and the semver baseline is still the
+  # v0.8.0 git tag (the last released state; the crates are not published to
+  # crates.io), so the baseline is the tagged source tree. The 11 crates that
+  # already existed at v0.8.0 are checked for breaking changes since the tag;
+  # the three crates added after 0.8.0 (consema-xml/plist/hcl) have no
+  # baseline and are excluded.
   semver:
     name: cargo-semver-checks (baseline v0.8.0)
     runs-on: ubuntu-latest
@@ -328,3 +329,47 @@ jobs:
           go-version: '1.26.5'
       - name: gofmt -l . && go vet && go build && go test && go test -race
         run: cd go && gofmt -l . && go vet ./... && go build ./... && go test ./... && go test -race ./...
+
+  # Go differential gate (roadmap §16.1 "Rust 与 Go 的 PVCE/PGCE bytes 完全
+  # 一致", §16.2 line 1488, §16.6 line 1549; docs/go-implementation-plan.md
+  # §4.4; the §14.12 "differential" gate plan): the go-verify-*.ps1 harnesses
+  # build the pinned Rust emitter examples (cargo build --locked -p
+  # consema-conformance --example …), provision the golden/evidence
+  # directories, run the Go differential tests with the golden env vars set,
+  # close the reverse directions, and fail on any divergence. The scripts are
+  # Windows PowerShell 5.1 compatible and locate the Rust example binary
+  # under target\debug\examples, so the job runs on windows-latest (the
+  # ts-differential precedent, ci-typescript.yml). A script failure fails
+  # the job (no continue-on-error).
+  go-differential:
+    name: go differential vs Rust (byte parity + normalized + protocol exchange)
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: swatinem/rust-cache@v2
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.26.5'
+      - name: scripts/go-verify-byte-parity.ps1
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts/go-verify-byte-parity.ps1'
+          & $script
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: scripts/go-verify-normalized-differential.ps1
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts/go-verify-normalized-differential.ps1'
+          & $script
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - name: scripts/go-verify-protocol-exchange.ps1
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $script = Join-Path $env:GITHUB_WORKSPACE 'scripts/go-verify-protocol-exchange.ps1'
+          & $script
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }

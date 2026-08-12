@@ -84,7 +84,7 @@
 
 | 开放项 | 状态（fc-manifest open_items / rc-1.0.0-candidate） | 依赖它的 §28 条件 | 影响判定 |
 |---|---|---|---|
-| C-1：CI 10 job GitHub 干净 checkout 全矩阵全绿 | **已闭环（2026-08-11：GitHub Actions run #5，head 437fd35，132/132 steps 全绿，10+1 job windows/ubuntu/macos 全矩阵；fc-manifest open_items C-1 → closed）** | §28.5 条件 1/3/4（三平台全矩阵、SEC-9 Linux/macOS 验证、A-4 msrv 真验证、A-9 package 真跑、semver approved-failure 落定） | **C-1 腿阻塞已解除**（run #5 真跑全绿：三平台全矩阵、SEC-9、A-4、A-9 随 manifest C-1.closes 满足）；§28.5 仍 **PARTIAL**——C-2/C-3 开放；**延伸（2026-08-12，head dbba9a4）**：五语言 CI 全绿（ci.yml run#9 Rust 10+1 + ci-typescript/ci-python/ci-kotlin 各 run#2 全绿）——§28.5 条件 1（标准/Rust/Go/CLI/suite 同时完成）的证据由双语言扩展到五语言在 CI 中 live（five-language-ci-design.md §10） |
+| C-1：CI 10 job GitHub 干净 checkout 全矩阵全绿 | **已闭环（2026-08-11：GitHub Actions run #5，head 437fd35，132/132 steps 全绿，10+1 job（增补前，11 定义/17 次执行）windows/ubuntu/macos 全矩阵；go-differential 2026-08-12 增补后 ci.yml 为 10+2 job/12 定义；fc-manifest open_items C-1 → closed）** | §28.5 条件 1/3/4（三平台全矩阵、SEC-9 Linux/macOS 验证、A-4 msrv 真验证、A-9 package 真跑、semver approved-failure 落定） | **C-1 腿阻塞已解除**（run #5 真跑全绿：三平台全矩阵、SEC-9、A-4、A-9 随 manifest C-1.closes 满足）；§28.5 仍 **PARTIAL**——C-2/C-3 开放；**延伸（2026-08-12，head dbba9a4）**：五语言 CI 全绿（ci.yml run#9 Rust 10+1 + ci-typescript/ci-python/ci-kotlin 各 run#2 全绿）——§28.5 条件 1（标准/Rust/Go/CLI/suite 同时完成）的证据由双语言扩展到五语言在 CI 中 live（five-language-ci-design.md §10） |
 | C-2：每格式 ≥72 CPU-hours release-candidate fuzz | partial（runs.csv 13,005 行 / 79.427 CPU-hours，截取自 session 79 期间，2026-08-10；最接近格式 properties ≈20.6%（14.8/72）；零新 crash；Go 16 targets 30s clean-run 已有记录）；**2026-08-12 快照（runs.csv 权威复算）**：55,879 行 / 391.7 CPU-hours，零新 crash（非零退出仅已知 session-9 分类）；**properties 73.6h 首个突破 72h 门槛（102.2%）**，yaml 65.2h（90.6%）、ini 62.7h（87.1%）最接近；其余门槛单位（7 格式家族 + protocol-decode）仍开放 | §28.5 条件 3（P0/P1=0 的 fuzz clean-run 证据完整性，§22.4:1905） | **阻塞 §28.5 通过**（Q-7 未闭）；不依赖其他四要素 |
 | C-3：真实发布密钥与 0.13.0 发布执行 | partial（演练密钥仅流程验证；默认 keyring 无真实密钥；docs/release 仅 0.8.0 演练产物；D-1/D-2 处置随本项） | §28.5 条件 5（生产发布物可验证/可重建/可升级——发布物、SBOM、签名、checksum、build provenance 真跑）；§28.4 条件 6 的供应链侧 | **阻塞 §28.5 通过**；D-1 要求"manifest 必须从干净发布 commit 重新生成"（rc-1.0.0-candidate.md:16）与 F-B 同源纪律（干净 checkout 复现） |
 | RC soak 阶段 1（磁盘失败、部分权限失败演练、differential 追加、Go RC fuzz 记录、corpus 巡检、性能复测） | 部分权限失败演练已闭环（rc-1.0.0-candidate.md §3.5 演练 4，2026-08-10）；磁盘失败演练环境阻塞（演练 5；C-1 已闭环 2026-08-11 后 Linux runner 完成路径可用，演练本身仍待执行）；differential 追加、Go RC fuzz 记录、corpus 巡检、性能复测状态按 rc-1.0.0-candidate.md §4.1 | §28.5 条件 6（failure/limits 演练完整性，§22.7"stale/部分权限/中断/磁盘四类演练"——仅磁盘失败未记录，部分权限已闭环） | 阻塞 §28.5 的 RC 收口（RC soak 本身是 §16.6 硬门禁的法定例外） |
@@ -142,7 +142,7 @@
 | # | 命令 | 结果 | 对应声称 |
 |---|---|---|---|
 | 1 | `go test -count=1 ./...`（worktree） | 18 包 ok / 1 包 FAIL（`conformance`：**digest 35bebc8d… ≠ 记录 e3d6578858…**，即 F-B）；其余全部 ok，含 cmd/consema e2e（5.439s）、pilot（1.395s）〔修复前实测记录——F-B 已由 2209582 处置（回填 35bebc8d…）并审计验证〕 | go/README "all green" 在**本机 CRLF 工作树**成立；干净 checkout 下 F-B 使 conformance 包红 |
-| 2 | runner 计数探针（worktree 临时测试文件，用后删除） | **TOTAL=508 PASSED=508 SKIPPED=0 FAILED=0**；DIGEST_OK=false | go/README.md:807-808 的 508/0/0 与 G5.3 "零 documented skip" |
+| 2 | runner 计数探针（worktree 临时测试文件，用后删除） | **TOTAL=508 PASSED=508 SKIPPED=0 FAILED=0**；DIGEST_OK=false | go/README.md:809 的 0.18.0 历史态「506 passed / 2 documented skips / 0 failed」（该历史态未标注后续 G5.3 翻转——ada5020 已将 2 个 skip 翻转执行为 508 全执行，go/README 已注明演进；本探测 508/0/0 与翻转后口径一致） |
 | 3 | `go test -count=1 -run TestCapabilityParity ./` | PASS（OperationSets + NoRustOnlyMandatoryBehavior） | capability parity 硬门禁（go/README.md:797-809） |
 | 4 | `gofmt -l .`、`go vet ./...`、`go build ./...`、`go mod tidy` | 全干净 | §6 门禁（go-implementation-plan.md:323） |
 | 5 | `go test -race -count=1 ./conformance/...` 及其余包 | 全 ok（唯一 FAIL 系核验临时文件删除时序所致，已复跑确认） | race 门禁 |
@@ -227,7 +227,7 @@
 2. **修 F-B**（vector digest 复现性）——已验证（2209582，审计 PASS）：从干净 LF checkout 重算并回填
    fc-manifest 与断言，与 D-1 纪律合并为"一切门禁证据以干净 checkout 为准"（干净 LF worktree 上 digest
    断言/复算/shared-conformance 6/6 全绿）；
-3. **C-1**：推入 GitHub 真跑 10 job 全矩阵；回填 manifest——**已闭环（2026-08-11，run #5 132/132 steps 全绿，head 437fd35，10+1 job windows/ubuntu/macos；结果已回填 fc-manifest，C-1 → closed）**；
+3. **C-1**：推入 GitHub 真跑 10 job 全矩阵；回填 manifest——**已闭环（2026-08-11，run #5 132/132 steps 全绿（增补前 10+1 job，11 定义/17 次执行），head 437fd35，windows/ubuntu/macos；go-differential 2026-08-12 增补后 ci.yml 为 10+2 job/12 定义；结果已回填 fc-manifest，C-1 → closed）**；
 4. **C-2**：每格式 72 CPU-hours fuzz 账本（clang 主机 cargo-fuzz 为主）；
 5. **C-3**：真实密钥 + 备份 + 吊销证书；从干净发布 commit 按 release-process §7 十项顺序执行发布
    （checksum/SBOM/签名/tag/恢复演练复跑）；
@@ -248,3 +248,40 @@
   `74e336e`（历史）的 Go CLI 与 Rust 全部门禁实测通过（§4 第 1/6/7 行）。
 - 附注（随本次文档修复）：go/README.md:531 "productVersion defaults to the Go milestone version `0.19.0`"
   文案陈旧（go/cmd/consema/version.go:15 现为 1.0.0-rc.1），已随本次文档修复同步修正（go/README.md §Version）。
+
+---
+
+## 7. 五语言扩展审计（2026-08-12）
+
+- 范围：五维交叉审计（哲学统一/语义一致/逻辑自洽/真实有效/完整可靠）在五语言面上执行，
+  对应 §28 五要素 × 五语言（2026-08-11 用户决策：TS/Python/Kotlin 与 Rust/Go 同等地位，
+  docs/multi-language-implementation-plan.md；五语言 CI 架构见 docs/five-language-ci-design.md）
+- 审计对象 = 2026-08-12 工作树（三语言 L0-L5 全闭环 + 五语言 CI 全绿之后，dbba9a4）
+- 判定体例照 §1-§6（表 + 判定 + 证据 file:line 或实测记录）
+
+### 7.1 五维度 × 五语言审计结论
+
+| 维度 | 判定 | 结论要点 |
+|---|---|---|
+| 哲学统一 | **PASS** | P1 python yaml `Document` 未 frozen 已修（python/src/consema/yaml/document.py，本批次）；P2 TS `bytes()` 已修（typescript/src/document/source.ts，本批次）；P2 信息性 python 公开构造器记录在案（文档化，接受）；§1.1 六条既有结论在五语言面无新增反例 |
+| 语义一致 | **PASS** | P1 Go 差分 gate 未接 CI 已修（ci.yml 新增 go-differential job，go-verify-*.ps1 三 harness 进 CI，2026-08-12）；P2 Go/Kotlin 差分计数改精确（differential 测试计数断言，本批次）；P2 PortableGraph 别名统一（go/graph、typescript/src/graph、kotlin graph，本批次）；**187 error codes / 41 contracts 五语言注册表集合互差为 0（实测）** |
+| 逻辑自洽 | **PASS** | 五语言 read/query/project、materialize/convert、edit/patch/apply 链闭合均以共享向量 508/508 为界（§1.3 六条在五语言面复验，无新增反例）；字节权威单一（Rust 编码器）与星型差分拓扑（Rust 锚居中，five-language-ci-design.md §2.3）不构成权威循环 |
+| 真实有效 | **PASS** | 508/508 与聚合 digest 35bebc8d… 五 runner 复算一致；**132/132 steps 于 2026-08-12 经 GitHub Actions API 在线核实**（run #5，head 437fd35：17 次 job 执行 / 132 steps / 0 failed）；fuzz 快照 **391.681h 从 runs.csv 前 55,879 行精确复现**（2026-08-12 快照，session 400 中段截取口径，追加式账本以 runs.csv 为准）；零依赖声称四语言（Go/TS/Python/Kotlin）全实（go.mod 零 require / npm ls --omit=dev 空 / pyproject dependencies=[] / kotlin runtimeClasspath 空）；P2 陈旧声称清单已修（§7.2 处置表） |
+| 完整可靠 | **PARTIAL**（与 §28.5 同口径） | P1 根 CHANGELOG 已补五语言时间线（2026-08-12）；P2 三语言 README 已建（typescript/README.md、python/README.md、kotlin/README.md）；git 卫生零问题（5a040be purge 后无构建产物入库；.gitignore 覆盖 kotlin/build、node_modules、__pycache__、venv）；遗留项与 five-language-ci-design.md §10 声称一致（shared-conformance 脚本随 runner-CLI 批次、L-package、3-OS 矩阵处置仍为未来项）；§28.5 判定不变——C-2/C-3 开放 |
+
+### 7.2 五语言扩展审计 findings 处置表
+
+| 维度 | 分级 | 描述 | 处置 |
+|---|---|---|---|
+| 哲学统一 | P1 | python yaml `Document` 可变（未 frozen，与不可变 Document 哲学相悖） | 已修（python/src/consema/yaml/document.py，本批次） |
+| 哲学统一 | P2 | TS `bytes()` 构造语义与其余语言不一致 | 已修（typescript/src/document/source.ts，本批次） |
+| 哲学统一 | P2 | python 公开构造器信息性语义未记录 | 记录在案（文档化，接受；不构成语义漂移） |
+| 语义一致 | P1 | Go 差分 gate 未接入 CI（go-verify-*.ps1 仅本地执行 + 文档化完成路径） | 已修（ci.yml 新增 go-differential job，2026-08-12；§0.1「未接入 CI」表述随之过时） |
+| 语义一致 | P2 | Go/Kotlin 差分测试计数断言不精确 | 已修（差分计数改精确，本批次） |
+| 语义一致 | P2 | PortableGraph 别名面五语言不一致 | 已修（别名统一：go/graph、typescript/src/graph、kotlin graph，本批次） |
+| 语义一致 | — | 187 error codes / 41 contracts 五语言注册表集合 | 互差为 0（实测；语义面与 §1.2 结论一致） |
+| 真实有效 | P2 | 陈旧声称清单（版本推进 0.8.0、C-1 未真跑、ci.yml job 计数未反映 go-differential 增补、go/README「无 Go job」、ci-kotlin.yml 注释引用 gitignored 路径等） | 已修：根 CHANGELOG（五语言时间线补录 + C-1 closed）、根 README（0.8.0→1.0.0-rc.1、五语言共同证明、三语言一句）、go/README（F1 closed、506/2 skip 历史态注记、Go job 如实化）、fc-manifest（product_version 1.0.0-rc.1、msrv/矩阵真跑）、five-language-ci-design §10（零 skip 断言分语言状态、go-differential 记录）、ci-kotlin.yml 头注释（指向 kotlin/verify/TestShim.kt 与直驱 K2JVMCompiler） |
+| 完整可靠 | P1 | 根 CHANGELOG 未覆盖五语言时间线 | 已补（2026-08-12，a0c318b/5cf680b+cd26af3/2f981df/dbba9a4/c6c89bb/8d00c4f 六条目） |
+| 完整可靠 | P2 | 三语言目录无 README（go/README 有而 TS/Python/Kotlin 无） | 已建（typescript/README.md、python/README.md、kotlin/README.md，2026-08-12） |
+
+**§7 结论**：五语言面上哲学统一/语义一致/逻辑自洽/真实有效 **PASS**（findings 全部处置），完整可靠 **PARTIAL**（与 §28.5 同口径：C-2/C-3 开放）；五语言扩展未改变 §6.1 判定。

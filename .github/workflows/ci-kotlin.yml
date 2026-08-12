@@ -3,8 +3,9 @@
 # (the design rejects a single shared matrix, §5.2). The repository has no
 # Gradle wrapper (design §7.3 lists kotlin/gradlew as a later L0-batch
 # item), so the jobs drive the direct JVM K2JVMCompiler exactly like the
-# committed verification scripts and the L4 scaffolding
-# (kotlin/build/work/compile_tests.ps1), with CONSEMA_JAVA_HOME /
+# committed verification scripts (scripts/kotlin-verify-*.ps1) and the
+# tracked kotlin/verify/TestShim.kt shim (kotlin/build/ is gitignored and
+# does not exist in a clean checkout), with CONSEMA_JAVA_HOME /
 # CONSEMA_KOTLINC environment overrides. Every job provisions the pinned
 # kotlinc 2.2.0 distribution (cached) on top of the Temurin 17 JDK.
 # kotlin-gates compiles all sources and runs the full unit-test suite via
@@ -91,8 +92,9 @@ jobs:
           Write-Output "kotlin-test-2.2.0.jar provisioned at $kotlinTestJar"
       # Compiles every main and test source into one module (internal
       # visibility) together with the module-local kotlin.test.Test shim
-      # (kotlin/verify/TestShim.kt), exactly the L4 scaffolding
-      # pattern of kotlin/build/work/compile_tests.ps1.
+      # (kotlin/verify/TestShim.kt), the pattern of the committed
+      # scripts/kotlin-verify-*.ps1 harnesses (kotlin/build/ is a
+      # runtime-created, gitignored work area).
       - name: compile main + test sources (K2JVMCompiler, single module + shim)
         shell: pwsh
         run: |
