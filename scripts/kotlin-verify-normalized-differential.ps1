@@ -12,7 +12,9 @@ param(
 #   1. builds the minimal Rust evidence example
 #      (crates/consema-conformance/examples/emit_normalized_results.rs);
 #   2. forward direction: runs it over the checked-in case set
-#      (go/conformance/differential/normalized/cases.json) into <OutDir> as
+#      (conformance/differential/normalized/cases.json, the shared
+#      single-authority case directory of the consema repository) into
+#      <OutDir> as
 #      one `<case-id>.txt` normalized-facts file per case;
 #   3. forward comparison + reverse emission: compiles the Kotlin main +
 #      differential tests and runs them through the temp main() test runner
@@ -68,7 +70,7 @@ if (-not (Test-Path $kotlinTestJar) -or -not (Test-Path $kotlinTestJunit5Jar)) {
 
 # --- case set ----------------------------------------------------------------
 if ($CaseFile -eq '') {
-    $CaseFile = Join-Path $workspaceRoot 'go\conformance\differential\normalized\cases.json'
+    $CaseFile = Join-Path $workspaceRoot 'conformance\differential\normalized\cases.json'
 }
 if (-not (Test-Path $CaseFile)) {
     Write-Error "normalized differential case file not found: $CaseFile"

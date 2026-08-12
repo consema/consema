@@ -12,7 +12,8 @@ param(
 #   1. builds the minimal Rust encoder example
 #      (crates/consema-conformance/examples/emit_parity_bytes.rs);
 #   2. runs it over the checked-in case set
-#      (go/conformance/differential/cases.json) into <OutDir> as one
+#      (conformance/differential/cases.json, the shared single-authority
+#      case directory of the consema repository) into <OutDir> as one
 #      `<case-id>.hex` file per case;
 #   3. runs the Go side (`go test ./conformance/differential/` with
 #      CONSEMA_DIFFERENTIAL_RUST_DIR set) which compares Go encode bytes
@@ -44,7 +45,7 @@ if (-not (Get-Command go -ErrorAction SilentlyContinue)) {
 
 # --- case set ----------------------------------------------------------------
 if ($CaseFile -eq '') {
-    $CaseFile = Join-Path $goDir 'conformance\differential\cases.json'
+    $CaseFile = Join-Path $workspaceRoot 'conformance\differential\cases.json'
 }
 if (-not (Test-Path $CaseFile)) {
     Write-Error "differential case file not found: $CaseFile"
@@ -93,6 +94,7 @@ if ($LASTEXITCODE -ne 0) {
 # --- Go side -----------------------------------------------------------------
 Write-Host "[3/3] running the Go differential test (differential_test.go)..."
 $env:CONSEMA_DIFFERENTIAL_RUST_DIR = $OutDir
+$env:CONSEMA_DIFFERENTIAL_CASES_DIR = Join-Path $workspaceRoot 'conformance\differential'
 # Capture files live outside $OutDir: that directory must contain only the
 # Rust encoder's `<case-id>.hex` files (the Go test rejects any other file).
 $logDir = Join-Path $env:TEMP 'consema-go-parity'

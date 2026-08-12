@@ -12,7 +12,8 @@ param(
 #   1. builds the minimal Rust encoder example
 #      (crates/consema-conformance/examples/emit_parity_bytes.rs);
 #   2. runs it over the checked-in case set
-#      (go/conformance/differential/cases.json) into <OutDir> as one
+#      (conformance/differential/cases.json, the shared single-authority
+#      case directory of the consema repository) into <OutDir> as one
 #      `<case-id>.hex` file per case;
 #   3. compiles the Kotlin main + differential tests with the direct JVM
 #      K2JVMCompiler and runs them through the temp main() test runner with
@@ -61,7 +62,7 @@ if (-not (Test-Path $kotlinTestJar) -or -not (Test-Path $kotlinTestJunit5Jar)) {
 
 # --- case set ----------------------------------------------------------------
 if ($CaseFile -eq '') {
-    $CaseFile = Join-Path $workspaceRoot 'go\conformance\differential\cases.json'
+    $CaseFile = Join-Path $workspaceRoot 'conformance\differential\cases.json'
 }
 if (-not (Test-Path $CaseFile)) {
     Write-Error "differential case file not found: $CaseFile"

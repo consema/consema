@@ -22,10 +22,11 @@
   CI**（.github 全域检索 `go-verify` 零命中）；按 go/README.md:821-850 的既定分工，.github 是 Rust
   门禁域，Go 的验证以本地执行 + 文档化完成路径为准。差分证据链：byte parity 68/68（51 PVCE + 17
   PGCE，go/README.md:776-798）、normalized 108/108 双向、protocol exchange 83/83 双向（
-  five-element-review-1.0.0.md:35；实测 2026-08-10 本机重跑）。case 集：`go/conformance/differential/
+  five-element-review-1.0.0.md:35；实测 2026-08-10 本机重跑）。case 集：`conformance/differential/
   cases.json`（68，manifest `consema.differential.byte-parity@1`）、`normalized/cases.json`（108，
   `consema.differential.normalized@1`）、`protocol-exchange/cases.json`（83，
-  `consema.differential.protocol-exchange@1`）——2026-08-11 逐文件实测。
+  `consema.differential.protocol-exchange@1`）——2026-08-11 逐文件实测；2026-08-12 自
+  `go/conformance/differential/` git mv 迁移至共享位置（§3.5 已执行，单一权威）。
 - **三语言 scaffold（盲写产物，工具链后台安装中）**：`typescript/`（package.json:16-19 的
   `check`=tsc --noEmit / `test`=node --test；devDeps 仅 typescript ~5.9.0 + @types/node，package.json:29-32；
   tsconfig strict，typescript/tsconfig.json:3-15）、`python/`（pyproject.toml:20 requires-python >= 3.12、
@@ -205,13 +206,14 @@
 
 ### 3.5 共享 case 集（消除五份拷贝）
 
-- **现状**：三份 case 文件在 `go/conformance/differential/` 下（68/108/83，实测）。语言无关的
-  case 集（kind/format/profile/source/steps，go/README.md:776-781）放在某语言目录下，会随语言数
-  增长成 5 份拷贝 → 拷贝漂移 = 差分 corpus 碎片化，违反单权威精神。
-- **设计**：新语言 case 集放共享只读位置 `conformance/differential/`（新目录）：
+- **现状（已执行 2026-08-12）**：三份 case 文件原在 `go/conformance/differential/` 下（68/108/83，
+  实测）。语言无关的 case 集（kind/format/profile/source/steps，go/README.md:776-781）放在某语言
+  目录下，会随语言数增长成 5 份拷贝 → 拷贝漂移 = 差分 corpus 碎片化，违反单权威精神。
+- **设计（已执行）**：新语言 case 集放共享只读位置 `conformance/differential/`（新目录）：
   `cases.json`（byte-parity 68）、`normalized/cases.json`（108）、`protocol-exchange/cases.json`
-  （83）；**现有 go/ 下三文件随第二个语言 harness 合入批次 git mv 迁移**（go 侧测试内嵌副本与
-  脚本同步更新，同一批——照"向量与 runner 必须同批"纪律，go-implementation-plan.md:234）。
+  （83）；**现有 go/ 下三文件已随本批次 git mv 迁移**（2026-08-12：go 侧测试由内嵌改为运行时
+  读取——`CONSEMA_DIFFERENTIAL_CASES_DIR` 或默认向上探测，五语言 harness 与 12 个 verify 脚本
+  同步更新，同一批——照"向量与 runner 必须同批"纪律，go-implementation-plan.md:234）。
 - 每语言完整性测试断言：manifest id（`consema.differential.byte-parity@1` / `normalized@1` /
   `protocol-exchange@1`）+ **精确 case 计数**（68/108/83）+ 下限（>= 40，照 go-verify-byte-parity.ps1:
   56-59 体例）——单文件、五处共钉，任何一侧漂移即红。
@@ -361,7 +363,9 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
 - Kotlin：`kotlin/src/test/kotlin/consema/conformance/`、`.../differential/`、
   `kotlin/gradlew` + `kotlin/gradle/wrapper/*`（含 distributionSha256Sum，L0 批次必须入库）、
   `kotlin/gradle.lockfile`（L5 锁定）。
-- 共享：`conformance/differential/`（新目录，§3.5 迁移自 go/，第二个语言 harness 合入批次执行）。
+- 共享：`conformance/differential/`（新目录，§3.5 迁移自 go/，第二个语言 harness 合入批次执行）
+  ——**已执行（2026-08-12）**：case 文件 git mv 至共享目录，go 测试改运行时读取，五语言 harness
+  与 verify 脚本统一从该目录取数。
 
 ### 7.4 fc-manifest 扩展字段（`consema.fc-manifest@1` 内追加，不动既有字段）
 
@@ -453,8 +457,15 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
     （typescript/src/conformance/runner.test.ts:23 允许 passed+skipped=508，
     documented skip 仍被接受）；
     kotlin `gradlew`/wrapper 仍缺失（§7.3 L0 批次后续项，workflow 按无 wrapper 设计
-    直驱 K2JVMCompiler）；`conformance/differential/` 共享 case 集迁移（§3.5/§7.3）
-    未执行
+    直驱 K2JVMCompiler）
+- **共享 case 集迁移已执行（2026-08-12）**：三份 case 文件已 git mv 至
+  `conformance/differential/`（`cases.json` / `normalized/cases.json` /
+  `protocol-exchange/cases.json`，单一权威，§3.5/§7.3 原计划项关闭）；go 侧三个差分测试由
+  `//go:embed` 改为运行时读取（`CONSEMA_DIFFERENTIAL_CASES_DIR` 环境变量，或从测试包目录向上
+  探测 `conformance/differential`——单仓与 consema/consema-go 并排布局均可解析；未设置且探测
+  失败时 documented skip）；五个语言 harness（go/typescript/python/kotlin）与 12 个 verify 脚本
+  统一从 `conformance/differential/` 取数；crates/ 下四个 Rust 例子的 doc 注释仍引用旧路径
+  （其 case 文件路径经 CLI 参数传入，功能不受影响），留待拆分批次随 Rust 文档更新
 - **ci.yml 新增 go-differential job（2026-08-12）**：Go 差分 gate 进 CI——
   `go-differential`（ci.yml:344-376，windows-latest）串行执行
   scripts/go-verify-byte-parity.ps1 / go-verify-normalized-differential.ps1 /

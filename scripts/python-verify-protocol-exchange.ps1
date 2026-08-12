@@ -13,7 +13,8 @@ param(
 #   1. builds the minimal Rust exchange example
 #      (crates/consema-conformance/examples/emit_protocol_exchange.rs);
 #   2. emit mode: runs it over the checked-in case set
-#      (go/conformance/differential/protocol-exchange/cases.json) into
+#      (conformance/differential/protocol-exchange/cases.json, the shared
+#      single-authority case directory of the consema repository) into
 #      <OutDir> as one `<case-id>.json.hex`/`.pvce.hex`/`.error.txt` per
 #      case (the Rust side self-verifies decode/re-encode byte identity and
 #      rejection codes);
@@ -59,7 +60,7 @@ if (-not (Get-Command $python -ErrorAction SilentlyContinue)) {
 
 # --- case set ----------------------------------------------------------------
 if ($CaseFile -eq '') {
-    $CaseFile = Join-Path $workspaceRoot 'go\conformance\differential\protocol-exchange\cases.json'
+    $CaseFile = Join-Path $workspaceRoot 'conformance\differential\protocol-exchange\cases.json'
 }
 if (-not (Test-Path $CaseFile)) {
     Write-Error "protocol-exchange case file not found: $CaseFile"

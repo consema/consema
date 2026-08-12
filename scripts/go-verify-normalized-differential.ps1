@@ -13,7 +13,9 @@ param(
 #   1. builds the minimal Rust evidence example
 #      (crates/consema-conformance/examples/emit_normalized_results.rs);
 #   2. forward direction: runs it over the checked-in case set
-#      (go/conformance/differential/normalized/cases.json) into <OutDir> as
+#      (conformance/differential/normalized/cases.json, the shared
+#      single-authority case directory of the consema repository) into
+#      <OutDir> as
 #      one `<case-id>.txt` normalized-facts file per case;
 #   3. forward comparison + reverse emission: runs the Go side
 #      (`go test ./conformance/differential/normalized/` with
@@ -43,7 +45,7 @@ param(
 #   1. triage the finding per roadmap §11.3 and reduce it to a minimal
 #      cross-language reproducer;
 #   2. append the minimal case to cases.json in this directory
-#      (go/conformance/differential/normalized/cases.json) using the same
+#      (conformance/differential/normalized/cases.json) using the same
 #      schema as the existing entries (kind/format/profile/source/steps);
 #      the integrity guards are automatic and enforced by
 #      TestCaseFileIntegrity on every `go test ./...` run: the manifest id
@@ -83,7 +85,7 @@ if (-not (Get-Command go -ErrorAction SilentlyContinue)) {
 
 # --- case set ----------------------------------------------------------------
 if ($CaseFile -eq '') {
-    $CaseFile = Join-Path $goDir 'conformance\differential\normalized\cases.json'
+    $CaseFile = Join-Path $workspaceRoot 'conformance\differential\normalized\cases.json'
 }
 if (-not (Test-Path $CaseFile)) {
     Write-Error "normalized differential case file not found: $CaseFile"
@@ -137,6 +139,7 @@ if (Test-Path $goEvidenceDir) { Remove-Item $goEvidenceDir -Recurse -Force }
 Write-Host "[3/4] running the Go differential test (normalized_test.go) + emitting the Go evidence files -> $goEvidenceDir"
 $env:CONSEMA_DIFFERENTIAL_NORMALIZED_RUST_DIR = $OutDir
 $env:CONSEMA_DIFFERENTIAL_NORMALIZED_GO_DIR = $goEvidenceDir
+$env:CONSEMA_DIFFERENTIAL_CASES_DIR = Join-Path $workspaceRoot 'conformance\differential'
 # Capture files live outside $OutDir and $goEvidenceDir: those directories
 # must contain only the `<case-id>.txt` evidence files (the Go test and the
 # consume mode each reject any other file).

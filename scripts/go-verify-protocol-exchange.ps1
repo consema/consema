@@ -12,7 +12,8 @@ param(
 #   1. builds the Rust example (crates/consema-conformance/examples/
 #      emit_protocol_exchange.rs);
 #   2. runs it in emit mode over the checked-in case set
-#      (go/conformance/differential/protocol-exchange/cases.json) into
+#      (conformance/differential/protocol-exchange/cases.json, the shared
+#      single-authority case directory of the consema repository) into
 #      <OutDir>/rust as one `<case-id>.json.hex`, `<case-id>.pvce.hex` or
 #      `<case-id>.error.txt` file per case (the Rust side also verifies its
 #      own decode/re-encode byte identity and its rejection codes);
@@ -34,7 +35,7 @@ param(
 $ErrorActionPreference = 'Stop'
 $workspaceRoot = Split-Path -Parent $PSScriptRoot
 $goDir = Join-Path $workspaceRoot 'go'
-$caseDir = Join-Path $goDir 'conformance\differential\protocol-exchange'
+$caseDir = Join-Path $workspaceRoot 'conformance\differential\protocol-exchange'
 
 # --- repo layout sanity ------------------------------------------------------
 if (-not (Test-Path (Join-Path $workspaceRoot 'Cargo.toml')) -or
@@ -106,6 +107,7 @@ if ($LASTEXITCODE -ne 0) {
 Write-Host "[3/4] running the Go exchange test (exchange_test.go)..."
 $env:CONSEMA_EXCHANGE_RUST_DIR = $rustDir
 $env:CONSEMA_EXCHANGE_GO_DIR = $goDirOut
+$env:CONSEMA_DIFFERENTIAL_CASES_DIR = Join-Path $workspaceRoot 'conformance\differential'
 $logDir = Join-Path $env:TEMP 'consema-go-exchange'
 New-Item -ItemType Directory -Force $logDir | Out-Null
 $stdoutFile = Join-Path $logDir 'go-test.stdout.txt'

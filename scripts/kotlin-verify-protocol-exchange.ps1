@@ -12,7 +12,8 @@ param(
 #   1. builds the minimal Rust example
 #      (crates/consema-conformance/examples/emit_protocol_exchange.rs);
 #   2. emit direction: runs it over the checked-in case set
-#      (go/conformance/differential/protocol-exchange/cases.json) into
+#      (conformance/differential/protocol-exchange/cases.json, the shared
+#      single-authority case directory of the consema repository) into
 #      <OutDir> as `<case-id>.json.hex` / `<case-id>.pvce.hex` (accept
 #      cases) or `<case-id>.error.txt` with the recorded rejection code
 #      (reject cases);
@@ -69,7 +70,7 @@ if (-not (Test-Path $kotlinTestJar) -or -not (Test-Path $kotlinTestJunit5Jar)) {
 
 # --- case set ----------------------------------------------------------------
 if ($CaseFile -eq '') {
-    $CaseFile = Join-Path $workspaceRoot 'go\conformance\differential\protocol-exchange\cases.json'
+    $CaseFile = Join-Path $workspaceRoot 'conformance\differential\protocol-exchange\cases.json'
 }
 if (-not (Test-Path $CaseFile)) {
     Write-Error "protocol-exchange case file not found: $CaseFile"
