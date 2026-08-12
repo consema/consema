@@ -12,6 +12,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 - **§28 五要素终审记录**（`docs/five-element-review-1.0.0.md`）：哲学统一/语义一致/逻辑自洽/真实有效 **PASS**，完整可靠 **PARTIAL**（C-1 已闭环 2026-08-11、C-2 fuzz 推进中、C-3 开放）；历史 findings 全部关账或标豁免；实测核验 14 项（Go 508/0/0、Rust 1,629 passed、差分 108×2、交换 83/83、parity 68/68、capability parity）；
 - **RFC 0015 §3.3 契约修订**：product_version 校验从严格 MAJOR.MINOR.PATCH 扩展为完整 SemVer 2.0 核心语法（接受 `-rc.1`/`-beta.2` prerelease；无 git hash、无 build metadata；cli-v1 向量保持有效）——Rust/Go 两语言校验器同语义扩展 + 双向接受/拒绝测试；
 - **聚合 digest 规范态重算**：conformance 向量聚合 sha256 以规范 LF 字节重算（`git show` 规范 blob），新值 `35bebc8d…` 取代 CRLF 工作树记录的 `e3d6578858…`（fc-manifest/go-implementation-plan/conformance_test/脚本全部更新；`git archive` 干净 checkout 全绿复现，含 race）。
+- **P2-B 向量补强（2026-08-12，rc 前审计驱动）**：plist-v1.json +4 binary limit 失败 case（`plist.limit.container-depth/object-count/string-code-units/data-bytes@1`，转录 parser_binary.rs limit 矩阵，修复 README「覆盖 limits」声称与零 limit case 的缺口）；yaml-v1.json +4（undefined-anchor block 上下文、version-directive 拒绝 `yaml.profile.version-directive@1`、`max_nesting_depth` → `core.parse.resource-limit@1`、alias 预算零值门 → `yaml.projection.resource-limit@1`）；java-properties-v1.json +3（key 位 malformed unicode escape 家族码、invalid sequence → `core.source.invalid-sequence@1`、BOM conflict → `core.source.encoding-conflict@1`）。18 套 suite 508 → **519 cases**，聚合 digest → `cfd6e296…`；五语言 runner（rs/go/ts/py/kt）全量执行新增 case 零失败（Rust cargo test 全绿、Go/TS/Python/Kotlin runner 519/519），digest/计数硬钉五仓同步。
 
 ### Verified（2026-08-10 实测）
 

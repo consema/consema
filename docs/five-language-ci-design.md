@@ -43,7 +43,7 @@
    go/README.md:559-590 "Rust side is the authority for the bytes"；路线图 §16.1 硬门禁）。每个新语言
    的字节证明只能对着 Rust golden 做，golden 转录自向量文件或 Rust 编码器输出，不是抄 Go 的测试
    （multi-language-implementation-plan.md:65）。
-2. **单 digest**：conformance/vectors 聚合 sha256 `35bebc8d…`（fc-manifest-0.13.0.json:38）是五个 runner
+2. **单 digest**：conformance/vectors 聚合 sha256 `cfd6e296…`（fc-manifest-0.13.0.json:38）是五个 runner
    共钉的**同一个值**——digest 只覆盖语言无关的向量文件本身（fc-manifest-0.13.0.json:40），因此五个
    runner 各自计算必然得到同一值（§4）。
 3. **每 runner 是向量的唯一执行者**：某语言的 conformance 测试只由该语言 runner 执行，不得跨语言

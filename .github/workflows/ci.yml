@@ -98,9 +98,9 @@ jobs:
   # (docs/fc-manifest-0.13.0.json "conformance_suite.aggregate_sha256").
   # A vector added, removed or edited without updating the record fails CI —
   # the standing executor for the language-neutral conformance freeze
-  # (18 suites / 508 cases).
+  # (18 suites / 519 cases).
   shared-conformance-digest:
-    name: conformance vectors aggregate digest (18 suites / 508 cases)
+    name: conformance vectors aggregate digest (18 suites / 519 cases)
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -111,7 +111,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          expected='35bebc8d384d71740f7c1a886bc50f4e095ff52fe05d2a407f04b842ee6922fa'
+          expected='cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a'
           vector_dir='conformance/vectors'
           : > /tmp/digest-input
           for f in $(LC_ALL=C ls "$vector_dir"/*.json | LC_ALL=C sort); do

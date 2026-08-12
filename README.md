@@ -40,7 +40,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 
 **审计与门禁证据**（`docs/`）：
 
-- [fc-manifest-0.13.0.json](docs/fc-manifest-0.13.0.json)：0.13.0 Feature-Complete Gate 记录（含 conformance 聚合 digest `35bebc8d…` 与各门禁条目证据）
+- [fc-manifest-0.13.0.json](docs/fc-manifest-0.13.0.json)：0.13.0 Feature-Complete Gate 记录（含 conformance 聚合 digest `cfd6e296…` 与各门禁条目证据）
 - [five-element-review-1.0.0.md](docs/five-element-review-1.0.0.md)：五要素审计
 - [fuzz-evidence-0.13.0.md](docs/fuzz-evidence-0.13.0.md) 与 `docs/fuzz-evidence-0.13.0-logs/`：fuzz 证据（含原始日志）
 - [0.13.0-gate-plan.md](docs/0.13.0-gate-plan.md)、[API-REVIEW-0.13.0.md](docs/API-REVIEW-0.13.0.md)、[COVERAGE-0.13.0.md](docs/COVERAGE-0.13.0.md)、[CHANGELOG.md](docs/CHANGELOG.md)、`docs/release/`（SBOM / 校验和 / 发布记录）
@@ -48,7 +48,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 
 **Conformance 仲裁层**（`conformance/`，语言无关权威）：
 
-- `vectors/`：18 套语言无关 suite 共 508/508 cases（聚合 digest `35bebc8d384d71740f7c1a886bc50f4e095ff52fe05d2a407f04b842ee6922fa`）
+- `vectors/`：18 套语言无关 suite 共 519/519 cases（聚合 digest `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`）
 - `fixtures/`：真实配置夹具；`corpora/`：mutation 语料
 - `oracles/`：固定 runtime oracle（`hcl-go-v1`、`plist-macos-v1` 等，manifest 记录 runtime 固定事实与 documented skip_path）
 - `differential/`：跨语言差分 case 集（byte parity / normalized / protocol-exchange，五语言共用单一权威）
@@ -64,7 +64,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 ## Conformance 权威声明
 
 - 各语言仓（consema-rs / consema-go / consema-ts / consema-py / consema-kt）CI 通过多仓 checkout 从本仓 `conformance/` 取数：vectors、fixtures、oracles 与 differential case 集是本仓维护、五仓共享的**单一语言无关权威**。
-- 本仓 CI 的 `shared-conformance-digest` job 复算 `conformance/vectors/` 聚合 digest 并断言等于 `35bebc8d384d71740f7c1a886bc50f4e095ff52fe05d2a407f04b842ee6922fa`（算法：文件名字节序排序、逐文件 sha256、`{basename}:{digest}` 以 `\n` 连接、再 sha256；以规范 checkout 的 LF 字节为准，见 `docs/fc-manifest-0.13.0.json` conformance_suite note）。
+- 本仓 CI 的 `shared-conformance-digest` job 复算 `conformance/vectors/` 聚合 digest 并断言等于 `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`（算法：文件名字节序排序、逐文件 sha256、`{basename}:{digest}` 以 `\n` 连接、再 sha256；以规范 checkout 的 LF 字节为准，见 `docs/fc-manifest-0.13.0.json` conformance_suite note）。
 - **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 都必须同步全部五个语言仓（实现与测试）并同步更新聚合 digest 与 18/508 计数；未同步的向量变更会让各仓 conformance gate 与 digest 断言失败。
 
 ## 格式家族
