@@ -8,6 +8,8 @@
 
 本文是 Consema 从 Rust `0.1.0` 经已完成的 `0.2.0`、`0.3.0` 走向 `1.0.0` 的总路线图、产品范围和发布治理基线。
 
+> **文档地位注记（2026-08-12）**：双语言决策已被 2026-08-11 五语言决策扩展——TS/Python/Kotlin 加入 1.0.0 release 标准，与 Rust/Go 同等地位（见 `docs/multi-language-implementation-plan.md` 与 `docs/five-language-ci-design.md`）。本文档为双语言时代规划，历史章节保留，当前态以五语言文档为准。
+
 它回答以下问题：
 
 1. `1.0.0` 到底意味着什么；
@@ -994,7 +996,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
   ↓
 0.12.0 Rust SDK + CLI 产品集成                           Rust
   ↓
-0.13.0 Rust 生产加固与 Feature-Complete Gate      Rust 门禁进行中（C-1/C-2/C-3 开放）
+0.13.0 Rust 生产加固与 Feature-Complete Gate      Rust 门禁推进中（C-1 已闭环 2026-08-11；C-2 partial，3/9 单位过 72h；C-3 partial；五语言各 L0-L5 已交付）
   ↓
 0.14.0 Go core / PVCE / PGCE / protocol                  Go 开始
   ↓
@@ -1014,6 +1016,8 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 ```
 
 > **决策注记（2026-08-07）**：owner 决定在 C-1/C-2/C-3 完成前启动 `0.14.0` 的 Go 实现（G0.1-G0.3：core/graph/protocol），这是经记录的路线图偏差，按 §0 冲突解决层级处理——修改路线图、不静默缩小 1.0.0 承诺；`0.13.0` 门禁判定以 docs/fc-manifest-0.13.0.json 为准（gate_open/not_closed，C-1/C-2/C-3 开放，decision record 见该 manifest）。
+>
+> **状态更新（2026-08-12）**：C-1 已闭环——2026-08-11 GitHub Actions run#5（head 437fd35）132/132 steps 全绿；C-2 推进中——2026-08-12 10:17 快照 62,432 行 / ≈460 CPU-hours（runs.csv 权威），properties/yaml/ini 三单位已过 72h 门槛；C-3 partial；Go 全里程碑（0.14.0-0.19.0 G0.1-G5.6）已交付；五语言实现各 L0-L5 已交付（TS/Python/Kotlin 与 Rust/Go 同等地位，见 docs/multi-language-implementation-plan.md 与 docs/five-language-ci-design.md）。
 
 版本数量可以在实际执行中增加，但不得压缩语义门禁。若某个阶段过大，可以拆成更多 minor 版本；不能为了保持编号漂亮而把未完成能力滚入下一阶段。
 
@@ -1370,7 +1374,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * 所有 public object 的 lifecycle、identity、completion 和 failure 已定义；
 * 没有依赖 Rust 类型名才能解释的语言无关行为；
 * 所有 provisional abstraction 已验证、修订或删除；
-* Go API mapping RFC 已接受（2026-08-07 修订为 15-kind 契约映射）；Go 实现 0.14.0 G0.1-G0.3 已按 2026-08-07 决策记录 D-1 启动（core/graph/protocol，见 fc-manifest decisions[0]；C-1/C-2/C-3 完成前不发布 0.14.0、不宣称里程碑关闭）；
+* Go API mapping RFC 已接受（2026-08-07 修订为 15-kind 契约映射）；Go 实现 0.14.0 G0.1-G0.3 已按 2026-08-07 决策记录 D-1 启动（core/graph/protocol，见 fc-manifest decisions[0]；C-1/C-2/C-3 完成前不发布 0.14.0、不宣称里程碑关闭）；**（注记：Go 全里程碑已交付——0.14.0-0.19.0 G0.1-G5.6，2026-08-10 前；C-1 已闭环 2026-08-11 run#5）**；
 * 所有已知规范歧义有 resolution 或明确的阻断状态。
 
 ## 15.3 质量门禁
@@ -2231,7 +2235,7 @@ Lossless structure、provenance 和 graph 必然增加成本。控制：
 | R-17 | CLI protocol 与 batch apply | `0.12.0` |
 | R-18 | Rust stable API candidate | `0.13.0` |
 | R-19 | Go API mapping | Go 开始前 |
-| R-20 | 1.0 compatibility/support policy | `0.19.0` |
+| R-20 | 1.0 compatibility/support policy | `0.19.0`（已交付：RFC 0020 Accepted，2026-08-10） |
 
 每个版本还必须维护：
 

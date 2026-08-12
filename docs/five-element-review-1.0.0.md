@@ -21,12 +21,12 @@
 
 | # | 通过条件（原文引用 §28.1） | 最终状态证据 | 核验结论 |
 |---|---|---|---|
-| 1 | 八个格式都以不可变 Document 为真实状态 | Rust：各家族 RFC 0012-0014 与 README（无损 Document、immutable）；Go：go/README.md:455-457（§21.2 政策 1：Completed objects 逻辑不可变、访问器返回拷贝、唯一变更路径是显式 builder）。CHANGELOG.md:163（0.10.0 行"未修改 Document 字节精确往返"） | 通过 |
-| 2 | PortableValue 不吞并 graph、XML tree 或 HCL program | YAML graph 归属 PortableGraph（RFC 0006/0007，CHANGELOG.md:230"PortableValue 未因 YAML 增加引用或 graph 类型"）；XML element-tree、HCL body/expression 各自有 `xml.element-tree@1`/`hcl.projection.body@1`/`hcl.expression@1` 记录（CHANGELOG.md:129、169）；IMPLEMENTATION.md:108（"PortableGraph 是与 PortableValue 平行的 immutable portable representation"）；Go 侧同名记录（go/README.md:298-301、402-408） | 通过 |
-| 3 | Projection、Materialization 和 Edit 都是显式操作 | RFC 0004（MaterializationRequest/Result、fidelity/report/provenance）；CLI 默认只读/dry-run、写操作显式参数（CHANGELOG.md:92"没有任何命令在无显式参数时写目标文件"）；失败形态原子（B-5，API-REVIEW-0.13.0.md:107"report:null,target:null 是诚实形态"）；Go 侧同样显式（pilot-go-0.19.0.md §2.7 六组原子拒绝） | 通过 |
+| 1 | 八个格式都以不可变 Document 为真实状态 | Rust：各家族 RFC 0012-0014 与 README（无损 Document、immutable）；Go：go/README.md:455-457（§21.2 政策 1：Completed objects 逻辑不可变、访问器返回拷贝、唯一变更路径是显式 builder）。CHANGELOG.md:152、172（0.11.0/0.10.0 行"未修改 Document 字节精确往返"） | 通过 |
+| 2 | PortableValue 不吞并 graph、XML tree 或 HCL program | YAML graph 归属 PortableGraph（RFC 0006/0007，CHANGELOG.md:239"PortableValue 未因 YAML 增加引用或 graph 类型"）；XML element-tree、HCL body/expression 各自有 `xml.element-tree@1`/`hcl.projection.body@1`/`hcl.expression@1` 记录（CHANGELOG.md:178、138、147）；IMPLEMENTATION.md:108（"PortableGraph 是与 PortableValue 平行的 immutable portable representation"）；Go 侧同名记录（go/README.md:298-301、402-408） | 通过 |
+| 3 | Projection、Materialization 和 Edit 都是显式操作 | RFC 0004（MaterializationRequest/Result、fidelity/report/provenance）；CLI 默认只读/dry-run、写操作显式参数（CHANGELOG.md:101"没有任何命令在无显式参数时写目标文件"）；失败形态原子（B-5，API-REVIEW-0.13.0.md:107"report:null,target:null 是诚实形态"）；Go 侧同样显式（pilot-go-0.19.0.md §2.7 六组原子拒绝） | 通过 |
 | 4 | CLI 便利性不改变核心默认拒绝原则 | RFC 0015（default dry-run、`edit --write` usage 显式拒绝，crates/consema/src/bin/consema/edit_cmd.rs:1020-1023 由测试钉死）；帮助文本已如实化（API-REVIEW-0.13.0.md:110：args.rs:194 "dry-run only"） | 通过 |
 | 5 | Rust 与 Go 共享行为，不强制共享实现结构 | 路线图 §11（双实现原则）；RFC 0016 §1.1 cgo 禁令（go/README.md:771-773）；Go stdlib-only 零第三方依赖（go.mod 无 require，go/README.md:554-557）；两语言独立 parser（go/README.md 各家族"self-written"/"independent tokenizer"） | 通过 |
-| 6 | 生产级范围没有把配置来源、evaluation 和治理平台塞入核心 | `.env` 明确为"后续 source adapter，而不是第九种配置格式 Profile"（CHANGELOG.md:215）；HCL 不求值（SECURITY.md:36、CHANGELOG.md:138）；无 schema/registry/remote-KV 进核心（路线图 §24 非目标清单，CHANGELOG.md:215-216、283-284） | 通过 |
+| 6 | 生产级范围没有把配置来源、evaluation 和治理平台塞入核心 | `.env` 明确为"后续 source adapter，而不是第九种配置格式 Profile"（CHANGELOG.md:224）；HCL 不求值（SECURITY.md:36、CHANGELOG.md:147）；无 schema/registry/remote-KV 进核心（路线图 §24 非目标清单，CHANGELOG.md:137、147） | 通过 |
 
 ### 1.2 §28.2 语义一致（第 2266-2290 行）— **PASS**
 
@@ -40,16 +40,16 @@
 
 | # | 通过条件 | 最终状态证据 | 核验结论 |
 |---|---|---|---|
-| 1 | read/query/project 链闭合 | W1-W7 全工作流经公共 API 端到端（pilot-go-0.19.0.md §2.1-§2.7）；query 定义错误不晚于首个 Match（rc-1.0.0-candidate.md:46）；Go 三查询域 21 个（go/README.md:430-433） | 通过 |
-| 2 | materialize/convert 链闭合 | 两阶段 projection→PortableValue→materialization 组合（CHANGELOG.md:292）；canonical 生成字节必先重解析闭包验证（各家族 Correctness 段）；Go `Convert*` 8 入口（go/README.md:437-443）；convert 组合 W6 全 Exact、W7 六组原子拒绝（pilot-go-0.19.0.md §2.6-2.7） | 通过 |
-| 3 | edit/patch/apply 链闭合 | dry-run/commit 等价（EditPlan/SourcePatch/UntouchedByteProof，CHANGELOG.md:305）；plan/apply 双前置条件 + skipped-stale 状态机（pilot-go-0.19.0.md §2.8）；中断恢复 100%（53+47，pilot metric 11） | 通过 |
-| 4 | Document 与 portable representation 之间没有隐藏同步 | 转换/物化全部显式两阶段 + 重解析闭包验证（CHANGELOG.md:301"任何失败不携带 Document 或 partial output"）；无共享缓存/隐式关联（架构层，IMPLEMENTATION.md 分层） | 通过 |
+| 1 | read/query/project 链闭合 | W1-W7 全工作流经公共 API 端到端（pilot-go-0.19.0.md §2.1-§2.7）；query 定义错误不晚于首个 Match（rc-1.0.0-candidate.md:48）；Go 三查询域 21 个（go/README.md:430-433） | 通过 |
+| 2 | materialize/convert 链闭合 | 两阶段 projection→PortableValue→materialization 组合（CHANGELOG.md:232）；canonical 生成字节必先重解析闭包验证（各家族 Correctness 段）；Go `Convert*` 8 入口（go/README.md:437-443）；convert 组合 W6 全 Exact、W7 六组原子拒绝（pilot-go-0.19.0.md §2.6-2.7） | 通过 |
+| 3 | edit/patch/apply 链闭合 | dry-run/commit 等价（EditPlan/SourcePatch/UntouchedByteProof，CHANGELOG.md:208）；plan/apply 双前置条件 + skipped-stale 状态机（pilot-go-0.19.0.md §2.8）；中断恢复 100%（53+47，pilot metric 11） | 通过 |
+| 4 | Document 与 portable representation 之间没有隐藏同步 | 转换/物化全部显式两阶段 + 重解析闭包验证（CHANGELOG.md:150、171"失败不携带 Document/partial output"）；无共享缓存/隐式关联（架构层，IMPLEMENTATION.md 分层） | 通过 |
 | 5 | format-specific edit 不伪装成 universal edit | 16 个 format-local operation registry（json 8/toml 7/yaml 8/ini 8/properties 5/xml 8/plist 6/hcl 6，fc-manifest-0.13.0.json:213-215；Go 侧同集，go/README.md:430-433）；跨家族组合显式经 Document 投影/物化，不假借"通用编辑" | 通过 |
 | 6 | YAML graph、XML tree 和 HCL expression 都有合法归属 | PortableGraph / `xml.element-tree@1` / `hcl.expression@1`（§1.1 第 2 行证据）；Go 侧同名记录实现（go/README.md:183-189、298-301、402-408） | 通过 |
-| 7 | Rust 先行与 Go 反向审计没有权威循环 | PVCE/PGCE 字节权威 = Rust 编码器（go/README.md:559-590"Rust side is the authority for the bytes"）；golden 向量由 Rust 编码器生成、Go 逐字节转录，既有冻结字节零变动（CHANGELOG.md:76）；差分 harness 双向（Go 发射 → Rust consume）构成对 Rust 的独立反审计而非循环依赖；cgo 禁令排除 FFI 作弊（go/README.md:771-773） | 通过 |
+| 7 | Rust 先行与 Go 反向审计没有权威循环 | PVCE/PGCE 字节权威 = Rust 编码器（go/README.md:559-590"Rust side is the authority for the bytes"）；golden 向量由 Rust 编码器生成、Go 逐字节转录，既有冻结字节零变动（CHANGELOG.md:85）；差分 harness 双向（Go 发射 → Rust consume）构成对 Rust 的独立反审计而非循环依赖；cgo 禁令排除 FFI 作弊（go/README.md:771-773） | 通过 |
 
 **Kotlin ChangeSet 结构差异（终审记录 F-28.3-1，2026-08-12，LOW）**：Kotlin 在 7/8 family 无一等公民 ChangeSet
-（kotlin/json/Edit.kt:244-255 标注 "L4 milestone"——EditCommit 以有序 edit diagnostics 作为 fallback 事件代替）；
+（kotlin/src/main/kotlin/consema/json/Edit.kt:244-247 标注 "L4 milestone"——EditCommit 以有序 edit diagnostics 作为 fallback 事件代替）；
 `core.change-set@1` 向量经 runner 本地 wire builder（镜像 Rust 构造器）通过，协议线格式面闭环；
 功能闭合不受影响（conformance 508/508）。处置：不重构 Kotlin edit 管线（属 1.0.0 API 冻结决策，留待
 冻结前评估）；建议在 1.0.0 API 冻结前对齐（见 §6.2 收口项）。
@@ -62,9 +62,9 @@
 | 2 | `.env`、注册表和远程 KV 被正确归为来源 | CHANGELOG.md:215（`.env` 是后续 source adapter 而非第九种格式 Profile）；路线图 §24 非目标清单（注册表/远程 KV 不在 1.0.0 范围）——正确归类、未混入核心 | 通过 |
 | 3 | 八个家族完成真实 corpus 和迁移工作流 | 钉版 corpus 12 文件（pilot-go-0.19.0.md §1，digest 登记）；三类真实批量迁移全部执行（版本/镜像更新、结构插入删除、跨格式转换，pilot-go-0.19.0.md §4.1-4.3）；fixtures 覆盖 9 目录（conformance/fixtures/，2026-08-10 实测） | 通过 |
 | 4 | 每个格式不仅能 parse，还能保真、查询、投影、生成和编辑 | 路线图 §8 Mandatory Capability Matrix（第 613-643 行）；18 套语言无关 suite 508/508（实测 508 passed / 0 skipped / 0 failed，见 §4）；Go 侧 capability parity 全等（实测 PASS）；pilot W1-W5 覆盖全部八家族编辑 | 通过 |
-| 5 | 用户可以用 CLI 安全 plan/apply | Rust CLI 与 Go CLI（go/cmd/consema，74e336e）plan/apply 六步写前重验 + 原子替换 + 读回验证；stale/篡改/只读/中断负例全绿（pilot-go-0.19.0.md §2.8、rc-1.0.0-candidate.md:81）；升级演练逐字节兼容（rc-1.0.0-candidate.md §3.2） | 通过 |
-| 6 | 性能、安全和供应链有可重放证据 | BENCHMARKS-0.13.0.md（冻结预算 + 复验机制 §12）；三处超线性修复复测（CHANGELOG.md:42）；security matrix（go/README.md:715-744，35 行边界 + threat corpora）；供应链流程落地（release-process-0.13.0.md）——**但 0.13.0 真实发布未执行（C-3）且演练发现 D-1/D-2（checksum 不可复现、密钥无备份），见 §2 与 §3** | 通过（发布执行属 §28.5 口径） |
-| 7 | 静默信息损失为零 | pilot metric 3 = 0（pilot-go-0.19.0.md:154）；M2-F2（P0 静默损失）已修复并带 trip-wire（fuzz-evidence-0.13.0.md:134）；audited conversion 全部 fidelity=Exact 或原子失败（pilot metric 4/5） | 通过 |
+| 5 | 用户可以用 CLI 安全 plan/apply | Rust CLI 与 Go CLI（go/cmd/consema，74e336e）plan/apply 六步写前重验 + 原子替换 + 读回验证；stale/篡改/只读/中断负例全绿（pilot-go-0.19.0.md §2.8；rc-1.0.0-candidate.md:100-102（stale/中断）、162-189（演练 4 只读负例））；升级演练逐字节兼容（rc-1.0.0-candidate.md §3.2，:130-144） | 通过 |
+| 6 | 性能、安全和供应链有可重放证据 | BENCHMARKS-0.13.0.md（冻结预算 + 复验机制 §12）；三处超线性修复复测（CHANGELOG.md:51）；security matrix（go/README.md:719-749，32 行边界 + threat corpora）；供应链流程落地（release-process-0.13.0.md）——**但 0.13.0 真实发布未执行（C-3）且演练发现 D-1/D-2（checksum 不可复现、密钥无备份），见 §2 与 §3** | 通过（发布执行属 §28.5 口径） |
+| 7 | 静默信息损失为零 | pilot metric 3 = 0（pilot-go-0.19.0.md:154）；M2-F2（P0 静默损失）已修复并带 trip-wire（fuzz-evidence-0.13.0.md:148、156）；audited conversion 全部 fidelity=Exact 或原子失败（pilot metric 4/5） | 通过 |
 
 ### 1.5 §28.5 完整可靠（第 2316-2326 行）— **PARTIAL**
 
@@ -72,11 +72,11 @@
 |---|---|---|---|
 | 1 | 标准、Rust、Go、CLI 和 suite 同时完成 | RFC 0001-0020 冻结；Rust 0.13.0 Feature-Complete（fc-manifest 功能门禁全 complete）；Go 0.14.0-0.19.0 全部里程碑交付（74e336e）；Rust CLI 11 命令 + Go CLI beta（go/cmd/consema，e2e 9 测试实测 PASS）；18 套 suite 508 cases 双 runner 全过（实测） | 通过 |
 | 2 | 所有 mandatory capability 100% 通过 | 508/508（实测）；capability parity 8 families / 16 profiles / 21 query domains / 16 operation registries / 187 codes（实测 PASS）；无 "Rust only" mandatory 行为（go/capability_parity_test.go） | 通过 |
-| 3 | P0/P1 为零 | 通过：F-A/F-B 已修复并验证（2209582，审计 PASS），"无未解决 P0/P1"恢复成立——rc-1.0.0-candidate.md:58 记录"当前 0"（本次核验当时发现的 F-B 提交态证据缺陷与 F-A 工作树回归已分别处置，见 §5.1/§5.2） | **通过** |
+| 3 | P0/P1 为零 | 通过：F-A/F-B 已修复并验证（2209582，审计 PASS），"无未解决 P0/P1"恢复成立——rc-1.0.0-candidate.md:63 记录"当前 0"（本次核验当时发现的 F-B 提交态证据缺陷与 F-A 工作树回归已分别处置，见 §5.1/§5.2） | **通过** |
 | 4 | 两语言 observable mismatch 为零 | normalized differential 108/108 ×2、byte parity 68/68、protocol exchange 83/83（2026-08-10 全部重跑通过，§4）；pilot metric 12 = 0（pilot-go-0.19.0.md:164）；Go fuzz 4 缺陷修复后双语言契约一致（go/README.md:683-714） | 通过 |
 | 5 | 生产发布物可验证、可重建、可升级 | 发布流程与演练已落地（release-process-0.13.0.md、rc-1.0.0-candidate.md §3：升级/回滚逐字节兼容）；**但真实发布未执行（C-3 开放）**：无真实密钥、无发布 commit 上的 checksum/SBOM/签名；演练发现 D-1（0.8.0 checksum manifest 从 git 历史不可复现，脏树记录）与 D-2（演练密钥无持久公钥） | **部分（C-3 + D-1/D-2 阻塞）** |
-| 6 | failure、recovery、cancellation、limits 和 conflict 都有正式语义 | RFC 0015 exit code 0-5 分类（穷尽映射测试）；limits 矩阵（Rust SECURITY.md + Go limits_matrix_test.go 91 行 + security_matrix_test.go 32 行）；batch 状态机 completed/failed/pending/skipped-stale；中断注入 seam（CONSEMA_APPLY_INTERRUPT_AFTER）；RC soak 待补：**仅磁盘失败演练未记录**（rc-1.0.0-candidate.md:96，P2-6，RC soak 阶段 1 必做：部分权限演练已闭环——演练 4，2026-08-10；磁盘失败环境阻塞——演练 5：C-1 已闭环（2026-08-11）后 Linux runner 完成路径可用，演练本身仍待执行） | 通过（仅磁盘失败演练归 RC soak 收口） |
-| 7 | 没有通过 experimental 标签隐藏未完成的 1.0 承诺 | F-8 门禁 complete：无 mandatory capability 标记 experimental/stub/partial（fc-manifest-0.13.0.json:241-250）；全部边界是显式拒绝而非 stub（CHANGELOG.md:40-45） | 通过 |
+| 6 | failure、recovery、cancellation、limits 和 conflict 都有正式语义 | RFC 0015 exit code 0-5 分类（穷尽映射测试）；limits 矩阵（Rust SECURITY.md + Go limits_matrix_test.go 91 行 + security_matrix_test.go 32 行）；batch 状态机 completed/failed/pending/skipped-stale；中断注入 seam（CONSEMA_APPLY_INTERRUPT_AFTER）；RC soak 待补：**仅磁盘失败演练未记录**（rc-1.0.0-candidate.md:100-102，P2-6，RC soak 阶段 1 必做：部分权限演练已闭环——演练 4，2026-08-10；磁盘失败环境阻塞——演练 5：C-1 已闭环（2026-08-11）后 Linux runner 完成路径可用，演练本身仍待执行） | 通过（仅磁盘失败演练归 RC soak 收口） |
+| 7 | 没有通过 experimental 标签隐藏未完成的 1.0 承诺 | F-8 门禁 complete：无 mandatory capability 标记 experimental/stub/partial（fc-manifest-0.13.0.json:241-250）；全部边界是显式拒绝而非 stub（CHANGELOG.md:74-80） | 通过 |
 
 ---
 
@@ -84,11 +84,11 @@
 
 | 开放项 | 状态（fc-manifest open_items / rc-1.0.0-candidate） | 依赖它的 §28 条件 | 影响判定 |
 |---|---|---|---|
-| C-1：CI 10 job GitHub 干净 checkout 全矩阵全绿 | **已闭环（2026-08-11：GitHub Actions run #5，head 437fd35，132/132 steps 全绿，10+1 job（增补前，11 定义/17 次执行）windows/ubuntu/macos 全矩阵；go-differential 2026-08-12 增补后 ci.yml 为 10+2 job/12 定义；fc-manifest open_items C-1 → closed）** | §28.5 条件 1/3/4（三平台全矩阵、SEC-9 Linux/macOS 验证、A-4 msrv 真验证、A-9 package 真跑、semver approved-failure 落定） | **C-1 腿阻塞已解除**（run #5 真跑全绿：三平台全矩阵、SEC-9、A-4、A-9 随 manifest C-1.closes 满足）；§28.5 仍 **PARTIAL**——C-2/C-3 开放；**延伸（2026-08-12，head dbba9a4）**：五语言 CI 全绿（ci.yml run#9 Rust 10+1 + ci-typescript/ci-python/ci-kotlin 各 run#2 全绿）——§28.5 条件 1（标准/Rust/Go/CLI/suite 同时完成）的证据由双语言扩展到五语言在 CI 中 live（five-language-ci-design.md §10） |
-| C-2：每格式 ≥72 CPU-hours release-candidate fuzz | partial（runs.csv 13,005 行 / 79.427 CPU-hours，截取自 session 79 期间，2026-08-10；最接近格式 properties ≈20.6%（14.8/72）；零新 crash；Go 16 targets 30s clean-run 已有记录）；**2026-08-12 快照（runs.csv 权威复算）**：55,879 行 / 391.7 CPU-hours，零新 crash（非零退出仅已知 session-9 分类）；**properties 73.6h 首个突破 72h 门槛（102.2%）**，yaml 65.2h（90.6%）、ini 62.7h（87.1%）最接近；其余门槛单位（7 格式家族 + protocol-decode）仍开放 | §28.5 条件 3（P0/P1=0 的 fuzz clean-run 证据完整性，§22.4:1905） | **阻塞 §28.5 通过**（Q-7 未闭）；不依赖其他四要素 |
+| C-1：CI 10 job GitHub 干净 checkout 全矩阵全绿 | **已闭环（2026-08-11：GitHub Actions run #5，head 437fd35，132/132 steps 全绿，10+1 job（增补前，11 定义/17 次执行）windows/ubuntu/macos 全矩阵；go-differential 2026-08-12 增补后 ci.yml 为 10+2 job/12 定义；fc-manifest open_items C-1 → closed）** | §28.5 条件 1/3/4（三平台全矩阵、SEC-9 Linux/macOS 验证、A-4 msrv 真验证、A-9 package 真跑、semver approved-failure 落定） | **C-1 腿阻塞已解除**（run #5 真跑全绿：三平台全矩阵、SEC-9、A-4、A-9 随 manifest C-1.closes 满足）；§28.5 仍 **PARTIAL**——C-2/C-3 未关闭（partial）；**延伸（2026-08-12，head dbba9a4）**：五语言 CI 全绿（ci.yml run#9 Rust 10+1 + ci-typescript/ci-python/ci-kotlin 各 run#2 全绿；go-differential 上线：2026-08-12，run#12 全绿）——§28.5 条件 1（标准/Rust/Go/CLI/suite 同时完成）的证据由双语言扩展到五语言在 CI 中 live（five-language-ci-design.md §10） |
+| C-2：每格式 ≥72 CPU-hours release-candidate fuzz | partial（runs.csv 13,005 行 / 79.427 CPU-hours，截取自 session 79 期间，2026-08-10；最接近格式 properties ≈20.6%（14.8/72）；零新 crash；Go 16 targets 30s clean-run 已有记录）；**2026-08-12 10:17 复算快照（runs.csv 权威复算，快照时点标注）**：62,432 行 / ~460 CPU-hours，零新 crash（非零退出仅已知 session-9 分类）；**properties 85.5h（118.8%）、yaml 75.8h（105.3%）、ini 72.8h（101.1%）三单位已过 72h 门槛**；hcl 55.5h（77.1%）、json 55.1h（76.5%）最接近门槛的开放单位，toml 33.3h、protocol-decode 29.1h、plist 26.7h、xml 19.6h 仍开放 | §28.5 条件 3（P0/P1=0 的 fuzz clean-run 证据完整性，§22.4:1905） | **阻塞 §28.5 通过**（Q-7 未闭）；不依赖其他四要素 |
 | C-3：真实发布密钥与 0.13.0 发布执行 | partial（演练密钥仅流程验证；默认 keyring 无真实密钥；docs/release 仅 0.8.0 演练产物；D-1/D-2 处置随本项） | §28.5 条件 5（生产发布物可验证/可重建/可升级——发布物、SBOM、签名、checksum、build provenance 真跑）；§28.4 条件 6 的供应链侧 | **阻塞 §28.5 通过**；D-1 要求"manifest 必须从干净发布 commit 重新生成"（rc-1.0.0-candidate.md:16）与 F-B 同源纪律（干净 checkout 复现） |
 | RC soak 阶段 1（磁盘失败、部分权限失败演练、differential 追加、Go RC fuzz 记录、corpus 巡检、性能复测） | 部分权限失败演练已闭环（rc-1.0.0-candidate.md §3.5 演练 4，2026-08-10）；磁盘失败演练环境阻塞（演练 5；C-1 已闭环 2026-08-11 后 Linux runner 完成路径可用，演练本身仍待执行）；differential 追加、Go RC fuzz 记录、corpus 巡检、性能复测状态按 rc-1.0.0-candidate.md §4.1 | §28.5 条件 6（failure/limits 演练完整性，§22.7"stale/部分权限/中断/磁盘四类演练"——仅磁盘失败未记录，部分权限已闭环） | 阻塞 §28.5 的 RC 收口（RC soak 本身是 §16.6 硬门禁的法定例外） |
-| Go CLI 合入后的 cross-language exchange 复跑（P2-7） | 已闭环（2026-08-10，rc-1.0.0-candidate.md:299：G5.6 合入后四 harness 复跑 83/83 + 108/108 + 68/68） | §22.2（rc-1.0.0-candidate.md:38 边界）→ §28.5 条件 4 的 CLI 侧核对 | 不阻塞（SDK 面 83/83 已实测；CLI 侧已闭环） |
+| Go CLI 合入后的 cross-language exchange 复跑（P2-7） | 已闭环（2026-08-10，rc-1.0.0-candidate.md:314：G5.6 合入后四 harness 复跑 83/83 + 108/108 + 68/68） | §22.2（rc-1.0.0-candidate.md:38 边界）→ §28.5 条件 4 的 CLI 侧核对 | 不阻塞（SDK 面 83/83 已实测；CLI 侧已闭环） |
 | 版本推进 `1.0.0-rc.1`（F-A） | 已随 2209582 提交（Cargo.toml:31 / go/cmd/consema/version.go:15）并通过两语言门禁（审计实测） | §28.5 条件 5 的发布准备、C-3 阶段 0 执行 | 不阻塞（F-A 已修复，§5.1） |
 | vector 聚合 digest 干净 checkout 不可复现（F-B，提交态） | 已修复（2209582）：干净 LF checkout 重算 35bebc8d… 并回填 fc-manifest:38 与 conformance_test.go:106，与 D-1 纪律合并记录（一切门禁证据以干净 checkout 为准） | §28.5 条件 5（可重建证据）、C-1（go-1-26 job）、fc-manifest"值可精确复现"声称 | 不阻塞（已修复；C-1 推入与 C-3 发布按原路径执行） |
 
@@ -147,7 +147,7 @@
 | 4 | `gofmt -l .`、`go vet ./...`、`go build ./...`、`go mod tidy` | 全干净 | §6 门禁（go-implementation-plan.md:323） |
 | 5 | `go test -race -count=1 ./conformance/...` 及其余包 | 全 ok（唯一 FAIL 系核验临时文件删除时序所致，已复跑确认） | race 门禁 |
 | 6 | `cargo test -p consema-conformance --release --locked`（worktree） | exit 0；26 个 test binary 全 ok，179 passed / 0 failed（18 套 suite runner 全部 conformant） | Rust conformance 508/508 + 计数断言 |
-| 7 | `cargo test --workspace --locked`（worktree） | exit 0；63 个 test binary 全 ok，1,629 passed / 0 failed | CHANGELOG.md:59 的 workspace 全绿（0.13.0 记录 1,617；当前提交态 1,629，增量来自 0.13.0 后 conformance 域） |
+| 7 | `cargo test --workspace --locked`（worktree） | exit 0；63 个 test binary 全 ok，1,629 passed / 0 failed | CHANGELOG.md:68 的 workspace 全绿（0.13.0 记录 1,617；当前提交态 1,629，增量来自 0.13.0 后 conformance 域） |
 | 8 | `cargo fmt --check`（worktree） | 干净 | fmt 门禁 |
 | 9 | `scripts/go-verify-byte-parity.ps1` | **byte parity 68/68 equal（51 pvce + 17 pgce），exit 0** | §16.1/§22.2 PVCE/PGCE byte-exact |
 | 10 | `scripts/go-verify-normalized-differential.ps1` | **108/108 forward + 108/108 reverse，exit 0** | §22.2 normalized 结果一致 |
@@ -191,7 +191,7 @@
   （recorded），两处实测一致；fc-manifest:40 note 已注明规范 checkout（LF）为权威口径、历史 CRLF 值被取代。
   审计验证：干净 LF worktree 上 go test digest 断言 PASS、手工复算 MATCH、shared-conformance 脚本 6/6 exit 0。
 - **补注（本机差异，文档化）**：本机 CRLF 工作树（`core.autocrlf=true`）上仍算出 e3d6578858…，属文档化
-  本机差异（rc-1.0.0-candidate.md:299 同述）；规范 checkout（LF）为权威口径，CI 不受影响。
+  本机差异（rc-1.0.0-candidate.md:314 同述）；规范 checkout（LF）为权威口径，CI 不受影响。
 - **修复前状态（历史记录）**：
   - 现象：干净 checkout（LF，`.gitattributes` 第 1 行 `* text=auto eol=lf`）下
     `go/conformance` 的 `TestRunIsConformant`/`TestDigestAlgorithmMatchesManifest` FAIL、
@@ -201,7 +201,7 @@
     CRLF）上按文档化算法算出的；git 提交内容为 LF（`git show HEAD:conformance/vectors/cli-v1.json` 实测 LF）。
     干净 checkout 产出 LF，逐文件 sha256 即不同 → 聚合 digest 不同。记录值只在"与记录机 checkout 状态相同"
     的机器上可复现，与 fc-manifest 第 40 行"值可精确复现"与 §28.5"可重建"声称不符。
-  - 影响（当时，P1 级）：(a) C-1 的 go-1-26 CI job（ci.yml:306-317，`go test ./...` 于 ubuntu）在干净
+  - 影响（当时，P1 级）：(a) C-1 的 go-1-26 CI job（ci.yml:321-331，`go test ./...` 于 ubuntu）在干净
     checkout 必红，C-1 完成路径硬阻塞；(b) 任何第三方 clone 复跑 shared-conformance 脚本必红；(c) 与 D-1
     同源纪律（"manifest 必须从干净发布 commit 重新生成"）在 vector 域同样适用。
 
@@ -217,7 +217,7 @@
 | §28.2 语义一致 | **PASS** | 18 概念在 registry 与跨语言面上行为一致；命名漂移全部冻结、属 1.0.0 窗口命名清理而非语义不一致 |
 | §28.3 逻辑自洽 | **PASS** | 三条操作链闭合、无隐藏同步、无权威循环（byte 权威单一 = Rust 编码器 + 双向差分反审计） |
 | §28.4 真实有效 | **PASS** | corpus/迁移/pilot/零静默损失全部实测成立；供应链流程落地（真跑归 §28.5 口径） |
-| §28.5 完整可靠 | **PARTIAL** | 实测 508/0/0、1,629 Rust 测试、108×2/68/83 全过（提交态 74e336e，历史记录）；F-A/F-B 已由 2209582 处置并审计验证；PARTIAL 理由：C-2/C-3 开放（C-3 含 D-1/D-2）+ RC soak 两项演练未记录（C-1 已闭环 2026-08-11，run #5 132/132 全绿） |
+| §28.5 完整可靠 | **PARTIAL** | 实测 508/0/0、1,629 Rust 测试、108×2/68/83 全过（提交态 74e336e，历史记录）；F-A/F-B 已由 2209582 处置并审计验证；PARTIAL 理由：C-2/C-3 未关闭（partial）（C-3 含 D-1/D-2）+ RC soak 两项演练未记录（C-1 已闭环 2026-08-11，run #5 132/132 全绿） |
 
 ### 6.2 1.0.0 前剩余收口项（按依赖序）
 
@@ -233,7 +233,7 @@
    （checksum/SBOM/签名/tag/恢复演练复跑）；
 6. **RC soak 阶段 1**：磁盘失败与部分权限失败演练（§22.7）、differential 追加、Go RC fuzz 记录、corpus 巡检、
    性能复测（每 48h 查 fuzz 账本）；
-7. **P2-7**：Go CLI 合入后 exchange 复跑闭环——已闭环（rc-1.0.0-candidate.md:299，2026-08-10）；
+7. **P2-7**：Go CLI 合入后 exchange 复跑闭环——已闭环（rc-1.0.0-candidate.md:314，2026-08-10）；
 8. 处置完成后重跑本终审：§28.5 条件 3/5 转 ✓ 即五要素全 PASS，进入 §29 最终确认。
 
 ### 6.3 诚实声明
@@ -242,7 +242,7 @@
   13,005 行 / 79.427 CPU-hours，截取自 2026-08-10 session 79 期间；session 78 结束快照 12,937 行 /
   78.971 CPU-hours，15:53:39）；
 - F-B 已修复（2209582）：干净 LF checkout 重算 35bebc8d… 并回填，"记录值在记录机（CRLF）复现"与
-  "干净 checkout 不可复现"两侧差异现为文档化本机行为（§4 第 12/13 行，rc-1.0.0-candidate.md:299），
+  "干净 checkout 不可复现"两侧差异现为文档化本机行为（§4 第 12/13 行，rc-1.0.0-candidate.md:314），
   规范 checkout 绿、CI 不受影响；
 - F-A 已修复（2209582）：RFC 0015 §3.3 修订接受 pre-release 后缀，1.0.0-rc.1 已提交；本核验时点提交
   `74e336e`（历史）的 Go CLI 与 Rust 全部门禁实测通过（§4 第 1/6/7 行）。
@@ -266,8 +266,8 @@
 | 哲学统一 | **PASS** | P1 python yaml `Document` 未 frozen 已修（python/src/consema/yaml/document.py，本批次）；P2 TS `bytes()` 已修（typescript/src/document/source.ts，本批次）；P2 信息性 python 公开构造器记录在案（文档化，接受）；§1.1 六条既有结论在五语言面无新增反例 |
 | 语义一致 | **PASS** | P1 Go 差分 gate 未接 CI 已修（ci.yml 新增 go-differential job，go-verify-*.ps1 三 harness 进 CI，2026-08-12）；P2 Go/Kotlin 差分计数改精确（differential 测试计数断言，本批次）；P2 PortableGraph 别名统一（go/graph、typescript/src/graph、kotlin graph，本批次）；**187 error codes / 41 contracts 五语言注册表集合互差为 0（实测）** |
 | 逻辑自洽 | **PASS** | 五语言 read/query/project、materialize/convert、edit/patch/apply 链闭合均以共享向量 508/508 为界（§1.3 六条在五语言面复验，无新增反例）；字节权威单一（Rust 编码器）与星型差分拓扑（Rust 锚居中，five-language-ci-design.md §2.3）不构成权威循环 |
-| 真实有效 | **PASS** | 508/508 与聚合 digest 35bebc8d… 五 runner 复算一致；**132/132 steps 于 2026-08-12 经 GitHub Actions API 在线核实**（run #5，head 437fd35：17 次 job 执行 / 132 steps / 0 failed）；fuzz 快照 **391.681h 从 runs.csv 前 55,879 行精确复现**（2026-08-12 快照，session 400 中段截取口径，追加式账本以 runs.csv 为准）；零依赖声称四语言（Go/TS/Python/Kotlin）全实（go.mod 零 require / npm ls --omit=dev 空 / pyproject dependencies=[] / kotlin runtimeClasspath 空）；P2 陈旧声称清单已修（§7.2 处置表） |
-| 完整可靠 | **PARTIAL**（与 §28.5 同口径） | P1 根 CHANGELOG 已补五语言时间线（2026-08-12）；P2 三语言 README 已建（typescript/README.md、python/README.md、kotlin/README.md）；git 卫生零问题（5a040be purge 后无构建产物入库；.gitignore 覆盖 kotlin/build、node_modules、__pycache__、venv）；遗留项与 five-language-ci-design.md §10 声称一致（shared-conformance 脚本随 runner-CLI 批次、L-package、3-OS 矩阵处置仍为未来项）；§28.5 判定不变——C-2/C-3 开放 |
+| 真实有效 | **PASS** | 508/508 与聚合 digest 35bebc8d… 五 runner 复算一致；**132/132 steps 于 2026-08-12 经 GitHub Actions API 在线核实**（run #5，head 437fd35：17 次 job 执行 / 132 steps / 0 failed）；fuzz 快照 **62,432 行 / ~460 CPU-hours 复算**（2026-08-12 10:17 快照，追加式账本以 runs.csv 为准）；零依赖声称四语言（Go/TS/Python/Kotlin）全实（go.mod 零 require / npm ls --omit=dev 空 / pyproject dependencies=[] / kotlin runtimeClasspath 空）；P2 陈旧声称清单已修（§7.2 处置表） |
+| 完整可靠 | **PARTIAL**（与 §28.5 同口径） | P1 根 CHANGELOG 已补五语言时间线（2026-08-12）；P2 三语言 README 已建（typescript/README.md、python/README.md、kotlin/README.md）；git 卫生零问题（5a040be purge 后无构建产物入库；.gitignore 覆盖 kotlin/build、node_modules、__pycache__、venv）；遗留项与 five-language-ci-design.md §10 声称一致（shared-conformance 脚本随 runner-CLI 批次、L-package、3-OS 矩阵处置仍为未来项）；§28.5 判定不变——C-2/C-3 未关闭（partial） |
 
 ### 7.2 五语言扩展审计 findings 处置表
 
@@ -284,4 +284,4 @@
 | 完整可靠 | P1 | 根 CHANGELOG 未覆盖五语言时间线 | 已补（2026-08-12，a0c318b/5cf680b+cd26af3/2f981df/dbba9a4/c6c89bb/8d00c4f 六条目） |
 | 完整可靠 | P2 | 三语言目录无 README（go/README 有而 TS/Python/Kotlin 无） | 已建（typescript/README.md、python/README.md、kotlin/README.md，2026-08-12） |
 
-**§7 结论**：五语言面上哲学统一/语义一致/逻辑自洽/真实有效 **PASS**（findings 全部处置），完整可靠 **PARTIAL**（与 §28.5 同口径：C-2/C-3 开放）；五语言扩展未改变 §6.1 判定。
+**§7 结论**：五语言面上哲学统一/语义一致/逻辑自洽/真实有效 **PASS**（findings 全部处置），完整可靠 **PARTIAL**（与 §28.5 同口径：C-2/C-3 未关闭（partial））；五语言扩展未改变 §6.1 判定。

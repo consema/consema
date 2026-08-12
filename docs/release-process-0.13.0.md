@@ -282,7 +282,7 @@ verify exit=0
 ## 7. 0.13.0 发布检查单（收口时按序执行，M9 复核）
 
 ```text
-□ 1. workspace 版本推进到 0.13.0（Cargo.toml [workspace.package] version）
+□ 1. workspace 版本推进到 1.0.0-rc.1（Cargo.toml [workspace.package] version；0.13.0 推进项已被 1.0.0-rc.1 取代，commit 2209582）
 □ 2. CI 10 job 全绿（含 package job，§2.2）——常设重建证明
 □ 3. 本地干净重建：cargo fetch --locked + verify-package-archives.ps1（§2.1）
 □ 4. SBOM：scripts/release-sbom.ps1 → docs/release/sbom-0.13.0.json（§5）

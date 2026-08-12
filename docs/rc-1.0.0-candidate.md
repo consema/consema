@@ -12,12 +12,12 @@
 | 阻塞项 | 状态 | 证据 | 完成路径 |
 |---|---|---|---|
 | C-1：CI 10 job 在 GitHub 干净 checkout 全矩阵全绿 | **closed** | GitHub Actions run #5（2026-08-11，head 437fd35，main push）：132/132 steps 全绿（增补前 10+1 job：lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package/go-1-26，11 定义/17 次执行）在 windows/ubuntu/macos 全矩阵通过；2026-08-12 增补 go-differential 后 ci.yml 为 10+2 job（12 定义）；run 历史：run#1 workflow-parse fail（job id go-1.26 含点号）→ run#2 5 根因（symlink_dir 移除、oracles ParserError、coverage Get-CimInstance guard、package 工具链顺序、tags 未推）→ run#3 4 根因（macOS /var→/private/var 临时路径 symlink、oracles 缺 exit 0、semver 嵌套 baseline 歧义、coverage 数组 guard $null）→ run#4 fmt import 顺序 → run#5 全绿；结果已回填 manifest（C-1 → closed） | 已闭环（2026-08-11，run #5 全绿） |
-| C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §3.2.1/§8 快照：258.327 CPU-hours（session 297 时点复算，2026-08-11）；runs.csv 41,939 行（零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈66.8%，完成路径不变）；**2026-08-12 快照（runs.csv 权威复算）**：55,879 行 / 391.7 CPU-hours，零新 crash（非零退出仅 10 行 = 已知 session-9 外部终止分类，非 fuzz finding）；**properties 73.6h 首个突破 72h 门槛（102.2%）**；yaml 65.2h（90.6%）、ini 62.7h（87.1%）最接近；其余 8 个门槛单位（7 格式家族 + protocol-decode）仍开放，完成路径不变（快照口径：55,879 行 / 391.7h 为 session 400 中段截取——wave 3/4 已完成，2026-08-12 时点，非会话结束快照；runs.csv 为唯一权威账本） | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
+| C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §3.2.1/§8 快照：258.327 CPU-hours（session 297 时点复算，2026-08-11）；runs.csv 41,939 行（零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈66.8%，完成路径不变）；**2026-08-12 10:17 快照（runs.csv 权威复算）**：62,432 行 / ≈460 CPU-hours，零新 crash（非零退出 = 10 行 session-9 + 16 行 session-448-wave-3 超时分类，均非 fuzz finding）；**properties 85.5h（118.8%）、yaml 75.8h（105.3%）、ini 72.8h（101.1%）三单位已过 72h 门槛**；hcl 55.5h（77.1%）、json 55.1h（76.5%）最接近其余；toml 33.3h、protocol-decode 29.1h、plist 26.7h、xml 19.6h 继续累计；完成路径不变（快照口径：runs.csv 为唯一权威账本，实时数字持续增长） | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
 | C-3：真实发布密钥与 0.13.0 发布执行 | **partial** | 演练密钥 82301612…（隔离 keyring）验证过全流程；**默认 keyring 尚无真实发布密钥**；docs/release 只有 0.8.0 演练产物 | 按 release-process-0.13.0.md §7 十项检查单顺序执行；版本推进 0.8.0→0.13.0；真实密钥+备份+吊销证书；**manifest 必须从干净发布 commit 重新生成**（见 §4 D-1） |
 
 ## 2. §22 门禁核对表（逐行状态，2026-08-10）
 
-### 22.1 标准与格式 — 达成（双语言）
+### 22.1 标准与格式 — 达成（截至 2026-08-10 双语言范围；五语言扩展见 §4.1 与五语言 CI 记录）
 
 - 八个格式家族 GA：Rust 全（0.13.0 Feature-Complete）+ Go 全（0.18.0 G4.1，hcl 收口）。✓
 - mandatory Profile 规范冻结、mandatory capability 已注册：registry v7（41 contract / 187 codes）。✓
@@ -25,7 +25,7 @@
 - protocol schema 稳定：RFC 0015 v7；无 provisional public abstraction（G5.5 审查）。✓
 - 格式差异经 native model/Profile/policy 表达（oracle exclusion inventory 冻结）。✓
 
-### 22.2 双语言实现 — 达成（除 Go CLI beta 交接面）
+### 22.2 双语言实现 — 达成（截至 2026-08-10 双语言范围；五语言扩展见 §4.1 与五语言 CI 记录；Go CLI 交接面已闭环 2026-08-10，见下）
 
 - capability set 一致：G4.4 capability parity 硬门禁（无 "Rust only" mandatory）。✓
 - shared conformance 100%：18 套 / 508 cases 双 runner 全过。✓
@@ -34,8 +34,9 @@
 - normalized parse/query/projection/materialization/edit 结果一致：G5.2 bidirectional differential。✓
 - 独立实现（无 FFI/私有中间结果）：cgo 禁令 + 依赖面审查。✓
 - Rust/Go public API 稳定性审查：G5.5 完成（§21.2 六项政策核对）。✓
-- **边界**：cross-language protocol exchange 的 CLI 侧（Go CLI beta，G5.6）并行实现中，
-  未参与本清单核对；Go CLI 合入后需补一次 exchange 复跑。
+- **边界（已闭环 2026-08-10）**：cross-language protocol exchange 的 CLI 侧（Go CLI，G5.6）
+  当时并行实现中、未参与本清单核对；G5.6 已合入，exchange 复跑已闭环（P2-7，见 §5：
+  协议交换 83/83、双向差分 108/108、字节 parity 68/68）。
 
 ### 22.3 正确性 — 达成（本 pilot 佐证）
 
@@ -53,9 +54,12 @@
 ### 22.4 安全与质量 — 部分（C-2 阻塞；C-1 已闭环 2026-08-11）
 
 - Rust+Go 全测试矩阵：本地全绿；GitHub 真跑 = C-1——**已闭环（2026-08-11，run #5，head 437fd35，132/132 steps 全绿，10+1 job（增补前，11 定义/17 次执行）windows/ubuntu/macos；go-differential 2026-08-12 增补后 ci.yml 为 10+2 job/12 定义）**。✓
-- release-candidate fuzz clean-run：Rust 188.336/72 CPU-hours = C-2（session 234 时点复算，
-  2026-08-11，runs.csv 33,337 行，零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈48%）；
-  Go fuzz targets（G5.4 矩阵）需 release-candidate clean-run 记录。⏳
+- release-candidate fuzz clean-run：Rust 188.336/72 CPU-hours（历史快照——session 234 时点
+  复算，2026-08-11，runs.csv 33,337 行，零新 crash）；**最新快照 62,432 行 / ≈460 CPU-hours
+  （2026-08-12 10:17，runs.csv 权威，零新 crash；properties 85.5h（118.8%）、yaml 75.8h
+  （105.3%）、ini 72.8h（101.1%）三单位已过 72h 门槛；hcl 55.5h、json 55.1h 最接近其余）**
+  = C-2（其余单位 72h 门槛仍开放，继续累计）；Go fuzz targets clean-run 记录已有
+  （2026-08-10，go/README.md:661-763：16 targets 各 30s，零 panic/hang/limit bypass）。⏳
 - 无未解决 P0/P1：当前 0。✓
 - 无未接受 critical/high dependency vulnerability：deny/audit 门禁。✓
 - XML/YAML/HCL/binary plist 专项 threat tests：Rust security matrix + Go
@@ -279,7 +283,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
   kotlin jar 供给（kotlin-test-2.2.0 + junit-jupiter-api-5.10.2 自 Maven Central）
   + TestShim.kt 入库（kotlin/verify/）；共享 conformance 脚本随 runner-CLI 批次
   仍为未来项（five-language-ci-design.md §10）
-- 每 48h fuzz 账本检查 → 进行中（账本 258.327 CPU-hours，41,939 行，零新 crash，最近快照 session 297，2026-08-11）
+- 每 48h fuzz 账本检查 → 进行中（最新快照 62,432 行 / ≈460 CPU-hours，2026-08-12 10:17 复算，runs.csv 权威；properties/yaml/ini 三单位已过 72h 门槛；详见 §1 C-2 行）
 
 ### 4.2 巡检 4 条观察记录（P2 级）
 

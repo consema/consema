@@ -27,8 +27,8 @@
 **0.13.0 Rust Feature-Complete Gate 当前状态（START GATE 的直接输入，未关闭）：**
 
 - fc-manifest-0.13.0.json：`status: "gate_open"`（第 5 行），`feature_complete_judgment.verdict: "not_closed"`（第 505 行），status_meaning 原明示"仅在本判定翻转为 closed 后启动"（第 6 行）——已按 2026-08-07 decision record 修订为"已提前启动 go/ 0.14.0 G0.1-G0.3，C-1/C-2/C-3 完成路径不变"。
-- 开放项（第 513-541 行）：C-1（CI 10 job 在 GitHub 干净 checkout 真跑全矩阵全绿，第 515-522 行）、C-2（每格式 72 CPU-hours release-candidate fuzz，当前 26.309 CPU-hours——2026-08-07 会话结束快照，runs.csv 4,063 行，第 524-531 行）、C-3（真实发布密钥与 0.13.0 发布执行，第 533-540 行）。
-- 已关闭：全部功能/规范/性能门禁，质量除 Q-7 外、安全除 SEC-9 外、API 与产品除 A-4/A-9 外（第 506-512 行）。
+- 开放项（2026-08-07 时点快照，第 513-541 行）：C-1（CI 10 job 在 GitHub 干净 checkout 真跑全矩阵全绿，第 515-522 行）——**已 closed（2026-08-11，GitHub Actions run#5 132/132 steps 全绿，head 437fd35）**；C-2（每格式 72 CPU-hours release-candidate fuzz，2026-08-07 会话结束快照 26.309 CPU-hours、runs.csv 4,063 行；**最新快照 62,432 行 / ≈460 CPU-hours，2026-08-12 10:17 复算，runs.csv 权威，properties/yaml/ini 三单位已过 72h 门槛**，第 524-531 行）、C-3（真实发布密钥与 0.13.0 发布执行，第 533-540 行）。
+- 已关闭：全部功能/规范/性能门禁，质量除 Q-7 外（第 506-512 行）；安全（SEC-9）与 API/产品（A-4/A-9）已随 C-1 闭环（2026-08-11 run#5，fc-manifest open_items C-1 closes 列表）。
 - 原约束结论（0.13.0-gate-plan.md:136）："0.14.0 不得在判定翻转前开始"——2026-08-07 decision record 已修订为：C-1/C-2/C-3 完成前不得发布 0.14.0、不得宣称 Go 里程碑关闭，go/ 按 §6 门禁独立验证（见 §7）。
 
 **Go 侧必须镜像的语言无关契约面（只读调研清单）：**
@@ -307,7 +307,7 @@ Go runner 每次执行校验 `conformance/vectors/` 聚合 sha256 与 fc-manifes
 | R-7 | canonical JSON / PVCE 字节漂移 | protocol-v1/v2 双传输等价向量（32+11 case）+ 双 runner 字节断言 | 0.14.0 起 |
 | R-8 | 双 runner 向量集漂移（各自跳过不同 case） | case 计数断言 + 聚合 digest 校验（§4.5）；skip 必须文档化（§4.3） | runner 每跑 |
 | R-9 | Go 工具链/最低版本漂移 | go.mod 最低版本 0.14.0 冻结，三平台 CI 验证（§21.2 第 1831 行）；门禁含 gofmt/vet/race/fuzz（第 1832 行） | 每个里程碑 |
-| R-10 | 数值语义漂移（Integer/Decimal 精度） | math/big 基座、无 float64 round-trip（RFC 0016 §4.1 第 128-130 行）；向量字符串表示纪律（README.md:5） | 0.14.0 起 |
+| R-10 | 数值语义漂移（Integer/Decimal 精度） | math/big 基座、无 float64 round-trip（RFC 0016 §4.1 第 128-130 行）；向量字符串表示纪律（conformance/README.md:3） | 0.14.0 起 |
 | R-11 | context.Context 滥用（隐藏业务参数） | 只用于取消/deadline（§21.2 第 1827 行；RFC 0016 §5.1 第 159 行） | 0.15.0 起 |
 | R-12 | 差分覆盖不足 | differential corpus 追加式（§17.4 第 1615 行）；pilot 缺陷入 regression（§22.7 第 1938 行） | 0.15.0 起 |
 | R-13 | Go CLI 与 Rust CLI 的 machine schema 漂移 | 同一 RFC 0015 protocol + cross-language protocol exchange（§16.6 第 1549 行）；machine schema 无 Rust 类型名（cli-implementation-plan.md:496 先例） | 0.19.0 |
@@ -344,6 +344,8 @@ Go runner 每次执行校验 `conformance/vectors/` 聚合 sha256 与 fc-manifes
 ---
 
 ## 7. START GATE（起始门禁；本计划最高优先级条款）
+
+> **§7 实况注记（2026-08-12 追加；本文档为规划阶段产物，下列条款保留为 0.14.0 时点的历史门禁条款）**：Go 里程碑已按 §6 门禁独立验证交付——0.14.0-0.19.0 G0.1-G5.6 全部 closed（go/README 逐项记录，productVersion 1.0.0-rc.1，runner 508/508）；C-1 已闭环（2026-08-11，GitHub Actions run#5 132/132 steps 全绿，head 437fd35）；C-2 推进中（2026-08-12 10:17 快照 62,432 行 / ≈460 CPU-hours，properties/yaml/ini 三单位已过 72h 门槛）；C-3 partial。
 
 > **C-1/C-2/C-3 完成之前，不得发布 0.14.0、不得宣称任何 Go 里程碑关闭；`go/` 内实现按 §6 门禁独立验证。**（2026-08-07 decision record 修订：owner 已书面授权提前启动 go/ 0.14.0 G0.1-G0.3，原"门禁全闭前不创建任何实现文件"条款不再适用于已开工的 G0.1-G0.3。）
 

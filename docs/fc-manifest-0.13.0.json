@@ -3,7 +3,7 @@
   "gate_version": "0.13.0",
   "recorded_at": "2026-08-07",
   "status": "gate_open",
-  "status_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭：本 manifest 记录每个门禁条目的当前状态、证据与完成路径；Go 实现（0.14.0）以本 manifest 为起点（路线图 §15.7 第 1445 行），已按 2026-08-07 owner decision（decisions[0]）提前启动 go/ 0.14.0 G0.1-G0.3（core/graph/protocol），C-1/C-2/C-3 完成路径与 Go 里程碑门禁不变。",
+  "status_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭（C-1 已闭环 2026-08-11；C-2/C-3 开放）：本 manifest 记录每个门禁条目的当前状态、证据与完成路径；Go 实现以本 manifest 为起点（路线图 §15.7 第 1445 行），0.14.0-0.19.0 全里程碑（G0.1-G5.6）已按 2026-08-07 owner decision（decisions[0]）授权启动并全部独立验证交付（go/README 逐项记录；productVersion 1.0.0-rc.1，runner 508/508），C-1/C-2/C-3 完成路径与 Go 里程碑门禁不变。",
   "source_of_truth": [
     "路线图《Consema 1.0.0 产品路线图与双语言落地设计.md》§15.1-§15.7（门禁清单）、§18.3/§18.4（coverage 政策/缺陷分级）、§19.4（发布供应链）、§20.3（回退政策）、§23（真实项目验证）",
     "docs/0.13.0-gate-plan.md（执行计划；本条目的证据与缺口对应其 §1/§2/§3/§7）",
@@ -309,16 +309,16 @@
         },
         {
           "id": "S-6",
-          "name": "Go API mapping RFC 已接受（2026-08-07 修订为 15-kind 映射）；Go 实现 0.14.0 G0.1-G0.5 已按 2026-08-07 决策记录 D-1 交付（core/graph/protocol + conformance runner + fuzz/字节 harness）",
+          "name": "Go API mapping RFC 已接受（2026-08-07 修订为 15-kind 映射）；Go 实现 0.14.0-0.19.0 全里程碑（G0.1-G5.6）已交付（core/graph/protocol/document + 八格式家族全 surface + CLI go/cmd/consema + conformance runner + fuzz/差分 harness；productVersion 1.0.0-rc.1，runner 508/508）",
           "status": "complete",
           "evidence": [
             "docs/rfcs/0016-go-api-mapping-v1.md（Accepted，§4.1 15-kind 值映射冻结）",
-            "go/：0.14.0 G0.1-G0.5（core 15-kind+PVCE、graph+PGCE、protocol v1-v7 41/187+CLI 记录、go/conformance 18-suite runner、6 fuzz target、differential 字节 harness），2026-08-07 实测 go build/vet/test/race/gofmt/tidy 全绿",
-            "conformance runner 实测：适用 case 149/149 通过、359 documented skip、聚合 digest 35bebc8d... 精确一致（规范 checkout 实测；2026-08-07 CRLF 工作树记录 e3d6578858... 已被规范态值取代）",
-            "跨语言字节 parity 实测：68/68（51 PVCE + 17 PGCE）双向相等（scripts/go-verify-byte-parity.ps1）",
-            "docs/go-implementation-plan.md:319-342（§6 验收门禁表）、§7 修订条款（D-1 决策记录）"
+            "go/：0.14.0 G0.1-G0.5 起步（core 15-kind+PVCE、graph+PGCE、protocol v1-v7 41/187+CLI 记录、go/conformance 18-suite runner、6 fuzz target、differential 字节 harness），0.15.0-0.19.0（G1.1-G5.6）完成八格式家族全 surface 与 CLI go/cmd/consema（11 命令 + plan/apply，exit 0-5 矩阵）；go build/vet/test/race/gofmt/tidy 全绿，19 包全绿（含 race）；productVersion 1.0.0-rc.1（go/cmd/consema/version.go:15）",
+            "conformance runner 实测：0.14.0 时点适用 case 149/149 通过、359 documented skip（历史）；现为 508/508 零 skip，聚合 digest 35bebc8d... 精确一致（规范 checkout 实测；2026-08-07 CRLF 工作树记录 e3d6578858... 已被规范态值取代）",
+            "跨语言字节 parity 实测：68/68（51 PVCE + 17 PGCE）双向相等（scripts/go-verify-byte-parity.ps1）；normalized 差分 108/108 双向、协议交换 83/83（2026-08-10）",
+            "docs/go-implementation-plan.md:319-342（§6 验收门禁表）、§7 修订条款（D-1 决策记录）；go/README.md 逐里程碑交付记录（G0.1-G5.6 全 closed）"
           ],
-          "source_of_truth": "RFC 0016；2026-08-07 owner decision（decisions[0]）书面授权提前启动；0.13.0 判定仍为 not_closed，C-1/C-2/C-3 完成前不得发布 0.14.0、不得宣称 Go 里程碑关闭（go-implementation-plan §7）"
+          "source_of_truth": "RFC 0016；2026-08-07 owner decision（decisions[0]）书面授权提前启动；Go 里程碑已按 go-implementation-plan §6 门禁独立验证交付（0.14.0-0.19.0 全 closed，go/README 逐项记录）；C-1 已闭环（2026-08-11 run#5），C-2/C-3 仍开放"
         },
         {
           "id": "S-7",
@@ -404,13 +404,13 @@
           "name": "每个格式发布前至少累计 72 CPU-hours release-candidate fuzz，零未解释 crash、panic、hang 或 limit bypass",
           "status": "partial",
           "evidence": [
-            "docs/fuzz-evidence-0.13.0.md:81-106（§3.2.1 2026-08-07 会话结束快照：26.309 CPU-hours、4,063 次进程运行、10.994 亿次变异、0 新发现）",
+            "docs/fuzz-evidence-0.13.0.md §3.2.1/§8（2026-08-12 10:17 快照：62,432 行 / ≈460 CPU-hours、零新 crash；properties 85.5h（118.8%）、yaml 75.8h（105.3%）、ini 72.8h（101.1%）三单位已过 72h 门槛）",
             "docs/fuzz-evidence-0.13.0.md:158-159（§8 会话结束快照）",
             "docs/fuzz-evidence-0.13.0-logs/runs.csv（4,063 行真实账本，追加式，唯一权威）",
             "docs/fuzz-evidence-0.13.0-logs/waves.log"
           ],
           "source_of_truth": "路线图 §15.3 第 1382-1387 行（任何新 crash 清零该 target 计时）",
-          "completion_path": "首选：Linux + nightly + clang 主机对 17 个 cargo-fuzz target 运行 cargo +nightly fuzz run（corpus 进化，fuzz/corpus/<target>/ 种子已提交）；备选：本机 in-process 协议续跑（仅代码变化后的波次提供新探索）。按 fuzz-evidence §4 协议把每格式家族（parse+ops 汇总，protocol 单独）真实 CPU 时长追加进 runs.csv；每格式达到 72 CPU-hours 且零未解释问题即关闭（§7.3）。当前最接近的格式家族（properties 4.964 CPU-hours）也仅 6.9%（4.964/72；2026-08-07 会话结束快照口径，runs.csv 4,063 行），剩余部分以此路径累计。",
+          "completion_path": "首选：Linux + nightly + clang 主机对 17 个 cargo-fuzz target 运行 cargo +nightly fuzz run（corpus 进化，fuzz/corpus/<target>/ 种子已提交）；备选：本机 in-process 协议续跑（仅代码变化后的波次提供新探索）。按 fuzz-evidence §4 协议把每格式家族（parse+ops 汇总，protocol 单独）真实 CPU 时长追加进 runs.csv；每格式达到 72 CPU-hours 且零未解释问题即关闭（§7.3）。截至 2026-08-12 10:17 快照（runs.csv 62,432 行，权威复算）：properties 85.5h（118.8%）、yaml 75.8h（105.3%）、ini 72.8h（101.1%）三单位已过 72h 门槛；hcl 55.5h（77.1%）与 json 55.1h（76.5%）最接近其余，剩余部分以此路径累计。",
           "owner": "fuzz 证据账本（agent H 延续）+ 0.13.0 gatekeeper"
         },
         {
@@ -763,23 +763,20 @@
   },
   "feature_complete_judgment": {
     "verdict": "not_closed",
-    "verdict_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭。已关闭：全部功能/规范门禁、质量门禁除 Q-7 外全部、性能门禁全部、API 与产品门禁除 A-4/A-9 外全部、安全门禁除 SEC-9 外全部。本判定翻转（closed）需要下列开放项全部完成；0.14.0 Go 实现已按 2026-08-07 owner decision（decisions[0]）提前启动 go/ 0.14.0 G0.1-G0.3，但 C-1/C-2/C-3 完成前不得发布 0.14.0、不得宣称 Go 里程碑关闭（路线图 §15.7 第 1445 行；START GATE 修订条款见 docs/go-implementation-plan.md §7）。",
+    "verdict_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭（C-2/C-3 开放）。已关闭：全部功能/规范门禁、质量门禁除 Q-7 外全部、性能门禁全部、API 与产品门禁全部（A-4/A-9 已随 C-1 闭环——2026-08-11 run#5 132/132 steps 全绿，见 open_items C-1）、安全门禁全部（SEC-9 已随 C-1 闭环——run#5 三 OS cli 测试矩阵全绿）。本判定翻转（closed）需要下列开放项全部完成；Go 实现 0.14.0-0.19.0（G0.1-G5.6）已按 2026-08-07 owner decision（decisions[0]）授权启动并全部独立验证交付（go/README 逐项记录），C-1 已闭环（2026-08-11 run#5），剩余 C-2/C-3 完成路径见 open_items（路线图 §15.7 第 1445 行；START GATE 修订条款见 docs/go-implementation-plan.md §7）。",
     "closed_gates": [
       "functional（§15.1）",
       "spec（§15.2）",
-      "performance（§15.5）"
+      "performance（§15.5）",
+      "security（§15.4）",
+      "api_product（§15.6）"
     ],
     "partial_gates": {
       "quality（§15.3）": [
         "Q-7：72 CPU-hours per-format RC fuzz"
       ],
-      "security（§15.4）": [
-        "SEC-9：CLI redaction/临时文件权限 Linux/macOS 全量验证"
-      ],
-      "api_product（§15.6）": [
-        "A-4：MSRV 在 CI 真验证",
-        "A-9：release artifact 干净重建（CI package job 真跑）"
-      ]
+      "security（§15.4）": [],
+      "api_product（§15.6）": []
     },
     "open_items": [
       {
@@ -810,7 +807,7 @@
         ],
         "evidence": [
           "docs/fuzz-evidence-0.13.0.md:139-145（§7 完成路径）",
-          "docs/fuzz-evidence-0.13.0.md:158-159（§8 会话结束快照：188.336 CPU-hours、33,337 行、90.206 亿次变异，最接近格式家族 properties 48.3%；session 234 时点复算（2026-08-11）；快照口径，runs.csv 为唯一权威账本）"
+          "docs/fuzz-evidence-0.13.0.md §3.2.1/§8（2026-08-12 10:17 快照：62,432 行 / ≈460 CPU-hours、零新 crash；properties 85.5h（118.8%）、yaml 75.8h（105.3%）、ini 72.8h（101.1%）三单位已过 72h 门槛；hcl 55.5h / json 55.1h / toml 33.3h / protocol-decode 29.1h / plist 26.7h / xml 19.6h 继续累计；快照口径，runs.csv 为唯一权威账本）"
         ],
         "completion_path": "见 quality.Q-7.completion_path（clang 主机 cargo-fuzz 为主，本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时）。",
         "owner": "fuzz 证据账本（agent H 延续）+ 0.13.0 gatekeeper"
@@ -832,7 +829,7 @@
       }
     ],
     "tree_state_note": "本 manifest 记录时（2026-08-07）仓库曾为工作树状态；M2 修复（M2-F1/M2-F2）、fuzz/property/mutation 语料、三处性能修复与回归测试已随 0.13.0 落地 commit 094f5d1（Harden and gate the Rust implementation）与 7e9de38（Record the 0.13.0 gate evidence）提交入库，不再处于工作树状态；本 manifest 的 evidence 行号按 7e9de38 提交树核验。",
-    "go_milestone_status": "0.14.0 G0.1-G0.5 已交付（2026-08-07）；0.14.0 发布与里程碑关闭仍受 C-1/C-2/C-3 门禁（D-1 修订条款，见 decisions[0]）"
+    "go_milestone_status": "Go 0.14.0-0.19.0 全里程碑（G0.1-G5.6）已交付（2026-08-10 前完成，go/README 逐项记录；productVersion 1.0.0-rc.1 已提交，commit 2209582）；C-1 已闭环（2026-08-11 run#5），C-2/C-3 门禁仍开放（D-1 修订条款，见 decisions[0]）"
   },
   "decisions": [
     {

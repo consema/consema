@@ -73,7 +73,7 @@ TOML table、inline table、array-of-tables、dotted key 和 array 拥有各自�
 - 上游 YAML 门禁：[Official YAML test-suite acceptance gate](docs/UPSTREAM-YAML-TEST-SUITE.md)
 - 版本变更记录：[CHANGELOG](CHANGELOG.md)
 
-`1.0.0` 的目标不是最小闭环，而是覆盖 JSON、YAML、TOML、INI、XML、Properties、Property List 与 HCL 八个格式家族，并由 Rust、Go、TypeScript、Python、Kotlin 五个独立实现共同证明（2026-08-11 用户决策：五语言同等地位，见 `docs/multi-language-implementation-plan.md` 与 `docs/five-language-ci-design.md`）。Go SDK（go/，0.14.0 里程碑 G0.1-G0.3：core/graph/protocol）按 2026-08-07 决策记录在 Rust Feature-Complete Gate 关闭前启动（偏差经记录，见 fc-manifest decision record）；其余 Go 里程碑（0.15.0-0.19.0）按 docs/go-implementation-plan.md 顺序推进。
+`1.0.0` 的目标不是最小闭环，而是覆盖 JSON、YAML、TOML、INI、XML、Properties、Property List 与 HCL 八个格式家族，并由 Rust、Go、TypeScript、Python、Kotlin 五个独立实现共同证明（2026-08-11 用户决策：五语言同等地位，见 `docs/multi-language-implementation-plan.md` 与 `docs/five-language-ci-design.md`）。Go SDK（go/）已按 2026-08-07 决策记录启动并交付 0.14.0-0.19.0 全里程碑（G0.1-G5.6：core/graph/protocol/document + 八格式家族全 surface + CLI go/cmd/consema；productVersion 1.0.0-rc.1，conformance runner 508/508 零 skip，逐项记录见 go/README.md）；go-1-26 与 go-differential 已进 CI（ci.yml 现为 10+2 job / 12 定义）。
 
 ## Workspace
 
@@ -451,4 +451,4 @@ cargo run --locked --offline --release -p consema-conformance --example hcl_base
 ./scripts/run-qt-ini-oracle.ps1
 ```
 
-当前未实现 semantic diff/merge、formatter、跨对象 member move/通用 table move、文件系统写入事务。Go SDK 按 2026-08-07 决策记录在 go/ 启动（0.14.0 里程碑 G0.1-G0.3：core/graph/protocol）。TypeScript/Python/Kotlin 按 2026-08-11 用户决策加入（与 Rust/Go 同等地位），L0-L5 全闭环，各 conformance 508/508（18 套 / digest 35bebc8d 共钉）。JSON family/TOML Profile 仍按各自入口接受 UTF-8；YAML、INI、Properties 与 XML 各自使用已冻结的显式 source/encoding contract；HCL 恒为 UTF-8。后续能力按路线图逐阶段落地，不以 README 声明代替完成证据。
+当前未实现 semantic diff/merge、formatter、跨对象 member move/通用 table move；SDK 层无文件系统写入 API（文件写入属 CLI plan/apply，RFC 0015 §8/§9 的原子写引擎已实现）。Go SDK 已按 2026-08-07 决策记录在 go/ 启动并交付全里程碑（0.14.0-0.19.0，G0.1-G5.6，见 go/README.md）。TypeScript/Python/Kotlin 按 2026-08-11 用户决策加入（与 Rust/Go 同等地位），L0-L5 全闭环，各 conformance 508/508（18 套 / digest 35bebc8d 共钉）。JSON family/TOML Profile 仍按各自入口接受 UTF-8；YAML、INI、Properties 与 XML 各自使用已冻结的显式 source/encoding contract；HCL 恒为 UTF-8。后续能力按路线图逐阶段落地，不以 README 声明代替完成证据。
