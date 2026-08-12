@@ -315,7 +315,7 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
 | L1（document+json+toml） | `L-differential` += normalized differential（json/toml 面使然） |
 | L2/L3（yaml/ini/properties/xml/plist/hcl） | 无新 job；conformance job 的 skip 数随 capability 收敛 |
 | L4（全操作 parity + capability parity） | `L-differential` += protocol exchange；`L-conformance` 断言 capability parity（照 go/capability_parity_test.go 体例，go/README.md:797-809） |
-| L5（runner 全 519 + fuzz/bench/security + CLI beta） | `L-conformance` 断言**零 documented skip**；新增 `L-package`（§1.1 package 行）；fuzz/bench/security 冒烟进 CI（短时长）；三平台矩阵按 Go 先例走文档化完成路径（go/README.md:814-850，"completion path documented, not a CI job"）或显式 3-OS 矩阵 job——二选一在 L5 批次记录 |
+| L5（runner 全 519 + fuzz/bench/security + CLI beta） | `L-conformance` 断言**零 documented skip**；新增 `L-package`（§1.1 package 行）；fuzz/bench/security 冒烟进 CI（短时长）；三平台矩阵按 Go 先例走文档化完成路径（go/README.md:814-850，"completion path documented, not a CI job"）或显式 3-OS 矩阵 job——二选一在 L5 批次记录（**已处置 2026-08-12：文档化完成路径，§10 记录**） |
 | 1.0.0 收口 | 每语言 API 稳定性门禁（§1.1 semver 行）；五语言全部 job 全绿入 §22/五要素审计（multi-language-implementation-plan.md:111） |
 
 **语言间并行**：三语言 L0-L5 完全并行（multi-language-implementation-plan.md:38-39 "三语言之间
@@ -465,15 +465,34 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
   - `scripts/{ts,python,kotlin}-verify-shared-conformance.ps1` 尚未合入（2026-08-12
     复核不存在）；workflow 头注释明示其随 runner-CLI 批次作为第四个 differential
     step 落地（ci-typescript.yml:13-15）——**runner-CLI slot 仍为未来项**
-  - `L-package` job 与 3-OS 矩阵处置属 §5.3 L5 批次，未上线；零 documented
-    skip 断言已部分上线——**Kotlin 已上线**（kotlin/src/test/kotlin/consema/
-    conformance/ConformanceRunnerTest.kt:58-59 显式断言 519 passed / 0 skipped）、
-    **Python 已上线**（每 suite 适用面 (passed,0,0) 共钉，python/tests/conformance/
-    test_runner.py:32-51,89——任何 documented skip 即红）、**TS 未上线**
-    （typescript/src/conformance/runner.test.ts:23 允许 passed+skipped=519，
-    documented skip 仍被接受）；
-    kotlin `gradlew`/wrapper 仍缺失（§7.3 L0 批次后续项，workflow 按无 wrapper 设计
-    直驱 K2JVMCompiler）
+  - 零 documented skip 断言**三语言已全部上线（2026-08-12）**：Kotlin
+    （kotlin/src/test/kotlin/consema/conformance/ConformanceRunnerTest.kt:58-59
+    显式断言 519 passed / 0 skipped）、Python（每 suite 适用面 (passed,0,0) 共钉，
+    python/tests/conformance/test_runner.py:32-51,89——任何 documented skip 即红）、
+    TS（typescript/src/conformance/runner.test.ts:23 起断言 passed===519 &&
+    skipped===0，任何 documented skip 即红）
+  - `L-package` job 与 3-OS 矩阵处置原属 §5.3 L5 批次——**已上线/已处置
+    （2026-08-12，见下段记录）**；kotlin `gradlew`/wrapper 已入库（c60d31a，
+    gradle 8.14，kotlin-gates 走 wrapper 驱动，ci-kotlin.yml:105-114）
+- **L5 批次落地（2026-08-12）**：
+  - **`L-package` job × 3 上线**（§1.1 package 行 / §7.1 规划行 L5 项）：`ts-package`
+    = npm pack --dry-run（tarball 必须含 files: src，ci-typescript.yml）、
+    `python-package` = pip wheel --no-deps .（hatchling 后端，wheel 必须含
+    consema/ 包，ci-python.yml）、`kotlin-package` = bash gradlew jar（gradle 8.14
+    wrapper，jar 必须产出至 kotlin/build/libs/，ci-kotlin.yml）；三 job 均
+    ubuntu-latest、均入各仓 `check (all gates green)` needs、permissions:
+    contents: read、无 secrets、不依赖 conformance 数据（打包与数据无关）；
+    本机实测通过（ts 261 文件含 src/、py consema-0.14.0-py3-none-any.whl 含
+    consema/__init__.py、kt consema-kotlin-1.0.0-rc.1.jar 含 consema/ 类）
+  - **3-OS 矩阵处置 = 文档化完成路径（§5.3 L5 行"二选一"决策）**：ts/py/kt
+    保持单 OS 主跑面 + windows/ubuntu 双 OS 差分面——ts/py 的 gates/conformance
+    在 ubuntu-latest、differential 在 windows-latest（ci-typescript.yml /
+    ci-python.yml），kt 语言 job 全在 windows-latest（ci-kotlin.yml）。理由：
+    三语言实现为纯库 + 协议面（零第三方运行时依赖、无平台专属 API，§0.2
+    不变量 5），三 OS 差异主要影响 I/O/CLI 面，该面已由 Rust/Go 的 3-OS 矩阵
+    覆盖（ci.yml lint/test/oracles/package 3 OS，rc-1.0.0-candidate.md §1 C-1）。
+    完成路径 = 未来若出现平台专属需求，按 Go 先例（go/README.md:814-850）
+    追加显式 3-OS 矩阵 job，文档化即完成、不建常设 job。
 - **共享 case 集迁移已执行（2026-08-12）**：三份 case 文件已 git mv 至
   `conformance/differential/`（`cases.json` / `normalized/cases.json` /
   `protocol-exchange/cases.json`，单一权威，§3.5/§7.3 原计划项关闭）；go 侧三个差分测试由

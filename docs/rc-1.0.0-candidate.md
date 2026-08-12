@@ -28,7 +28,9 @@
 ### 22.2 双语言实现 — 达成（截至 2026-08-10 双语言范围；五语言扩展见 §4.1 与五语言 CI 记录；Go CLI 交接面已闭环 2026-08-10，见下）
 
 - capability set 一致：G4.4 capability parity 硬门禁（无 "Rust only" mandatory）。✓
-- shared conformance 100%：18 套 / 508 cases 双 runner 全过。✓
+- shared conformance 100%：18 套 / 519 cases 五 runner 全过（增补后 519；
+  聚合 digest `cfd6e296da5b…` 五 runner 共钉，fc-manifest-0.13.0.json:37-38
+  为权威——2026-08-12 P2-B 向量补强 508→519，:39）。✓
 - PVCE/PGCE byte-exact：G0.1-G0.2 硬门禁 + differential harness。✓
 - protocol cross-encode/decode 100%：G5.3（Rust CLI ↔ Go protocol codec）。✓
 - normalized parse/query/projection/materialization/edit 结果一致：G5.2 bidirectional differential。✓
@@ -241,8 +243,9 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 - Go 侧 release-candidate fuzz clean-run 记录 → 已有（2026-08-10，
   go/README.md:661-763，16 targets 30s）
 - 每格式真实 corpus 抽检巡检 → **已完成**（2026-08-10：钉版 12 文件 digest 12/12
-  一致；508 核对一致；regressions 空数组符合预期；9 家族来源与覆盖足够；
-  4 条观察见下）
+  一致；508 核对一致（增补前——2026-08-12 P2-B 向量补强至 519 后该计数为
+  519，fc-manifest-0.13.0.json:37-39）；regressions 空数组符合预期；
+  9 家族来源与覆盖足够；4 条观察见下）
 - 性能基线复测 → **Go 侧已执行**（2026-08-10：8×2 benchmarks；9/16 项比值
   >1.10，全部标注"疑似回退（fuzz 负载下测得，需空闲复测确认）"，无代码回退
   结论——同会话 7 项更快、无代码改动、GC 争抢特征）；Go 侧无冻结预算
