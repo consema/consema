@@ -2,8 +2,10 @@
 
 - 对应计划：`docs/0.13.0-gate-plan.md` M8（72 CPU-hours release-candidate fuzz，串行，依赖 M2）与 §15.3 质量门禁（路线图第 1381-1387 行）
 - 缺陷分级：路线图 §18.4（第 1683-1685 行：P0 数据破坏/静默损失/RCE/错误写文件/跨快照误编辑；P1 panic/crash/hang/错误完成状态/明显语义不一致/limit bypass；P2 有安全替代路径的功能缺陷/非核心性能回退/诊断位置错误）
-- 引擎：`crates/consema-conformance/src/fuzz.rs`（M2 落地的确定性 in-process 变异引擎，等价 harness 说明见该文件第 1-44 行）
+- 引擎：consema-rs 的 `consema-conformance/src/fuzz.rs`（六仓拆分前母仓路径 `crates/consema-conformance/src/fuzz.rs`；M2 落地的确定性 in-process 变异引擎，等价 harness 说明见该文件第 1-44 行）
 - 机器日志（原始证据，本记录的唯一权威数字来源）：`docs/fuzz-evidence-0.13.0-logs/waves.log`（会话/波次摘要）与 `docs/fuzz-evidence-0.13.0-logs/runs.csv`（逐进程真实时长账本，追加式）
+
+> **六仓拆分影响说明（2026-08-12 追加）**：六仓拆分后，fuzz 驱动运行于 **consema-rs** 仓根（`run_waves.ps1` 运行副本，未跟踪文件；新增 `-LedgerDir` 参数，默认指向母仓 `docs/fuzz-evidence-0.13.0-logs` 绝对路径；原版脚本保留于账本目录作冻结协议证据）；账本与 waves.log 仍写本仓 `docs/fuzz-evidence-0.13.0-logs/`——C-2 证据权威不变；runs.csv 为追加式账本（只 append、从不改写），拆分不触碰既有行，累计连续性不受影响；C-2 门禁单位口径不变（72 CPU-hours/格式家族 = parse+ops 合计、protocol 单独，§15.3）。会话 455 起由 consema-rs 驱动续接，详情见 §3.1 六仓拆分停机 incident 记录。
 
 ## 1. 机器事实（2026-08-07 实测）
 
@@ -12,12 +14,12 @@
 | CPU | 13th Gen Intel(R) Core(TM) i9-13900HX（24 physical / 32 logical cores） |
 | OS | Microsoft Windows 11 Pro 10.0.26200 |
 | 工具链 | rustc 1.97.1 (8bab26f4f 2026-07-14) stable-x86_64-pc-windows-msvc；cargo 1.97.1 |
-| clang | 未安装（MSVC-only）——libfuzzer-sys 的 C++ runtime 无法链接，`cargo fuzz run` 在本机不可用（cargo-fuzz 0.13.2 已安装但每个 target 都需要 clang runtime；fuzz.rs:10-13 与 `crates/*/fuzz/README.md` 同述） |
+| clang | 未安装（MSVC-only）——libfuzzer-sys 的 C++ runtime 无法链接，`cargo fuzz run` 在本机不可用（cargo-fuzz 0.13.2 已安装但每个 target 都需要 clang runtime；fuzz.rs:10-13 与 consema-rs 的 `consema-*/fuzz/README.md`（拆分前 `crates/*/fuzz/README.md`）同述） |
 | 仓库 HEAD | 7e9de3825c74b9ee981bdf2d0a9316cdb1b0fd40（clean：M2 修复与语料已随 0.13.0 落地 commit 094f5d1/7e9de38 入库；会话期代码状态见 §5） |
 
 ## 2. 目标清单与迭代常数
 
-每格式 target 逻辑单源在 `crates/<format>/fuzz/fuzz_logic/`（in-process 驱动 `include!` + cargo-fuzz wrapper 双接线）；迭代常数为驱动文件中的提交常量（证据：无种子空跑不算证据）。
+每格式 target 逻辑单源在 consema-rs 的 `consema-<format>/fuzz/fuzz_logic/`（拆分前 `crates/<format>/fuzz/fuzz_logic/`；in-process 驱动 `include!` + cargo-fuzz wrapper 双接线）；迭代常数为驱动文件中的提交常量（证据：无种子空跑不算证据）。
 
 | 驱动 | 长期 target 数 | 每 target 迭代（单次长期运行） | 合计变异数/波次 |
 |---|---|---|---|
@@ -61,7 +63,12 @@
 > 5. 08-11 08:53：为消除心跳轮询 ~77% 空转，驱动改为**分离进程连续 wrapper**（while 循环背靠背跑会话），会话间隔 ~3.3 分钟，速率恢复 ~12 CPU-h/墙钟小时。
 
 > **2026-08-12 session 448 wave 3 超时 incident（追加，诚实记录）**：
-> 2026-08-12 10:15:18，session 448 wave 3 的 34 个进程中有 16 个以 FAIL 被收割（exit=-1000，wall=1800s，cpu=0s；对应 errlog 全部 0 字节）——进程未执行即被波次安全超时强杀（wave 超时收割路径：cpu=0s 且 errlog 无输出，target 代码未运行，非 target 内 hang）；已按 session-9 体例分类为**非 fuzz finding**——不清零任何 target 的 release-candidate clean 计时、无 corpus regression（§4 step 2）；wave 1/2/4 正常入账，session 449 起恢复；账本非零退出累计 = session-9 的 10 行 + 本 incident 的 16 行 = **26 行，均非 fuzz finding**。
+> 2026-08-12 10:15:18，session 448 wave 3 的 34 个进程中有 16 个以 FAIL 被收割（exit=-1000，wall=1800s，cpu=0s；对应 errlog 全部 0 字节）——进程未执行即被波次安全超时强杀（wave 超时收割路径：cpu=0s 且 errlog 无输出，target 代码未运行，非 target 内 hang）；已按 session-9 体例分类为**非 fuzz finding**——不清零任何 target 的 release-candidate clean 计时、无 corpus regression（§4 step 2）；wave 1/2/4 正常入账，session 449 起恢复；账本非零退出累计 = session-9 的 10 行 + 本 incident 的 16 行 = 26 行，均非 fuzz finding（当时累计；2026-08-12 六仓拆分停机 incident 后更新为 40 行，见下条）。
+
+> **2026-08-12 六仓拆分停机 incident（追加，诚实记录）**：
+> 2026-08-12 10:52:47 session 454（母仓 HEAD=00c850d）waves 1-3 正常入账（全 0 失败）；wave 4 于 10:57:55 启动、10:58:54 被外部终止——主 agent 为执行六仓拆分暂停驱动：母仓 `crates/` 移出后剩空骨架目录、无根 Cargo.toml/workspace，`cargo test -p consema-conformance --no-run --locked` 构建目标不存在（waves.log 10:59:30 INCIDENT NOTE：`driver stopped by main agent for six-repo split (C-2 accumulation paused; resumes from consema-rs layout)`）。wave 4 的 34 进程中有 14 个以 FAIL 被收割（exit=-1，wall≈59.2-59.4s、cpu≈35.8-37.3s——进程已启动运行约 59s 即被终止，CPU 真实计入 509.3 s ≈ 0.14 CPU-hours，变异未完成；非 target 内失败）；其余 20 进程正常入账（exit 0）。session 454 合计 136 行（122 行 exit 0 + 14 行 exit=-1），10:58:58 `session done: 63247 ledger rows; total CPU-hours=461.321 failures=14`——此 failures=14 为驱动原始计数，按本段分类全部为**非 fuzz finding**（停机中断/外部终止，同 session-9 体例），不清零任何 target 的 release-candidate clean 计时、无 corpus regression（§4 step 2）。
+> **恢复与迁移**：11:41:04 session 455 起续接（consema-rs HEAD=6bcb068，重建后 wave 1 正常入账），停机 42 分钟（10:58:58 → 11:41:04）；驱动迁移至 consema-rs 根——`run_waves.ps1` 运行副本（未跟踪文件），新增 `-LedgerDir` 参数默认指向母仓 `docs/fuzz-evidence-0.13.0-logs` 绝对路径，tree-hash pathspec 由 `crates Cargo.toml Cargo.lock conformance` 更新为根布局 `Cargo.toml Cargo.lock conformance 'consema*'`；原版脚本保留于账本目录作冻结协议证据；账本与 waves.log 仍写母仓路径，C-2 证据权威不变。
+> **账本非零退出口径更新**：10 行 session-9（外部终止）+ 16 行 session-448-wave-3（超时强杀）+ 14 行本 incident（停机中断）= **40 行，全部有分类说明、均非 fuzz finding**（runs.csv 实测：exit=-1 共 24 行 = 10 + 14；exit=-1000 共 16 行）。
 
 ### 3.2 每 target 累计账本（数据源 runs.csv，3281 行 = session 7 的 17 行 + session 8 的 1530 行 + session 9 的 102 行 + session 10（waves 1-42）的 1428 行 + session 11 的 204 行；其中 3271 行 exit_code=0，10 行 exit=-1——session 9 wave 3 外部终止、已分类非 fuzz finding，见 §3.1）
 
@@ -91,6 +98,7 @@
 按格式家族（parse+ops 汇总）：json 2.610 / toml 1.556 / yaml 3.473 / ini 3.435 / properties 4.023 / xml 0.957 / plist 1.306 / hcl 2.616 CPU-hours；protocol（单 target）1.388。
 
 ### 3.2.1 2026-08-07 会话结束快照（追加；runs.csv 为唯一权威账本
+**2026-08-12 13:43 快照（session 492 done；runs.csv 为唯一权威账本）**：账本 68,415 行 / **488.634 CPU-hours**（68,375 行 exit 0；非零退出 40 行 = session-9 的 10 行外部终止 + session-448 wave 3 的 16 行超时 + session-454 的 14 行六仓拆分停机中断，均非 fuzz finding，见 §3.1 事件时间线）。每格式门槛单位累计（CPU-hours，本机复算）：properties **92.0**（127.8%，已过 72h）/ yaml **81.5**（113.2%，已过 72h）/ ini **78.4**（108.9%，已过 72h）/ hcl **59.8**（83.1%）/ json **59.4**（82.5%）/ toml **36.0**（49.9%）/ protocol-decode **31.4**（43.6%）/ plist **28.9**（40.2%）/ xml **21.2**（29.5%）。properties/yaml/ini 三单位已过 72h 门槛；hcl/json 为其余中最接近门槛的单位；其余单位按 §7 完成路径累计（clang 主机 cargo-fuzz 为主，本机连续 wrapper 续跑为备选）；runs.csv 为唯一权威账本，实时数字持续增长（session 493+ 驱动中）。
 **2026-08-12 10:17 快照（追加式；runs.csv 为唯一权威账本）**：账本 62,432 行 / **≈460 CPU-hours**（零新 crash；非零退出 = 10 行 session-9 外部终止 + 16 行 session-448 wave 3 超时分类 = 26 行，均非 fuzz finding，见 §3.1 事件时间线）。每格式门槛单位累计（CPU-hours，本机复算）：properties **85.5**（118.8%，已过 72h）/ yaml **75.8**（105.3%，已过 72h）/ ini **72.8**（101.1%，已过 72h）/ hcl **55.5**（77.1%）/ json **55.1**（76.5%）/ toml **33.3**（46.3%）/ protocol-decode **29.1**（40.4%）/ plist **26.7**（37.1%）/ xml **19.6**（27.2%）。properties/yaml/ini 三单位已过 72h 门槛；其余单位继续按 §7 完成路径累计（clang 主机 cargo-fuzz 为主，本机连续 wrapper 续跑为备选）；runs.csv 为唯一权威账本，后续会话数字随快照继续追加。
 **2026-08-11 会话 235-297 累计（追加式）**：session 297 完成态 + 298 首波（41,939 行 / 258.327 CPU-hours，2026-08-11 15:39 窗口复算）— runs.csv 41,939 行 / **258.327 CPU-hours**（41,929 行 exit 0、10 行 exit=-1（session 9 wave 3 外部终止、非 fuzz finding，见 §3.1））。每格式家族累计（CPU-hours，本机复算）：json **31.5** / toml **19.0** / yaml **42.6** / ini **41.3** / properties **48.1** / xml **11.6** / plist **15.8** / hcl **31.6** / protocol（单 target）**16.8**。相对每格式 72h 门槛，最接近的 properties **66.8%**（48.1/72；其余：yaml 59.2%、ini 57.4%、hcl 43.9%、json 43.8%、toml 26.4%、protocol 23.3%、plist 21.9%、xml 16.1%）；**72h 门槛仍开放**，剩余部分按 §7 完成路径累计（clang 主机 cargo-fuzz 为主，本机连续 wrapper 续跑为备选）；session 298+ 持续追加中，后续会话数字随 §3.2.1 快照继续追加。
 **2026-08-11 会话 79-234 累计（追加式）**：账本 33,337 行 / **188.336 CPU-hours**（session 234 时点复算，2026-08-11；零失败——除 session 9 已分类 10 行 exit=-1）。每格式家族累计（CPU-hours，本机复算）：json 23.0 / toml 13.9 / yaml 30.8 / ini 30.0 / properties 34.8 / xml 8.7 / plist 11.8 / hcl 23.0；protocol（单 target）12.3。相对每格式 72h 门槛最接近 properties **48.3%**（34.8/72；其余：yaml 42.8%、ini 41.6%、hcl/json 32.0%、toml 19.4%、protocol 17.1%、plist 16.4%、xml 12.1%）；runs.csv 为唯一权威账本；session 235+ 持续追加中；**每格式 72h 门槛仍开放，完成路径不变（§7：clang 主机 cargo-fuzz 为主、本机连续 wrapper 续跑为备选）**。发布记录数字以本快照为准。
@@ -129,12 +137,12 @@
 
 ### 3.3 波次执行方式与诚实口径
 
-- 每波 = 17 个长期 target 的 `Copies` 份并发进程，每进程一个核心（`--test-threads=1`），整波并行跨满机器核心；波与波之间做 tree-hash 检查（`git status --porcelain -- crates Cargo.toml Cargo.lock conformance` + HEAD），代码变化（修复 agent 落地）→ 先重建测试二进制再跑下一波，保证每波都是**当前 release-candidate 代码状态**的真实运行。
+- 每波 = 17 个长期 target 的 `Copies` 份并发进程，每进程一个核心（`--test-threads=1`），整波并行跨满机器核心；波与波之间做 tree-hash 检查（六仓拆分后于 consema-rs 根执行：`git status --porcelain -- Cargo.toml Cargo.lock conformance 'consema*'` + HEAD；拆分前 pathspec 为 `crates Cargo.toml Cargo.lock conformance`），代码变化（修复 agent 落地）→ 先重建测试二进制再跑下一波，保证每波都是**当前 release-candidate 代码状态**的真实运行。
 - **确定性说明（必须公开）**：引擎是确定性变异（提交种子 + 提交 corpus），同一代码状态下的重复运行覆盖完全相同的变异计划；**新增探索只发生在代码变化后的运行**（本会话中修复 agent 多次落地，见 §5）或 clang 主机的 cargo-fuzz（corpus 进化，见 §7）。账本如实记录"跑了什么"，不把重复运行冒充新探索；72 CPU-hours 的完成路径以 §7 为准。
 
 ## 4. 累计协议（后来的运行如何追加）
 
-1. 从仓库根目录运行：`powershell -NoProfile -ExecutionPolicy Bypass -File docs\fuzz-evidence-0.13.0-logs\run_waves.ps1 -Waves <N> -Copies <C>`（脚本是 §3.3 协议的机器可执行形式；每波自动 tree-hash → 重建 → 并发运行 → 逐进程真实 CPU/墙钟/退出码 → 追加 runs.csv 与 waves.log）。
+1. 六仓拆分后从 consema-rs 根运行：`powershell -NoProfile -ExecutionPolicy Bypass -File run_waves.ps1 -Waves <N> -Copies <C>`（运行副本；`-LedgerDir` 默认指向母仓 `docs\fuzz-evidence-0.13.0-logs` 绝对路径；原版脚本保留于账本目录作冻结协议证据；脚本是 §3.3 协议的机器可执行形式；每波自动 tree-hash → 重建 → 并发运行 → 逐进程真实 CPU/墙钟/退出码 → 追加 runs.csv 与 waves.log）。
 2. 任何 FAIL 行（exit ≠ 0）都是事件：立即停止追加，按 §6 分类；**新 crash 清零该 target 的 release-candidate clean 计时**（§15.3 第 1389 行），并把最小输入按 `conformance/corpora/README.md` 的 regressions 工作流永久加入 `conformance/corpora/mutation-v1.json` 的 `regressions` 数组（replay 测试从此永久覆盖）。
 3. 追加永不改写既有行（只 append）；汇总从 runs.csv 重算。
 4. 会话结束更新本文档 §3.2 与 §8 的累计数字。
@@ -162,7 +170,7 @@
 
 本机（MSVC，无 clang）只能用 in-process harness 累计（§1）；**文档化的完成路径**：
 
-1. **首选（clang 主机，corpus 进化）**：在 Linux + nightly + clang 主机上，对 9 个 crate 的 17 个 cargo-fuzz target 运行 `cargo +nightly fuzz run <target>`（`crates/<format>/fuzz/` 下：8 × `parse` + 8 × `operations` + protocol `decode`；wrapper 直接复用同一 `fuzz_logic` 单源）。corpus 种子已提交（`fuzz/corpus/<target>/`），首次构建生成的 `fuzz/Cargo.lock` 应一并提交（M8 证据规则：无种子运行不算证据）。每格式按 §3 协议把运行时长追加进本账本。
+1. **首选（clang 主机，corpus 进化）**：在 Linux + nightly + clang 主机上，对 9 个 crate 的 17 个 cargo-fuzz target 运行 `cargo +nightly fuzz run <target>`（consema-rs 的 `consema-<format>/fuzz/` 下（拆分前 `crates/<format>/fuzz/`）：8 × `parse` + 8 × `operations` + protocol `decode`；wrapper 直接复用同一 `fuzz_logic` 单源）。corpus 种子已提交（`fuzz/corpus/<target>/`），首次构建生成的 `fuzz/Cargo.lock` 应一并提交（M8 证据规则：无种子运行不算证据）。每格式按 §3 协议把运行时长追加进本账本。
 2. **备选（本机继续）**：重复 §4 协议继续 in-process 波次；注意确定性口径（§3.3）——只有代码变化后的波次提供新探索。
 3. **每格式 72 CPU-hours 门槛**：按格式家族汇总其 parse+ops（protocol 单独）target 的累计 CPU-hours，达到 72 且零未解释问题（§15.3）才算关闭该格式；本会话累计见 §8。
 
@@ -184,6 +192,7 @@
 - **2026-08-11 会话 79-234 累计（追加式；runs.csv 为唯一权威账本，发布记录数字以本快照为准）**：session 234 时点复算（2026-08-11）——runs.csv 33,337 行 / **188.336 CPU-hours**（33,327 行 exit 0、10 行 exit=-1（session 9 wave 3 外部终止、非 fuzz finding，见 §3.1））。每格式家族累计（CPU-hours，本机复算）：json **23.0** / toml **13.9** / yaml **30.8** / ini **30.0** / properties **34.8** / xml **8.7** / plist **11.8** / hcl **23.0** / protocol（单 target）**12.3**。相对每格式 72h 门槛，最接近的 properties **48.3%**（34.8/72；其余：yaml 42.8%、ini 41.6%、hcl/json 32.0%、toml 19.4%、protocol 17.1%、plist 16.4%、xml 12.1%）；**72h 门槛仍开放**，剩余部分按 §7 完成路径累计（clang 主机 cargo-fuzz 为主，本机连续 wrapper 续跑为备选）；session 235+ 持续追加中，后续会话数字随 §3.2.1 快照继续追加。
 - **2026-08-11 会话 235-297 累计（追加式）**：session 297 完成态 + 298 首波（41,939 行 / 258.327 CPU-hours，2026-08-11 15:39 窗口复算）— runs.csv 41,939 行 / **258.327 CPU-hours**（41,929 行 exit 0、10 行 exit=-1（session 9 wave 3 外部终止、非 fuzz finding，见 §3.1））。每格式家族累计（CPU-hours，本机复算）：json **31.5** / toml **19.0** / yaml **42.6** / ini **41.3** / properties **48.1** / xml **11.6** / plist **15.8** / hcl **31.6** / protocol（单 target）**16.8**。相对每格式 72h 门槛，最接近的 properties **66.8%**（48.1/72；其余：yaml 59.2%、ini 57.4%、hcl 43.9%、json 43.8%、toml 26.4%、protocol 23.3%、plist 21.9%、xml 16.1%）；**72h 门槛仍开放**，剩余部分按 §7 完成路径累计（clang 主机 cargo-fuzz 为主，本机连续 wrapper 续跑为备选）；session 298+ 持续追加中，后续会话数字随快照继续追加。
 - **2026-08-12 10:17 快照（追加式；runs.csv 为唯一权威账本，发布记录数字以本快照为准）**：账本 62,432 行 / **≈460 CPU-hours**（零新 crash；非零退出 = 10 行 session-9 + 16 行 session-448 wave 3 超时分类 = 26 行，均非 fuzz finding，见 §3.1 事件时间线）。每格式门槛单位累计（CPU-hours，本机复算）：properties **85.5**（118.8%，已过 72h）/ yaml **75.8**（105.3%，已过 72h）/ ini **72.8**（101.1%，已过 72h）/ hcl **55.5**（77.1%）/ json **55.1**（76.5%）/ toml **33.3**（46.3%）/ protocol-decode **29.1**（40.4%）/ plist **26.7**（37.1%）/ xml **19.6**（27.2%）。三单位已过 72h 门槛，其余单位仍开放，剩余部分按 §7 完成路径累计（clang 主机 cargo-fuzz 为主，本机连续 wrapper 续跑为备选）；runs.csv 为唯一权威账本。
+- **2026-08-12 13:43 快照（session 492 done；runs.csv 为唯一权威账本，发布记录数字以本快照为准）**：账本 68,415 行 / **488.634 CPU-hours**（68,375 行 exit 0、40 行非零退出——10 行 session-9 外部终止 + 16 行 session-448 wave 3 超时 + 14 行 session-454 六仓拆分停机中断，均非 fuzz finding，见 §3.1 事件时间线）。每格式门槛单位累计（CPU-hours，本机复算）：properties **92.0**（127.8%，已过 72h）/ yaml **81.5**（113.2%，已过 72h）/ ini **78.4**（108.9%，已过 72h）/ hcl **59.8**（83.1%）/ json **59.4**（82.5%）/ toml **36.0**（49.9%）/ protocol-decode **31.4**（43.6%）/ plist **28.9**（40.2%）/ xml **21.2**（29.5%）。properties/yaml/ini 三单位已过 72h 门槛；hcl/json 为其余中最接近门槛的单位；其余单位仍开放，剩余部分按 §7 完成路径累计（clang 主机 cargo-fuzz 为主，本机连续 wrapper 续跑为备选）；runs.csv 为唯一权威账本，session 493+ 持续追加中。
 
 ## 9. 开放事项
 
