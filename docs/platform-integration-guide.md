@@ -59,7 +59,9 @@ Consema 的承诺边界是**单文件内容处理**：`apply` 的"批量原子�
   registry 条目（json 8 / toml 7 / yaml 8 / ini 8 / properties 5 / xml 8 /
   plist 6 / hcl 6，见 fc-manifest-0.13.0.json 与五要素评审 §5）；dry-run
   与提交产生完全相同的 replacements 与 target digest（SECURITY.md）。
-  平台不应自己拼接字节改写配置。
+  平台不应自己拼接字节改写配置。**Go SDK 的 YAML family 仅 Commit 直提
+  （无 EditPlan dry-run 面，pilot-go F-2 / G2.1 已知 gap）；平台若需 YAML
+  编辑预览请用 Rust/TS/Py/Kt 或经 yaml.Commit 检查产物**。
 - **CLI 路径（批量）**：文件级批量变更一律走 `plan` → `apply`（RFC 0015
   契约；`apply` 只接受先前 `plan` 产生的 manifest，不接受裸操作）。这是
   平台默认的批量变更通道：plan 只读、apply 逐文件重验双前置条件
@@ -242,7 +244,7 @@ pilot-go-0.19.0.md §2.8 对照）：
 
 | 操作 | 量级 | 出处 |
 |---|---|---|
-| plan（单文件，parse + edit dry-run） | **~0.5-3 ms/文件** | pilot：plan 100 文件 333 ms（≈3.3 ms/文件）；BENCHMARKS：plan 100 INI p50 ≈72 ms（≈0.7 ms/文件） |
+| plan（单文件，parse + edit dry-run） | **~0.5-3 ms/文件** | pilot：plan 100 文件 333 ms（≈3.3 ms/文件）；BENCHMARKS：plan 100 INI p50 ≈0.072 ms（≈0.7 µs/文件，单次调用内 100 文件；与 pilot 333 ms/100 文件的量级差异系两源口径不同：BENCHMARKS 为冻结预算行 p50，pilot 为冷进程实测） |
 | apply（含每文件原子写 + 读回验证） | **~21-45 ms/文件** | pilot：apply 100 文件 2,137 ms（≈21 ms/文件）；BENCHMARKS：apply 100 INI p50 ≈4.5 s（≈45 ms/文件） |
 | 单文件冷进程命令 | 5-37 ms（p50/p95/max） | pilot：inspect/query/edit dry-run/convert |
 | Go 实现对照 | plan 100 文件 52 ms；apply 100 文件 3.4 s | pilot-go-0.19.0 §2.8 |
