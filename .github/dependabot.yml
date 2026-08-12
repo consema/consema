@@ -1,0 +1,16 @@
+# Dependabot version updates: github-actions ecosystem. This repository
+# carries the language-independent spec, conformance authority data and CI
+# for the oracles/digest gates, so the only updatable dependency surface is
+# the actions pinned in .github/workflows. The conformance/ fixture
+# manifests (fixtures/toml/Cargo.toml, fixtures/toml/pyproject.toml,
+# fixtures/real-world/package.json, oracles/hcl-go-v1/go.mod) are frozen
+# test data (fc-manifest digest gate) and are deliberately NOT tracked by
+# Dependabot — any dependency bump there must go through the freeze/audit
+# process, not an automated PR.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
