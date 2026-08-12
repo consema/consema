@@ -88,3 +88,5 @@ JSON family（`json.strict@1`、`jsonc.bounded@1`、`json5.standard@1`）、TOML
 ```
 
 各语言实现自身的测试与门禁在其各自仓 CI（consema-rs / consema-go / consema-ts / consema-py / consema-kt）。
+
+<!-- labeler smoke test marker (branch test/labeler-smoke, will be closed) -->
