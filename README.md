@@ -21,6 +21,14 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 
 拆分决策与执行记录（对齐修复 → 差分集迁移 → subtree split → 五仓组装 → 母仓瘦身 → CI 修复链 → semver 门禁真空修正 → 驱动迁移）：[six-repo-split-2026-08-12.md](docs/six-repo-split-2026-08-12.md)。
 
+## 工程标准与深度项
+
+2026-08-12 拆仓后落地的跨仓工程标准与深度项记录（简短清单）：
+
+- **工程标准**：六仓齐备 [CONTRIBUTING.md](CONTRIBUTING.md) / [RELEASING.md](RELEASING.md) / [SECURITY.md](SECURITY.md)，本仓为权威版
+- **1.0.0 RC soak 五本**（`docs/`）：[rc-soak-stage1-benchmarks.md](docs/rc-soak-stage1-benchmarks.md)、[rc-soak-stage1-corpus.md](docs/rc-soak-stage1-corpus.md)、[rc-soak-stage1-differential.md](docs/rc-soak-stage1-differential.md)、[rc-soak-stage1-disk-drill.md](docs/rc-soak-stage1-disk-drill.md)、[rc-soak-stage1-go-fuzz.md](docs/rc-soak-stage1-go-fuzz.md)
+- **CI 深度项**（六仓一致）：全部 action 以提交 SHA pin（`@<sha> # vX.Y.Z` 注释，防 supply-chain 漂移）；`re-actors/alls-green@05ac9388… # v1.2.2` 聚合门禁 `check (all gates green)` 是分支保护唯一 required check（tokio/pydantic 模式，`if: always()` + `jobs: toJSON(needs)`）；release/publishing 流程经 zizmor 静态审计（如 cache-poisoning 规避）
+
 ## 本仓内容
 
 **规范文档**（根目录，权威载体）：

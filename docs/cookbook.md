@@ -876,3 +876,23 @@ convert 组合的 loss policy 小结（全部实测，§22.6）：
 - entry-mapping → object 的映射政策是唯一授权转换通道
   （`mapping_policy: UniqueStringEntriesToObject`，第 5 节 JSON→TOML 例），
   转换信封携带完整 report（两阶段 fidelity + events，`--json` 可查）。
+
+## 13. 五语言 SDK 快速上手示例
+
+同一份 "SDK chain" 场景——`json.strict` 解析 `{"a":1,"b":{"c":2}}` →
+`b.c` 原生语义查询（`json.native-semantic-query@1`）→ best-exact 投影
+（`json.projection.best-exact-core@1`）→ `a` 改 `42` 的结构编辑 → canonical
+JSON 材料化 → 跨格式转换到 TOML——在五个语言实现中各有一份等价示例（设计见
+`docs/multi-language-implementation-plan.md`；CLI 侧对应配方见第 2–6 节）。
+
+| 语言 | 示例文件 | 运行命令 |
+| --- | --- | --- |
+| Rust | [consema/examples/sdk_chain.rs](https://github.com/consema/consema-rs/blob/main/consema/examples/sdk_chain.rs) | `cargo run -p consema --example sdk_chain` |
+| Go | [go/examples/sdk_chain/main.go](https://github.com/consema/consema-go/blob/main/go/examples/sdk_chain/main.go) | `cd go && go run ./examples/sdk_chain` |
+| TypeScript | [typescript/examples/sdk_chain.ts](https://github.com/consema/consema-ts/blob/main/typescript/examples/sdk_chain.ts) | `cd typescript && node examples/sdk_chain.ts`（node 26 原生运行 `.ts`，无构建步骤） |
+| Python | [python/examples/sdk_chain.py](https://github.com/consema/consema-py/blob/main/python/examples/sdk_chain.py) | `cd python && PYTHONPATH=src python examples/sdk_chain.py` |
+| Kotlin | [kotlin/examples/SdkChain.kt](https://github.com/consema/consema-kt/blob/main/kotlin/examples/SdkChain.kt) | `kotlinc -jvm-target 17 -d out src/main/kotlin examples/SdkChain.kt`，再 `java -cp "out;<kotlinc>\lib\kotlin-stdlib.jar" consema.examples.SdkChainKt` |
+
+运行命令均取自各示例文件头注释（实测命令）；每个示例文件头部都链接了本
+cookbook 与五语言设计文档，各仓 README 提供完整的 SDK 文档（Rust /
+Go / TypeScript / Python / Kotlin）。
