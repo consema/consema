@@ -1,0 +1,13 @@
+# CODEOWNERS — consema 规范仓
+#
+# 当前以单一维护者兜底（* @franckcl1989）。后续按域扩展为 team 占位：
+# team 均为占位名，需在 GitHub 组织创建对应 team 后启用；创建前保持注释，
+# 避免 GitHub 无法解析 owner 导致 PR review 请求告警。
+#
+# 计划域（占位）：
+#   /conformance/         @consema/conformance-maintainers
+#   /conformance/oracles/ @consema/oracle-maintainers
+#   /docs/                @consema/spec-maintainers
+#   /docs/rfcs/           @consema/spec-maintainers
+#   /scripts/             @consema/spec-maintainers
+* @franckcl1989
