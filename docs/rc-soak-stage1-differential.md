@@ -6,7 +6,8 @@
   与 §10（实施实况）；`docs/six-repo-split-2026-08-12.md` §2/§6（六仓布局与
   conformance 仲裁层）。
 - 目标：五语言差分 harness 在 RC soak 阶段的**追加运行**——C-2 关账后一键重跑
-  全部 12 个 verify 脚本，验证五语言与 Rust 锚的全部差分面（字节 parity /
+  各语言仓 `scripts/` 下的全部 12 个 verify 脚本（母仓不持有 verify 脚本），
+  验证五语言与 Rust 锚的全部差分面（字节 parity /
   normalized 双向 / protocol exchange 双向）在当前 release-candidate 代码状态下
   依然全绿，并记录结果。
 - **本手册只含流程与记录模板；执行本身不在本准备批次内。**
@@ -18,7 +19,7 @@
 
 | 仓库 | 角色 | 关键路径（检出根下） |
 |---|---|---|
-| `consema`（母仓） | 规范/conformance 仲裁/证据权威 | `conformance/`（vectors 18 套 508 cases、fixtures、corpora、**differential case 集单一权威**）、`docs/fc-manifest-0.13.0.json` |
+| `consema`（母仓） | 规范/conformance 仲裁/证据权威 | `conformance/`（vectors 18 套 519 cases、fixtures、corpora、**differential case 集单一权威**）、`docs/fc-manifest-0.13.0.json` |
 | `consema-rs` | Rust 参考实现（差分 Rust 锚侧） | `Cargo.toml`（workspace 根）、`consema-conformance/`（四个 emit 例子）、`target/` |
 | `consema-go` | Go 实现 | `go/`、`scripts/go-verify-*.ps1` |
 | `consema-ts` | TypeScript 实现 | `typescript/`、`scripts/ts-verify-*.ps1` |
@@ -36,8 +37,9 @@
   （`emit_parity_bytes.rs` / `emit_normalized_results.rs` / `emit_protocol_exchange.rs`
   / `emit_conformance_reports.rs`，`consema-conformance/examples/`）只消费 case 文件
   与输出目录，语言无关。
-- **母仓 `scripts/` 下仍保留拆分前的 12 个 verify 脚本**（引用 `go/`、`typescript/`、
-  `kotlin/`、`crates/consema-conformance/` 等已不存在路径，不可运行）——**执行一律用
+- **母仓 `scripts/` 不持有 verify 脚本**：拆分前残留的 13 个 `*-verify-*.ps1`
+  （引用 `go/`、`typescript/`、`kotlin/`、`crates/consema-conformance/` 等已不存在
+  路径，运行必失败）已于 2026-08-13 删除，同功能脚本在各语言仓——**执行一律用
   各语言仓自带的 `scripts/L-verify-*.ps1`**（拆分批次已适配多仓模式，新增
   `-RustWorkspace` 参数）。
 
