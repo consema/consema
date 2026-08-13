@@ -23,7 +23,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 ### Boundaries
 
 - **C-1（CI GitHub 真跑）**：**已闭环**——2026-08-11 GitHub Actions run #5（head 437fd35）132/132 steps 全绿，10+1 job 定义（增补前；go-differential 2026-08-12 增补后 ci.yml 为 10+2 job / 12 定义）/ 三 OS 矩阵 17 次执行在 windows/ubuntu/macos 全矩阵通过，2026-08-12 经 GitHub Actions API 在线核实，结果已回填 fc-manifest（C-1 → closed）；五语言 CI 全绿（2026-08-12，ci.yml run#12 + ci-typescript/ci-python/ci-kotlin 各 run#5，head db746ba）将 C-1 证据由双语言扩展到 TS/Python/Kotlin；
-- **C-2（72 CPU-hours fuzz）**：账本 62,432 行 / ≈460 CPU-hours（2026-08-12 10:17 复算，runs.csv 权威）；properties 85.5h（118.8%）、yaml 75.8h（105.3%）、ini 72.8h（101.1%）三单位已过 72h 门槛；其余 hcl 55.5h / json 55.1h / toml 33.3h / protocol-decode 29.1h / plist 26.7h / xml 19.6h 继续累计；零新 crash（非零退出 = 10 行 session-9 + 16 行 session-448-wave-3 超时分类，均非 fuzz finding；快照口径——追加式账本以 runs.csv 为准），完成路径不变（clang 主机 cargo-fuzz 17 target 为主）；
+- **C-2（72 CPU-hours fuzz）**：账本 122,478 行 / 780.529 CPU-hours（2026-08-13 复算，runs.csv 权威）；properties 145.4h（201.9%）、yaml 128.8h（178.9%）、ini 124.8h（173.3%）、hcl 95.5h（132.7%）、json 95.3h（132.3%）五单位已过 72h 门槛；其余 toml 57.7h / protocol-decode 50.7h / plist 47.4h / xml 35.0h 继续累计；零新 crash（非零退出 = 40 行：10 行 session-9 外部终止 + 16 行 session-448-wave-3 超时 + 14 行 session-454 拆分停机，均非 fuzz finding；快照口径——追加式账本以 runs.csv 为准），完成路径不变（clang 主机 cargo-fuzz 17 target 为主）；
 - **C-3（真实发布密钥与发布执行）**：真实密钥 + 签名 tag/artifact + SBOM/checksum 落盘 + 恢复演练复跑未执行（D-1：checksum manifest 须从干净发布 commit 重新生成；D-2：演练密钥无持久公钥）；
 - **RC soak**：§22 中部分权限/磁盘失败演练列为 RC soak 必做（rc-1.0.0-candidate.md §2）；
 - 依赖序（终审记录）：F-A → F-B → C-1 → C-2 → C-3 → RC soak → P2-7 → **1.0.0**。
@@ -67,7 +67,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 ### Verified
 
 - workspace `cargo test --workspace --locked`：1,617 passed / 0 failed（2026-08-07 实测）；18 套语言无关 suite 508/508（含 fuzz/property/mutation 新增的 conformance 域测试）；
-- mutation corpus 全量 replay：174,921 case 通过（`cargo test -p consema-conformance --test mutation_corpus --locked -- --ignored`，63.10s）；
+- mutation corpus 全量 replay：174,921 case 通过（`cargo test -p consema-conformance --test mutation_corpus --locked -- --ignored`，2026-08-07 15:49；原始输出未保留在仓内、时长不可复算——见 fuzz-evidence-0.13.0.md §8 证据链说明）；
 - cargo deny 四段与 cargo audit（本地 1,189 advisories / 76 deps / 0 漏洞；Cargo.lock 实测 76 个 `[[package]]`，cargo audit 口径随版本变化，以当前扫描结果为准）保持全绿；CI 10 job（lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package）均已落盘（第一次 GitHub 真跑是收口项，见 Boundaries）；
 - coverage 可复现基线入库（86.51/82.82/87.91，脚本产出）；BENCHMARKS-0.13.0.md 预算表 + 后修复复测（S3 127.5 ms、S4 0.105 s）记录在档；
 - 发布供应链演练真实执行：签名全流程、SBOM 生成、三场恢复演练、14 归档校验，记录于 `docs/release-process-0.13.0.md`。

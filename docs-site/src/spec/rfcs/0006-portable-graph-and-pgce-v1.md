@@ -1,6 +1,6 @@
 # RFC 0006: PortableGraph and PGCE v1
 
-- Status: Accepted for Consema 0.7.0 implementation
+- Status: Implemented in Consema 0.7.0
 - Date: 2026-08-04
 - Scope: immutable portable graph values, graph-local identity, strict graph
   equality/hash, canonical graph numbering, PGCE/1, bounded construction and

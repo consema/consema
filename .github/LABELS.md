@@ -21,7 +21,7 @@ complements the human-chosen `kind:` label.
 | `area: core`    | `d93f0b` | Implementation / authoritative content (repo source tree)          |
 | `area: ci`      | `bfd4f2` | CI / tooling: `.github/**`, `scripts/**`                           |
 | `area: docs`    | `c2e0c6` | Documentation: `*.md`, `docs/**`                                   |
-| `needs-info`    | `fbca04` | Issues awaiting information: the stale workflow (`only-labels: needs-info`) target |
+| `needs-info`    | `d4c5f9` | Issues awaiting information: the stale workflow (`only-labels: needs-info`) target（2026-08-13 换色：原与 `kind: release` 共用 `fbca04`，标签 UI 不可区分） |
 
 Create the labels in a fresh checkout (or any new repository copy) with:
 

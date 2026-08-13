@@ -1,7 +1,7 @@
-# `1.0.0-rc.1` 候选清单（0.19.0 G5.7，路线图 §16.6 第 1555 行）
+# `1.0.0-rc.1` 候选清单（0.19.0 G5.7，路线图 §16.6 第 1561 行）
 
 - 日期：2026-08-10（本地实测）
-- 依据：路线图 §22（`1.0.0` 最终发布门槛，第 1867-1942 行）、§23（真实项目验证）；
+- 依据：路线图 §22（`1.0.0` 最终发布门槛，第 1871-1946 行）、§23（真实项目验证）；
   fc-manifest-0.13.0.json（open_items C-1/C-2/C-3）；go-implementation-plan §6 门禁总表
 - 本文档 = G5.7 交付物 4/5：阻塞项清单（C-1/C-2/C-3 状态）、§22 门禁核对表、
   RC soak 计划、已知 P2 发布判断清单；并含 release/upgrade/rollback 演练记录
@@ -11,8 +11,8 @@
 
 | 阻塞项 | 状态 | 证据 | 完成路径 |
 |---|---|---|---|
-| C-1：CI 10 job 在 GitHub 干净 checkout 全矩阵全绿 | **closed** | GitHub Actions run #5（2026-08-11，head 437fd35，main push）：132/132 steps 全绿（增补前 10+1 job：lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package/go-1-26，11 定义/17 次执行）在 windows/ubuntu/macos 全矩阵通过；2026-08-12 增补 go-differential 后 ci.yml 为 10+2 job（12 定义；六仓拆分后该定义属 consema-rs 仓，母仓 ci.yml 为 oracles/shared-conformance-digest/check 三 job）；run 历史：run#1 workflow-parse fail（job id go-1.26 含点号）→ run#2 5 根因（symlink_dir 移除、oracles ParserError、coverage Get-CimInstance guard、package 工具链顺序、tags 未推）→ run#3 4 根因（macOS /var→/private/var 临时路径 symlink、oracles 缺 exit 0、semver 嵌套 baseline 歧义、coverage 数组 guard $null）→ run#4 fmt import 顺序 → run#5 全绿；结果已回填 manifest（C-1 → closed） | 已闭环（2026-08-11，run #5 全绿） |
-| C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §3.2.1/§8 快照：258.327 CPU-hours（session 297 时点复算，2026-08-11）；runs.csv 41,939 行（零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈66.8%，完成路径不变）；**2026-08-12 10:17 快照（runs.csv 权威复算）**：62,432 行 / ≈460 CPU-hours，零新 crash（非零退出 = 10 行 session-9 + 16 行 session-448-wave-3 超时分类，均非 fuzz finding）；**properties 85.5h（118.8%）、yaml 75.8h（105.3%）、ini 72.8h（101.1%）三单位已过 72h 门槛**；hcl 55.5h（77.1%）、json 55.1h（76.5%）最接近其余；toml 33.3h、protocol-decode 29.1h、plist 26.7h、xml 19.6h 继续累计；完成路径不变（快照口径：runs.csv 为唯一权威账本，实时数字持续增长） | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
+| C-1：CI 10 job 在 GitHub 干净 checkout 全矩阵全绿 | **closed** | GitHub Actions run #5（2026-08-11，head 437fd35，main push）：132/132 steps 全绿（增补前 10+1 job：lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package/go-1-26，11 定义/17 次执行）在 windows/ubuntu/macos 全矩阵通过；2026-08-12 增补 go-differential 后为 10+2 job（12 定义；六仓拆分后各 job 归仓：10 个 Rust 门禁属 consema-rs/.github/workflows/ci.yml、go-1-26 与 go-differential 属 consema-go/.github/workflows/ci-go.yml（go-differential 在 :177）、oracles 属母仓 ci.yml——母仓 ci.yml 为 oracles/shared-conformance-digest/check 三 job）；run 历史：run#1 workflow-parse fail（job id go-1.26 含点号）→ run#2 5 根因（symlink_dir 移除、oracles ParserError、coverage Get-CimInstance guard、package 工具链顺序、tags 未推）→ run#3 4 根因（macOS /var→/private/var 临时路径 symlink、oracles 缺 exit 0、semver 嵌套 baseline 歧义、coverage 数组 guard $null）→ run#4 fmt import 顺序 → run#5 全绿；结果已回填 manifest（C-1 → closed） | 已闭环（2026-08-11，run #5 全绿） |
+| C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §3.2.1/§8 快照：258.327 CPU-hours（session 297 时点复算，2026-08-11）；runs.csv 41,939 行（零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈66.8%，完成路径不变）；**2026-08-13 复算快照（runs.csv 权威）**：122,478 行 / 780.529 CPU-hours，零新 crash（非零退出 = 40 行：10 行 session-9 外部终止 + 16 行 session-448-wave-3 超时 + 14 行 session-454 拆分停机，均非 fuzz finding）；**properties 145.4h（201.9%）、yaml 128.8h（178.9%）、ini 124.8h（173.3%）、hcl 95.5h（132.7%）、json 95.3h（132.3%）五单位已过 72h 门槛**；toml 57.7h（80.2%）、protocol-decode 50.7h（70.4%）、plist 47.4h（65.8%）、xml 35.0h（48.6%）继续累计；完成路径不变（快照口径：runs.csv 为唯一权威账本，实时数字持续增长） | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
 | C-3：真实发布密钥与 0.13.0 发布执行 | **partial** | 演练密钥 82301612…（隔离 keyring）验证过全流程；**默认 keyring 尚无真实发布密钥**；docs/release 现含 0.8.0 演练产物与 1.0.0-rc.1 PREVIEW 预检产物（2026-08-12 入库：sbom-1.0.0-rc.1.json、cargo-package-1.0.0-rc.1.log、verify-package-archives-1.0.0-rc.1.result.txt、PREVIEW-1.0.0-rc.1.md） | 按 release-process-0.13.0.md §7 十项检查单顺序执行；1.0.0-rc.1 发布执行（版本已推进 0.8.0→0.13.0→1.0.0-rc.1，2209582）；真实密钥+备份+吊销证书；**manifest 必须从干净发布 commit 重新生成**（见 §4 D-1） |
 
 ## 2. §22 门禁核对表（逐行状态，2026-08-10）
@@ -29,8 +29,8 @@
 
 - capability set 一致：G4.4 capability parity 硬门禁（无 "Rust only" mandatory）。✓
 - shared conformance 100%：18 套 / 519 cases 五 runner 全过（增补后 519；
-  聚合 digest `cfd6e296da5b…` 五 runner 共钉，fc-manifest-0.13.0.json:37-38
-  为权威——2026-08-12 P2-B 向量补强 508→519，:39）。✓
+  聚合 digest `cfd6e296da5b…` 五 runner 共钉，fc-manifest-0.13.0.json:39
+  为权威——2026-08-12 P2-B 向量补强 508→519，:41）。✓
 - PVCE/PGCE byte-exact：G0.1-G0.2 硬门禁 + differential harness。✓
 - protocol cross-encode/decode 100%：G5.3（Rust CLI ↔ Go protocol codec）。✓
 - normalized parse/query/projection/materialization/edit 结果一致：G5.2 bidirectional differential。✓
@@ -55,13 +55,14 @@
 
 ### 22.4 安全与质量 — 部分（C-2 阻塞；C-1 已闭环 2026-08-11）
 
-- Rust+Go 全测试矩阵：本地全绿；GitHub 真跑 = C-1——**已闭环（2026-08-11，run #5，head 437fd35，132/132 steps 全绿，10+1 job（增补前，11 定义/17 次执行）windows/ubuntu/macos；go-differential 2026-08-12 增补后 ci.yml 为 10+2 job/12 定义（六仓拆分后该定义属 consema-rs 仓，母仓 ci.yml 为 oracles/shared-conformance-digest/check 三 job）**。✓
+- Rust+Go 全测试矩阵：本地全绿；GitHub 真跑 = C-1——**已闭环（2026-08-11，run #5，head 437fd35，132/132 steps 全绿，10+1 job（增补前，11 定义/17 次执行）windows/ubuntu/macos；go-differential 2026-08-12 增补后为 10+2 job/12 定义（六仓拆分后各 job 归仓：10 个 Rust 门禁属 consema-rs、go-1-26 与 go-differential 属 consema-go ci-go.yml:177、oracles 属母仓 ci.yml——母仓为 oracles/shared-conformance-digest/check 三 job）**。✓
 - release-candidate fuzz clean-run：Rust 188.336/72 CPU-hours（历史快照——session 234 时点
-  复算，2026-08-11，runs.csv 33,337 行，零新 crash）；**最新快照 62,432 行 / ≈460 CPU-hours
-  （2026-08-12 10:17，runs.csv 权威，零新 crash；properties 85.5h（118.8%）、yaml 75.8h
-  （105.3%）、ini 72.8h（101.1%）三单位已过 72h 门槛；hcl 55.5h、json 55.1h 最接近其余）**
+  复算，2026-08-11，runs.csv 33,337 行，零新 crash）；**最新快照 122,478 行 / 780.529 CPU-hours
+  （2026-08-13 复算，runs.csv 权威，零新 crash；properties 145.4h（201.9%）、yaml 128.8h
+  （178.9%）、ini 124.8h（173.3%）、hcl 95.5h（132.7%）、json 95.3h（132.3%）五单位已过 72h
+  门槛；toml 57.7h、protocol-decode 50.7h、plist 47.4h、xml 35.0h 继续累计）**
   = C-2（其余单位 72h 门槛仍开放，继续累计）；Go fuzz targets clean-run 记录已有
-  （2026-08-10，go/README.md:661-763：16 targets 各 30s，零 panic/hang/limit bypass）。⏳
+  （2026-08-10，consema-go/go/README.md:674-727：16 targets 各 30s，零 panic/hang/limit bypass）。⏳
 - 无未解决 P0/P1：当前 0。✓
 - 无未接受 critical/high dependency vulnerability：deny/audit 门禁。✓
 - XML/YAML/HCL/binary plist 专项 threat tests：Rust security matrix + Go
@@ -116,7 +117,10 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 
 - `git archive` 提取 v0.8.0 tag 与 9c1ede20/7e9de38 三棵树；v0.8.0 tag 树
   `cargo package --workspace --locked --no-verify` 产出 12 个 .crate（该 tag 早于
-  hcl/plist/xml crates），9c1ede20/7e9de38 产出 14 个。
+  hcl/plist/xml crates），9c1ede20/7e9de38 产出 15 个（两树各含 15 个 crate 目录，
+  含 consema-conformance——repository-only crate 不写入 SHA256SUMS 清单，故
+  SHA256SUMS 条目为 14；本句的 15 为 cargo package 输出数、14 为清单条目数，
+  口径差异如实注明）。
 - **发现 D-1**：对 v0.8.0、9c1ede20、7e9de38 三个 commit 的干净重建均无法复现
   `docs/release/SHA256SUMS-0.8.0.txt` 的 14 个 digest（0/14 匹配）。根因：
   manifest 记录于 2026-08-07 的**脏工作树**状态（fc-manifest tree_state_note 明示
@@ -210,7 +214,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 
 ## 4. RC soak 计划
 
-目标：§22 全部门禁除 RC soak 本身全部通过（§16.6 第 1557 行硬门禁）。
+目标：§22 全部门禁除 RC soak 本身全部通过（§16.6 第 1563 行硬门禁）。
 
 ```text
 阶段 0（RC 构建前，阻塞）：
@@ -231,7 +235,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 
 阶段 2（soak 通过后）：
   无 P0/P1 与 contract ambiguity → 发布 1.0.0-rc.1
-  RC 期间发现 P0/P1/ambiguity → 新 RC + 相应 clean-run 重做（第 1942 行）
+  RC 期间发现 P0/P1/ambiguity → 新 RC + 相应 clean-run 重做（第 1946 行）
 ```
 
 ### 4.1 阶段 1 当前进展（2026-08-10）
@@ -241,7 +245,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 - 双语言 differential corpus 追加运行 → 四 harness 已复跑（P2-7，
   83/83+108/108+68/68；追加 corpus 待 C-2 关账后随收口执行）
 - Go 侧 release-candidate fuzz clean-run 记录 → 已有（2026-08-10，
-  go/README.md:661-763，16 targets 30s）
+  consema-go/go/README.md:674-727，16 targets 30s）
 - 每格式真实 corpus 抽检巡检 → **已完成**（2026-08-10：钉版 12 文件 digest 12/12
   一致；508 核对一致（增补前——2026-08-12 P2-B 向量补强至 519 后该计数为
   519，fc-manifest-0.13.0.json:37-39）；regressions 空数组符合预期；
@@ -249,7 +253,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 - 性能基线复测 → **Go 侧已执行**（2026-08-10：8×2 benchmarks；9/16 项比值
   >1.10，全部标注"疑似回退（fuzz 负载下测得，需空闲复测确认）"，无代码回退
   结论——同会话 7 项更快、无代码改动、GC 争抢特征）；Go 侧无冻结预算
-  （go/README.md:750），仅趋势记录；Rust 侧 -Check 复验（BENCHMARKS §11）
+  （consema-go/go/README.md:761），仅趋势记录；Rust 侧 -Check 复验（BENCHMARKS §11）
   建议 fuzz 关账后空闲环境执行（避免 ~40% CPU 负载假阳性 fail）
 - 发布路径预检（C-3 非密钥机械步骤）→ **已实测**（2026-08-10，干净 worktree）：
   `cargo package --workspace --locked --no-verify` 15 归档 exit 0；
@@ -260,7 +264,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
   由 verify 脚本/签名步骤保证）；脚本须从原生 PowerShell 运行（GNU tar 会
   误报 Windows 路径）；与 fuzz 共享 cargo 锁时机械步骤约 40 分钟
 - coverage -Trend 平台差处置 → 入库基线 86.51/82.82/87.91 为 Windows 本机
-  测得（docs/COVERAGE-0.13.0.md:15,17），CI coverage job 在 ubuntu 测，
+  测得（docs/COVERAGE-0.13.0.md:33、68），CI coverage job 在 ubuntu 测，
   跨平台差 >1.0pp 时 C-1 首跑可能 -Trend 首红。处置：若红，按脚本政策在
   ubuntu 等效环境刷新入库报告并附处置记录（release 里程碑刷新许可，
   coverage.ps1:524）；不阻塞 C-1 推入（实测：run #5 coverage job 全绿，未触发
@@ -283,21 +287,23 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
   ci-python.yml run#2（python-gates/python-conformance/python-differential）、
   ci-kotlin.yml run#2（kotlin-gates/kotlin-conformance/kotlin-differential）；
   首跑缺陷已在 dbba9a4 修复：python 测试夹具硬编码路径 8 处 → 仓库相对路径；
-  kotlin jar 供给（kotlin-test-2.2.0 + junit-jupiter-api-5.10.2 自 Maven Central）
-  + TestShim.kt 入库（kotlin/verify/）；共享 conformance 脚本随 runner-CLI 批次
+  kotlin jar 供给（直驱路径的 kotlin-test.jar / kotlin-test-junit5.jar 取自
+  kotlinc 2.2.0 发行版 lib/，仅 junit-jupiter-api-5.10.2.jar 自 Maven Central；
+  2026-08-13 修正记录见 five-language-ci-design.md §10）；TestShim.kt 已于
+  2026-08-13 删除（死件，git 历史保留）；共享 conformance 脚本随 runner-CLI 批次
   仍为未来项（five-language-ci-design.md §10）
-- 每 48h fuzz 账本检查 → 进行中（最新快照 62,432 行 / ≈460 CPU-hours，2026-08-12 10:17 复算，runs.csv 权威；properties/yaml/ini 三单位已过 72h 门槛；详见 §1 C-2 行）
+- 每 48h fuzz 账本检查 → 进行中（最新快照 122,478 行 / 780.529 CPU-hours，2026-08-13 复算，runs.csv 权威；properties/yaml/ini/hcl/json 五单位已过 72h 门槛；详见 §1 C-2 行）
 
 ### 4.2 巡检 4 条观察记录（P2 级）
 
 1. pilot-go-0.19.0.md §1 标题"12 个文件"而表含 13 行（logback.xml 为"—"）——与
-   go/pilot/pilot_test.go:157-170 的 12 文件注册一致，接受；
+   consema-go/go/pilot/pilot_test.go:157-170 的 12 文件注册一致，接受；
 2. vectors/toml-v1.json 的 toml.corpus.cargo-manifest fixture 路径为裸
    `"Cargo.toml"`（仓库根，非 fixtures 下），Rust runner 用 include_bytes! 解析
    （consema-rs/consema-conformance/src/toml_v1.rs:27）——Go runner 落地时需继承同一
    解析约定；
-3. json5/ 与 toml/ 目录无独立 README（其余 7 家族有）——来源声明由
-   conformance/README 与 corpora 元数据承担，体例不一致可接受；
+3. 仅 json5/ 目录无独立 README（其余 8 家族有；toml/ 的 README 自 943c014 起存在）
+   ——来源声明由 conformance/README 与 corpora 元数据承担，体例不一致可接受；
 4. fixtures 层负向文件覆盖不均（json5/xml/hcl 的负向在 vectors/corpora/oracle
    层，体系层面满足）——接受，维持文档化替代载体。
 
@@ -319,5 +325,5 @@ disposition。
 ## 6. 相关文件
 
 - 本 pilot：`docs/pilot-go-0.19.0.md`（W1-W8 全流程、12 指标、三场迁移、Rust 复核）
-- 可复现：`go/pilot/pilot_test.go`（14 测试；`CONSEMA_PILOT_RUST_CLI` 时含跨语言对照）
+- 可复现：`consema-go/go/pilot/pilot_test.go`（14 测试；`CONSEMA_PILOT_RUST_CLI` 时含跨语言对照）
 - 先例：`docs/pilot-0.13.0.md`、`docs/release-process-0.13.0.md`、`docs/fc-manifest-0.13.0.json`

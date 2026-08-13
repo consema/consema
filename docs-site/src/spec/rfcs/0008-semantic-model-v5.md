@@ -1,6 +1,6 @@
 # RFC 0008: Semantic model v5 graph and YAML protocol
 
-- Status: Accepted for Consema 0.7.0 implementation
+- Status: Implemented in Consema 0.7.0
 - Date: 2026-08-04
 - Scope: additive `core.semantic-model@5` contracts, PortableGraph/PGCE
   transport, graph query and projection results, externally located YAML query

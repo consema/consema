@@ -9,6 +9,23 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $workspaceRoot = Split-Path -Parent $PSScriptRoot
+# git-bash GNU tar misparses Windows drive paths when it wins the PATH lookup
+# (`/usr/bin/tar: Cannot connect to C: resolve failed`), so on Windows resolve
+# the system bsdtar explicitly and keep the PATH lookup elsewhere (CI ubuntu
+# unchanged). $env:OS is set on every Windows host (PowerShell 5.1 and Core
+# alike) and unset on non-Windows, so the test is false there.
+$tarCommand = if (
+    $env:OS -eq 'Windows_NT' -and
+    (Test-Path -LiteralPath "$env:SystemRoot\System32\tar.exe" -PathType Leaf)
+) {
+    "$env:SystemRoot\System32\tar.exe"
+} else {
+    'tar'
+}
+# 六仓拆分（2026-08-12）后本副本与 consema-rs/scripts/verify-package-archives.ps1
+# 并存：本仓根无 Cargo.toml/workspace，脚本须从 consema-rs 检出执行（cargo
+# metadata/package 解析 consema-rs 工作区）；两副本应保持同步，母仓副本为记录
+# 载体，执行路径以 consema-rs 副本为准（docs/release-process-0.13.0.md §2.2）。
 $cargo = if ($env:CONSEMA_CARGO) { $env:CONSEMA_CARGO } else { 'cargo' }
 $targetDirectory = if ($env:CARGO_TARGET_DIR) {
     [IO.Path]::GetFullPath($env:CARGO_TARGET_DIR)
@@ -209,7 +226,7 @@ try {
     New-Item -ItemType Directory -Path $temporaryRoot | Out-Null
 
     foreach ($artifact in $artifacts) {
-        $entries = @(& tar -tf $artifact.Archive)
+        $entries = @(& $tarCommand -tf $artifact.Archive)
         if ($LASTEXITCODE -ne 0) {
             throw "cannot list package archive: $($artifact.Archive)"
         }
@@ -226,7 +243,7 @@ try {
             }
         }
 
-        & tar -xzf $artifact.Archive -C $temporaryRoot
+        & $tarCommand -xzf $artifact.Archive -C $temporaryRoot
         if ($LASTEXITCODE -ne 0) {
             throw "cannot extract package archive: $($artifact.Archive)"
         }

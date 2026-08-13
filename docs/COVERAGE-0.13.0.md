@@ -3,9 +3,14 @@
 - 报告体例：由 `scripts/coverage.ps1` 整体生成（政策文本也在脚本内；禁止手改数字块）。
   本文件是 0.13.0 门禁 M3 的“报告数值入库”载体（gate plan §4 M3、§7 验收表：
   “coverage 可复现报告”）。
-- 取代一次性数字：CHANGELOG.md:176 与 RELEASE-0.8.0.md:98 的 84.65% regions /
+- 取代一次性数字：CHANGELOG.md:219 与 RELEASE-0.8.0.md:98 的 84.65% regions /
   82.73% functions / 86.59% lines 是单次辅助报告，无脚本、无工件、不可复现；自本
   报告起 coverage 由常设脚本在固定 commit 上产出，任何数字变化都来自脚本运行。
+- **副本状态注记（2026-08-13）**：本文件为 2026-08-07 commit 9c1ede2 的测量记录
+  （86.51/82.82/87.91）；2026-08-13 已重测并入库的**权威副本**在
+  consema-rs/docs/COVERAGE-0.13.0.md（commit d7d1554，86.79/83.08/88.20，
+  脚本执行位置随六仓拆分迁至 consema-rs/scripts/coverage.ps1）——本副本保留为
+  历史测量记录，现行数字以 consema-rs 副本为准。
 
 
 
@@ -88,7 +93,7 @@ coverage.crate consema-yaml regions=85.23 functions=88.21 lines=87.36
 ## Coverage 政策（路线图 §18.3 落地）
 
 1. **Coverage 不替代语义证明。** 本报告的百分比只是回归探测器。质量证据的权威
-   来源是 conformance 508/508 向量、byte-exact round-trip 证明、hardening 测试、
+   来源是 conformance 18 套向量（519 cases；2026-08-12 P2-B 补强前为 508）、byte-exact round-trip 证明、hardening 测试、
    差分 oracle、fuzz（0.13.0 M2/M8）与 API 审查（M4）；任何发布记录都不得把单一
    coverage 百分比当作质量证明引用。本报告取代 CHANGELOG.md:176 的一次性数字，
    也不再制造新的单次数字。

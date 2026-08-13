@@ -2,6 +2,11 @@
 # §19.4 "signed tag 与 release artifact"). Covers the two signing paths of
 # the release supply chain:
 #
+# 注（2026-08-13）：六仓拆分后本脚本的 cargo metadata 从启动 cwd 解析
+# workspace——母仓根已无 Cargo.toml，必须在 consema-rs 检出内执行
+# （-RepoRoot 默认值是本脚本父目录，与实际 cargo 解析根是两个互不相关的根；
+# 发布检查单命令见 docs/release-process-0.13.0.md §7，均按 consema-rs 执行）。
+#
 #   -SignTag v0.13.0
 #       GPG-sign the release tag: git tag -s -a v0.13.0 -m "Consema 0.13.0"
 #       and immediately verify it with git tag -v. A tag that already

@@ -76,7 +76,18 @@ if ($isWindows) {
 }
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
-if ($RustWorkspace -eq '') { $RustWorkspace = Join-Path $repoRoot 'consema-rs' }
+# -RustWorkspace 默认值按六仓并排布局检测（rc-soak-stage1-disk-drill.md §2）：
+# 六仓并排检出时（consema-rs 与母仓同级），从母仓根向上取并排 consema-rs；
+# 嵌套目录假设（<repoRoot>\consema-rs）仅作为拆分前布局的兼容回退，两者都
+# 不存在时由后续 sanity check 明确报错——不静默使用错误路径。
+if ($RustWorkspace -eq '') {
+    $sideBySide = Join-Path (Split-Path -Parent $repoRoot) 'consema-rs'
+    if (Test-Path (Join-Path $sideBySide 'Cargo.toml')) {
+        $RustWorkspace = $sideBySide
+    } else {
+        $RustWorkspace = Join-Path $repoRoot 'consema-rs'
+    }
+}
 $RustWorkspace = [System.IO.Path]::GetFullPath($RustWorkspace)
 if ($FixturesDir -eq '') { $FixturesDir = Join-Path $repoRoot 'conformance\fixtures' }
 if ($VolumeDir -eq '') {

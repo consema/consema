@@ -27,8 +27,10 @@
 - `oracles/dotnet-ini-v1/`：固定 .NET SDK 10.0.302 / `IniConfigurationProvider` 10.0.10 的扁平化、大小写等价、引号与重复拒绝行为，共 7 个差分 case；
 - `oracles/windows-ini-v1/`：固定 Windows wide profile API、`kernel32.dll` 与 Windows build 的检索/枚举行为，共 5 个差分 case；
 - `oracles/qt-ini-v1/`：固定 Qt 6.10.2 `QSettings::IniFormat` 与官方 MinGW 13.1.0 的 portable shared subset，共 4 个差分 case；
+- `oracles/hcl-go-v1/`：固定 hashicorp/hcl v2.21.0 + go-cty v1.13.0 Go module 的 HCL accept/reject 差分行为，共 29 个 case（`skip_path` 文档化）；
+- `oracles/plist-macos-v1/`：固定 macOS Foundation/plutil 的 plist 差分行为，共 7 个 case（`skip_path` 文档化）；
 - `corpora/json5-v2.2.3.json`：固定到 JSON5 官方 `v2.2.3`/`c3a7524` 的 43 个接受与 39 个拒绝输入（文件内 82 项；门禁口径 83 = 82 + 1 个完整真实夹具），记录上游来源、Git blob、LF 存储变换和 MIT 许可；
-- `corpora/mutation-v1.json`：mutation 语料（46 fixtures / 174,921 cases + regressions 数组，0.13.0 gate plan M2）：逐 fixture 字节 mutation 全集 + fuzz 回归输入；确定性重放生成，`-- --check` 门禁保证与生成器同步（新增回归条目永久入 corpus，见 `corpora/README.md`）；
+- `corpora/mutation-v1.json`：mutation 语料（46 fixtures / 174,921 cases + regressions 数组，0.13.0 gate plan M2）：逐 fixture 字节 mutation 全集 + fuzz 回归输入；确定性重放生成（`gen_mutation_corpus --check` 可人工校验与生成器同步——非常设门禁：母仓与 consema-rs 的 CI/测试均未调用该检查，如实记录；新增回归条目永久入 corpus，见 `corpora/README.md`）；
 - `differential/`：跨语言差分 case 集单一权威（byte-parity `cases.json` 68 / `normalized/cases.json` 108 / `protocol-exchange/cases.json` 83），2026-08-12 由 `00c850d` 自 `go/conformance/differential/` 迁入；五语言 harness 与 verify 脚本统一从本目录取数，各语言侧测试断言精确计数（68/108/83），任何一侧漂移即红；
 - `fixtures/json5/package-json5-v2.2.3.json5`：官方完整真实 JSON5 配置夹具；
 - `fixtures/real-world/`：覆盖 package JSON、TypeScript/VS Code JSONC 与服务 JSON5 的非专有典型项目配置；
@@ -36,6 +38,9 @@
 - `fixtures/yaml/`：Kubernetes、GitHub Actions、Compose 与 anchor-heavy 自有 MIT 工程夹具，无 secret 或第三方复制内容；
 - `fixtures/ini/`：桌面应用、.NET 风格服务、Python 工具、mixed-newline 与显式 CP1252 自有 MIT 工程夹具；
 - `fixtures/properties/`：logging、localization、build tool、Windows path、continuation、Latin-1 与 Java UTF-16 edge 自有 MIT 工程夹具；
+- `fixtures/hcl/`：tf/ 与 tfvars/ 真实 HCL 工程夹具（0.16.0-0.18.0 交付家族，各自 README 记录来源/许可证）；
+- `fixtures/plist/`：plist XML/binary 真实工程夹具（0.17.0 交付家族，各自 README 记录来源/许可证）；
+- `fixtures/xml/`：Maven/Spring/logging/app-server/namespaced XML 工程夹具（0.17.0 交付家族，各自 README 记录来源/许可证）；
 - `corpora/licenses/yaml-test-suite-MIT.txt`：固定官方 YAML suite 的许可证证据；完整 402-case 上游数据由可复现 adapter 从固定 tag/commit 执行，不复制进仓库。
 
 每个 case 固定包含：

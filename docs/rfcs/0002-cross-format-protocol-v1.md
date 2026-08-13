@@ -1,6 +1,6 @@
 # RFC 0002: Cross-format protocol v1
 
-- Status: Accepted for Consema 0.3.0 implementation
+- Status: Implemented in Consema 0.3.0
 - Date: 2026-08-04
 - Scope: language-neutral protocol objects shared by every format family
 

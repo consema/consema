@@ -1,6 +1,6 @@
 # RFC 0007: YAML family profiles and safety v1
 
-- Status: Accepted for Consema 0.7.0 implementation
+- Status: Implemented in Consema 0.7.0
 - Date: 2026-08-04
 - Scope: YAML 1.2 Core and 1.1 compatibility profiles, raw source and lossless
   document facts, native serialization/representation semantics, query,

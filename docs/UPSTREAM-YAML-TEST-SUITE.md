@@ -47,6 +47,11 @@ Run on Windows PowerShell:
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/run-yaml-test-suite.ps1
 ```
 
+（注：六仓拆分后母仓根无 Cargo.toml——本脚本第一步 `cargo build --locked
+-p consema-conformance --bin consema-yaml-test-adapter` 在母仓原位必然失败
+（exit 101）；需先从 consema-rs 检出运行，或在本仓 scripts/ 原位仅作记录
+载体；无 CI job 执行本脚本。）
+
 The script clones the exact data tag when absent, verifies the peeled commit,
 builds `consema-yaml-test-adapter` from the locked workspace, and writes a TSV
 record for all 402 cases under `target/`. Each row contains the case ID,

@@ -45,9 +45,9 @@ cargo run --locked --offline --release -p consema-conformance --example hcl_base
   每次调用校验 exit 0）；请求记录文件（`cli.request@1` / `cli.edit-request@1` /
   `cli.convert-request@1`）形状与钉版 digest 照 §10.2 末段；批量语料 = 100 份
   `ini/desktop-settings.ini` 字节相同副本（每次 apply 前重新生成）。
-- 命令清单照 §10.2 的 25 行（inspect ×9、query ×2、materialize ×4、conformance、
-  plan、apply、S1-S4 场景 ×4、convert C1-C5 ×5）；场景行迭代数：S3 N=30、
-  S4 N=1、C1-C5 N=30（§11/§12）。
+- 命令清单照 §10.2 的 28 行（inspect ×13、query ×3、materialize ×4、conformance、
+  plan、apply、convert C1-C5 ×5；S1-S4 场景行为 SDK 行，不在 CLI 清单内）；
+  场景行迭代数：S3 N=30、S4 N=1、C1-C5 N=30（§11/§12）。
 - 预计全量 -Check ~25-30 分钟（§11）。
 
 ### 2.3 通过/失败判定（§11 + §8 item 3）
@@ -64,9 +64,9 @@ cargo run --locked --offline --release -p consema-conformance --example hcl_base
   (v) 记录公开（引用进 CHANGELOG）。
 - **禁止 benchmark gaming**（§8 item 6）：关闭诊断/无损覆盖/limits 的配置本身即违例。
 
-## 3. Go 侧基准趋势记录（go/README.md:749-767）
+## 3. Go 侧基准趋势记录（go/README.md:758-816）
 
-- 定位：`consema-go/go/README.md` "## Benchmark baseline (0.19.0 G5.4)"。
+- 定位：`consema-go/go/README.md` "## Benchmark baseline (0.19.0 G5.4)"（:758 起）。
 - 命令（在 `consema-go` 检出）：
 
 ```text
@@ -74,7 +74,7 @@ cd go
 go test -bench=. -benchtime=1s ./json/ ./toml/ ./yaml/ ./ini/ ./properties/ ./xml/ ./plist/ ./hcl/
 ```
 
-- **无冻结预算**（go/README.md:749-752："no frozen budget; that is a Rust-side
+- **无冻结预算**（go/README.md:761："no frozen budget; that is a Rust-side
   discipline"）——Go 侧只有趋势记录，不触发 §8 门禁；**>10% 回退的判定惯例**
   （2026-08-10 首跑先例）：比值 >1.10 标注"疑似回退（负载状态，需空闲复测确认）"，
   无代码回退结论须附依据（同会话其它项更快/无代码改动/GC 争抢特征）。
@@ -89,7 +89,7 @@ go test -bench=. -benchtime=1s ./json/ ./toml/ ./yaml/ ./ini/ ./properties/ ./xm
 
 - 环境：Windows 11 10.0.26200 / i9-13900HX；Rust <ver>；consema-rs HEAD <commit>；
   空闲状态：fuzz 驱动已关账（C-2 关闭时间 <…>），其他后台负载 <…>
-- 执行：§2.1 SDK 7 harness（15 samples）+ §2.2 CLI 行（N=200/S3=30/S4=1/C1-C5=30/
+- 执行：§2.1 SDK 6 harness（15 samples）+ §2.2 CLI 行（N=200/S3=30/S4=1/C1-C5=30/
   plan=50/apply=20）；总墙钟 <…> 分钟
 - 结果：<逐行对照表：行 / 冻结 p50,p95,peak / 测得 p50,p95,peak / delta % / pass>
   （原始样本输出：<路径/行区间>）
@@ -117,5 +117,5 @@ go test -bench=. -benchtime=1s ./json/ ./toml/ ./yaml/ ./ini/ ./properties/ ./xm
 
 - `docs/BENCHMARKS-0.13.0.md`（冻结预算、§8-§12 机制；本手册的唯一数字来源）
 - `docs/rc-1.0.0-candidate.md` §4/§4.1（soak 计划、Go 首跑记录、fuzz 关账建议）
-- `consema-go/go/README.md` :749-767（Go 基准命令与 2026-08-10 记录）
+- `consema-go/go/README.md` :758-816（Go 基准命令与 2026-08-10 记录）
 - `docs/APPROVALS-0.13.0.md`（触发时创建，§9 模板）

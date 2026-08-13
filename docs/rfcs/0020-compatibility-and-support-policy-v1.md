@@ -168,9 +168,9 @@ Class rules:
 > Go public API surface, the yaml family intentionally has no dry-run
 > entry point in this window — `PlanEdit` explicitly rejects yaml
 > transactions with the registered `core.edit.operation-unsupported@1`
-> (RFC 0004 §17; `crates/consema-protocol/src/error_registry.rs:502`).
+> (RFC 0004 §17; `consema-rs/consema-protocol/src/error_registry.rs:502`).
 > The Rust yaml family publishes `dry_run`
-> (`crates/consema-yaml/src/edit.rs:554`); the Go-side boundary is a
+> (`consema-rs/consema-yaml/src/edit.rs:554`); the Go-side boundary is a
 > deliberate, documented API shape (go-implementation-plan §2.6 G5.5;
 > go/edits.go). Adding a Go yaml dry-run surface is a feature for the
 > post-1.0.0 window, not a blocker — recorded per the 2026-08-10 P2-2

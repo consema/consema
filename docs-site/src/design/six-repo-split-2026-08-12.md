@@ -35,7 +35,7 @@
 | 2. cases.json 差分集迁移 | `00c850d`（34 files，273+/84-） | 共享差分 case 集迁至 `conformance/differential/` 单一权威（five-language-ci-design §3.5 落地）：go embed → 运行时加载（`CONSEMA_DIFFERENTIAL_CASES_DIR` + upward probe），12 个 verify 脚本 + TS/Python/Kotlin harness 路径更新 |
 | 3. git subtree split 五分支 | （无新 commit，历史保留） | 五语言分支 commit 数实测：rs 179 / go 26 / ts 5 / py 7 / kt 7（`git rev-list --count <assembly>^`），历史完整保留 |
 | 4. 五仓组装 | rs `6bcb068`（201 files，193,987+/187-）、go `cb0aedc`（371 files）、ts `1faa03f`、py `00d9054`（260 files）+ py `1a15969`（de-nest 修正：assembly move 与 leftover worktree dirs 冲突）、kt `613ae2f` | Cargo.toml members 重写（15 crates 至仓库根，无 crates/ 目录）；include 路径 172 处 `../../../` → `../../`；conformance vendor 快照入仓（consema-rs 以此快照 + 计数钉为 CI 机制，见 §6；go/ts/py/kt 四仓 CI 经 `repository:` 多仓 checkout 从母仓 provision） |
-| 5. 母仓瘦身 | `2d7494f`（1448 files，96+/748,455-） | 删除全部语言目录；README 六仓导航；CI 重建为 oracles + digest 两 job（见 §6） |
+| 5. 母仓瘦身 | `2d7494f`（1448 files，96+/748,455-） | 删除全部语言目录；README 六仓导航；CI 重建为 oracles + shared-conformance-digest + check 三 job（见 §6） |
 | 6. 五仓推送 | （push，无 commit） | 五语言仓 `git push origin main`（origin 实测 = consema org 各仓） |
 | 7. 驱动迁移 | （见 §7） | `run_waves.ps1` 副本到 consema-rs，`-LedgerDir` 指向母仓账本，C-2 从 session 455 恢复累计 |
 

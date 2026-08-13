@@ -1,6 +1,10 @@
 # Consema 0.13.0 gate M7: SBOM generation (gate plan §4 M7, roadmap §19.4
 # "SBOM"; selection record in docs/release-process-0.13.0.md "SBOM 选型").
 #
+# 注（2026-08-13）：六仓拆分后本脚本的 cargo metadata 从启动 cwd 解析
+# workspace——母仓根已无 Cargo.toml，必须在 consema-rs 检出内执行
+# （docs/release-process-0.13.0.md §5；母仓 scripts/ 副本为记录载体）。
+#
 # Tool selection (recorded, with the rejected alternative):
 #   chosen:       cargo-sbom 0.10.0  (crates.io, MIT, psastras/sbom-rs)
 #   rejected:     cyclonedx-bom 0.8.1 (crates.io, Apache-2.0, CycloneDX org)

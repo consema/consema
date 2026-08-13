@@ -4,9 +4,9 @@
   RC 确认后启动）
 - 用途：指导基于 Consema 构建的配置管理平台完成接入——架构选型、变更记录
   格式、回滚流程、能力边界、机器协议消费、限制与分片、性能基线
-- 权威依据：[RFC 0015](rfcs/0015-cli-machine-protocol-and-batch-apply-v1.md)
-  （CLI 机器协议与 batch apply）、[产品路线图 §24 / §4.4](../Consema%201.0.0%20产品路线图与双语言落地设计.md)
-  （能力边界）、[cookbook](cookbook.md)（可复制配方）
+- 权威依据：[RFC 0015](../spec/rfcs/0015-cli-machine-protocol-and-batch-apply-v1.md)
+  （CLI 机器协议与 batch apply）、[产品路线图 §24 / §4.4](../concepts/roadmap-1.0.0.md)
+  （能力边界；站点为发布视图副本，权威在规范仓根目录原文）、[cookbook](cookbook.md)（可复制配方）
 
 ## 1. 定位：Consema 覆盖"配置内容处理"面
 
@@ -270,9 +270,9 @@ pilot-go-0.19.0.md §2.8 对照）：
    stale 场景）、cookbook §10（能力矩阵与 11 条已知边界）。
 3. **协议细节**：RFC 0015（信封 / exit 分类 / plan-result manifest /
    恢复语义 / 资源限制 / 错误代数）。
-4. **实测记录**：[pilot-0.13.0.md](pilot-0.13.0.md)（Rust CLI）、
-   [pilot-go-0.19.0.md](pilot-go-0.19.0.md)（Go CLI 对照）、
-   [BENCHMARKS-0.13.0.md](BENCHMARKS-0.13.0.md)。
+4. **实测记录**：[pilot-0.13.0.md](https://github.com/consema/consema/blob/main/docs/pilot-0.13.0.md)（Rust CLI）、
+   [pilot-go-0.19.0.md](https://github.com/consema/consema/blob/main/docs/pilot-go-0.19.0.md)（Go CLI 对照）、
+   [BENCHMARKS-0.13.0.md](https://github.com/consema/consema/blob/main/docs/BENCHMARKS-0.13.0.md)。
 5. **能力现状基线**：8 families / 16 profiles / 21 query domains /
    16 operation registries / 187 诊断码（v7 registry）；CLI 11 命令
    （RFC 0015 §6.1），机器 schema 冻结为 v1 candidate（路线图 §15.6）。

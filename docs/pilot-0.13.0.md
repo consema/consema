@@ -73,7 +73,7 @@ Recovered 行为由第 2.7 节（W7）覆盖。Properties 的 `java-properties.e
 
 **CLI 上不可执行（F-1）。** `xml.edit.set-attribute-value@1` 请求显式拒绝
 （exit 2，消息同 2.1 的 xml 变体）。namespace/mixed content 保持能力在
-SDK 层（README.md:14 与 RFC 0012 的编辑事务），CLI 词表未接线。
+SDK 层（RFC 0012 的编辑事务；六仓拆分后母仓 README 不再承载 SDK 细节，见各语言仓 README），CLI 词表未接线。
 
 ### 2.4 W4 — plist XML/binary 中修改 typed value 并保持 representation contract
 
@@ -84,7 +84,7 @@ CLI 可执行的是同族 convert（XML → binary，含 `bplist00` 头，见 2.
 ### 2.5 W5 — HCL 中修改 literal attribute，不执行表达式
 
 **CLI 上不可执行（F-1）。** `hcl.edit.set-attribute-value@1` 请求显式拒绝
-（exit 2）。无求值语义在 SDK 层（README.md:16，`hcl.expression@1` 只承载
+（exit 2）。无求值语义在 SDK 层（SECURITY.md:36，`hcl.expression@1` 只承载
 语法事实）；CLI 的 convert 对 derived expression 原子失败（2.7 节）。
 
 ### 2.6 W6 — JSON ↔ TOML、JSON ↔ YAML 等可表示组合的 audited conversion
@@ -203,7 +203,7 @@ consema: error: apply: interrupted by SIGINT/SIGTERM: the result manifest keeps 
 
 | # | 指标 | 数值 | 测量方式 |
 |---|---|---|---|
-| 1 | exact unmodified round-trip rate | 2/2 = 100%（语义往返） | JSON→TOML→JSON 与 JSON→YAML→JSON 再转换值与源深度相等；字节级 round-trip 是库级门禁（18 套 suite 508/508，README.md:32），CLI 可观察代理 = 目标字节重解析闭包（convert 每次成功都执行） |
+| 1 | exact unmodified round-trip rate | 2/2 = 100%（语义往返） | JSON→TOML→JSON 与 JSON→YAML→JSON 再转换值与源深度相等；字节级 round-trip 是库级门禁（18 套 suite 519/519，README.md:56；2026-08-12 P2-B 补强前为 508/508），CLI 可观察代理 = 目标字节重解析闭包（convert 每次成功都执行） |
 | 2 | untouched-byte preservation rate | 97.7%/文件（编辑路径）；100%（stale 路径） | 每文件 1 个 replacement（4 字节值替换），177 字节文件 → 173/177；stale 文件 0 字节写入（s-03.ini 实测 `width=1440` 保持） |
 | 3 | silent-loss count | 0 | 19 个 convert 运行（12 成功 + 7 原子失败，第 2.6/2.7 节）全部 ExactOnly 或原子失败；成功信封 `core.conversion-report@1` 两阶段 fidelity 均为 Exact（抽查 INI→JSON 信封） |
 | 4 | authorized-loss report completeness | 完整 | 唯一授权转换通道为 `mapping_policy: UniqueStringEntriesToObject`（entry-mapping → object）；成功信封始终携带完整 `core.conversion-report@1`（source/target profile、projection/materialization fidelity、events、target snapshot） |
@@ -273,18 +273,18 @@ materializer（provenance/闭包重解析路径）修复并补入 BENCHMARKS 大
 根因不在 materializer 本身，而在逐 lookup 的坐标转换：`raw_byte_at` 每次
 调用对整源做一次 `from_utf8` 重校验（O(source) per call），YAML 每个
 lexeme/节点边界都走一次 → O(source × pieces) 的 O(n²) 形成形状（与 task
-#53 同一根因，见 `crates/consema-document/src/source.rs:1540-1548`）。
+#53 同一根因，见 `consema-rs/consema-document/src/source.rs:1540-1548`）。
 
 修复（三处配合，各带回归测试）：
 
-- `crates/consema-yaml/src/offsets.rs:1-80`——`RawByteResolver`：单遍正向
+- `consema-rs/consema-yaml/src/offsets.rs:1-80`——`RawByteResolver`：单遍正向
   行走的 decoded-scalar → raw-byte 偏移解析器，每次 lookup 摊还 O(1)，
   O(source + lookups) 总量；与 `raw_byte_at` 逐点相等测试（:90-156）。
-- `crates/consema-document/src/source.rs:466-509`——`DecodedStorage::RawUtf8`
+- `consema-rs/consema-document/src/source.rs:466-509`——`DecodedStorage::RawUtf8`
   保留构造时已校验的文本，`decoded_text`/`raw_byte_at` 变 O(1) 视图；
   回归网 `per_call_coordinate_conversion_does_not_rescan_large_utf8_sources`
   （:1538-1589）。
-- `crates/consema-xml/src/parser.rs:2027-2052`——xml 的 `raw_offset` UTF-8
+- `consema-rs/consema-xml/src/parser.rs:2027-2052`——xml 的 `raw_offset` UTF-8
   恒等快捷（同根因的 xml 侧修复）。
 
 后修复实测（同一机器、同一请求形状）：`big-nf5000`（335,312 B）JSON → YAML
@@ -296,7 +296,7 @@ lexeme/节点边界都走一次 → O(source × pieces) 的 O(n²) 形成形状�
 **F-2 复核修正（audit B-8，2026-08-07）：** 上述 "1.01 s、线性" 结论未完全
 复现：round-2 审计用重建输入测得嵌套形状 294-354 KB → 5.1-7.2 s（block 与
 flow 皆然）、2000→4000 items 1.24 s → 7.4 s（≈6×）。根因是修复后残余的两处
-独立超线性（均在 `crates/consema-yaml/src/`）：
+独立超线性（均在 `consema-rs/consema-yaml/src/`）：
 
 1. **Composer 覆盖 span 滞后解析**（`native.rs`）：集合的 covering span 在子
    节点之后才解析，单遍 `RawByteResolver` 游标回退 → 每个嵌套集合重走全文
@@ -324,9 +324,9 @@ consema: error: convert: flag '--output' is not available in this build: convert
 ```
 
 exit 1（usage）。帮助文本 `--output <path> result or manifest write target`
-与 README.md:418-419（"目标字节在 stdout，`--output <path>` 显式落盘"）对
-convert 不成立（plan/apply 的 `--output` 正常）。M6 已修正 cookbook §5
-表述；README 与帮助文本需随 fsio 落地同步（报告给 0.13.0 收口）。
+与 CHANGELOG.md:112 的口径（"materialize/convert 的目标字节默认只到 stdout；
+`--output <path>` 显式落盘"）对 convert 不成立（plan/apply 的 `--output` 正常）。M6 已修正 cookbook §5
+表述；帮助文本需随 fsio 落地同步（报告给 0.13.0 收口）。
 
 ### F-4（已修复，文档缺陷）— cookbook §5 的 convert-request.json 块尾多出 `]}`，复制即被拒绝
 

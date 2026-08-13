@@ -54,6 +54,20 @@ if (-not $isWindows) {
     exit 3
 }
 
+# -RustWorkspace 默认值按六仓并排布局检测（rc-soak-stage1-disk-drill.md §2）：
+# 六仓并排检出时（consema-rs 与母仓同级），从母仓根向上取并排 consema-rs；
+# 嵌套目录假设（<repoRoot>\consema-rs）仅作为拆分前布局的兼容回退，两者都
+# 不存在时由后续 Fail-Blocked 明确报错——不静默使用错误路径。
+if ($RustWorkspace -eq '') {
+    $repoRoot = Split-Path -Parent $PSScriptRoot
+    $sideBySide = Join-Path (Split-Path -Parent $repoRoot) 'consema-rs'
+    if (Test-Path (Join-Path $sideBySide 'Cargo.toml')) {
+        $RustWorkspace = $sideBySide
+    } else {
+        $RustWorkspace = Join-Path $repoRoot 'consema-rs'
+    }
+}
+
 # --- preconditions (honest environment gate, 需授权环境) --------------------
 function Fail-Blocked([string]$Reason) {
     Write-Host 'RC soak drill 5 (disk full) — Windows variant: environment blocked (recorded, not executed)'

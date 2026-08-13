@@ -36,9 +36,22 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false
-      - uses: peaceiris/actions-mdbook@ee69d230fe19748b7abf22df32acaa93833fad08 # v2.0.0
-        with:
-          mdbook-version: '0.5.4'
+      # mdbook 0.5.4 install: pinned release tarball with sha256 verification
+      # (replaced peaceiris/actions-mdbook, which downloaded without a
+      # checksum — the org supply-chain posture pins sha256 for every
+      # downloaded toolchain, 2026-08-13).
+      - name: install mdbook 0.5.4 (pinned tarball + sha256)
+        shell: bash
+        run: |
+          set -euo pipefail
+          url='https://github.com/rust-lang/mdBook/releases/download/v0.5.4/mdbook-v0.5.4-x86_64-unknown-linux-gnu.tar.gz'
+          expected='3f28de05dafca9d0f2eab99c662116b0e37b89b1d96a08f8f430b9eeae958cd7'
+          curl -fsSL "$url" -o /tmp/mdbook.tar.gz
+          echo "$expected  /tmp/mdbook.tar.gz" | sha256sum -c -
+          mkdir -p "$HOME/.cargo/bin"
+          tar -xzf /tmp/mdbook.tar.gz -C "$HOME/.cargo/bin" mdbook
+          chmod +x "$HOME/.cargo/bin/mdbook"
+          "$HOME/.cargo/bin/mdbook" --version
       - name: build book
         working-directory: docs-site
         run: mdbook build

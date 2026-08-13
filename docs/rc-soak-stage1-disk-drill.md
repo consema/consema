@@ -33,7 +33,7 @@
 |---|---|---|
 | 运行环境 | Linux runner（GitHub Actions ubuntu 或等权自托管），root 或免密 sudo | `id -u` 或 `sudo -n true` |
 | 工具链 | bash、coreutils（dd/df）、mount/umount、pwsh | `command -v bash dd df mount` |
-| consema-rs 检出 | 六仓并排布局中的 `consema-rs` 检出（Cargo.toml 在根） | 脚本 `-RustWorkspace` 默认 `<仓根>\consema-rs` |
+| consema-rs 检出 | 六仓并排布局中的 `consema-rs` 检出（Cargo.toml 在根） | 脚本 `-RustWorkspace` 默认：优先并排检测（母仓同级 `consema-rs`，Cargo.toml 存在即用），否则回退嵌套假设 `<仓根>\consema-rs` 并在不存在时明确报错——并排布局下不传参也能解析 |
 | 规范仓检出 | 母仓 conformance/（fixtures 单一权威） | 脚本 `-FixturesDir` 默认 `<仓根>\conformance\fixtures` |
 | consema CLI | `consema-rs/target/release/consema`（Linux）；缺失时脚本自动 `cargo build --release --locked -p consema` | `-SkipBuild` 可禁止自动构建 |
 | 夹具钉版 | `conformance/fixtures/ini/desktop-settings.ini` = 177 B，sha256 `b01f173b34c8e4121150432b30e64f6a72a150b31d9afcbd806ebfe17e6a6ff8`（BENCHMARKS-0.13.0.md §3 钉版；脚本断言，不符即红） | 脚本内置 |
@@ -45,6 +45,8 @@
 ```text
 # 一键执行（默认：tmpfs 64 MiB 小卷、20 份 desktop-settings.ini 夹具、
 # window:width→1600 编辑请求（cookbook.md §6）、填至 ≤48 KiB free）：
+# 注：-RustWorkspace 默认已做并排布局检测（六仓并排检出即自动解析）；
+# 非并排布局仍须显式传参。
 pwsh -NoProfile -ExecutionPolicy Bypass -File scripts/rc-soak-disk-full.ps1
 
 # 常用参数：

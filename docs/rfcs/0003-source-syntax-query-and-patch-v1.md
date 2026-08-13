@@ -1,6 +1,6 @@
 # RFC 0003: Raw source, syntax query, and SourcePatch v1
 
-- Status: Accepted for Consema 0.4.0 implementation
+- Status: Implemented in Consema 0.4.0
 - Date: 2026-08-04
 - Scope: raw source facts, decoded locations, binary regions, lossless syntax query, cursor completion, and byte patches
 

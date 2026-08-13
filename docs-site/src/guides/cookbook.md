@@ -2,8 +2,11 @@
 
 本文是任务导向的 `consema` CLI 配方集。每条配方的命令都在 0.12.0 开发工作区
 （Windows 11 Pro 10.0.26200，`target/release/consema.exe`）上实际执行过，
-输出按原样粘贴。命令与输出中的路径以你的实际环境为准；请求文件内容（RFC
-0015 §3.2 严格解码的 canonical tagged JSON）逐字节给出，复制即用。
+输出按原样粘贴。注：机器输出示例的 `product_version` 字段为 0.8.0——0.12.0
+CLI 里程碑的 workspace 产品版本（Consema 版本治理下 CLI 里程碑 0.12.0 携带
+workspace 版本 0.8.0）；现行 PRODUCT_VERSION 为 1.0.0-rc.1。命令与输出中的
+路径以你的实际环境为准；请求文件内容（RFC 0015 §3.2 严格解码的 canonical
+tagged JSON）逐字节给出，复制即用。
 
 机器可读输出、exit code 语义与命令边界的权威定义见
 `docs/rfcs/0015-cli-machine-protocol-and-batch-apply-v1.md`、
@@ -141,7 +144,9 @@ match 7: $.devDependencies (key devDependencies) = {typescript: "5.6.3"}
 syntax 查询域对 Recovered 可查询已证明部分（IMPLEMENTATION §4.3/§4.5/
 §4.6 的 INI/HCL/XML 恢复语义）。native 查询域（如
 `json.native-semantic-query@1`）与本版本的 xml/plist/hcl 源在 query 上未
-接线，显式拒绝而非不完整结果（0.13.0 API 评审项，见第 10 节）。
+接线，显式拒绝而非不完整结果（0.13.0 API 评审项，见第 10 节）。〔superseded
+注记：xml/plist/hcl 便携域查询已随 1.0.0-rc.1 接线（query_cmd.rs:553-557
+分派、0 skipped 全绿），本节为 0.12.0 时点记录〕
 
 机器模式：`--json` 时 stdout 只有一行 `core.cli-output@1` 信封：
 

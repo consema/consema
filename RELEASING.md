@@ -13,7 +13,11 @@
   推进统一）；各仓 CI `check-version-consistency` 门禁各自守护（manifest
   与 README `Version:` 行一致）；**1.0.0 首发时**按同版本五仓齐发执行。
 - **版本 bump 纪律**：改版本必须同步改本仓 README 的版本行，否则
-  `check-version-consistency` 门禁失败——这是有意的护栏。
+  `check-version-consistency` 门禁失败——这是有意的护栏（如实注记：五语言仓
+  门禁以 `grep -qF "Version: $version" README.md` 子串匹配——rc→GA 方向
+  （1.0.0-rc.1 → 1.0.0）新串是旧串前缀必然命中，忘改 README 不被拦截；
+  反向 bump 会被正确拦截，行为不对称；精确匹配（行锚定）修正在六仓门禁侧
+  跟踪）。
 
 ## 2. CHANGELOG 策展
 
@@ -36,7 +40,10 @@
 6. [ ] 依次推送各仓 `vX.Y.Z` tag（发布由各仓 release workflow 自动执行；
        **不要手动执行发布命令**，处置失败除外）。
 7. [ ] 发布后核对：crates.io（14 crate）/ npm / PyPI / Maven Central /
-       Go proxy 各版本可见；GitHub Releases 存在。
+       GitHub Releases 存在；Go proxy 各版本可见（如实注记：consema.dev
+       域名 DNS NXD 且模块位于 consema-go/go/ 子目录无路径后缀，Go proxy
+       目前无法拾取——发布机制以 GitHub Release 建档为准，proxy 收录待
+       域名与模块路径就绪）。
 8. [ ] 版本同步决策记录：本次是否五仓齐发，写入 CHANGELOG 与决策记录。
 
 ## 4. 各仓发布机制与用户侧凭证清单
@@ -47,7 +54,7 @@
 | consema-ts | npm（`@consema/consema`） | tag v* | `npm publish --provenance`（id-token: write）+ `NPM_TOKEN` | npm 生成 publish token → GitHub secret `NPM_TOKEN`；canary（zod 模式）P2 |
 | consema-py | PyPI（`consema`） | tag v* | trusted publishing (OIDC) 标准做法，无密码 | PyPI 项目设置 → Publishing → 添加 GitHub publisher（consema/consema-py，workflow `release.yml`） |
 | consema-kt | Maven Central（`dev.consema:consema-kotlin`） | tag v* | `gradle publish`（Central Portal deploy 端点）+ PGP 签名 | Sonatype Portal 认领 `dev.consema` namespace + deploy token → secrets `OSSRH_USERNAME`/`OSSRH_PASSWORD`；PGP 密钥 → secrets `SIGNING_KEY`/`SIGNING_PASSWORD`；凭证专人 |
-| consema-go | Go proxy（`consema.dev/consema`）+ GitHub Release | tag v* | tag 即发布；workflow 重跑门禁 + `action-gh-release` 建 Release | 无凭证；注意 tag 不可变（proxy 收录后不可删改）；goreleaser P2 |
+| consema-go | GitHub Release（go proxy 待域名与模块路径就绪） | tag v* | tag 即发布；workflow 重跑门禁 + `action-gh-release` 建 Release（如实注记：`consema.dev/consema` 域名 DNS NXD 且模块位于 `go/` 子目录无路径后缀，Go proxy 目前无法拾取——当前以 GitHub Release 建档为发布记录） | 无凭证；注意 tag 不可变（proxy 收录后不可删改）；goreleaser P2 |
 | consema（规范仓） | 无 registry 发布 | — | 发布纪律载体 | — |
 
 ## 5. 参考

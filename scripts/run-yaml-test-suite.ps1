@@ -4,6 +4,11 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+# 注（2026-08-13）：六仓拆分后母仓根无 Cargo.toml/workspace——本脚本的
+# `cargo build --locked -p consema-conformance` 在母仓原位必然失败（exit 101）；
+# 须从 consema-rs 检出运行（脚本保留于本仓 scripts/ 作记录载体，无 CI job
+# 执行；官方 yaml-test-suite 402 项的记录见 fuzz-evidence 与 conformance/README
+# 上游 gate 段）。
 $workspaceRoot = Split-Path -Parent $PSScriptRoot
 $expectedCommit = '6e6c296ae9c9d2d5c4134b4b64d01b29ac19ff6f'
 $expectedTag = 'data-2022-01-17'

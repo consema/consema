@@ -6,10 +6,11 @@
   与 §10（实施实况）；`docs/six-repo-split-2026-08-12.md` §2/§6（六仓布局与
   conformance 仲裁层）。
 - 目标：五语言差分 harness 在 RC soak 阶段的**追加运行**——C-2 关账后一键重跑
-  各语言仓 `scripts/` 下的全部 12 个 verify 脚本（母仓不持有 verify 脚本），
+  各语言仓 `scripts/` 下的全部 13 个 verify 脚本（母仓不持有 verify 脚本；
+  consema-go 4 个——含 go-verify-shared-conformance.ps1——ts/py/kt 各 3 个），
   验证五语言与 Rust 锚的全部差分面（字节 parity /
-  normalized 双向 / protocol exchange 双向）在当前 release-candidate 代码状态下
-  依然全绿，并记录结果。
+  normalized 双向 / protocol exchange 双向 / shared-conformance）在当前
+  release-candidate 代码状态下依然全绿，并记录结果。
 - **本手册只含流程与记录模板；执行本身不在本准备批次内。**
 
 ## 1. 六仓检出布局（跨仓 checkout 说明）
@@ -32,7 +33,9 @@
   `normalized/cases.json`（108）、`protocol-exchange/cases.json`（83）
   （five-language-ci-design.md §3.5，2026-08-12 迁移；母仓与 consema-rs 的
   conformance/ 内容逐字节一致——母仓维护、consema-rs 镜像快照，本机实测
-  `cases.json` 0 差异）。
+  `cases.json` 0 差异；如实注记：两树有 2 个文件不同（conformance/README.md
+  与 conformance/corpora/README.md——rs vendored 副本未随母仓 6638467/fb6fc92
+  更新，待重新 vendor），case 数据文件全部一致）。
 - **Rust 锚侧** = `consema-rs` 检出：四个 Rust 例子
   （`emit_parity_bytes.rs` / `emit_normalized_results.rs` / `emit_protocol_exchange.rs`
   / `emit_conformance_reports.rs`，`consema-conformance/examples/`）只消费 case 文件
@@ -40,8 +43,9 @@
 - **母仓 `scripts/` 不持有 verify 脚本**：拆分前残留的 13 个 `*-verify-*.ps1`
   （引用 `go/`、`typescript/`、`kotlin/`、`crates/consema-conformance/` 等已不存在
   路径，运行必失败）已于 2026-08-13 删除，同功能脚本在各语言仓——**执行一律用
-  各语言仓自带的 `scripts/L-verify-*.ps1`**（拆分批次已适配多仓模式，新增
-  `-RustWorkspace` 参数）。
+  各语言仓自带的 `scripts/{go,ts,python,kotlin}-verify-*.ps1`**（拆分批次已
+  适配多仓模式，新增 `-RustWorkspace` 参数；go 侧含
+  `go-verify-shared-conformance.ps1`）。
 
 ## 2. 前置条件
 
@@ -75,7 +79,7 @@ Copy-Item -LiteralPath "$spec\docs\fc-manifest-0.13.0.json" `
 不 provision 时脚本默认路径失败——这正是 CI 已修复的时序坑
 （six-repo-split-2026-08-12.md §4 根因 1），手册如实要求先 provision。
 
-### 3.2 运行 12 个 verify 脚本
+### 3.2 运行 13 个 verify 脚本
 
 每个脚本必须显式传 `-RustWorkspace`（本地并排布局下默认值
 `<语言仓>\consema-rs` 不存在；CI 里它是嵌套 checkout，本地是并排检出）：
@@ -88,14 +92,14 @@ Copy-Item -LiteralPath "$spec\docs\fc-manifest-0.13.0.json" `
 # （ts/python/kotlin 同构，脚本名前缀相应替换）
 ```
 
-全量清单（12 个脚本 × 各 1 次 = 12 次执行）：
+全量清单（13 个脚本 × 各 1 次 = 13 次执行）：
 
-| 语言仓 | byte parity | normalized differential | protocol exchange |
-|---|---|---|---|
-| consema-go | `go-verify-byte-parity.ps1` | `go-verify-normalized-differential.ps1` | `go-verify-protocol-exchange.ps1` |
-| consema-ts | `ts-verify-byte-parity.ps1` | `ts-verify-normalized-differential.ps1` | `ts-verify-protocol-exchange.ps1` |
-| consema-py | `python-verify-byte-parity.ps1` | `python-verify-normalized-differential.ps1` | `python-verify-protocol-exchange.ps1` |
-| consema-kt | `kotlin-verify-byte-parity.ps1` | `kotlin-verify-normalized-differential.ps1` | `kotlin-verify-protocol-exchange.ps1` |
+| 语言仓 | byte parity | normalized differential | protocol exchange | shared conformance |
+|---|---|---|---|---|
+| consema-go | `go-verify-byte-parity.ps1` | `go-verify-normalized-differential.ps1` | `go-verify-protocol-exchange.ps1` | `go-verify-shared-conformance.ps1` |
+| consema-ts | `ts-verify-byte-parity.ps1` | `ts-verify-normalized-differential.ps1` | `ts-verify-protocol-exchange.ps1` | —（未合入，随 runner-CLI 批次） |
+| consema-py | `python-verify-byte-parity.ps1` | `python-verify-normalized-differential.ps1` | `python-verify-protocol-exchange.ps1` | —（未合入，随 runner-CLI 批次） |
+| consema-kt | `kotlin-verify-byte-parity.ps1` | `kotlin-verify-normalized-differential.ps1` | `kotlin-verify-protocol-exchange.ps1` | —（未合入，随 runner-CLI 批次） |
 
 每个脚本的内部流水线（照各脚本头部注释与 CI job 语义）：
 
@@ -161,5 +165,5 @@ Copy-Item -LiteralPath "$spec\docs\fc-manifest-0.13.0.json" `
 - `docs/five-language-ci-design.md` §3/§10（harness 语义、CI 实况）
 - `docs/six-repo-split-2026-08-12.md` §2/§6（六仓布局、conformance 仲裁层、多仓 checkout 模式）
 - `docs/rc-1.0.0-candidate.md` §4.1（P2-7 基线：83/83+108/108+68/68）
-- 各语言仓 `scripts/L-verify-*.ps1`（执行载体）
+- 各语言仓 `scripts/{go,ts,python,kotlin}-verify-*.ps1`（执行载体；go 含 shared-conformance）
 - 母仓 `conformance/differential/`（case 集单一权威）

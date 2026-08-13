@@ -7,13 +7,20 @@
 #
 #   - oracles: differential oracles with documented skip paths (roadmap
 #     §14.12 "differential"), three-OS matrix. Honest-scope note: hosted
-#     runners have no pinned toolchain for the hcl/plist oracles, so their
-#     legs are documented skip (exit 3 = success); real differential
-#     execution happens on the pinned local host, not in this job.
+#     runners have no pinned toolchain for the hcl/plist oracles, so all
+#     legs take the documented skip path (exit 3 = success) on hosted
+#     runners; no real differential run of these oracles is observed in any
+#     repository (the pinned-host runs claimed in earlier revisions of this
+#     comment were never recorded — see the 2026-08-13 adversarial-audit
+#     disposition G113/G011). This job is the documented-skip standing
+#     check, not the real run.
 #   - shared-conformance-digest: recompute the aggregate sha256 of
 #     conformance/vectors/*.json and assert it equals the frozen record
-#     (docs/fc-manifest-0.13.0.json "conformance_suite.aggregate_sha256") so
-#     a vector added or removed without updating the record fails CI.
+#     (docs/fc-manifest-0.13.0.json "conformance_suite.aggregate_sha256",
+#     read from the manifest at runtime) so a vector added or removed
+#     without updating the record fails CI.
+#   - check: alls-green aggregate gate (if: always() + toJSON(needs)) — the
+#     branch-protection required check.
 #
 # No repository secrets are required.
 #
@@ -45,18 +52,18 @@ jobs:
   # target/oracles/go-1.26.5; when absent it exits 3 (documented skip). The
   # pinned runtime facts (go.os=windows, windows_build=10.0.26200.0) can
   # only match a pinned Windows host, so hosted runners take the skip path
-  # (exit 3) — real differential execution happens on the pinned local
-  # host (pinned Go 1.26.5 / Windows 10.0.26200 / pinned macOS toolchain);
-  # this job is the documented-skip standing check, not the real run.
-  # run-plist-macos-oracle.ps1: runs on macOS (plutil + pinned Swift
-  # toolchain per manifest runtime pins) and exits 3 on Windows/Linux
-  # (documented skip). On the macOS leg the runner label is the unpinned
-  # macos-latest image, so a host pin drift (macOS/Xcode/Swift version
-  # mismatch against the manifest runtime pins, plan risk R-2) also takes
-  # the documented skip (exit 3 with a stderr note) instead of failing;
-  # pinned hosts run the differential and any genuine failure still exits
-  # non-zero. Exit 3 is wired as success per the manifests' "skip_path"
-  # records; any other non-zero exit fails the job.
+  # (exit 3). Honest-scope note: no real differential run is observed in
+  # any repository — the manifest records the pinned runtime facts (Go
+  # 1.26.5 / Windows 10.0.26200 / pinned macOS toolchain for plist) but no
+  # pinned-host run (Windows or macOS) has ever been recorded; this job is
+  # the documented-skip standing check, not the real run.
+  # run-plist-macos-oracle.ps1: the manifest pins a macOS toolchain; hosted
+  # runners take the documented skip (exit 3 with a stderr note) on every
+  # leg, including the unpinned macos-latest image (host pin drift against
+  # the manifest runtime pins, plan risk R-2). No macOS execution has been
+  # observed or recorded in any repository. Exit 3 is wired as success per
+  # the manifests' "skip_path" records; any other non-zero exit fails the
+  # job.
   oracles:
     name: differential oracles (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
@@ -69,9 +76,9 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
         with:
           persist-credentials: false
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
-        with:
-          go-version: '1.26.5'
+      # No setup-go here: run-hcl-go-oracle.ps1 probes the pinned toolchain
+      # under target/oracles/go-1.26.5 and never uses PATH Go, so a
+      # setup-go step was a 100% dead step (removed 2026-08-13).
       - name: run differential oracles (exit 3 = documented skip = success)
         shell: pwsh
         run: |
@@ -117,7 +124,11 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          expected='cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a'
+          # Read the frozen record from the manifest at runtime (the
+          # manifest is the authority; a record update without this
+          # workflow syncing is exactly what should fail CI — a hardcoded
+          # literal would go unnoticed).
+          expected=$(python3 -c 'import json; d=json.load(open("docs/fc-manifest-0.13.0.json")); print(d["digests"]["conformance_suite"]["aggregate_sha256"])')
           vector_dir='conformance/vectors'
           : > /tmp/digest-input
           for f in $(LC_ALL=C ls "$vector_dir"/*.json | LC_ALL=C sort); do

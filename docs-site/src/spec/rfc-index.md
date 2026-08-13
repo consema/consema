@@ -6,14 +6,14 @@ RFC 0017–0019 编号在 `docs/rfcs/` 下保留未用（无对应文件），�
 
 | RFC | 标题 | 状态 | 本站 | 权威文件 |
 | --- | --- | --- | --- | --- |
-| 0001 | `toml.1.0@1` 原生语义、投影、查询与编辑契约 | Accepted | [本站](rfcs/0001-toml-1.0-profile.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0001-toml-1.0-profile.md) |
-| 0002 | Cross-format protocol v1 | Accepted（0.3.0） | [本站](rfcs/0002-cross-format-protocol-v1.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0002-cross-format-protocol-v1.md) |
-| 0003 | Raw source, syntax query, and SourcePatch v1 | Accepted（0.4.0） | [本站](rfcs/0003-source-syntax-query-and-patch-v1.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0003-source-syntax-query-and-patch-v1.md) |
+| 0001 | `toml.1.0@1` 原生语义、投影、查询与编辑契约 | Implemented（0.2.0） | [本站](rfcs/0001-toml-1.0-profile.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0001-toml-1.0-profile.md) |
+| 0002 | Cross-format protocol v1 | Implemented（0.3.0） | [本站](rfcs/0002-cross-format-protocol-v1.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0002-cross-format-protocol-v1.md) |
+| 0003 | Raw source, syntax query, and SourcePatch v1 | Implemented（0.4.0） | [本站](rfcs/0003-source-syntax-query-and-patch-v1.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0003-source-syntax-query-and-patch-v1.md) |
 | 0004 | Materialization, conversion, and structural edit v1 | Implemented（0.5.0） | [本站](rfcs/0004-materialization-conversion-and-structural-edit-v1.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0004-materialization-conversion-and-structural-edit-v1.md) |
 | 0005 | JSON family production profile and JSON5 v1 | Implemented（0.6.0） | [本站](rfcs/0005-json-family-production-v1.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0005-json-family-production-v1.md) |
-| 0006 | PortableGraph and PGCE v1 | Accepted（0.7.0） | [本站](rfcs/0006-portable-graph-and-pgce-v1.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0006-portable-graph-and-pgce-v1.md) |
-| 0007 | YAML family profiles and safety v1 | Accepted（0.7.0） | [本站](rfcs/0007-yaml-family-profiles-and-safety-v1.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0007-yaml-family-profiles-and-safety-v1.md) |
-| 0008 | Semantic model v5 graph and YAML protocol | Accepted（0.7.0） | [本站](rfcs/0008-semantic-model-v5.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0008-semantic-model-v5.md) |
+| 0006 | PortableGraph and PGCE v1 | Implemented（0.7.0） | [本站](rfcs/0006-portable-graph-and-pgce-v1.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0006-portable-graph-and-pgce-v1.md) |
+| 0007 | YAML family profiles and safety v1 | Implemented（0.7.0） | [本站](rfcs/0007-yaml-family-profiles-and-safety-v1.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0007-yaml-family-profiles-and-safety-v1.md) |
+| 0008 | Semantic model v5 graph and YAML protocol | Implemented（0.7.0） | [本站](rfcs/0008-semantic-model-v5.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0008-semantic-model-v5.md) |
 | 0009 | INI family profiles v1 | Implemented（0.8.0） | [本站](rfcs/0009-ini-family-profiles-v1.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0009-ini-family-profiles-v1.md) |
 | 0010 | Java Properties profiles v1 | Implemented（0.8.0） | [本站](rfcs/0010-java-properties-profiles-v1.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0010-java-properties-profiles-v1.md) |
 | 0011 | Semantic model v6 for line-oriented formats | Implemented（0.8.0） | [本站](rfcs/0011-semantic-model-v6.md) | [docs/rfcs](https://github.com/consema/consema/blob/main/docs/rfcs/0011-semantic-model-v6.md) |

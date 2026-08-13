@@ -1,6 +1,6 @@
 # RFC 0016: Go API mapping v1
 
-- Status: Accepted（2026-08-07 随 15-kind 契约映射修订；Go 实现 0.14.0 进行中）
+- Status: Accepted（2026-08-07 随 15-kind 契约映射修订；Go 实现已交付（0.14.0-0.19.0，1.0.0-rc.1 前哨））
 - Date: 2026-08-07
 - Scope: the charter (立项) RFC of the Go SDK API surface. It freezes the Go
   module layout, the core value-model mapping (PortableValue/PortableGraph to

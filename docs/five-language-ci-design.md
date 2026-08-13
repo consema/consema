@@ -6,7 +6,7 @@
 - 范围声明：本文是规划阶段唯一交付物（只读调研产出）；不修改任何仓库文件、不运行 git commit
 - 权威输入：`docs/multi-language-implementation-plan.md`、`docs/go-implementation-plan.md` §4/§6/§7、
   `.github/workflows/ci.yml`（现 10+2 job：10 Rust + go-1-26 + go-differential；**六仓拆分 2d7494f 后此句为拆分前快照——10 Rust 门禁归 consema-rs 仓、go-1-26 / go-differential 归 consema-go 仓，母仓 ci.yml 重建为 oracles / shared-conformance-digest / check 三 job**）、`conformance/README.md`、`docs/fc-manifest-0.13.0.json`、
-  路线图 §17.1（第 1565-1575 行）/§21.2（第 1825-1834 行）/§22.2（第 1879-1887 行）/§22.4（第 1902-1910 行）
+  路线图 §17.1（第 1569-1580 行）/§21.2（第 1829-1841 行）/§22.2（第 1883-1892 行）/§22.4（第 1906-1916 行）
 
 ---
 
@@ -16,7 +16,7 @@
 
 - **CI**：`.github/workflows/ci.yml` 单一 workflow，11 个 job = 10 个 Rust 门禁（lint/test/coverage/
   msrv/conformance/deny/audit/semver/oracles/package，ci.yml:25-307）+ `go-1-26`（ci.yml:321-331）。
-  C-1 开放项记录此 10 job 需在 GitHub 干净 checkout 全矩阵全绿（fc-manifest-0.13.0.json:786-802）。〔注：本节为 2026-08-11 调研快照，已由 §10 实况取代——拆分前母仓 ci.yml 为 10+2 job（go-1-26 ci.yml:321 + go-differential ci.yml:344-375）；六仓拆分 2d7494f 后 go-differential 归 consema-go 仓（ci-go.yml:172-246），母仓 ci.yml 现为 oracles / shared-conformance-digest / check 三 job〕
+  C-1 记录此 10 job 需在 GitHub 干净 checkout 全矩阵全绿（fc-manifest-0.13.0.json open_items 第 785-804 行；C-1 status 已 closed——2026-08-11 run #5 132/132 steps 全绿并回填 closure）。〔注：本节为 2026-08-11 调研快照，已由 §10 实况取代——拆分前母仓 ci.yml 为 10+2 job（go-1-26 ci.yml:321 + go-differential ci.yml:344-375）；六仓拆分 2d7494f 后 go-differential 归 consema-go 仓（ci-go.yml:177-259），母仓 ci.yml 现为 oracles / shared-conformance-digest / check 三 job〕
 - **差分 harness 现状（关键事实）**：`scripts/go-verify-byte-parity.ps1`、`go-verify-normalized-
   differential.ps1`、`go-verify-protocol-exchange.ps1`、`go-verify-shared-conformance.ps1` 目前**未接入
   CI**（.github 全域检索 `go-verify` 零命中）；按 go/README.md:821-850 的既定分工，.github 是 Rust
@@ -40,17 +40,17 @@
 ### 0.2 设计不变量（本设计不得违反）
 
 1. **单字节权威**：Rust 编码器是 PVCE/1、PGCE/1 字节的唯一权威（multi-language-implementation-plan.md:18、
-   go/README.md:559-590 "Rust side is the authority for the bytes"；路线图 §16.1 硬门禁）。每个新语言
+   consema-go/go/README.md:601 "Rust side is the authority for the bytes"；路线图 §16.1 硬门禁）。每个新语言
    的字节证明只能对着 Rust golden 做，golden 转录自向量文件或 Rust 编码器输出，不是抄 Go 的测试
    （multi-language-implementation-plan.md:65）。
-2. **单 digest**：conformance/vectors 聚合 sha256 `cfd6e296…`（fc-manifest-0.13.0.json:38）是五个 runner
-   共钉的**同一个值**——digest 只覆盖语言无关的向量文件本身（fc-manifest-0.13.0.json:40），因此五个
+2. **单 digest**：conformance/vectors 聚合 sha256 `cfd6e296…`（fc-manifest-0.13.0.json:39）是五个 runner
+   共钉的**同一个值**——digest 只覆盖语言无关的向量文件本身（fc-manifest-0.13.0.json:41），因此五个
    runner 各自计算必然得到同一值（§4）。
 3. **每 runner 是向量的唯一执行者**：某语言的 conformance 测试只由该语言 runner 执行，不得跨语言
    委托、不得复用他语言 runner 的结果（conformance/README.md:81 第 3 条；go-implementation-plan.md:234
    "向量与 runner 必须同批"）。
 4. **禁止复用边界**：不 import/调用/FFI 到 Rust、Go 或彼此（multi-language-implementation-plan.md:62；
-   路线图 §22.2 第 1886 行"两个实现均独立，不通过 FFI 或私有中间结果作弊"扩展到五语言）。
+   路线图 §22.2 第 1890 行"两个实现均独立，不通过 FFI 或私有中间结果作弊"扩展到五语言）。
 5. **零运行时依赖**：运行时依赖保持零（测试框架除外），CI 强制验证（§1.3）。
 6. **双向差分不弱化**：normalized 差分对每个新语言保持 forward（Rust 发射 → 语言比较+发射）与
    reverse（Rust consume 语言证据）两个方向（go-verify-normalized-differential.ps1:12-29），四语言
@@ -80,11 +80,11 @@
 | conformance（cargo test -p consema-conformance + suite-count 断言，:145-173） | Rust runner 腿 | 每语言独立 conformance job（§2）：TS/Python/Kotlin 各一，runner 内做 18/519 + digest 断言（不复制 ci.yml:155-173 的内联 PS 脚本——断言进各语言 runner 测试，单一来源） |
 | deny（cargo deny check，:175-184） | Rust 依赖政策 | 每语言零运行时依赖断言 + 开发依赖审计（§1.3）：TS `npm ls --omit=dev` 空 + `npm audit`（L5）；Python `dependencies = []`（pyproject.toml:22）断言 + `pip check`；Kotlin runtimeClasspath 空断言 + gradle 依赖锁定/验证（L5） |
 | audit（cargo audit / RustSec，:186-199） | Rust 供应链 | 同 deny 行。安全面 = 运行时零依赖 → 供应链面只剩 dev 工具（typescript/@types/node、pytest、kotlin.test+junit-jupiter）；L5 收口时逐语言审计并记录（照 SEC-6 体例，fc-manifest-0.13.0.json:510-518） |
-| semver（cargo-semver-checks，:201-235） | Rust API 稳定性 | **Rust 专属**。三语言 API 稳定性门禁属 1.0.0 收口（路线图 §22.2 第 1887 行"Rust/Go public API 都完成稳定性审查"扩展至五语言；multi-language-implementation-plan.md:111）：TS exports 冻结审查 / Python `__all__` 审查 / Kotlin public API dump（kotlinx binary-compatibility-validator 属 dev 依赖，政策允许），全部 L5+ |
+| semver（cargo-semver-checks，:201-235） | Rust API 稳定性 | **Rust 专属**。三语言 API 稳定性门禁属 1.0.0 收口（路线图 §22.2 第 1891 行"Rust/Go public API 都完成稳定性审查"扩展至五语言；multi-language-implementation-plan.md:111）：TS exports 冻结审查 / Python `__all__` 审查 / Kotlin public API dump（kotlinx binary-compatibility-validator 属 dev 依赖，政策允许），全部 L5+ |
 | oracles（差分 oracle 3 OS，:251-281） | 语言无关（第三方行为钉） | **不变**，仍由 Rust job 执行。注意：java-properties-v1 oracle 钉 OpenJDK 25.0.4（conformance/README.md:25）、python-configparser-v1 钉 CPython 3.14.6（:26）——这是第三方行为 pin，与 SDK 工具链（Kotlin JVM 17 / Python 3.12）是两回事，不得混淆 |
 | package（verify-package-archives，:283-307） | Rust 归档验证 | Rust 专属。每语言打包验证为 L5/1.0.0 门禁（§5）：TS `npm pack` + 干净目录安装；Python build wheel + 干净 venv 安装；Kotlin gradle jar + 干净 JVM 运行 |
 | go-1-26（拆分前母仓 ci.yml:321-331；六仓拆分后归 consema-go 仓） | Go 门禁（最低版本） | **保持原位**（不迁移，见 §5.2 决策）；是三个新语言 gates job 的直接模板 |
-| go-differential（拆分前母仓 ci.yml:344-375，2026-08-12 增补，见 §10；六仓拆分后归 consema-go 仓 ci-go.yml:172-246） | Go 差分 gate（byte parity + normalized + protocol exchange） | **保持原位**；是三个新语言 differential job 的直接模板 |
+| go-differential（拆分前母仓 ci.yml:344-375，2026-08-12 增补，见 §10；六仓拆分后归 consema-go 仓 ci-go.yml:177-259） | Go 差分 gate（byte parity + normalized + protocol exchange） | **保持原位**；是三个新语言 differential job 的直接模板 |
 
 ### 1.2 新语言 job 定义（每语言三个 job，L0 版）
 
@@ -218,7 +218,7 @@
   `.pvce.hex`/`.error.txt`（Rust 侧自验 decode/re-encode 字节同一性 + 拒绝码）→ 语言测试
   （字节 parity + Rust 字节 → 语言 decode 记录等价 + 字节同一 re-encode + 语言侧拒绝码）→
   语言侧发射自己编码器文件 → Rust `--verify` 模式闭合语言 → Rust 方向（记录等价 + 字节同一
-  re-encode + 拒绝码一致）。路线图 §22.2 第 1884 行"protocol cross-encode/decode 100%"扩展至
+  re-encode + 拒绝码一致）。路线图 §22.2 第 1888 行"protocol cross-encode/decode 100%"扩展至
   五语言。
 
 ### 3.5 共享 case 集（消除五份拷贝）
@@ -229,7 +229,7 @@
 - **设计（已执行）**：新语言 case 集放共享只读位置 `conformance/differential/`（新目录）：
   `cases.json`（byte-parity 68）、`normalized/cases.json`（108）、`protocol-exchange/cases.json`
   （83）；**现有 go/ 下三文件已随本批次 git mv 迁移**（2026-08-12：go 侧测试由内嵌改为运行时
-  读取——`CONSEMA_DIFFERENTIAL_CASES_DIR` 或默认向上探测，五语言 harness 与 12 个 verify 脚本
+  读取——`CONSEMA_DIFFERENTIAL_CASES_DIR` 或默认向上探测，五语言 harness 与 13 个 verify 脚本
   同步更新，同一批——照"向量与 runner 必须同批"纪律，go-implementation-plan.md:234）。
 - 每语言完整性测试断言：manifest id（`consema.differential.byte-parity@1` / `normalized@1` /
   `protocol-exchange@1`）+ **精确 case 计数**（68/108/83）+ 下限（>= 40，照 go-verify-byte-parity.ps1:
@@ -253,11 +253,11 @@
 
 ### 4.1 算法与口径（不变）
 
-- SHA-256 聚合，算法冻结于 fc-manifest-0.13.0.json:40：按文件名字节序排序（Ordinal），逐文件
+- SHA-256 聚合，算法冻结于 fc-manifest-0.13.0.json:41：按文件名字节序排序（Ordinal），逐文件
   sha256（小写 hex），行格式 `{basename}:{digest}` 以 `\n` 连接（无尾换行），对该 UTF-8 字节串再
   sha256。实现参考 go-verify-shared-conformance.ps1:104-123。
 - **口径 = 规范 checkout 字节（LF，.gitattributes:1 eol=lf）**；CRLF 工作树（core.autocrlf=true）
-  下逐文件 sha256 不同属预期（fc-manifest-0.13.0.json:40；go-implementation-plan.md:293）。
+  下逐文件 sha256 不同属预期（fc-manifest-0.13.0.json:41；go-implementation-plan.md:293）。
 - digest 只覆盖 18 个向量文件（语言无关）→ 五个 runner 各自计算必然同一值——这是"五语言共享
   一个 digest"的机制本身，无需任何跨语言通信。
 
@@ -315,7 +315,7 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
 | L0（core+PVCE/PGCE+protocol） | `L-gates`（构建+单测+零依赖）、`L-conformance`（runner 全 18 套、未实现 capability 进 documented skip；digest+18/519 硬钉）、`L-differential` = byte parity + shared-conformance |
 | L1（document+json+toml） | `L-differential` += normalized differential（json/toml 面使然） |
 | L2/L3（yaml/ini/properties/xml/plist/hcl） | 无新 job；conformance job 的 skip 数随 capability 收敛 |
-| L4（全操作 parity + capability parity） | `L-differential` += protocol exchange；`L-conformance` 断言 capability parity（照 go/capability_parity_test.go 体例，go/README.md:797-809） |
+| L4（全操作 parity + capability parity） | `L-differential` += protocol exchange；`L-conformance` 断言 capability parity（照 go/capability_parity_test.go 体例，consema-go/go/README.md:817-） |
 | L5（runner 全 519 + fuzz/bench/security + CLI beta） | `L-conformance` 断言**零 documented skip**；新增 `L-package`（§1.1 package 行）；fuzz/bench/security 冒烟进 CI（短时长）；三平台矩阵按 Go 先例走文档化完成路径（go/README.md:814-850，"completion path documented, not a CI job"）或显式 3-OS 矩阵 job——二选一在 L5 批次记录（**已处置 2026-08-12：文档化完成路径，§10 记录**） |
 | 1.0.0 收口 | 每语言 API 稳定性门禁（§1.1 semver 行）；五语言全部 job 全绿入 §22/五要素审计（multi-language-implementation-plan.md:111） |
 
@@ -349,9 +349,9 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
 | 文件 | 动作 | 内容 |
 |---|---|---|
 | `.github/workflows/ci.yml` | **不改**（Rust 门禁域 + go-1-26 原位） | 现 11 job 全保留（§1.1 映射表） |
-| `.github/workflows/ci-typescript.yml` | 已新增（2026-08-12 上线全绿，见 §10） | `ts-gates`、`ts-conformance`、`ts-differential`（§1.2）；L5 加 `ts-package` |
-| `.github/workflows/ci-python.yml` | 已新增（2026-08-12 上线全绿，见 §10） | `python-gates`、`python-conformance`、`python-differential`；L5 加 `python-package` |
-| `.github/workflows/ci-kotlin.yml` | 已新增（2026-08-12 上线全绿，见 §10） | `kotlin-gates`、`kotlin-conformance`、`kotlin-differential`；L5 加 `kotlin-package` |
+| `.github/workflows/ci-typescript.yml` | 已新增（2026-08-12 上线全绿，见 §10） | 实际 9 job：`ts-gates`、`coverage`、`ts-compiler-matrix`、`ts-conformance`、`ts-differential`、`check-version-consistency`、`examples`、`ts-package`、`check`（§1.2 设计口径 3 job + L5 package 为规划表，保留历史） |
+| `.github/workflows/ci-python.yml` | 已新增（2026-08-12 上线全绿，见 §10） | 实际 8 job：`python-gates`、`python-conformance`、`python-differential`、`coverage`、`check-version-consistency`、`examples`、`python-package`、`check`（§1.2 设计口径 3 job + L5 package 为规划表，保留历史） |
+| `.github/workflows/ci-kotlin.yml` | 已新增（2026-08-12 上线全绿，见 §10） | 实际 7 job：`kotlin-gates`、`kotlin-conformance`、`kotlin-differential`、`check-version-consistency`、`examples`、`kotlin-package`、`check`（§1.2 设计口径 3 job + L5 package 为规划表，保留历史） |
 
 ### 7.2 scripts/ 新增（命名照 go-verify-* 惯例；自包含、pwsh、零第三方依赖）
 
@@ -409,7 +409,7 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
 
 1. **CI 形状**：每语言一个 workflow 文件（ci-typescript.yml / ci-python.yml / ci-kotlin.yml），
    ci.yml 一字不动（Rust 10 job + go-1-26 原位）；拒绝单矩阵（§5.2 四条理由）。
-2. **digest 共享**：SHA-256 聚合（算法 fc-manifest-0.13.0.json:40）只覆盖语言无关向量文件 → 五
+2. **digest 共享**：SHA-256 聚合（算法 fc-manifest-0.13.0.json:41）只覆盖语言无关向量文件 → 五
    runner 各算各的必得同一值；钉值两处：fc-manifest `digests.conformance_suite`（运行期校验）+
    每语言 runner 测试内硬钉常量（变更即红）；向量变更五处同批更新（§4）。
 3. **差分扩展**：Rust 四个例子零改动；每语言 4 个 `L-verify-*.ps1` 脚本镜像 go 双胞胎；字节
@@ -440,15 +440,16 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
 数据来源：GitHub Actions API 核验（head dbba9a4，2026-08-12）+ 本机复核（workflow/
 脚本/文件存在性）。
 
-- **三个新语言 workflow 全部 LIVE 且全绿**（每语言 3 job，与 §1.2/§7.1 设计一致）：
+- **三个新语言 workflow 全部 LIVE 且全绿**（§1.2/§7.1 的"每语言 3 job"为设计期口径；实际 job 数：ts 9、py 8、kt 7——gates/conformance/differential 之上叠加 coverage/check-version-consistency/examples/package/check 等）：
   - `.github/workflows/ci-typescript.yml` run#2：ts-gates / ts-conformance /
     ts-differential（differential = byte parity + normalized + protocol exchange
-    三个脚本，windows-latest，ci-typescript.yml:102-137）
+    三个脚本，windows-latest，ts-differential 在 ci-typescript.yml:286-365）
   - `.github/workflows/ci-python.yml` run#2：python-gates / python-conformance /
     python-differential
   - `.github/workflows/ci-kotlin.yml` run#2：kotlin-gates / kotlin-conformance /
-    kotlin-differential（无 gradle wrapper，按 ci-kotlin.yml:1-21 设计直驱
-    K2JVMCompiler + kotlin.test shim）
+    kotlin-differential（gradle wrapper 已入库——c60d31a，gradle 8.14；
+    kotlin-gates 走 wrapper 驱动，ci-kotlin.yml:115-141；"直驱 K2JVMCompiler +
+    kotlin.test shim"为 wrapper 落地前设计期描述）
   - `.github/workflows/ci.yml` run#9：Rust 10+1 job（增补前——go-differential
     2026-08-12 增补后为 10+2 job / 12 定义）保持全绿——§5.2 的文件级失败
     隔离在实跑中成立（新语言上线未触碰 Rust 门禁域）
@@ -490,7 +491,8 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
   - **3-OS 矩阵处置 = 文档化完成路径（§5.3 L5 行"二选一"决策）**：ts/py/kt
     保持单 OS 主跑面 + windows/ubuntu 双 OS 差分面——ts/py 的 gates/conformance
     在 ubuntu-latest、differential 在 windows-latest（ci-typescript.yml /
-    ci-python.yml），kt 语言 job 全在 windows-latest（ci-kotlin.yml）。理由：
+    ci-python.yml），kt 语言 job 为 4 个 windows-latest + 3 个 ubuntu-latest
+    （check-version-consistency / kotlin-package / check 在 ubuntu，ci-kotlin.yml）。理由：
     三语言实现为纯库 + 协议面（零第三方运行时依赖、无平台专属 API，§0.2
     不变量 5），三 OS 差异主要影响 I/O/CLI 面，该面已由 Rust/Go 的 3-OS 矩阵
     覆盖（ci.yml lint/test/oracles/package 3 OS，rc-1.0.0-candidate.md §1 C-1）。
@@ -501,8 +503,8 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
   `protocol-exchange/cases.json`，单一权威，§3.5/§7.3 原计划项关闭）；go 侧三个差分测试由
   `//go:embed` 改为运行时读取（`CONSEMA_DIFFERENTIAL_CASES_DIR` 环境变量，或从测试包目录向上
   探测 `conformance/differential`——单仓与 consema/consema-go 并排布局均可解析；未设置且探测
-  失败时 documented skip）；五个语言 harness（go/typescript/python/kotlin）与 12 个 verify 脚本
-  统一从 `conformance/differential/` 取数；consema-rs 的 `consema-conformance/examples/`
+  失败时 documented skip）；四个语言仓 harness（go/typescript/python/kotlin）与 13 个 verify 脚本
+  统一从 `conformance/differential/` 取数（Rust 侧 emit 示例经 CLI 参数传 case 文件路径，不从此目录取数）；consema-rs 的 `consema-conformance/examples/`
   下四个 Rust 例子的 doc 注释仍引用旧路径
   （其 case 文件路径经 CLI 参数传入，功能不受影响），留待拆分批次随 Rust 文档更新
 - **ci.yml 新增 go-differential job（2026-08-12）**：Go 差分 gate 进 CI——

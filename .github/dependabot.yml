@@ -4,9 +4,12 @@
 # the actions pinned in .github/workflows. The conformance/ fixture
 # manifests (fixtures/toml/Cargo.toml, fixtures/toml/pyproject.toml,
 # fixtures/real-world/package.json, oracles/hcl-go-v1/go.mod) are frozen
-# test data (fc-manifest digest gate) and are deliberately NOT tracked by
-# Dependabot — any dependency bump there must go through the freeze/audit
-# process, not an automated PR.
+# test data and are deliberately NOT tracked by Dependabot — any dependency
+# bump there must go through the freeze/audit process, not an automated PR.
+# （如实注记：fixtures/ 与 oracles/ 的冻结仅靠人工纪律——shared-conformance-
+# digest 门禁只覆盖 conformance/vectors/*.json 的 18 个文件，fixtures/ 与
+# oracles/ 不在 digest 覆盖内；早期注释把该冻结归因于 fc-manifest digest
+# gate 属机制归因错误，2026-08-13 修正。）
 version: 2
 updates:
   - package-ecosystem: github-actions

@@ -15,9 +15,9 @@
 | 项 | 内容 | 对照权威 |
 |---|---|---|
 | 1 | 钉版 12 文件 digest 核对（fixtures 层真实语料） | pilot-go-0.19.0.md §1 语料登记表（16 位 sha256 前缀 + 字节数） |
-| 2 | 519 计数核对（18 套向量 + 聚合 digest） | fc-manifest-0.13.0.json `digests.conformance_suite`（suites=18 / cases=519 / aggregate_sha256=`cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`）；conformance/README.md:73 |
+| 2 | 519 计数核对（18 套向量 + 聚合 digest） | fc-manifest-0.13.0.json `digests.conformance_suite`（suites=18 / cases=519 / aggregate_sha256=`cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`）；conformance/README.md:75 |
 | 3 | regressions 检查（fuzz 回归输入数组） | conformance/corpora/mutation-v1.json `regressions`（空数组符合预期；新增条目必须可追溯） |
-| 4 | 9 家族来源与覆盖 | conformance/fixtures/ 九目录 + 各家族 README 来源/许可证声明（conformance/README.md:31-37） |
+| 4 | 9 家族来源与覆盖 | conformance/fixtures/ 九目录 + 各家族 README 来源/许可证声明（conformance/README.md:35-43 夹具清单——hcl/plist/xml 三家已补全） |
 
 ## 2. 命令清单（在母仓检出执行）
 
@@ -100,7 +100,7 @@ $m = Get-Content 'conformance\corpora\mutation-v1.json' -Raw -Encoding UTF8 | Co
 ```powershell
 Get-ChildItem 'conformance\fixtures' -Directory | Select-Object -ExpandProperty Name
 # 各家族 README（hcl/ini/json5/plist/properties/real-world/toml/xml/yaml）
-# 的来源/许可证声明抽查（conformance/README.md:31-37）
+# 的来源/许可证声明抽查（conformance/README.md:35-43 夹具清单）
 ```
 
 预期：`real-world json5 toml yaml ini properties xml plist hcl` 九目录齐备。

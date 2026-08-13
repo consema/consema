@@ -61,14 +61,17 @@ TOML、YAML、INI、Java Properties、XML、Property List 与 HCL 八个格式�
    - 首行 `模块: 摘要`，≤50 字符（如 `docs: 补充 RFC 0021 正文`）；
    - 关联 issue 写 `Fixes: #123`；
    - 原子提交：一个逻辑变更一个提交，不混入无关改动。
-3. **本地验证**：本仓 CI 只跑本仓拥有的门禁（差分 oracle + 聚合 digest
-   断言）；改动脚本 / conformance 数据后至少本地跑相关脚本（见 README
-   「验证」节：`scripts/` 下 toml-test、yaml-test-suite、runtime oracle、
-   差分 oracle）。**`conformance/vectors/` 变更是五仓同步事件**：必须同步
-   五个语言仓并更新聚合 digest 与 18/519 计数（聚合 digest
+3. **本地验证**：本仓 CI 只跑本仓拥有的门禁（oracles + shared-conformance-
+   digest + check 聚合门禁）；改动脚本 / conformance 数据后至少本地跑相关
+   脚本（见 README「验证」节：`scripts/` 下 toml-test、yaml-test-suite、
+   runtime oracle、差分 oracle——注意 toml-test/yaml-test-suite 脚本需从
+   consema-rs checkout 运行，母仓根无 Cargo.toml 原位不可执行）。**`conformance/vectors/`
+   变更是五仓同步事件**：必须同步五个语言仓并更新聚合 digest 与 18/519
+   计数（聚合 digest
    `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`，见
-   README「Conformance 权威声明」），否则各仓 conformance 门禁与 digest
-   断言失败。
+   README「Conformance 权威声明」），否则 go/ts/kt 三仓 conformance 门禁
+   与 digest 断言失败（consema-rs 为 vendored 快照、consema-py CI 钉定
+   commit，两仓不自动跟随）。
 4. **PR**：标题遵循提交规范；确保 CI 全绿（含 pr-labels.yml 的 kind 标签
    门禁）。
 5. **评审**：至少一位维护者 approve；契约变更需在 PR 中记录 RFC 关联。
@@ -76,7 +79,7 @@ TOML、YAML、INI、Java Properties、XML、Property List 与 HCL 八个格式�
 ## 评审规范
 
 - 契约 / 语义变更无 RFC 关联，打回补充；
-- `conformance/vectors/` 变更未同步五仓、未更新聚合 digest 与计数，打回；
+- `conformance/vectors/` 变更未同步五仓、未更新聚合 digest 与计数，打回（跟随型失败面为 go/ts/kt 三仓；consema-rs vendored 快照与 consema-py 钉定 commit 需显式同步）；
 - 不允许用截断、降级测试或错误完成状态"修复"问题——资源上限与完成状态
   语义是安全边界（SECURITY.md），不因评审压力放松；
 - 版本一致性：改版本必须同步改 README 版本行（各语言仓有

@@ -996,7 +996,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
   ↓
 0.12.0 Rust SDK + CLI 产品集成                           Rust
   ↓
-0.13.0 Rust 生产加固与 Feature-Complete Gate      Rust 门禁推进中（C-1 已闭环 2026-08-11；C-2 partial，3/9 单位过 72h；C-3 partial；五语言各 L0-L5 已交付）
+0.13.0 Rust 生产加固与 Feature-Complete Gate      Rust 门禁推进中（C-1 已闭环 2026-08-11；C-2 partial，5/9 单位过 72h——2026-08-13 复算 122,478 行 / 780.529 CPU-hours，properties/yaml/ini/hcl/json 已过门槛；C-3 partial；五语言各 L0-L5 已交付）
   ↓
 0.14.0 Go core / PVCE / PGCE / protocol                  Go 开始
   ↓
@@ -1017,7 +1017,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 
 > **决策注记（2026-08-07）**：owner 决定在 C-1/C-2/C-3 完成前启动 `0.14.0` 的 Go 实现（G0.1-G0.3：core/graph/protocol），这是经记录的路线图偏差，按 §0 冲突解决层级处理——修改路线图、不静默缩小 1.0.0 承诺；`0.13.0` 门禁判定以 docs/fc-manifest-0.13.0.json 为准（gate_open/not_closed，C-1/C-2/C-3 开放，decision record 见该 manifest）。
 >
-> **状态更新（2026-08-12）**：C-1 已闭环——2026-08-11 GitHub Actions run#5（head 437fd35）132/132 steps 全绿；C-2 推进中——2026-08-12 10:17 快照 62,432 行 / ≈460 CPU-hours（runs.csv 权威），properties/yaml/ini 三单位已过 72h 门槛；C-3 partial；Go 全里程碑（0.14.0-0.19.0 G0.1-G5.6）已交付；五语言实现各 L0-L5 已交付（TS/Python/Kotlin 与 Rust/Go 同等地位，见 docs/multi-language-implementation-plan.md 与 docs/five-language-ci-design.md）。
+> **状态更新（2026-08-12；2026-08-13 更新 C-2 数字）**：C-1 已闭环——2026-08-11 GitHub Actions run#5（head 437fd35）132/132 steps 全绿；C-2 推进中——2026-08-13 复算 122,478 行 / 780.529 CPU-hours（runs.csv 权威），properties/yaml/ini/hcl/json 五单位已过 72h 门槛；C-3 partial；Go 全里程碑（0.14.0-0.19.0 G0.1-G5.6）已交付；五语言实现各 L0-L5 已交付（TS/Python/Kotlin 与 Rust/Go 同等地位，见 docs/multi-language-implementation-plan.md 与 docs/five-language-ci-design.md）。
 
 版本数量可以在实际执行中增加，但不得压缩语义门禁。若某个阶段过大，可以拆成更多 minor 版本；不能为了保持编号漂亮而把未完成能力滚入下一阶段。
 

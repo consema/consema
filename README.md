@@ -9,7 +9,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 
 ## 文档站
 
-[consema.github.io/consema](https://consema.github.io/consema/)：本仓文档的 GitHub Pages 发布视图（mdbook，源码在 `docs-site/`，构建与部署 workflow 见 `.github/workflows/docs-site.yml`）。**部署待启用**：站点从未成功部署——docs-site workflow 唯一一次 run 的 deploy 步骤失败（`createPagesDeployment` 404，GitHub Pages API 亦 404），根因是仓库设置中 GitHub Pages 未启用（Settings → Pages → Source 需设为 "GitHub Actions"），workflow 文件本身无 bug；待用户在仓库设置启用后，下次 push 即自动部署。本站把 `docs/` 与根目录的规范、RFC、路线图、指南与审计证据变成可浏览、可引用的站点；**权威文档始终以本仓 `docs/` 与根目录为准**，站点是发布视图。
+[consema.github.io/consema](https://consema.github.io/consema/)：本仓文档的 GitHub Pages 发布视图（mdbook，源码在 `docs-site/`，构建与部署 workflow 见 `.github/workflows/docs-site.yml`）。**已部署**：GitHub Pages 已启用（Settings → Pages → Source = "GitHub Actions"），docs-site workflow run#3（700fa44）build/deploy/check 全部 success（2026-08-13），后续 push 即自动部署（run#1 71a1dca、run#2 6638467 为启用前失败记录）。本站把 `docs/` 与根目录的规范、RFC、路线图、指南与审计证据变成可浏览、可引用的站点；**权威文档始终以本仓 `docs/` 与根目录为准**，站点是发布视图。
 
 ## 六仓结构
 
@@ -62,15 +62,16 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 
 - 差分 oracle 驱动：`run-hcl-go-oracle.ps1`、`run-plist-macos-oracle.ps1`（exit 3 = documented skip）
 - 固定 runtime oracle 源码与固定工具链：`scripts/oracles/`
-- 上游格式 gate：`run-toml-test.ps1`（官方 toml-test v2.2.0）、`run-yaml-test-suite.ps1`（官方 yaml-test-suite data-2022-01-17）、`run-properties-jdk-oracle.ps1` / `run-python-configparser-oracle.ps1` / `run-dotnet-ini-oracle.ps1` / `run-windows-ini-oracle.ps1` / `run-qt-ini-oracle.ps1`（5 套固定 runtime oracle，36/36 差分案例）
+- 上游格式 gate：`run-toml-test.ps1`（官方 toml-test v2.2.0）、`run-yaml-test-suite.ps1`（官方 yaml-test-suite data-2022-01-17）——脚本与记录在母仓、**无 CI job 执行**；六仓拆分后母仓根无 Cargo.toml，脚本需从 consema-rs 布局运行（见下「验证（本仓侧）」注）
+- 固定 runtime oracle：`run-properties-jdk-oracle.ps1` / `run-python-configparser-oracle.ps1` / `run-dotnet-ini-oracle.ps1` / `run-windows-ini-oracle.ps1` / `run-qt-ini-oracle.ps1`（5 套，36/36 差分案例；一次性记录 2026-08-05——六仓任何 workflow 均不执行这 5 个脚本，不是常设门禁）
 
-**其他**：SECURITY.md（安全政策）、LICENSE、CHANGELOG.md（版本变更记录）、`.github/workflows/ci.yml`（本仓 CI：差分 oracle + 聚合 digest 断言）。
+**其他**：SECURITY.md（安全政策）、LICENSE、CHANGELOG.md（版本变更记录）、`.github/workflows/ci.yml`（本仓 CI：oracles + shared-conformance-digest + check 聚合门禁，三 job）。
 
 ## Conformance 权威声明
 
-- 各语言仓（consema-rs / consema-go / consema-ts / consema-py / consema-kt）CI 通过多仓 checkout 从本仓 `conformance/` 取数：vectors、fixtures、oracles 与 differential case 集是本仓维护、五仓共享的**单一语言无关权威**。
+- 各语言仓 CI 从本仓 `conformance/` 取数：consema-go / consema-ts / consema-py / consema-kt 经多仓 checkout 取数；consema-rs 使用 vendored 快照（`consema-rs/conformance/`，入库镜像，不随本仓 main 实时取数）——vectors、fixtures、oracles 与 differential case 集是本仓维护、五仓共享的**单一语言无关权威**。
 - 本仓 CI 的 `shared-conformance-digest` job 复算 `conformance/vectors/` 聚合 digest 并断言等于 `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`（算法：文件名字节序排序、逐文件 sha256、`{basename}:{digest}` 以 `\n` 连接、再 sha256；以规范 checkout 的 LF 字节为准，见 `docs/fc-manifest-0.13.0.json` conformance_suite note）。
-- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 都必须同步全部五个语言仓（实现与测试）并同步更新聚合 digest 与 18/519 计数；未同步的向量变更会让各仓 conformance gate 与 digest 断言失败。
+- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 都必须同步全部五个语言仓（实现与测试）并同步更新聚合 digest 与 18/519 计数；未同步的向量变更会让 go/ts/kt 三仓 conformance gate 与 digest 断言失败（consema-rs 为 vendored 快照、consema-py CI 钉定 commit，两仓不自动跟随母仓 main 前进）。
 
 ## 格式家族
 
@@ -81,9 +82,12 @@ JSON family（`json.strict@1`、`jsonc.bounded@1`、`json5.standard@1`）、TOML
 ## 验证（本仓侧）
 
 ```powershell
-./scripts/run-toml-test.ps1                          # 官方 toml-test v2.2.0 gate（205 valid + 474 invalid）
-./scripts/run-yaml-test-suite.ps1                    # 官方 yaml-test-suite data-2022-01-17 gate（402 case）
-./scripts/run-properties-jdk-oracle.ps1              # 固定 runtime oracle（5 套 / 36/36 差分案例）
+# 注意：六仓拆分后母仓根无 Cargo.toml/workspace——run-toml-test.ps1 与
+# run-yaml-test-suite.ps1 的第一步 cargo build 在母仓原位必然失败（exit 101）；
+# 需先从 consema-rs 检出运行（脚本保留于本仓 scripts/，无 CI job 执行）。
+./scripts/run-toml-test.ps1                          # 官方 toml-test v2.2.0 gate（205 valid + 474 invalid；从 consema-rs 运行）
+./scripts/run-yaml-test-suite.ps1                    # 官方 yaml-test-suite data-2022-01-17 gate（402 case；从 consema-rs 运行）
+./scripts/run-properties-jdk-oracle.ps1              # 固定 runtime oracle（5 套 / 36/36 差分案例；一次性记录 2026-08-05，非常设门禁）
 ./scripts/run-python-configparser-oracle.ps1
 ./scripts/run-dotnet-ini-oracle.ps1
 ./scripts/run-windows-ini-oracle.ps1

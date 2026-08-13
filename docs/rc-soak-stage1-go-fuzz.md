@@ -1,16 +1,17 @@
 # RC soak 阶段 1 — Go RC fuzz clean-run 重跑流程
 
 - 依据：`docs/rc-1.0.0-candidate.md` §4 阶段 1（"Go 侧 release-candidate fuzz
-  clean-run 记录 §22.4"）与 §4.1（"已有（2026-08-10，go/README.md:661-763，
+  clean-run 记录 §22.4"）与 §4.1（"已有（2026-08-10，go/README.md:674-727，
   16 targets 各 30s，零 panic/hang/limit bypass）"——六仓拆分后该记录位于
-  `consema-go/go/README.md` "## Fuzz targets" 节，:595-718）；
-  路线图 §22.4 第 1903 行（release-candidate fuzz clean-run）。
+  `consema-go/go/README.md` "## Fuzz targets" 节，:604-727，clean-run 记录
+  在 :674-727）；
+  路线图 §22.4 第 1909 行（release-candidate fuzz clean-run）。
 - 目标：RC soak 阶段对 Go 16 个 fuzz target 各 30s 的 clean-run **重跑**并记录
   （对照 2026-08-10 基线：execs/30s 与 PASS），验证候选代码状态下零
   panic / hang / limit bypass。
 - **本手册只含命令清单与记录模板；执行本身不在本准备批次内。**
 
-## 1. 目标清单（16 targets，go/README.md:608-643）
+## 1. 目标清单（16 targets，go/README.md:617-651 两个 target 表）
 
 | Target | 包 | 断言属性 |
 |---|---|---|
@@ -33,7 +34,7 @@
 
 资源上限全部固定为生产默认（`core.DefaultDecodeLimits` /
 `graph.DefaultPGCELimits` / `protocol.DefaultProtocolLimits`）；**limit 失败是
-pass 不是 crash**（与 Rust fuzz 契约同构，go/README.md:596-601）。
+pass 不是 crash**（与 Rust fuzz 契约同构，go/README.md:611）。
 
 ## 2. 前置条件
 
@@ -44,7 +45,7 @@ pass 不是 crash**（与 Rust fuzz 契约同构，go/README.md:596-601）。
 | 环境 | 空闲或与 fuzz 驱动错峰（Go 本机 fuzz 用满核数；记录负载状态） |
 | 时长 | 16 × 30s + 首次构建 ≈ 10-15 分钟 |
 
-## 3. 命令清单（consema-go 检出，照 go/README.md:644-664）
+## 3. 命令清单（consema-go 检出，照 go/README.md:653-672）
 
 ```text
 cd go
@@ -66,7 +67,7 @@ go test -fuzz='^FuzzParseBinary$'     -fuzztime=30s ./plist/
 go test -fuzz='^FuzzParse$'           -fuzztime=30s ./hcl/
 ```
 
-注意（go/README.md:644-645）：**锚定正则必须带 `^` `$`**——裸
+注意（go/README.md:653）：**锚定正则必须带 `^` `$`**——裸
 `-fuzz=FuzzParse` 会匹配所有 `FuzzParse` 前缀 target 并拒绝运行。
 
 ## 4. 预期断言
@@ -80,9 +81,12 @@ go test -fuzz='^FuzzParse$'           -fuzztime=30s ./hcl/
 
 ## 5. 发现处置（新 crash 协议）
 
-首个 clean-run 曾发现 4 缺陷并全部修复，每个失败输入已钉为回归种子于
-`testdata/fuzz/`（go/README.md:686-718：plist.binary trailer limit 伪 Complete、
-json.strict.trailing-comma 分类、yaml 解析挂起、plist.xml 恢复循环两个终止缺陷）。
+首个 clean-run 曾发现 4 缺陷并全部修复，失败输入已钉为回归种子（go/README.md:
+674-727 clean-run 记录；回归种子实况：③ yaml plain-block 挂起钉入
+yaml/testdata/fuzz/FuzzParse、④ plist.xml 恢复循环钉入 plist/testdata/fuzz/
+FuzzParseXML 两个目录；① plist.binary trailer limit 伪 Complete 与 ②
+json.strict.trailing-comma 分类为 fuzz target 内 f.Add 种子，无 testdata
+目录——"每个失败输入钉入 testdata/fuzz/"对 4 缺陷中 2 个不成立）。
 重跑若发现**新**输入：
 
 1. 记录最小输入（`testdata/fuzz/` 新文件即最小输入）与 target；
@@ -115,7 +119,7 @@ json.strict.trailing-comma 分类、yaml 解析挂起、plist.xml 恢复循环�
 
 ## 7. 相关文件
 
-- `consema-go/go/README.md` :595-718（target 表、命令、2026-08-10 基线记录、
+- `consema-go/go/README.md` :604-727（target 表、命令、2026-08-10 基线记录、
   4 缺陷与回归种子）
 - `docs/rc-1.0.0-candidate.md` §4/§4.1（soak 计划与 Go 侧现状）
 - `docs/fuzz-evidence-0.13.0.md` §2（Rust fuzz 契约与 limit-failure-is-pass 的

@@ -66,7 +66,7 @@ BENCHMARKS document.
 ## 3. Corpus and operations
 
 All inputs are repository-authored, fixture-gate-pinned corpora
-(`conformance/fixtures/`, `crates/consema-conformance/tests/*_fixtures.rs`)
+(`conformance/fixtures/`, `consema-rs/consema-conformance/tests/*_fixtures.rs`)
 or the plist corpora embedded in the plist harness. The CLI rows use the same
 fixtures plus `conformance/fixtures/real-world/package.json`.
 
@@ -214,20 +214,20 @@ the unchanged budget upper bounds (not re-measured post-fix):
   **127.5 ms post-fix (~40×)**.
 - **S4** (20,000-element XML inspect): pre-fix 56.6 s (frozen, N=1; an
   independent pre-fix sample measured 96.6 s,
-  `crates/consema-document/src/source.rs:1545`) → **0.105 s post-fix
+  `consema-rs/consema-document/src/source.rs:1545`) → **0.105 s post-fix
   (~920×, source.rs:1545)**.
 - Root cause of both (and of the pilot F-2 conversion finding, 69.4 s → 1.01 s,
   ~69×, `docs/pilot-0.13.0.md` F-2 resolution): every per-piece span/coordinate
   lookup re-validated the whole UTF-8 source (`raw_byte_at` full-buffer
   `from_utf8` pass) — O(source × pieces) formation. Three fixes, each with
   regression nets: xml `raw_offset` UTF-8 identity shortcut
-  (`crates/consema-xml/src/parser.rs:2027-2052`; linearity net
+  (`consema-rs/consema-xml/src/parser.rs:2027-2052`; linearity net
   `many_small_elements_formation_scales_linearly`, :2842-2878);
   `SourceSnapshot` retains the construction-validated text
-  (`crates/consema-document/src/source.rs:466-509`; net
+  (`consema-rs/consema-document/src/source.rs:466-509`; net
   `per_call_coordinate_conversion_does_not_rescan_large_utf8_sources`,
   :1538-1589); yaml `RawByteResolver` single-pass offset walk
-  (`crates/consema-yaml/src/offsets.rs:1-80`; pointwise-equality tests
+  (`consema-rs/consema-yaml/src/offsets.rs:1-80`; pointwise-equality tests
   :90-156).
 - **Frozen budgets remain valid upper bounds**: the fixes strictly improve
   performance, so no row of §4/§5/§6/§7 exceeds budget and no §8 item-3
@@ -250,7 +250,7 @@ linear" claim (pilot F-2) did not reproduce under the round-2 audit's
 reconstructed inputs: nested shapes measured 5.1-7.2 s at 294-354 KB and
 1.24 s → 7.4 s for 2000 → 4000 items (≈6×). Root cause of the residual
 superlinearity (fixed 2026-08-07, same session): two independent quadratic
-components, both in `crates/consema-yaml/src/`:
+components, both in `consema-rs/consema-yaml/src/`:
 
 - **Composer span resolution** (`native.rs`, the collection-start branches):
   the single-pass `RawByteResolver` walk restarted from byte 0 for every
@@ -261,7 +261,7 @@ components, both in `crates/consema-yaml/src/`:
   collection start span eagerly at event consumption time (event spans
   arrive in non-decreasing order); regression net
   `large_nested_materialization_stays_within_linear_budget`
-  (`crates/consema-yaml/src/materialization.rs`).
+  (`consema-rs/consema-yaml/src/materialization.rs`).
 - **Provenance-map linear scans** (`projection.rs` value/graph provenance,
   `materialization.rs` value provenance): every origin lookup ran
   `position()`/`find()` over the whole provenance map (O(entries) per node).
@@ -308,7 +308,7 @@ acceptance gate ("任何超预算或 10% 回退有批准记录").
 
 1. **Corpus and runner are versioned.** The budget corpus is §3 (fixtures,
    byte-pinned by SHA-256) plus §7 (scenario corpora, generation commands
-   in §10.3); the runner is `crates/consema-conformance/examples/*_baseline.rs`
+   in §10.3); the runner is `consema-rs/consema-conformance/examples/*_baseline.rs`
    at the frozen iteration counts, or the §10 CLI harness; the baseline
    version is the commit recorded in §1.
 2. **Main branch reports trends; release branches freeze baselines.** This
@@ -424,7 +424,7 @@ if ($p.ExitCode -ne 0) { throw }
 Command lines (F = `conformance\fixtures`, C = scratch dir with the §10.3
 corpora; the query and materialize request files are the RFC 0015 §3.2
 canonical tagged-JSON records — exact content is pinned in
-`crates/consema/tests/fixtures/m5_query_request.json` (shape) with the
+`consema-rs/consema/tests/fixtures/m5_query_request.json` (shape) with the
 path-source variant and the §7 source paths reproduced below):
 
 ```text
@@ -619,7 +619,7 @@ Could not be measured at freeze time (each is a documented gap with a
 method):
 
 - **TOML SDK rows**: no TOML baseline harness exists in
-  `crates/consema-conformance/examples/` (the six harnesses cover json5,
+  `consema-rs/consema-conformance/examples/` (the six harnesses cover json5,
   ini, properties, yaml, xml, plist, hcl). TOML is frozen through the CLI
   rows (`inspect toml.1.0@1`, `materialize toml.canonical-document@1`); an
   SDK TOML harness (same style as `json_family_baseline.rs`) is a follow-up.

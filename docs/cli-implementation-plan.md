@@ -17,7 +17,7 @@
 - `crates/consema` 是 lib-only 可发布 facade crate（`crates/consema/Cargo.toml`），`pub use` 全部 13 个 backend crate 并通过 `Document::parse_*`/`as_*` 与 `convert_*` 提供统一语义入口（`crates/consema/src/lib.rs:12-24`、`conversion.rs:317-560`）。
 - 仓库无 `.github/`：CI 是本地门禁（`scripts/verify-package-archives.ps1` 打包验证 + 各 oracle 脚本 + cargo 门禁）。
 - 依赖政策：`deny.toml` 的 `[sources]` 仅 crates.io 钉版、`[bans]` 禁多版本/通配；workspace 只钉版 7 个直接依赖（`Cargo.toml:21-28`）。CLI 计划因此**零新外部依赖**（§5）。
-- `docs/IMPLEMENTATION.md` §13（0.8.0 明确边界，第 381 行）明示"文件系统原子替换"未实现——0.12.0 是首次实现文件系统写入的版本，且按路线图 §6（第 497-508 行）只属于 CLI/application 层，不得塞回 Document 核心。
+- `docs/IMPLEMENTATION.md` §13（0.8.0 明确边界，第 451-453 行）明示"文件系统原子替换"未实现——0.12.0 是首次实现文件系统写入的版本，且按路线图 §6（第 497-508 行）只属于 CLI/application 层，不得塞回 Document 核心。
 
 ### 0.2 命令面（路线图 §10 第 783-818 行，11 个正式命令）
 
@@ -107,7 +107,7 @@ bin 绝不直接依赖任何 backend crate（硬门禁 1）
 | `consema::convert_*`（8 个） | 直接复用 | 跨格式转换的组合层（conversion.rs:317-560），CLI convert 命令的整个实现 |
 | `consema::protocol` 全部既有 payload | 直接复用 | QueryResultMessage/ProjectionResultMessage/MaterializationResultMessage/ConversionReportMessage/EditPlanMessage/SourceSnapshotMessage/SourcePatchMessage/Completion/DiagnosticMessage（protocol lib.rs:33-80）——CLI 机器输出直接包装这些消息 |
 | `ProtocolMessage::to_json/to_pvce`、`encode_json/decode_json`、`encode_pvce/decode_pvce` | 直接复用 | canonical JSON 与 PVCE/1 双传输（protocol value_transport.rs:11-95）；机器输出与请求输入的传输层 |
-| `core.query-definition@1` | 直接复用 | query 命令的请求输入（IMPLEMENTATION.md 第 196 行：固定字段 PortableValue schema + PVCE/1 传输）；`query_definition_message`/`query_definition_from_message`（protocol query.rs） |
+| `core.query-definition@1` | 直接复用 | query 命令的请求输入（IMPLEMENTATION.md 第 257 行：固定字段 PortableValue schema + PVCE/1 传输）；`query_definition_message`/`query_definition_from_message`（protocol query.rs） |
 | `ProjectionRequestMessage` / `MaterializationRequestMessage(V2)` | 直接复用 | project/materialize 命令的请求输入（protocol projection.rs、materialization.rs） |
 | `ContractRegistry` / `ErrorCodeRegistry` / `RegistryManifest` / `ProfileDescriptor` / `CapabilityDeclaration` | 直接复用 | capabilities/explain 命令与 registry.rs 的数据源（protocol contract.rs、registry.rs、registry_manifest.rs） |
 | `Document::snapshot_identity`、`SourceSnapshot` digest 事实 | 直接复用 | inspect 的 digest 报告；plan/apply 的前置条件事实 |
@@ -121,7 +121,7 @@ bin 绝不直接依赖任何 backend crate（硬门禁 1）
 |---|---|
 | `ContractRegistry` | 新增 `v7()`：38 条 v6 记录保持不变，追加 CLI 稳定 payload 契约（候选：`core.cli-output@1`、`core.batch-plan@1`、`core.batch-result@1`，最终名单由 RFC 0015 冻结） |
 | `ErrorCodeRegistry` | 新增 `v7()`：v6 的 166 条冻结不变，追加 `cli.*` 错误族（usage/data/limit/precondition/interrupted 类，命名模式 §2.3） |
-| `RegistryManifest` | `current()` 指向 v7（v6 先例：IMPLEMENTATION.md 第 377 行） |
+| `RegistryManifest` | `current()` 指向 v7（v6 先例：IMPLEMENTATION.md 第 443-445 行） |
 | `ConversionReport` 的 `protocol_report`/`protocol_materialization_result` | 直接复用（conversion.rs:137-248），CLI 机器输出不需重复实现两阶段报告外部化 |
 | facade public API | 按需小增：若 CLI 需要统一的格式枚举/查询域清单入口而 facade 未暴露，在 facade 补薄层（M4/M10 评审），**不改写既有 API** |
 
@@ -194,9 +194,9 @@ core.cli-output@1（固定字段 PortableValue，双传输）：
   redaction（{redacted: bool, count: int}，§4.4）
 ```
 
-- **CLI 机器 schema 必须是语言无关的语义模型 payload**：Go CLI（0.19.0）要产出同一 machine-readable output schema（§22.6 第 1923 行），双语言一致性清单覆盖 projection/materialization report（§11.2 第 849-861 行）——只有走固定字段 PortableValue + canonical JSON/PVCE 双传输 + typed decoder 重验的老路，才能被语言无关向量证明（protocol-v1/v2 双传输等价 32 个 case 先例，IMPLEMENTATION.md 第 337 行）。
+- **CLI 机器 schema 必须是语言无关的语义模型 payload**：Go CLI（0.19.0）要产出同一 machine-readable output schema（§22.6 第 1929 行），双语言一致性清单覆盖 projection/materialization report（§11.2 第 853-863 行）——只有走固定字段 PortableValue + canonical JSON/PVCE 双传输 + typed decoder 重验的老路，才能被语言无关向量证明（protocol-v1/v2 双传输等价 32 个 case 先例，IMPLEMENTATION.md 第 337 行）。
 - 错误分类：CLI 层错误码进 `ErrorCodeRegistry::v7()`（`cli.usage.*`、`cli.detection.*`、`cli.write.*`、`cli.interrupted.*` 等，命名模式照 `hcl.parse.*@1` 先例）；格式层诊断继续使用既有 166 条 + 各格式本地 code 常量，CLI 只传递不改写。
-- 每个 v7 payload 的 decoder 重新验证交叉约束（照 v6 先例：不能仅凭 schema discriminator 绕过，IMPLEMENTATION.md 第 377 行）。
+- 每个 v7 payload 的 decoder 重新验证交叉约束（照 v6 先例：不能仅凭 schema discriminator 绕过，IMPLEMENTATION.md 第 443-445 行）。
 
 ### 2.4 人类输出
 
@@ -231,7 +231,7 @@ core.cli-output@1（固定字段 PortableValue，双传输）：
 强制规则（对照 §3.3"默认不猜测"第 183-200 行与 §10 第 818 行）：
 
 1. **永不输出单一"这是 X 格式"结论**；扩展名、magic、BOM 都只是事实（plist 先例：CHANGELOG 0.10.0"magic number 与 `.plist` 扩展名都不选择 Profile、representation 或 encoding"）。
-2. **任何需要 parse 的命令必须显式 `--profile`/`--format`**；不提供"多方言都试一次"的自动尝试（INI 先例：IMPLEMENTATION.md 第 127 行"不提供'多方言都试一次'的自动检测"）。
+2. **任何需要 parse 的命令必须显式 `--profile`/`--format`**；不提供"多方言都试一次"的自动尝试（INI 先例：IMPLEMENTATION.md 第 132 行"不提供'多方言都试一次'的自动检测"）。
 3. 歧义时操作失败（exit 2，data 类），消息列出候选 + 理由 + 用法提示；`consema inspect` 本身报告歧义成功（exit 0，报告即结果）。
 4. 检测事实不携带任何执行授权：detect 永不 parse、不打开文件之外的内容、无副作用。
 
@@ -242,14 +242,14 @@ core.cli-output@1（固定字段 PortableValue，双传输）：
 
 ## 4. atomic write、batch manifest 与 secret redaction
 
-文件系统写入是首次实现（IMPLEMENTATION.md 第 381 行 0.8.0 明确边界；路线图 §6 第 497-508 行：文件系统应用链条属于 CLI/application 层）。设计逐条对应 §10 第 809-815 行。
+文件系统写入是首次实现（IMPLEMENTATION.md 第 453 行 0.8.0 明确边界；路线图 §6 第 497-508 行：文件系统应用链条属于 CLI/application 层）。设计逐条对应 §10 第 809-815 行。
 
 ### 4.1 fsio.rs：同目录临时文件 + 原子替换（第 811-812 行）
 
 - 写流程：目标同目录创建唯一临时文件（`{name}.consema-{pid}-{nonce}.tmp`）→ 写入渲染字节 → flush → 按 OS 语义原子替换（POSIX `rename`；Windows `std::fs::rename` 的 REPLACE_EXISTING 语义）→ 读回验证 target digest。
 - **权限/所有者政策**（第 815 行）：临时文件创建为受限权限（POSIX 0600）；替换前把目标文件既有权限/所有者（OS 支持时）复制到临时文件；Windows 只读属性与 ACL 行为在实现期实测并在 RFC 记录（跨平台验证是 0.13.0 门禁，§15.4 第 1399 行）。
 - **symlink 政策**（第 815 行）：写入路径默认拒绝 symlink/junction 目标（报告 `cli.write.symlink-policy@1`），`--follow-symlinks` 显式授权；inspect 报告 symlink 事实。
-- **换行与编码政策**（第 815 行）：CLI 不转码、不改换行——读原始字节进 `SourceSnapshot`，写渲染后的原始字节（`Document::render()` 字节精确，IMPLEMENTATION.md 第 68 行）；UTF-16/ISO-8859-1 文件全程按 encoding 事实直通。
+- **换行与编码政策**（第 815 行）：CLI 不转码、不改换行——读原始字节进 `SourceSnapshot`，写渲染后的原始字节（`Document::render()` 字节精确，IMPLEMENTATION.md 第 73 行）；UTF-16/ISO-8859-1 文件全程按 encoding 事实直通。
 - **不声称跨文件系统多文件原子性**（第 812 行）：fsio 只承诺单文件原子替换；多文件事务不存在，`apply` 的"批量原子性"是 manifest 状态机的可恢复性，不是文件系统事务。
 - 失败清理：临时文件残留由 `Drop`/退出钩子清理；中断时 manifest 先落盘（§4.2）。
 
@@ -273,7 +273,7 @@ files: [{ path, status: completed | failed | pending | skipped-stale,
 
 - **写入前重验**（第 810 行、§26.6 第 2192 行"stale digest 和 original bytes 双 precondition"）：apply 每文件先重读文件、重算 digest 与 manifest 的 `source_digest` 比对（stale → `skipped-stale`，exit 4 分类），再逐 replacement 验证 original-bytes 前置条件（`SourcePatch` 语义，SECURITY.md 第 22 行），全部通过才写。
 - **中断恢复**（第 813 行）：apply 在每文件写入**前**把该文件标记落盘（顺序：pending 状态先落 → 执行 → completed 后落），崩溃/中断后重跑 apply 用 manifest 判断：completed（digest 相符）跳过、failed 重报、pending 重做。manifest 的写入顺序是 R-5 风险点。
-- dry-run/commit 等价（IMPLEMENTATION.md 第 261 行）：plan 的 replacements 与 target digest 必须与最终写入一致，apply 结束后重读验证 target digest。
+- dry-run/commit 等价（IMPLEMENTATION.md 第 318 行）：plan 的 replacements 与 target digest 必须与最终写入一致，apply 结束后重读验证 target digest。
 
 ### 4.3 请求/结果的外部化
 
@@ -361,7 +361,7 @@ files: [{ path, status: completed | failed | pending | skipped-stale,
 
 范围：四命令接线：
 - 输入：`--request-file`/stdin 接受 canonical JSON 或 PVCE（`core.query-definition@1`/`ProjectionRequestMessage`/`MaterializationRequestMessage(V2)`），`decode_json`/`decode_pvce` 严格解码（拒绝非规范表示）。
-- 执行：只调 facade（`as_*` 适配器 → 各文档 `query`/`project`/`materialize`；`convert_*`）；Recovered 文档的 project/materialize 拒绝沿用 SDK 语义（IMPLEMENTATION.md 第 224 行）。
+- 执行：只调 facade（`as_*` 适配器 → 各文档 `query`/`project`/`materialize`；`convert_*`）；Recovered 文档的 project/materialize 拒绝沿用 SDK 语义（IMPLEMENTATION.md 第 285 行：Missing value、Recovered 文档、资源越界或 closure 不完整均整体失败）。
 - 输出：机器 = 信封 + 既有 protocol 消息（`QueryResultMessage` 等）；human = `output.rs` 渲染。**机器输出必须与 SDK 直接 encode 字节相等**（§11 兼容性门禁的测试载体）。
 - materialize/convert 的写文件仅经 `--output`（fsio 在 M6，故本里程碑先输出到 stdout/内存，不落盘）。
 
@@ -375,7 +375,7 @@ files: [{ path, status: completed | failed | pending | skipped-stale,
 
 ### M7 — edit + plan（串行）
 
-范围：`edit_cmd.rs`（单文件 dry-run：EditTransaction → `EditPlanMessage` + `SourcePatch`；`--write` 留待 M8 接 fsio）；`plan.rs`（多文件批量：逐文件 parse → edit dry_run → 汇总 `core.batch-plan@1`，human 视图逐项 redact）；`manifest.rs` plan 侧（schema 编码 + 从 `--output` 或 stdout 落盘）。plan 全程只读（plan manifest 是产物，不是授权——IMPLEMENTATION.md 第 261 行）。
+范围：`edit_cmd.rs`（单文件 dry-run：EditTransaction → `EditPlanMessage` + `SourcePatch`；`--write` 留待 M8 接 fsio）；`plan.rs`（多文件批量：逐文件 parse → edit dry_run → 汇总 `core.batch-plan@1`，human 视图逐项 redact）；`manifest.rs` plan 侧（schema 编码 + 从 `--output` 或 stdout 落盘）。plan 全程只读（plan manifest 是产物，不是授权——IMPLEMENTATION.md 第 318 行）。
 
 验收门禁：dry-run 等价断言（同一输入的 plan 与未来 commit 的 replacements/digest 一致，先在库内断言 dry_run 输出）；batch-plan golden 字节；多文件计划（含一个失败文件 → 该文件 `failed` 入 manifest，其余照常，**不整批失败也不伪装成功**，§3.4）；redaction 在 plan 视图的覆盖。
 
@@ -389,7 +389,7 @@ files: [{ path, status: completed | failed | pending | skipped-stale,
 
 范围：
 - `conformance/vectors/cli-v1.json`：suite `consema.cli.conformance@1`。case 覆盖：v7 信封双传输等价（canonical JSON ↔ PVCE 字节相等）；exit-code 分类矩阵（每错误族）；batch-plan/batch-result 状态迁移（含非法迁移负例）；redaction 展示策略（presentation-only 断言）；检测事实矩阵（marker → 事实/候选/歧义）。协议层向量由 `crates/consema-conformance/src/cli_v1.rs` 在库侧执行（照 plist_v1.rs 体例：SUITE 常量、include_str、capability 分派、suite id 检查、数据驱动）。
-- `conformance_cmd.rs`：内嵌自检子集（信封 round-trip、exit 分类、redact 自检），输出 suite 报告（机器格式）；完整语言无关 suite 仍由 `cargo test -p consema-conformance` 执行（发布物不含仓库 fixtures——consema-conformance `publish = false` 先例，IMPLEMENTATION.md 第 62 行）。
+- `conformance_cmd.rs`：内嵌自检子集（信封 round-trip、exit 分类、redact 自检），输出 suite 报告（机器格式）；完整语言无关 suite 仍由 `cargo test -p consema-conformance` 执行（发布物不含仓库 fixtures——consema-conformance `publish = false` 先例，IMPLEMENTATION.md 第 65 行）。
 - `tests/cli_hardening.rs`：路径穿越、超长路径、非法 UTF-8 文件名、超限文件、畸形 plan 输入、篡改 plan digest——不 panic、不写错目标。
 - `tests/cli_e2e.rs`：§22.6 工作流示例（真实规模夹具批量 plan/apply，§10 全命令冒烟）。
 

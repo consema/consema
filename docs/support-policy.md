@@ -1,7 +1,7 @@
 # Consema 支持政策（Support Policy）
 
 - 版本：0.1（草案，0.13.0 门禁 M6 交付；`1.0.0` 发布前必须公开，路线图
-  §21.4 第 1851 行）
+  §21.4 第 1855 行）
 - 适用范围：Rust SDK（`consema` facade 及全部 backend crates）、Rust CLI、
   `0.14.0` 起的 Go SDK / Go CLI（§21.2）、TypeScript（`@consema/consema`）、
   Python（`consema`）与 Kotlin（`dev.consema:consema-kotlin`）SDK——五语言
@@ -30,7 +30,7 @@
   与 Go RC 时按当时稳定生态冻结）。
 - **支持窗口**：从 MSRV 到当前 stable 的所有 Rust 版本。MSRV 提升只在
   minor 版本发生（§12.1 破坏性变更规则），**永不进入 patch release**
-  （§21.1 第 1820 行）；提升必须走 manifest 变更记录（§12 版本治理），并
+  （§21.1 第 1826 行）；提升必须走 manifest 变更记录（§12 版本治理），并
   在 CHANGELOG 注明用户可停留的最低版本。
 - **验证**：CI msrv job 是唯一权威（本地 `cargo +1.85.0` 只作复验）；任何
   使用高于 MSRV 语法的代码（如 let-chains）在合入前必须被 msrv job 拦截
@@ -41,7 +41,7 @@
 
 ## 2. Go version window
 
-Go 实现从 `0.14.0` 开始（§14.12 第 1345 行）。`go.mod` 声明的最低版本
+Go 实现从 `0.14.0` 开始（路线图 §16.1 第 1457 行）。`go.mod` 声明的最低版本
 `go 1.26` 已于 0.14.0 冻结（RFC 0016 §9 / go-implementation-plan §1.3；
 RFC 0020 §9.2 的调和表述：声明最低版本在 0.14.0 冻结，最低版本+验证工具链的
 正式冻结在 Go RC 时按当时 Go 稳定生态完成，见 RFC 0020）；不在本政策预先
@@ -66,7 +66,7 @@ Node 版本：
   five-language-ci-design §1.2）。
 - **提升纪律**：最低版本提升遵循 §1/§2 同纪律——只在 minor 发生、永不进入
   patch、不重解释已发布 contract，CHANGELOG 注明用户可停留的最低版本。
-- **验证**：CI `L-gates` / `L-conformance` / `L-differential` job 在钉定
+- **验证**：CI `ts-gates` / `ts-conformance` / `ts-differential` job 在钉定
   版本上运行（`npm ci` + `npm run check` + `npm test`）。
 
 ## 4. Python version window
@@ -141,7 +141,7 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 - **resource limit 与截断**：任何 limit 失败不伪装成功（SECURITY.md:3-14），
   修复不得引入截断假成功。
 - **披露流程**：安全缺陷先于公开经私有渠道披露；`1.0.0` 前在仓库
-  `SECURITY.md` 冻结披露联系邮箱与 PGP key（§19.4 第 1764 行要求
+  `SECURITY.md` 冻结披露联系邮箱与 PGP key（§19.4 第 1770 行要求
   "安全披露联系方式和支持周期"，本文件为其落点；0.13.0 M7 收口）。披露
   时间表：确认后 90 天内发布修复（critical/high），或公开说明处置状态。
 
@@ -150,7 +150,7 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 产品版本规则（§12.1、§21.3）：
 
 - **patch**（0.x.y / 1.0.x）：bug/security fix，不改变公共 API、已定义
-  行为或已发布 contract；MSRV 提升永不进入 patch（§21.1 第 1820 行）。
+  行为或已发布 contract；MSRV 提升永不进入 patch（§21.1 第 1826 行）。
 - **minor**（0.x.0 / 1.x.0）：向后兼容的新能力、新 Profile 或新 contract；
   `0.x` 阶段 minor 允许破坏性变更，但必须满足 §12.1 五条（出现在 minor、
   有迁移说明、不重解释 `namespace.contract@N`、更新 conformance、同步列出
@@ -178,7 +178,7 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 
 ## 10. contract / Profile 退役流程
 
-- **已发布 `namespace.contract@N` 永不重解释**（§21.3 第 1843 行、
+- **已发布 `namespace.contract@N` 永不重解释**（§21.3 第 1849 行、
   §12.2）：冻结的 registry 数组与 constructor 精确不变
   （IMPLEMENTATION.md 第 12 章：v1-v6 冻结、v7 增量为 additive）。
 - **新版本 = 新 identity**：能力演进发布新 contract/version pair
@@ -190,7 +190,7 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
   2. 退役记录写明原因、替代 contract ID、最后支持的产品版本；
   3. 退役不删除注册记录与 typed decoder 的解析路径（历史数据可审计）；
   4. `consema capabilities` 输出按退役状态标注，但格式家族与 Profile 的
-     parse 兼容性边界属于 Profile 兼容性（§21.3 第 1847 行），不在退役时
+     parse 兼容性边界属于 Profile 兼容性（§21.3 第 1853 行），不在退役时
      悄悄改变 acceptance/recovery 行为。
 - **error code 永不重定义**：RFC 0015 §5.3 冻结 exit code 分类
   {0..5} 与每 code 含义；任何新增/重定义必须走新 RFC 或新 contract
@@ -200,7 +200,7 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 
 ## 11. 工具链冻结时机
 
-§21.4 末段（第 1861 行）：具体工具链版本不在多年路线图中预先写死，而是在
+§21.4 末段（第 1867 行）：具体工具链版本不在多年路线图中预先写死，而是在
 **Rust Feature-Complete 与 Go RC** 两个时点按当时稳定生态冻结：
 
 - Rust：Feature-Complete（0.13.0 门禁，§15）冻结 MSRV 与验证工具链；
@@ -224,9 +224,9 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 | 三平台 | CI 矩阵（gate-plan M1）；BENCHMARKS-0.12.0.md Environment |
 | 缺陷等级 P0-P3 | 路线图 §18.4；SECURITY.md:16 硬化套件 |
 | audit/deny 常设 | SECURITY.md:38；gate-plan P-3/P-4 |
-| contract 冻结 | IMPLEMENTATION.md 第 12 章；README.md:31-32 |
+| contract 冻结 | IMPLEMENTATION.md 第 12 章；README.md:48、56（fc-manifest 与 conformance 清单行） |
 | exit code 冻结 | RFC 0015 §5.3；cookbook 第 11 节 |
 | 发布供应链（含披露联系方式） | 路线图 §19.4；gate-plan M7 |
 
 本政策的变更必须走 CHANGELOG；`1.0.0` 发布前由 0.13.0 门禁复核本文件与
-实际发布物一致（§21.4 第 1851 行"必须公开"）。
+实际发布物一致（§21.4 第 1855 行"必须公开"）。

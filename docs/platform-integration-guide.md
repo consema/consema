@@ -55,10 +55,11 @@ Consema 的承诺边界是**单文件内容处理**：`apply` 的"批量原子�
   SDK 之一（Rust / Go / TypeScript / Python / Kotlin，语言无关契约
   RFC 0016；五语言同等地位，2026-08-11 决策）。编辑事务
   （`EditTransaction` → `EditPlan`/`ChangeSet` → `SourcePatch`）覆盖全部
-  8 格式家族——每家族 5-8 个注册操作，共 16 个 format-local operation
-  registry 条目（json 8 / toml 7 / yaml 8 / ini 8 / properties 5 / xml 8 /
-  plist 6 / hcl 6，见 fc-manifest-0.13.0.json 与五要素评审 §5）；dry-run
-  与提交产生完全相同的 replacements 与 target digest（SECURITY.md）。
+  8 格式家族——每家族 5-8 个注册操作（json 8 / toml 7 / yaml 8 / ini 8 /
+  properties 5 / xml 8 / plist 6 / hcl 6，合计 56 个操作），对应 16 个
+  format-local operation registry（按 profile 计，见 fc-manifest-0.13.0.json
+  与五要素评审 §5）；dry-run 与提交产生完全相同的 replacements 与 target
+  digest（SECURITY.md）。
   平台不应自己拼接字节改写配置。**Go SDK 的 YAML family 仅 Commit 直提
   （无 EditPlan dry-run 面，pilot-go F-2 / G2.1 已知 gap）；平台若需 YAML
   编辑预览请用 Rust/TS/Py/Kt 或经 yaml.Commit 检查产物**。
@@ -171,15 +172,16 @@ Consema 只做单文件内容处理：平台负责"文件集合"这个维度（�
 ## 6. CLI 编辑限制与跨格式修改路径
 
 - **CLI 编辑词表仅 INI family**（0.13.0）：`consema edit` 只接受
-  `ini.edit.*` 操作；其余 6 个家族的 edit 请求显式拒绝（exit 2，
+  `ini.edit.*` 操作；其余 7 个家族的 edit 请求显式拒绝（exit 2，
   `cli.data.invalid-request@1`，消息自明，绝不静默）；`edit --write`
   未接线（dry-run only，`--write` 是 usage 错误 exit 1）；**批量写一律经
   `plan` + `apply`**（cookbook §10 边界 7、§6；pilot-0.13.0 F-1；
   B-8 backlog）。
 - **平台跨格式修改走 SDK 编辑事务**：json/toml/yaml/xml/plist/hcl/
-  properties 的内容修改通过 SDK `EditTransaction`（16 操作注册表：
-  每家族 5-8 个注册操作，见 §2）；CLI 批量路径用于 INI 及未来 B-7
-  映射后的全家族。
+  properties 的内容修改通过 SDK `EditTransaction`（16 个 operation
+  registry——按 profile 计；各家族操作数 json 8 / toml 7 / yaml 8 /
+  ini 8 / properties 5 / xml 8 / plist 6 / hcl 6 合计 56 个操作，见 §2）；
+  CLI 批量路径用于 INI 及未来 B-7 映射后的全家族。
 - **B-7 是平台可承接的适配面**：facade `operation_registry` 已为每
   profile 提供操作清单，平台若需在 CLI 层做跨格式批量编辑，可在平台侧
   实现"格式 → 操作请求"映射（请求体见 RFC 0015 §3.2 与 cookbook §6）；

@@ -7,6 +7,10 @@
   0.13.0 M1 交付）；`.github/workflows/ci.yml` package job（常设载体，M1 交付）。
 - 2026-08-07 首次执行记录：全部脚本与演练在本机（Windows 11，PowerShell 5.1 +
   Git for Windows msys 环境）实测，产出物已入库（`docs/release/`）。
+- **执行位置注记（2026-08-13）**：六仓拆分后母仓根无 Cargo.toml/workspace——
+  本文档 §3/§4/§5 的所有脚本命令（release-sign.ps1 / release-sbom.ps1 /
+  verify-package-archives.ps1）必须从 **consema-rs 检出**执行（脚本的 cargo
+  metadata 从启动 cwd 解析 workspace；母仓 `scripts/` 副本为记录载体）。
 - 不变量：**任何签名产物都必须来自真实 GPG 操作与真实归档**；演练记录只写实际发生
   的输出与退出码；人工改动 checksum 清单以迁就损坏归档视为伪造证据。
 
@@ -61,12 +65,12 @@ MSRV build leg: rustc 1.85.0 for all 14 crates
   consema-conformance 的 15 个归档；发布时归档集合以 verify 脚本/签名步骤
   计算为准（14 个），裸打包多出的 repository-only crate 不写进 SHA256SUMS。
 
-### 2.2 CI package job（常设载体，`.github/workflows/ci.yml:285-303`）
+### 2.2 CI package job（常设载体，六仓拆分后位于 consema-rs/.github/workflows/ci.yml:384-410）
 
 - `package` job：`ubuntu-latest`、`timeout-minutes: 60`；steps：
   `actions/checkout@v4` → `dtolnay/rust-toolchain@stable` → `dtolnay/rust-toolchain@1.85.0`
   → `swatinem/rust-cache@v2` → `cargo fetch --locked` → 运行
-  `scripts/verify-package-archives.ps1`（pwsh）。
+  `scripts/verify-package-archives.ps1`（pwsh，consema-rs 检出内执行）。
 - 语义：**每次推入都在干净 checkout 上重建全部 14 个发布归档并跑完整门禁**——这是
   "release artifact 可从干净环境重建"（§15.6）的常设证明，发布记录只需补充本地
   签名/SBOM/checksum 步骤，不需要重复证明可重建性。

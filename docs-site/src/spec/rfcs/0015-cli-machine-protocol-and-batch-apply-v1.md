@@ -22,7 +22,7 @@
 ## 1. Decision
 
 Consema 0.12.0 publishes the official `consema` CLI (a `[[bin]]` target of
-`crates/consema`) and freezes its machine-readable protocol as a v1
+`consema-rs/consema`) and freezes its machine-readable protocol as a v1
 candidate. The machine protocol consists of three registered contracts and
 several command-level payload records:
 
@@ -130,7 +130,7 @@ All registered contracts and envelope payloads are fixed-field
 `PortableValue` trees carried by the existing dual transports:
 
 - canonical JSON: `encode_json`/`decode_json`
-  (`crates/consema-protocol/src/value_transport.rs:11-75`), outer envelope
+  (`consema-rs/consema-protocol/src/value_transport.rs:11-75`), outer envelope
   fixed as `{"schema":"core.portable-value-json@1","value":...}`; objects
   are ordered `entries` arrays `[{key, value}]`; integers are stringified;
   Bytes are lowercase hex; unknown/missing/reordered fields, non-canonical
@@ -143,7 +143,7 @@ All registered contracts and envelope payloads are fixed-field
   `consema.cli.conformance@1` vectors (Section 16).
 
 The envelope follows the existing envelope discipline
-(`crates/consema-protocol/src/contract.rs:356-460`): the payload object's
+(`consema-rs/consema-protocol/src/contract.rs:356-460`): the payload object's
 first field must be `schema` with a value equal to `(id@version)`;
 dispatch keys on the exact `(contract.id, contract.version)` pair and never
 selects a version from field content (RFC 0011 Section 11).
@@ -190,7 +190,7 @@ rules:
 > sequence ships `1.0.0-rc.n` as prerelease versions; the cli-v1 vectors
 > pin no prerelease rejection, so the vectors stay valid. Implemented by
 > the identical `is_semantic_version` extension in
-> `crates/consema-protocol/src/cli.rs` and `go/protocol/cli.go`.
+> `consema-rs/consema-protocol/src/cli.rs` and `go/protocol/cli.go`.
 - Ordering: `files` arrays follow the command-line argument order;
   diagnostics follow a deterministic order (source order/argument order);
   `DiagnosticMessage.arguments` is a sorted map (existing contract
@@ -254,7 +254,7 @@ The `core.cli-output@1` typed decoder revalidates cross-constraints:
 - every `diagnostics` item strictly decodes as `core.diagnostic@1`
   (codes validated under `ErrorCodeRegistry::v7()`);
 - `ProtocolLimits` apply throughout
-  (`crates/consema-protocol/src/limits.rs:5-31`).
+  (`consema-rs/consema-protocol/src/limits.rs:5-31`).
 
 ### 4.4 Normative example (canonical JSON bytes)
 
@@ -941,7 +941,7 @@ core.batch-result@1
 ### 16.1 Vector suite
 
 The suite `consema.cli.conformance@1` (repository-level:
-`conformance/vectors/cli-v1.json` + `crates/consema-conformance/src/cli_v1.rs`,
+`conformance/vectors/cli-v1.json` + `consema-rs/consema-conformance/src/cli_v1.rs`,
 following the `consema.plist.conformance@1` pattern; total suite count
 17 → 18). Case `capability` dispatch:
 
@@ -986,7 +986,7 @@ the full bytes.
 
 ### 16.3 Process-level e2e
 
-`crates/consema/tests/cli_*.rs` launches the binary via
+`consema-rs/consema/tests/cli_*.rs` launches the binary via
 `env!("CARGO_BIN_EXE_consema")`: stdout/stderr separation assertions,
 exit-code matrix, full plan→apply flow, failure injection
 (stale/conflict/permission/disk/read-only/interruption), and machine-output
