@@ -285,3 +285,46 @@
 | 完整可靠 | P2 | 三语言目录无 README（go/README 有而 TS/Python/Kotlin 无） | 已建（typescript/README.md、python/README.md、kotlin/README.md，2026-08-12） |
 
 **§7 结论**：五语言面上哲学统一/语义一致/逻辑自洽/真实有效 **PASS**（findings 全部处置），完整可靠 **PARTIAL**（与 §28.5 同口径：C-2/C-3 未关闭（partial））；五语言扩展未改变 §6.1 判定。
+
+---
+
+## 8. 第三轮六仓全内容交叉审计（2026-08-13，1.0.0-rc.1 候选期）
+
+- 触发：`/loop` 收口循环（2026-08-12 晚启动）——"整个项目所有内容通过多要素交叉审计：哲学统一、语义一致、逻辑自洽、真实有效、完整可靠"
+- 范围：**六个仓库全部文件**（母仓 consema + consema-rs/go/ts/py/kt），8 个并行审计员（母仓 docs 域 / 母仓 conformance+CI 域 / 五语言仓各一 / 跨仓一致性），全部只读静态审计 + 独立复算 + GitHub Actions API 在线核验
+- 审计基线：母仓 HEAD d1bda22；语言仓 HEAD rs 16d4181 / go dabe4f3 / ts fc67a4c / py 2a825af / kt 1e2f3da
+- 判定体例照 §1-§7；本批为第二轮的增量全量复核（第二轮覆盖至 dbba9a4）
+
+### 8.1 五要素判定（第三轮）
+
+| 要素 | 判定 | 结论要点 |
+|---|---|---|
+| 哲学统一 | **PASS** | 六仓无反例：不可变 Document（py frozen dataclass/slots、TS 防御性拷贝、kt immutable、go Completed objects）、显式操作、CLI 默认拒绝、零依赖面（go.mod 零 require / npm 零 prod dep / pyproject dependencies=[] / kt 仅测试依赖）全部实测成立 |
+| 语义一致 | **PASS** | 519 cases / 聚合 digest cfd6e296… 在六仓全部独立复算命中（含 TS runner 字节级复算）；187 codes / 41 contracts 五语言注册表集合互差 0；差分 68/108/83 精确钉死；oracle 36 项实测 |
+| 逻辑自洽 | **PASS** | 三操作链以共享向量为界闭合；Rust 编码器字节权威 + 双向差分反审计无权威循环；六仓拆分计数 179/26/5/7/7 逐仓复算命中 |
+| 真实有效 | **PARTIAL** | 核心数字（519/cfd6e296/132 steps/179-26-5-7-7/版本 1.0.0-rc.1）全部为真；P2-B 后 508/35bebc8d 清扫不彻底（本批已全库清零）；consema-rs 自有 CI fmt 全红（run#31，本批已修复待推绿）；docs-site 从未部署成功（Pages 未启用，README 已如实化） |
+| 完整可靠 | **PARTIAL** | 与 §28.5 同口径：C-2（fuzz 账本累计中，properties/yaml/ini 已过 72h 门槛）与 C-3（真实发布密钥）未关闭；consema-go 文档化共享 conformance 验证路径 508 断言已修（P1 关闭） |
+
+### 8.2 findings 处置汇总（本批）
+
+| 仓 | P1 | P2 | P3 | 关键处置 |
+|---|---|---|---|---|
+| 母仓 | 1 | 12 | 3 | fc-manifest 证据行号迁移至六仓布局（evidence_note + 13 处引用更新）；README 18/508→18/519；six-repo-split §6 同步 519/cfd6e296 + job 计数 + rs vendor 机制如实化；five-language-ci-design 行号/oracle 计数 72/JSON5 口径/kotlin jar 供给/版本政策行；corpus runbook 钉值 519/cfd6e296；release-process §7 产物名 1.0.0-rc.1；docs-site 三副本同步；coverage.ps1 508→519；stale.yml 权限收窄；mutation-v1.json tool 字段路径 |
+| consema-rs | 0 | 3 | 5 | README job 计数 9→11、ctrlc 依赖如实化、vendored conformance/README 重新 vendor；**cargo fmt 4 文件修复（CI run#31 全红根因，fmt --check 归零）**；gen_mutation_corpus tool 字符串同步；run_waves.ps1 入库建议（待批次） |
+| consema-go | 1 | 4 | 3 | **shared_run_test.go 508→519（文档化验证路径必红修复）**；SECURITY.md 依赖门禁段改编；ci-go.yml 头注释 3→6 job；README 旧 fuzz 表注记；.gitignore provision 数据忽略 + CONTRIBUTING 本地 provision 步骤 |
+| consema-ts | 0 | 3 | 5 | "fmt" 虚假声称三处清除（README/job 名/CONTRIBUTING/CHANGELOG）；SECURITY.md 误挂 Rust 证据改为本仓真实机制+规范仓指针；**包版本 0.14.0→1.0.0-rc.1 统一**（用户决策 2026-08-12）；*.tgz 忽略 |
+| consema-py | 1 | 4 | 3 | **版本 0.14.0→1.0.0-rc.1 统一**（pyproject/__init__/README/bug_report，check-version 门禁两处同步）；compileall 静态门禁落地（job 名如实化）；mojibake 10 处 + BOM 修复（UTF-8 无 BOM 字节验证）；gitignore 补齐；L0-L5 描述更新 |
+| consema-kt | 1 | 4 | 4 | **「无 Gradle wrapper」声称 ×2 修复（§7.2 批次遗漏）**；计数 547→572/234→236 静态实测回填；jar 供给记录核实（脚本/CI 如实，仅母仓文档需修——已修）；TestShim.kt 标注 historical + 直驱模式描述重写；L4 标注 15 处→post-1.0.0（F-28.3-1 跟进） |
+
+跨仓新确认：consema-go 未跟踪 conformance//docs/ 为**测试必需 provision 数据**（CI 多仓 checkout 从母仓取数，非第二权威），已 gitignore + 文档化；docs-site 根因 = Pages 未启用（workflow 无 bug）；C-1 证据链 132/132（run#5）在线核实为真。
+
+### 8.3 本批遗留（随后续循环处置）
+
+1. **C-2**：fuzz 账本继续累计（2026-08-12 24:00 快照 84,600 行 / ≈582 CPU-hours；xml 25.7h 最远，全家族 ≥72h 时关账并回填本表）；
+2. **C-3**：真实发布密钥 + 备份 + 吊销证书（用户动作）；从干净发布 commit 按 release-process §7 执行（产物名已按 1.0.0-rc.1 更新）；
+3. **consema-rs CI 推绿**：fmt 修复待提交推送后验证 run 全绿；
+4. **docs-site 部署**：用户动作——consema 仓库 Settings → Pages → Source = "GitHub Actions"；
+5. **run_waves.ps1 入库**（consema-rs 根，账本驱动可追溯性）；
+6. RC soak 剩余：磁盘失败演练（Linux runner 路径可用）、Rust 侧性能 -Check 复验（fuzz 关账后空闲执行）。
+
+**§8 结论**：六仓全内容面上哲学统一/语义一致/逻辑自洽 **PASS**；真实有效/完整可靠 **PARTIAL**——本批 P1 全部处置（go 508 断言、py 版本矛盾、fc-manifest 证据行号、rs CI fmt、kt wrapper 声称），P2 全库清扫完成（508/35bebc8d 现行态清零）；剩余 PARTIAL 仅因 C-2（时间累计）与 C-3（用户密钥）未关闭，另加三项外部待办（rs CI 推绿验证、Pages 启用、run_waves 入库）。

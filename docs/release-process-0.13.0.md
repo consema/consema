@@ -283,11 +283,11 @@ verify exit=0
 
 ```text
 □ 1. workspace 版本推进到 1.0.0-rc.1（Cargo.toml [workspace.package] version；0.13.0 推进项已被 1.0.0-rc.1 取代，commit 2209582）
-□ 2. CI 10 job 全绿（含 package job，§2.2）——常设重建证明
+□ 2. 六仓 CI 全绿（含 package job，§2.2）——常设重建证明
 □ 3. 本地干净重建：cargo fetch --locked + verify-package-archives.ps1（§2.1）
-□ 4. SBOM：scripts/release-sbom.ps1 → docs/release/sbom-0.13.0.json（§5）
-□ 5. Checksum：release-sign.ps1 -SignArtifacts → SHA256SUMS-0.13.0.txt(.asc/.sig)
-□ 6. Tag：release-sign.ps1 -SignTag v0.13.0，登记 tag 对象 hash（§4.2）
+□ 4. SBOM：scripts/release-sbom.ps1 → docs/release/sbom-1.0.0-rc.1.json（§5）
+□ 5. Checksum：release-sign.ps1 -SignArtifacts → SHA256SUMS-1.0.0-rc.1.txt(.asc/.sig)
+□ 6. Tag：release-sign.ps1 -SignTag v1.0.0-rc.1，登记 tag 对象 hash（§4.2）
 □ 7. 全量校验：release-sign.ps1 -VerifyArtifacts（14 归档 + 双签名）exit 0
 □ 8. 恢复演练按 §6 复跑一次并记录（若演练记录与本次差异，记录差异原因）
 □ 9. 上述产物与本文件更新一并入库（发布记录 commit）

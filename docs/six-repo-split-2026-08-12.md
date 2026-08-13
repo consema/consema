@@ -34,7 +34,7 @@
 | 1. 全仓库对齐 | `aca77f6`（13 files，110+/94-） | 版本陈旧 3P1+24P2、路径引用 33P2 全部修复；Go 里程碑 0.14.0-0.19.0 交付、C-2 最新快照（3/9 units past 72h、62,432 行）、fc-manifest A-4/A-9/SEC-9 backfill、路线图五语言扩展注记、session-448 wave-3 超时事件记录、40+ 引用漂移修复（CHANGELOG / rc-candidate / ci.yml 行引用）。该 commit 在 go / py 的 split 历史中各有同名投影（go `7a03a15`、py `c1dfb4d`，同一变更在各 split 分支中保留）；rs / ts / kt 分支未带（对齐未触及其特有文件） |
 | 2. cases.json 差分集迁移 | `00c850d`（34 files，273+/84-） | 共享差分 case 集迁至 `conformance/differential/` 单一权威（five-language-ci-design §3.5 落地）：go embed → 运行时加载（`CONSEMA_DIFFERENTIAL_CASES_DIR` + upward probe），12 个 verify 脚本 + TS/Python/Kotlin harness 路径更新 |
 | 3. git subtree split 五分支 | （无新 commit，历史保留） | 五语言分支 commit 数实测：rs 179 / go 26 / ts 5 / py 7 / kt 7（`git rev-list --count <assembly>^`），历史完整保留 |
-| 4. 五仓组装 | rs `6bcb068`（201 files，193,987+/187-）、go `cb0aedc`（371 files）、ts `1faa03f`、py `00d9054`（260 files）+ py `1a15969`（de-nest 修正：assembly move 与 leftover worktree dirs 冲突）、kt `613ae2f` | Cargo.toml members 重写（15 crates 至仓库根，无 crates/ 目录）；include 路径 172 处 `../../../` → `../../`；conformance vendor 快照入仓（本地开发用，CI 实际多仓 checkout 取母仓）；CI workflow 多仓 checkout 模式落地 |
+| 4. 五仓组装 | rs `6bcb068`（201 files，193,987+/187-）、go `cb0aedc`（371 files）、ts `1faa03f`、py `00d9054`（260 files）+ py `1a15969`（de-nest 修正：assembly move 与 leftover worktree dirs 冲突）、kt `613ae2f` | Cargo.toml members 重写（15 crates 至仓库根，无 crates/ 目录）；include 路径 172 处 `../../../` → `../../`；conformance vendor 快照入仓（consema-rs 以此快照 + 计数钉为 CI 机制，见 §6；go/ts/py/kt 四仓 CI 经 `repository:` 多仓 checkout 从母仓 provision） |
 | 5. 母仓瘦身 | `2d7494f`（1448 files，96+/748,455-） | 删除全部语言目录；README 六仓导航；CI 重建为 oracles + digest 两 job（见 §6） |
 | 6. 五仓推送 | （push，无 commit） | 五语言仓 `git push origin main`（origin 实测 = consema org 各仓） |
 | 7. 驱动迁移 | （见 §7） | `run_waves.ps1` 副本到 consema-rs，`-LedgerDir` 指向母仓账本，C-2 从 session 455 恢复累计 |
@@ -75,10 +75,10 @@
 
 ## 6. conformance 仲裁层新架构
 
-- **`conformance/` 为单一语言无关权威**（本仓维护、五仓共享）：`vectors/` 18 套 suite 508 cases（聚合 digest `35bebc8d…`）+ `fixtures/`（真实夹具；**`fixtures/toml/Cargo.toml` 于 `943c014` 归位**为 `toml.corpus.cargo-manifest` 的单一权威）+ `oracles/`（固定 runtime oracle：hcl-go-v1、plist-macos-v1 等，manifest 记录 runtime 固定事实与 documented skip_path）+ `corpora/`（mutation 语料）+ `differential/`（跨语言差分 case 集单一权威：`cases.json` byte-parity 68 / `normalized/cases.json` 108 / `protocol-exchange/cases.json` 83，由 `00c850d` 迁入）。
-- **五仓 CI 多仓 checkout provision 模式**：各语言 workflow 用 `repository: consema/consema` 多仓 checkout 从母仓 `conformance/` 取数（vectors / fixtures / oracles / differential case 集）；差分方向需要时另 checkout `consema/consema-rs`（各仓 ci-*.yml 实测）。
-- **母仓 CI 只跑自有门禁**（`.github/workflows/ci.yml`，`2d7494f` 重建）：`oracles`（3 OS 矩阵，exit 3 = documented skip = success）+ `shared-conformance-digest`（复算 `conformance/vectors/` 聚合 digest 并断言等于冻结记录 `35bebc8d…`，18/508 冻结的常设执行者）。
-- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 必须同步全部五个语言仓并更新聚合 digest 与 18/508 计数（README 声明；未同步会让各仓 conformance gate 与 digest 断言失败）。
+- **`conformance/` 为单一语言无关权威**（本仓维护、五仓共享）：`vectors/` 18 套 suite 519 cases（聚合 digest `cfd6e296…`；P2-B 补强 2026-08-12 取代） + `fixtures/`（真实夹具；**`fixtures/toml/Cargo.toml` 于 `943c014` 归位**为 `toml.corpus.cargo-manifest` 的单一权威）+ `oracles/`（固定 runtime oracle：hcl-go-v1、plist-macos-v1 等，manifest 记录 runtime 固定事实与 documented skip_path）+ `corpora/`（mutation 语料）+ `differential/`（跨语言差分 case 集单一权威：`cases.json` byte-parity 68 / `normalized/cases.json` 108 / `protocol-exchange/cases.json` 83，由 `00c850d` 迁入）。
+- **五仓 CI provision 机制（如实）**：consema-rs 以 conformance vendor 快照 + 计数钉为机制（vendored `conformance/` 快照入仓，CI 与本地同源；权威仍在母仓，ci.yml 头注释明示）；go/ts/py/kt 四仓经 `repository: consema/consema` 多仓 checkout 从母仓 `conformance/` 取数（vectors / fixtures / oracles / differential case 集）；差分方向需要时另 checkout `consema/consema-rs`（各仓 ci-*.yml 实测）。
+- **母仓 CI 只跑自有门禁**（`.github/workflows/ci.yml`，`2d7494f` 重建）：三 job——`oracles`（3 OS 矩阵，exit 3 = documented skip = success）+ `shared-conformance-digest`（复算 `conformance/vectors/` 聚合 digest 并断言等于冻结记录 `cfd6e296…`，519 冻结的常设执行者）+ `check`（聚合门禁，`if: always()` + toJSON(needs)，分支保护唯一 required check）。
+- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 必须同步全部五个语言仓并更新聚合 digest 与 18/519 计数（README 声明；未同步会让各仓 conformance gate 与 digest 断言失败）。
 
 ## 7. fuzz 驱动迁移
 

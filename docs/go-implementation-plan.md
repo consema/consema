@@ -33,7 +33,7 @@
 
 **Go 侧必须镜像的语言无关契约面（只读调研清单）：**
 
-1. **conformance 向量**：`conformance/vectors/` 18 套 suite / 508 cases（本计划逐文件计数复核，2026-08-07）：v1.json 30、toml-v1 18、protocol-v1 32、source-v1 28、syntax-query-v1 19、protocol-v2 11、operations-v1 35、json-family-v2 33、portable-graph-v1 10、semantic-model-v5 22、yaml-v1 27、semantic-model-v6 25、ini-v1 20、java-properties-v1 22、xml-1-0-safe-v1 34、plist-v1 45、hcl-v1 57、cli-v1 40。聚合 sha256 `35bebc8d384d71740f7c1a886bc50f4e095ff52fe05d2a407f04b842ee6922fa`（fc-manifest 第 38 行；聚合方式见第 40 行；2026-08-10 复核可精确复现——按文件名字节序排序，逐文件 sha256（小写 hex），行格式 `{basename}:{digest}` 以 `\n` 连接（无尾换行）后对 UTF-8 字节再 sha256）。**digest 以规范 checkout（.gitattributes eol=lf，git 存储的 LF 规范态）字节为准**：2026-08-10 修订前记录值 `e3d6578858…` 是 2026-08-07 在 CRLF 工作树（本机 core.autocrlf=true）记录的，已被规范态值取代；CRLF 工作树下逐文件 sha256 不同属预期（本地开发用 `git config core.autocrlf false` 或接受该差异）。
+1. **conformance 向量**：`conformance/vectors/` 18 套 suite / 519 cases（本计划逐文件计数复核：2026-08-07 为 508；2026-08-12 P2-B 向量补强 plist +4 / yaml +4 / java-properties +3 后为 519）：v1.json 30、toml-v1 18、protocol-v1 32、source-v1 28、syntax-query-v1 19、protocol-v2 11、operations-v1 35、json-family-v2 33、portable-graph-v1 10、semantic-model-v5 22、yaml-v1 31、semantic-model-v6 25、ini-v1 20、java-properties-v1 25、xml-1-0-safe-v1 34、plist-v1 49、hcl-v1 57、cli-v1 40。聚合 sha256 `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`（fc-manifest 第 38 行；聚合方式见第 40 行；2026-08-12 补强后实测复核可精确复现，2026-08-10 复核的 35bebc8d… 为增补前值——按文件名字节序排序，逐文件 sha256（小写 hex），行格式 `{basename}:{digest}` 以 `\n` 连接（无尾换行）后对 UTF-8 字节再 sha256）。**digest 以规范 checkout（.gitattributes eol=lf，git 存储的 LF 规范态）字节为准**：2026-08-10 修订前记录值 `e3d6578858…` 是 2026-08-07 在 CRLF 工作树（本机 core.autocrlf=true）记录的，已被规范态值取代；CRLF 工作树下逐文件 sha256 不同属预期（本地开发用 `git config core.autocrlf false` 或接受该差异）。
 2. **registry**：semantic-model v7 = 41 条 contract / 187 个 error code（README.md:32；fc-manifest 第 26 行；`crates/consema-protocol/src/registry_manifest.rs` 为序列化源；0.13.0 audit F3 注册 `json.projection.incomplete-document@1`，186 → 187）。
 3. **capability set**：8 families / 16 profiles / 21 query domains / 16 operation registries / 187 codes（fc-manifest 第 31 行；`consema capabilities` 实测）。
 4. **协议 payload**：RFC 0015 v7 记录（`crates/consema-protocol/src/cli.rs`：CliOutputMessage、BatchPlanMessage、BatchResultMessage、CliCommand、Redaction、BatchPlanFileStatus/BatchResultFileStatus；exit 分类 `crates/consema-protocol/src/exit_class.rs:11` 起 Success/Usage/Data/Limit/Precondition/Internal 六类）。
@@ -81,7 +81,7 @@
 
 | 共享件 | 复用方式 | 依据 |
 |---|---|---|
-| `conformance/vectors/*.json`（18 套 / 508 cases） | Go runner 直接消费（§4.3 读取方式）；向量是权威，禁止内嵌期望值进 runner | 路线图 §17.1 第 1565-1573 行；RFC 0016 §7 第 190 行；conformance/README.md 第 3-4 条 |
+| `conformance/vectors/*.json`（18 套 / 519 cases） | Go runner 直接消费（§4.3 读取方式）；向量是权威，禁止内嵌期望值进 runner | 路线图 §17.1 第 1565-1573 行；RFC 0016 §7 第 190 行；conformance/README.md 第 3-4 条 |
 | `conformance/fixtures/`（raw 字节夹具） | 按仓库相对路径读取，跨语言相同字节 | 路线图 §17.3 第 1595-1596 行；README"未来 Go 实现必须直接消费相同向量和 fixture" |
 | registry 与 error code 数据（v7：41/187） | 冻结清单是数据；Go 的注册表代码自写，内容与 v7 序列化一致 | README.md:32；fc-manifest 第 26 行 |
 | 协议 payload 固定字段与 exit 分类（`core.cli-output@1`/`core.batch-plan@1`/`core.batch-result@1`、`core.query-definition@1`、ProjectionRequest/MaterializationRequest 等） | 字段形状是契约；typed decoder 重验交叉约束照 v6/v7 先例 | RFC 0015；RFC 0016 §5.1/§6；cli-implementation-plan.md:197（Go CLI 同 schema 先例）、:199 |
@@ -246,7 +246,7 @@
 - 权威组成五元（§17.1 第 1565-1571 行）：normative prose + contract registry + machine-readable vectors + raw fixtures + independent Rust and Go runners。
 - Go runner 直接消费 `conformance/vectors/*.json`（向量文件是权威，RFC 0016 §7 第 190 行）与 `conformance/fixtures/`（raw 字节，§17.3 第 1595 行）。
 
-### 4.2 向量台账与里程碑适用面（18 套 / 508 cases，本计划逐文件计数）
+### 4.2 向量台账与里程碑适用面（18 套 / 519 cases，本计划逐文件计数）
 
 | suite | cases | 首次适用里程碑 | 说明 |
 |---|---|---|---|
@@ -262,14 +262,14 @@
 | syntax-query-v1 | 19 | 0.15.0（json/toml 面） | 随家族扩展 |
 | operations-v1 | 35 | 0.15.0（json/toml 面） | 随家族扩展至 0.18.0 |
 | cli-v1 | 40 | 0.14.0（envelope/exit-class/batch 类型面）→ 0.19.0（detection/redaction CLI 面） | 协议面由 protocol codec 支撑；CLI 面随 Go CLI |
-| yaml-v1 | 27 | 0.16.0 | YAML 1.2/1.1 全操作 |
+| yaml-v1 | 31 | 0.16.0 | YAML 1.2/1.1 全操作 |
 | ini-v1 | 20 | 0.16.0 | 三 Profile |
-| java-properties-v1 | 22 | 0.16.0 | 两 Profile |
+| java-properties-v1 | 25 | 0.16.0 | 两 Profile |
 | xml-1-0-safe-v1 | 34 | 0.17.0 | XML 1.0 safe |
-| plist-v1 | 45 | 0.17.0 | XML/binary |
+| plist-v1 | 49 | 0.17.0 | XML/binary |
 | hcl-v1 | 57 | 0.18.0 | HCL native/tfvars |
 
-- 0.18.0 收口：18/508 全量 100%、零 documented skip；0.19.0 保持并叠加 cross-language 编排层（§17.2 第 1590 行）。
+- 0.18.0 收口：18/508 全量 100%、零 documented skip（增补前——2026-08-12 P2-B 向量补强后现为 18/519）；0.19.0 保持并叠加 cross-language 编排层（§17.2 第 1590 行）。
 - 中途里程碑的通过标准：**适用 capability 的 case 100% 通过**；未实现 capability 的 case 进入 documented skip（带 capability 与原因，绝不静默，RFC 0016 §7 第 191 行）；skip 计数入 runner 报告。
 
 ### 4.3 Go runner 设计（镜像 `consema-conformance` 体例）
@@ -290,7 +290,7 @@
 
 ### 4.5 聚合 digest 校验
 
-Go runner 每次执行校验 `conformance/vectors/` 聚合 sha256 与 fc-manifest 的 `conformance_suite` 记录一致（fc-manifest 第 35-41 行：聚合方式"按文件名排序，逐文件 sha256，聚合 sha256(concat of 'name:digest' 行)"，当前值 35bebc8d…）——防止双 runner 各跑不同向量集；manifest 变更必须双 runner 同批更新。**digest 以规范 checkout（LF）字节为准**（2026-08-10 修订：2026-08-07 的 CRLF 工作树记录值 e3d6578858… 已被规范态值取代；CRLF 工作树下该校验会红属预期，本地开发用 `git config core.autocrlf false`）。
+Go runner 每次执行校验 `conformance/vectors/` 聚合 sha256 与 fc-manifest 的 `conformance_suite` 记录一致（fc-manifest 第 35-41 行：聚合方式"按文件名排序，逐文件 sha256，聚合 sha256(concat of 'name:digest' 行)"，当前值 cfd6e296…）——防止双 runner 各跑不同向量集；manifest 变更必须双 runner 同批更新。**digest 以规范 checkout（LF）字节为准**（2026-08-10 修订：2026-08-07 的 CRLF 工作树记录值 e3d6578858… 已被规范态值取代；CRLF 工作树下该校验会红属预期，本地开发用 `git config core.autocrlf false`）。
 
 ---
 
@@ -333,7 +333,7 @@ Go runner 每次执行校验 `conformance/vectors/` 聚合 sha256 与 fc-manifes
 | native normalized facts、报告、诊断 code/order、edit bytes 一致 | §16.4 第 1524 行 | 0.17.0 |
 | macOS Foundation differential run | §16.4 第 1522 行 | 0.17.0 |
 | **Go mandatory capability set == Rust Feature-Complete Manifest capability set，无 "Rust only" mandatory 行为** | §16.5 第 1539 行硬门禁 | 0.18.0 |
-| 18/508 全量 100%、零 documented skip | §22.2 第 1880 行 | 0.18.0 起 |
+| 18/519 全量 100%、零 documented skip | §22.2 第 1880 行 | 0.18.0 起 |
 | bidirectional differential + cross-language protocol exchange 100% | §22.2 第 1882 行 | 0.19.0 |
 | Go public API 稳定性审查（§21.2 六项 + 文档注释门禁） | §22.2 第 1885 行；§16.6 第 1551 行 | 0.19.0 |
 | Rust 与 Go 分别完成至少一个端到端 SDK pilot | §22.7 第 1937 行 | 0.19.0 |

@@ -11,8 +11,10 @@
 ### 0.1 现状（2026-08-11 调研）
 
 - Rust（0.13.0 Feature-Complete，1.0.0-rc.1 版本推进）与 Go（0.14.0-0.19.0 六里程碑）已完成
-  conformance 508/508、PVCE/PGCE byte-exact、protocol exchange 83/83、normalized 108×2。
-- 共享仲裁层：`conformance/vectors/`（18 套 / 508 cases，聚合 digest 35bebc8d 双语言共钉）、
+  conformance 508/508（P2-B 补强前时点；补强后 519/519）、PVCE/PGCE byte-exact、
+  protocol exchange 83/83、normalized 108×2。
+- 共享仲裁层：`conformance/vectors/`（18 套 / 519 cases，聚合 digest cfd6e296 五语言共钉；
+  508/35bebc8d 为 2026-08-12 P2-B 补强前值，见 §7.1 关账表）、
   `conformance/fixtures/`、`conformance/corpora/`、`conformance/oracles/`；
   注册表：contract v7（41 条）/ error codes v7（187 码）；RFC 0016（Go 契约）为语言无关规范面。
 - 字节权威 = **Rust 编码器**（PVCE/1、PGCE/1 golden 字节，双语言差分 harness 反向审计）。
@@ -50,7 +52,7 @@ L5=fuzz/bench/security matrix+CLI+release-candidate clean-run（↔G5）。
 
 **数据来源优先级（提取冻结数据时）**：
 1. `conformance/vectors/*.json`（语言无关、机器可读、双语言共钉聚合 digest）——首选；
-2. RFC 0001-0020 规范 prose（语言无关权威）——次选；
+2. RFC 0001-0016 + 0020 规范 prose（语言无关权威；0017-0019 不存在）——次选；
 3. Rust 实现（第一权威语言：PVCE/PGCE 字节布局、注册表清单的最终仲裁者）——仅在 1/2 不足时；
 4. Go 实现——**仅作交叉参照**（核对"另一实现也这么理解"），不作为提取来源；若 Rust 与 Go
    不一致，以 Rust + 向量为准并记录差异上报（不得自行裁决）。
@@ -116,7 +118,7 @@ JDK 17.0.20 + kotlinc 2.2.0（Kt，直接 JVM 调用 K2JVMCompiler）、cargo 1.
 | 门禁 | 通过条件 |
 |---|---|
 | 构建 | 工具链就绪后各语言构建/测试命令 exit 0 |
-| conformance | 全 18 套 / 508 cases runner 通过（与 Rust/Go runner 同批） |
+| conformance | 全 18 套 / 519 cases runner 通过（与 Rust/Go runner 同批） |
 | 字节 parity | PVCE/PGCE 与 Rust 编码器字节一致（golden 转录测试） |
 | capability parity | mandatory capability set 与 fc-manifest 对齐；无 "Rust only" mandatory 行为 |
 | 零依赖 | 运行时零第三方依赖（测试框架除外） |
@@ -155,5 +157,5 @@ GATE 未过期间的代码统称"盲写产物"，不得进入任何发布证据�
 - 体例：`docs/go-implementation-plan.md`（§1-§7 平移）
 - 契约：RFC 0016（语言无关契约面）、RFC 0006/0007（graph/PGCE）、RFC 0015（CLI 协议）
 - 注册表：`docs/fc-manifest-0.13.0.json`（41 contract / 187 codes / capability 门禁）
-- 向量：`conformance/vectors/*.json`（18 套 / 508 cases）
+- 向量：`conformance/vectors/*.json`（18 套 / 519 cases）
 - 字节权威：crates/consema-pvce（PVCE/1）、crates/consema-graph（PGCE/1）

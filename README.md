@@ -9,7 +9,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 
 ## 文档站
 
-[consema.github.io/consema](https://consema.github.io/consema/)：本仓文档的 GitHub Pages 发布视图（mdbook，源码在 `docs-site/`，构建部署见 `.github/workflows/docs-site.yml`）。本站把 `docs/` 与根目录的规范、RFC、路线图、指南与审计证据变成可浏览、可引用的站点；**权威文档始终以本仓 `docs/` 与根目录为准**，站点是发布视图。
+[consema.github.io/consema](https://consema.github.io/consema/)：本仓文档的 GitHub Pages 发布视图（mdbook，源码在 `docs-site/`，构建与部署 workflow 见 `.github/workflows/docs-site.yml`）。**部署待启用**：站点从未成功部署——docs-site workflow 唯一一次 run 的 deploy 步骤失败（`createPagesDeployment` 404，GitHub Pages API 亦 404），根因是仓库设置中 GitHub Pages 未启用（Settings → Pages → Source 需设为 "GitHub Actions"），workflow 文件本身无 bug；待用户在仓库设置启用后，下次 push 即自动部署。本站把 `docs/` 与根目录的规范、RFC、路线图、指南与审计证据变成可浏览、可引用的站点；**权威文档始终以本仓 `docs/` 与根目录为准**，站点是发布视图。
 
 ## 六仓结构
 
@@ -70,7 +70,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 
 - 各语言仓（consema-rs / consema-go / consema-ts / consema-py / consema-kt）CI 通过多仓 checkout 从本仓 `conformance/` 取数：vectors、fixtures、oracles 与 differential case 集是本仓维护、五仓共享的**单一语言无关权威**。
 - 本仓 CI 的 `shared-conformance-digest` job 复算 `conformance/vectors/` 聚合 digest 并断言等于 `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`（算法：文件名字节序排序、逐文件 sha256、`{basename}:{digest}` 以 `\n` 连接、再 sha256；以规范 checkout 的 LF 字节为准，见 `docs/fc-manifest-0.13.0.json` conformance_suite note）。
-- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 都必须同步全部五个语言仓（实现与测试）并同步更新聚合 digest 与 18/508 计数；未同步的向量变更会让各仓 conformance gate 与 digest 断言失败。
+- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 都必须同步全部五个语言仓（实现与测试）并同步更新聚合 digest 与 18/519 计数；未同步的向量变更会让各仓 conformance gate 与 digest 断言失败。
 
 ## 格式家族
 

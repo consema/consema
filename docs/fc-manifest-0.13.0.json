@@ -4,6 +4,7 @@
   "recorded_at": "2026-08-07",
   "status": "gate_open",
   "status_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭（C-1 已闭环 2026-08-11；C-2/C-3 开放）：本 manifest 记录每个门禁条目的当前状态、证据与完成路径；Go 实现以本 manifest 为起点（路线图 §15.7 第 1445 行），0.14.0-0.19.0 全里程碑（G0.1-G5.6）已按 2026-08-07 owner decision（decisions[0]）授权启动并全部独立验证交付（go/README 逐项记录；productVersion 1.0.0-rc.1，runner 519/519），C-1/C-2/C-3 完成路径与 Go 里程碑门禁不变。",
+  "evidence_note": "六仓拆分（2026-08-12，commit 2d7494f）后证据路径迁移至 consema-rs：本 manifest 的 ci.yml 与根 Cargo.toml 证据（原单仓 .github/workflows/ci.yml 行号区间 :33-303、根 Cargo.toml）现属 consema-rs 仓，已按审计更新为 consema-rs/.github/workflows/ci.yml 与 consema-rs/Cargo.toml 的实际行号；oracles job 属母仓 ci.yml（oracles/shared-conformance-digest/check 三 job），go-1-26/go-differential 属 consema-go，Go 实现证据路径为 consema-go/go/；README.md 的 conformance 声明现位于 README.md:56。拆仓前单仓 ci.yml 的 10+1/10+2 job 结构与 run#1-5 记录为历史事实，其行号在拆分后文件不适用；其余 Rust 实现事实类 README 引用（registry/corpus/capability 等，原 README.md:25-37 区间）的 consema-rs README 行号核验另批处理。",
   "source_of_truth": [
     "路线图《Consema 1.0.0 产品路线图与双语言落地设计.md》§15.1-§15.7（门禁清单）、§18.3/§18.4（coverage 政策/缺陷分级）、§19.4（发布供应链）、§20.3（回退政策）、§23（真实项目验证）",
     "docs/0.13.0-gate-plan.md（执行计划；本条目的证据与缺口对应其 §1/§2/§3/§7）",
@@ -14,7 +15,7 @@
   "digests": {
     "product_version": {
       "value": "1.0.0-rc.1",
-      "evidence": "Cargo.toml:31（[workspace.package] version，2209582 提交推进 0.13.0→1.0.0-rc.1）；go/cmd/consema/version.go:15（Go CLI productVersion 同步）",
+      "evidence": "consema-rs/Cargo.toml:31（[workspace.package] version，2209582 提交推进 0.13.0→1.0.0-rc.1）；consema-go/go/cmd/consema/version.go:15（Go CLI productVersion 同步）",
       "note": "workspace 版本已推进 0.8.0→0.13.0→1.0.0-rc.1（2209582，15 crate version.workspace = true + Go CLI productVersion 同步）；真实发布执行（checksum/SBOM/签名/tag/恢复演练复跑，docs/release-process-0.13.0.md §7 检查单）仍属门禁收口的开放项（见 feature_complete_judgment.open_items C-3）。"
     },
     "spec_revision": {
@@ -36,7 +37,7 @@
       "suites": 18,
       "cases": 519,
       "aggregate_sha256": "cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a",
-      "evidence": "conformance/vectors/*.json（18 文件，2026-08-12 实测 18 suites / 519 cases：plist +4 binary limit、yaml +4 recovery/depth/alias-budget、java-properties +3 family-parse/encoding）；.github/workflows/ci.yml:155-173（conformance job 的 suite-count 断言 18/519）；README.md:33",
+      "evidence": "conformance/vectors/*.json（18 文件，2026-08-12 实测 18 suites / 519 cases：plist +4 binary limit、yaml +4 recovery/depth/alias-budget、java-properties +3 family-parse/encoding）；consema-rs/.github/workflows/ci.yml:191-209（conformance job 的 suite-count 断言 18/519，:206 为断言行）；README.md:56",
       "note": "聚合方式（2026-08-10 复核，2026-08-07 初记）：按文件名字节序排序，逐文件 sha256（小写 hex），每行格式 '{basename}:{digest}'，各行以 '\\n' 连接（无尾换行），聚合 sha256 即对该 UTF-8 字节串再 sha256。2026-08-12 P2-B 向量补强（plist +4 limit、yaml +4 recovery/depth/alias、java-properties +3 parse/encoding）后 18 文件实测聚合 = cfd6e296…（go runner VerifyVectorsDigest 同值交叉验证）。digest 以规范 checkout（.gitattributes eol=lf，git 存储的 LF 规范态）字节为准；2026-08-10 修订前记录值 e3d6578858… 是在 2026-08-07 的 CRLF 工作树（本机 core.autocrlf=true）上记录，已被规范态值取代（本机 CRLF 工作树下逐文件 sha256 不同属预期，本地开发用 git config core.autocrlf false 或接受该差异）。（与 M1 的 suite-count 断言同源，gate plan §8。）"
     },
     "corpus_test_suite_revisions": {
@@ -58,7 +59,7 @@
     "rust_compiler_msrv": {
       "declared": "1.85",
       "measured_toolchain": "rustc 1.97.1 (8bab26f4f 2026-07-14)",
-      "evidence": "Cargo.toml:33（rust-version = \"1.85\"）；.github/workflows/ci.yml:118-144（msrv job，1.85.0 全门禁）；docs/COVERAGE-0.13.0.md:17（实测工具链）；docs/fuzz-evidence-0.13.0.md:14（fuzz 会话工具链）",
+      "evidence": "consema-rs/Cargo.toml:33（rust-version = \"1.85\"）；consema-rs/.github/workflows/ci.yml:146-168（msrv job，1.85.0 全门禁）；docs/COVERAGE-0.13.0.md:17（实测工具链）；docs/fuzz-evidence-0.13.0.md:14（fuzz 会话工具链）",
       "note": "msrv job 已在 GitHub 真跑并全绿（C-1 已闭环：run #5，2026-08-11，head 437fd35，132/132 steps 全绿）。"
     },
     "dependency_lock_digest": {
@@ -71,7 +72,7 @@
         "ubuntu-latest",
         "macos-latest"
       ],
-      "evidence": ".github/workflows/ci.yml:33（lint 矩阵）、:55（test 矩阵）、:253（oracles 矩阵）；docs/support-policy.md:50-59（§3 支持环境）",
+      "evidence": "consema-rs/.github/workflows/ci.yml:41-42（lint 矩阵）、:66-67（test 矩阵）；母仓 .github/workflows/ci.yml:60-61（oracles 矩阵——六仓拆分后 oracles 属母仓）；docs/support-policy.md:50-59（§3 支持环境）",
       "note": "矩阵 job 已随 C-1 闭环在 GitHub 真跑全绿（run #5，2026-08-11，windows/ubuntu/macos 全矩阵，132/132 steps）。"
     },
     "known_accepted_limitations": [
@@ -180,7 +181,7 @@
           "evidence": [
             "conformance/vectors/*.json 18 suites / 519 cases（2026-08-12 实测）",
             "README.md:33",
-            ".github/workflows/ci.yml:155-173（conformance job 的 suite-count 断言）"
+            "consema-rs/.github/workflows/ci.yml:191-209（conformance job 的 suite-count 断言）"
           ],
           "source_of_truth": "语言无关 conformance vectors（语义权威顺序第 3 级）"
         },
@@ -459,7 +460,7 @@
           "name": "Rust workspace 保持 unsafe_code = \"forbid\"",
           "status": "complete",
           "evidence": [
-            "Cargo.toml:37",
+            "consema-rs/Cargo.toml:37",
             "docs/0.13.0-gate-plan.md P-9"
           ],
           "source_of_truth": "workspace manifest（lint 常设）"
@@ -512,7 +513,7 @@
           "status": "complete",
           "evidence": [
             "cargo audit --no-fetch 本地实测：1,189 advisories / 76 deps / 0 漏洞（2026-08-07，gate plan P-4；Cargo.lock 实测 76 个 [[package]]；cargo audit 口径随版本变化，以当前扫描结果为准）",
-            ".github/workflows/ci.yml:188-206（audit job）"
+            "consema-rs/.github/workflows/ci.yml:226-239（audit job）"
           ],
           "source_of_truth": "RustSec DB + CI audit job"
         },
@@ -523,7 +524,7 @@
           "evidence": [
             "cargo deny check advisories bans licenses sources 实测全绿（gate plan P-3）",
             "deny.toml",
-            ".github/workflows/ci.yml:123-132（deny job）"
+            "consema-rs/.github/workflows/ci.yml:211-222（deny job）"
           ],
           "source_of_truth": "deny.toml（政策）+ CI deny job"
         },
@@ -675,15 +676,15 @@
             "docs/API-REVIEW-0.13.0.md:182-187（§5：facade 13 个 consema-* path 依赖，无 [features] 段）",
             "CHANGELOG.md:21（CLI 全部格式知识来自 facade）"
           ],
-          "source_of_truth": "API-REVIEW §5 + crates/consema/Cargo.toml"
+          "source_of_truth": "API-REVIEW §5 + consema-rs/consema/Cargo.toml"
         },
         {
           "id": "A-4",
           "name": "MSRV 在 manifest 中声明并在 CI 真正验证",
           "status": "partial",
           "evidence": [
-            "声明：Cargo.toml:33（rust-version = \"1.85\"）",
-            "CI job 已交付：.github/workflows/ci.yml:118-144（msrv job，1.85.0 全门禁）",
+            "声明：consema-rs/Cargo.toml:33（rust-version = \"1.85\"）",
+            "CI job 已交付：consema-rs/.github/workflows/ci.yml:146-168（msrv job，1.85.0 全门禁）",
             "本地验证记录：gate plan §4 M1（干净 worktree 全流程 exit 0，MSRV 腿实测拦截 let-chains）"
           ],
           "source_of_truth": "路线图 §15.6 第 1419 行",
@@ -740,7 +741,7 @@
           "evidence": [
             "scripts/verify-package-archives.ps1（-AllowDirty + MSRV 腿 + tar 路径安全 + 校验和）",
             "本地实测：干净 HEAD worktree 全流程 exit 0（14 个 .crate + MSRV 1.85 腿，gate plan §4 M1 验证记录）",
-            "CI package job 已交付：.github/workflows/ci.yml:285-303",
+            "CI package job 已交付：consema-rs/.github/workflows/ci.yml:380-403",
             "docs/release-process-0.13.0.md:28-70（干净重建步骤 + CI 常设载体）"
           ],
           "source_of_truth": "路线图 §15.6 第 1424 行",
@@ -791,7 +792,7 @@
           "semver job 的 approved-failure 落定（API-REVIEW §3：三个 crate 的 enum_variant_added 保持失败 + RFC 级批准记录，或推入时加 allowlist——ci.yml 属 .github 域，由 gatekeeper 在推入时落定）"
         ],
         "evidence": [
-          ".github/workflows/ci.yml（10 job：lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package）",
+          ".github/workflows/ci.yml（六仓拆分 2d7494f 后为 consema-rs/.github/workflows/ci.yml：11 gate + check 聚合 = 12 job——lint/test/coverage/msrv/conformance/deny/audit/semver/package/check-version-consistency/examples/check；oracles 属母仓 ci.yml，go-1-26/go-differential 属 consema-go；run#5 的 10 job 为拆仓前单仓结构历史事实）",
           "gate plan §4 M1 验证记录（本地等效全流程实测；GitHub 真跑未发生）",
           "GitHub Actions run #5（2026-08-11，head 437fd35，main push）：132/132 steps 全绿（增补前 10+1 job：lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package/go-1-26，11 定义 / 17 次执行）在 windows/ubuntu/macos 全矩阵通过；2026-08-12 增补 go-differential 后 ci.yml 为 10+2 job（12 定义：10 Rust + go-1-26 + go-differential）；run 历史：run#1 workflow-parse fail（job id go-1.26 含点号）→ run#2 5 根因（symlink_dir 移除、oracles ParserError、coverage Get-CimInstance guard、package 工具链顺序、tags 未推）→ run#3 4 根因（macOS /var→/private/var 临时路径 symlink、oracles 缺 exit 0、semver 嵌套 baseline 歧义、coverage 数组 guard $null）→ run#4 fmt import 顺序 → run#5 全绿"
         ],
@@ -824,7 +825,7 @@
           "docs/release-process-0.13.0.md:124-139（§4.4：演练密钥 82301612… 仅流程验证；正式发布前必须在默认 keyring 生成真实密钥 + 备份 + 吊销证书）",
           "docs/release-process-0.13.0.md:278-291（§7 发布检查单 10 项）"
         ],
-        "completion_path": "按 release-process §7 顺序执行：版本推进 → CI 10 job 全绿 → 本地干净重建 → SBOM → checksum + 签名 → 签名 tag（登记 tag 对象 hash）→ 全量校验 → 恢复演练复跑 → 产物入库 → SECURITY.md 复核。",
+        "completion_path": "按 release-process §7 顺序执行：版本已推进 1.0.0-rc.1（2209582）→ 六仓 CI 全绿 → 本地干净重建 → SBOM → checksum + 签名 → 签名 tag（登记 tag 对象 hash）→ 全量校验 → 恢复演练复跑 → 产物入库 → SECURITY.md 复核。",
         "owner": "0.13.0 release owner（版本治理 §12）"
       }
     ],

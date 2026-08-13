@@ -2,11 +2,11 @@
 
 - 依据：`docs/rc-1.0.0-candidate.md` §4 阶段 1（"每格式真实 corpus 抽检巡检
   §22.7"）与 §4.1（2026-08-10 已完成一轮：钉版 12 文件 digest 12/12 一致；
-  508 核对一致；regressions 空数组符合预期；9 家族来源与覆盖足够；4 条观察见
+  508 核对一致（增补前——2026-08-12 P2-B 向量补强至 519 后该计数为 519）；regressions 空数组符合预期；9 家族来源与覆盖足够；4 条观察见
   §4.2）与 §4.2（巡检观察记录体例）；`docs/five-element-review-1.0.0.md:63`
   （钉版 corpus 12 文件，digest 登记）；`docs/pilot-go-0.19.0.md` §1（语料登记表）。
 - 目标：RC soak 阶段对真实 corpus 的**抽检巡检**——四类核对（钉版 digest /
-  508 计数 / regressions / 家族来源覆盖）+ 观察记录（P2 级，照 rc-candidate §4.2
+  519 计数 / regressions / 家族来源覆盖）+ 观察记录（P2 级，照 rc-candidate §4.2
   的 4 条观察体例：编号、出处、判定）。
 - **本手册只含命令与记录模板；执行本身不在本准备批次内。**
 
@@ -15,7 +15,7 @@
 | 项 | 内容 | 对照权威 |
 |---|---|---|
 | 1 | 钉版 12 文件 digest 核对（fixtures 层真实语料） | pilot-go-0.19.0.md §1 语料登记表（16 位 sha256 前缀 + 字节数） |
-| 2 | 508 计数核对（18 套向量 + 聚合 digest） | fc-manifest-0.13.0.json `digests.conformance_suite`（suites=18 / cases=508 / aggregate_sha256=`35bebc8d384d71740f7c1a886bc50f4e095ff52fe05d2a407f04b842ee6922fa`）；conformance/README.md:73 |
+| 2 | 519 计数核对（18 套向量 + 聚合 digest） | fc-manifest-0.13.0.json `digests.conformance_suite`（suites=18 / cases=519 / aggregate_sha256=`cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`）；conformance/README.md:73 |
 | 3 | regressions 检查（fuzz 回归输入数组） | conformance/corpora/mutation-v1.json `regressions`（空数组符合预期；新增条目必须可追溯） |
 | 4 | 9 家族来源与覆盖 | conformance/fixtures/ 九目录 + 各家族 README 来源/许可证声明（conformance/README.md:31-37） |
 
@@ -59,10 +59,10 @@ foreach ($rel in $files) {
 （logback.xml 在 pilot 表中为"—"行：W3 的 text 编辑目标、不在 12 文件注册内，
 照 rc-candidate §4.2 观察 1 的判定接受。）
 
-### 2.2 508 计数 + 聚合 digest
+### 2.2 519 计数 + 聚合 digest
 
 ```powershell
-# 18 套向量 / 508 cases（照 go-verify-shared-conformance.ps1 [1/6] 的算法：
+# 18 套向量 / 519 cases（照 go-verify-shared-conformance.ps1 [1/6] 的算法：
 # 文件名 Ordinal 排序、逐文件 sha256 小写、"{basename}:{digest}" 以 \n 连接
 # 无尾换行、再 sha256；口径 = 规范 checkout 字节（LF））
 $names = @(Get-ChildItem 'conformance\vectors' -Filter '*.json' | ForEach-Object { $_.Name })
@@ -80,7 +80,7 @@ $agg = [System.BitConverter]::ToString(
 "suites=$($names.Count) cases=$total aggregate=$agg"
 ```
 
-预期：`suites=18 cases=508 aggregate=35bebc8d384d71740f7c1a886bc50f4e095ff52fe05d2a407f04b842ee6922fa`
+预期：`suites=18 cases=519 aggregate=cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`
 （注意 CRLF 工作树会使逐文件 digest 不同——须在规范 checkout（`git config
 core.autocrlf false` / LF）下核对，照 go-verify-shared-conformance.ps1:91-96 注记）。
 
@@ -113,7 +113,7 @@ Get-ChildItem 'conformance\fixtures' -Directory | Select-Object -ExpandProperty 
 - 环境：<机器/OS>；母仓 HEAD <commit>；checkout 形态：<规范 LF / CRLF 工作树>
 - 四类核对：
   1. 钉版 12 文件 digest：<N>/12 一致（不符项逐条列出：文件 + 实测 vs 登记）
-  2. 508 核对：<suites>/18、<cases>/508 一致；aggregate <一致/不符>
+  2. 519 核对：<suites>/18、<cases>/519 一致；aggregate <一致/不符>
   3. regressions：<N> 条（空数组符合预期 / 新增条目逐条对应发现记录）
   4. 9 家族来源与覆盖：<N> 目录齐备；来源/许可证声明抽查 <通过/发现>
 - 观察记录（P2 级，照 §4.2 体例：编号 + 出处 + 判定）：
@@ -129,7 +129,7 @@ Get-ChildItem 'conformance\fixtures' -Directory | Select-Object -ExpandProperty 
 ## 4. 相关文件
 
 - `docs/pilot-go-0.19.0.md` §1（12 文件语料登记）
-- `docs/fc-manifest-0.13.0.json`（conformance_suite：18/508/aggregate 35bebc8d…）
-- `conformance/README.md`（18 套 508 cases、fixtures 家族说明、变更纪律）
+- `docs/fc-manifest-0.13.0.json`（conformance_suite：18/519/aggregate cfd6e296…）
+- `conformance/README.md`（18 套 519 cases、fixtures 家族说明、变更纪律）
 - `conformance/corpora/README.md`（mutation 语料与 regressions 工作流）
 - `docs/rc-1.0.0-candidate.md` §4.1/§4.2（首轮巡检记录与观察体例）
