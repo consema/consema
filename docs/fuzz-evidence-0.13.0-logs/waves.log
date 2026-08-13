@@ -15988,3 +15988,361 @@
 [2026-08-13T10:04:59+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
 [2026-08-13T10:05:00+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
 [2026-08-13T10:05:01+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:05:55+08:00] wave 1 done: procs=34 wall_max=54.4s cpu_total_s=811.2 cpu_hours=0.225 failures=0
+[2026-08-13T10:05:55+08:00] wave 2: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:05:55+08:00] wave 2: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:05:55+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:06:38+08:00] wave 2 done: procs=34 wall_max=42.9s cpu_total_s=713.8 cpu_hours=0.198 failures=0
+[2026-08-13T10:06:38+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:06:38+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:07:16+08:00] wave 3 done: procs=34 wall_max=37.8s cpu_total_s=631.2 cpu_hours=0.175 failures=0
+[2026-08-13T10:07:16+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:07:16+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:07:54+08:00] wave 4 done: procs=34 wall_max=37.4s cpu_total_s=624.2 cpu_hours=0.173 failures=0
+[2026-08-13T10:07:55+08:00] session done: 120165 ledger rows; total CPU-hours=766.533 failures=0
+[2026-08-13T10:07:55+08:00] FINAL
+[2026-08-13T10:08:17+08:00] session start: session=893 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:08:17+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:08:17+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=d97a038a42b8eb029de206440b476ad53b01e9aa
+[2026-08-13T10:08:17+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:08:18+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:08:18+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:09:04+08:00] wave 1 done: procs=34 wall_max=45.8s cpu_total_s=692.9 cpu_hours=0.192 failures=0
+[2026-08-13T10:09:04+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:09:04+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:09:50+08:00] wave 2 done: procs=34 wall_max=45.9s cpu_total_s=718 cpu_hours=0.199 failures=0
+[2026-08-13T10:09:50+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:09:50+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:10:32+08:00] wave 3 done: procs=34 wall_max=42.6s cpu_total_s=681 cpu_hours=0.189 failures=0
+[2026-08-13T10:10:32+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:10:33+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:11:14+08:00] wave 4 done: procs=34 wall_max=42s cpu_total_s=668 cpu_hours=0.186 failures=0
+[2026-08-13T10:11:16+08:00] session done: 120301 ledger rows; total CPU-hours=767.3 failures=0
+[2026-08-13T10:11:16+08:00] FINAL
+[2026-08-13T10:11:39+08:00] session start: session=894 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:11:39+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:11:39+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=d97a038a42b8eb029de206440b476ad53b01e9aa
+[2026-08-13T10:11:39+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:11:40+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:11:40+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:12:19+08:00] wave 1 done: procs=34 wall_max=39.2s cpu_total_s=649.3 cpu_hours=0.18 failures=0
+[2026-08-13T10:12:19+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:12:20+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:13:00+08:00] wave 2 done: procs=34 wall_max=40.1s cpu_total_s=650.6 cpu_hours=0.181 failures=0
+[2026-08-13T10:13:00+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:13:00+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:13:43+08:00] wave 3 done: procs=34 wall_max=43.1s cpu_total_s=699.4 cpu_hours=0.194 failures=0
+[2026-08-13T10:13:43+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:13:43+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:14:31+08:00] wave 4 done: procs=34 wall_max=48.1s cpu_total_s=698.7 cpu_hours=0.194 failures=0
+[2026-08-13T10:14:35+08:00] session done: 120437 ledger rows; total CPU-hours=768.049 failures=0
+[2026-08-13T10:14:35+08:00] FINAL
+[2026-08-13T10:14:56+08:00] session start: session=895 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:14:56+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:14:56+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=dbb80da8f2a04e6dfdca4fe0ed54cc2e1977d6de
+[2026-08-13T10:14:57+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:14:58+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:14:58+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:15:47+08:00] wave 1 done: procs=34 wall_max=48.7s cpu_total_s=729.9 cpu_hours=0.203 failures=0
+[2026-08-13T10:15:47+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:15:47+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:16:43+08:00] wave 2 done: procs=34 wall_max=56s cpu_total_s=711.1 cpu_hours=0.198 failures=0
+[2026-08-13T10:16:44+08:00] wave 3: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:16:44+08:00] wave 3: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:16:44+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:17:36+08:00] wave 3 done: procs=34 wall_max=51.5s cpu_total_s=733.9 cpu_hours=0.204 failures=0
+[2026-08-13T10:17:36+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:17:36+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:18:19+08:00] wave 4 done: procs=34 wall_max=43.3s cpu_total_s=679.7 cpu_hours=0.189 failures=0
+[2026-08-13T10:18:21+08:00] session done: 120573 ledger rows; total CPU-hours=768.842 failures=0
+[2026-08-13T10:18:21+08:00] FINAL
+[2026-08-13T10:18:43+08:00] session start: session=896 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:18:43+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:18:43+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T10:18:43+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:18:45+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:18:45+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:19:29+08:00] wave 1 done: procs=34 wall_max=43.8s cpu_total_s=682.2 cpu_hours=0.19 failures=0
+[2026-08-13T10:19:29+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:19:29+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:20:12+08:00] wave 2 done: procs=34 wall_max=42.8s cpu_total_s=675.2 cpu_hours=0.188 failures=0
+[2026-08-13T10:20:12+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:20:12+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:20:52+08:00] wave 3 done: procs=34 wall_max=39.9s cpu_total_s=651.2 cpu_hours=0.181 failures=0
+[2026-08-13T10:20:52+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:20:52+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:21:36+08:00] wave 4 done: procs=34 wall_max=44.2s cpu_total_s=673.2 cpu_hours=0.187 failures=0
+[2026-08-13T10:21:39+08:00] session done: 120709 ledger rows; total CPU-hours=769.587 failures=0
+[2026-08-13T10:21:39+08:00] FINAL
+[2026-08-13T10:22:00+08:00] session start: session=897 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:22:00+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:22:01+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T10:22:01+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:22:02+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:22:02+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:22:46+08:00] wave 1 done: procs=34 wall_max=43.8s cpu_total_s=689.7 cpu_hours=0.192 failures=0
+[2026-08-13T10:22:46+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:22:46+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:23:28+08:00] wave 2 done: procs=34 wall_max=41.6s cpu_total_s=669.9 cpu_hours=0.186 failures=0
+[2026-08-13T10:23:28+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:23:28+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:24:16+08:00] wave 3 done: procs=34 wall_max=48.5s cpu_total_s=733.5 cpu_hours=0.204 failures=0
+[2026-08-13T10:24:16+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:24:16+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:25:03+08:00] wave 4 done: procs=34 wall_max=46.7s cpu_total_s=723.9 cpu_hours=0.201 failures=0
+[2026-08-13T10:25:05+08:00] session done: 120845 ledger rows; total CPU-hours=770.37 failures=0
+[2026-08-13T10:25:05+08:00] FINAL
+[2026-08-13T10:25:27+08:00] session start: session=898 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:25:27+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:25:27+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T10:25:27+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:25:28+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:25:28+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:26:07+08:00] wave 1 done: procs=34 wall_max=39s cpu_total_s=642.8 cpu_hours=0.179 failures=0
+[2026-08-13T10:26:07+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:26:08+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:27:08+08:00] wave 2 done: procs=34 wall_max=60.8s cpu_total_s=854.7 cpu_hours=0.237 failures=0
+[2026-08-13T10:27:08+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:27:09+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:28:05+08:00] wave 3 done: procs=34 wall_max=56.3s cpu_total_s=852.5 cpu_hours=0.237 failures=0
+[2026-08-13T10:28:05+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:28:05+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:28:52+08:00] wave 4 done: procs=34 wall_max=46.7s cpu_total_s=717.4 cpu_hours=0.199 failures=0
+[2026-08-13T10:28:54+08:00] session done: 120981 ledger rows; total CPU-hours=771.222 failures=0
+[2026-08-13T10:28:54+08:00] FINAL
+[2026-08-13T10:29:16+08:00] session start: session=899 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:29:16+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:29:16+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T10:29:16+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:29:17+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:29:18+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:30:14+08:00] wave 1 done: procs=34 wall_max=54.4s cpu_total_s=760.2 cpu_hours=0.211 failures=0
+[2026-08-13T10:30:16+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:30:20+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:31:12+08:00] wave 2 done: procs=34 wall_max=52.8s cpu_total_s=741 cpu_hours=0.206 failures=0
+[2026-08-13T10:31:12+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:31:13+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:32:07+08:00] wave 3 done: procs=34 wall_max=54.5s cpu_total_s=758.4 cpu_hours=0.211 failures=0
+[2026-08-13T10:32:09+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:32:10+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:33:06+08:00] wave 4 done: procs=34 wall_max=56.3s cpu_total_s=692 cpu_hours=0.192 failures=0
+[2026-08-13T10:33:08+08:00] session done: 121117 ledger rows; total CPU-hours=772.042 failures=0
+[2026-08-13T10:33:08+08:00] FINAL
+[2026-08-13T10:33:31+08:00] session start: session=900 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:33:31+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:33:31+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T10:33:31+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:33:34+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:33:34+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:34:20+08:00] wave 1 done: procs=34 wall_max=45.5s cpu_total_s=698.9 cpu_hours=0.194 failures=0
+[2026-08-13T10:34:20+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:34:20+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:35:02+08:00] wave 2 done: procs=34 wall_max=42.4s cpu_total_s=686.7 cpu_hours=0.191 failures=0
+[2026-08-13T10:35:02+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:35:03+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:35:45+08:00] wave 3 done: procs=34 wall_max=41.9s cpu_total_s=679.2 cpu_hours=0.189 failures=0
+[2026-08-13T10:35:45+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:35:45+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:36:26+08:00] wave 4 done: procs=34 wall_max=41.5s cpu_total_s=674.7 cpu_hours=0.187 failures=0
+[2026-08-13T10:36:28+08:00] session done: 121253 ledger rows; total CPU-hours=772.803 failures=0
+[2026-08-13T10:36:28+08:00] FINAL
+[2026-08-13T10:36:50+08:00] session start: session=901 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:36:50+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:36:50+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T10:36:50+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:36:50+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:36:50+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:37:31+08:00] wave 1 done: procs=34 wall_max=40.5s cpu_total_s=648.1 cpu_hours=0.18 failures=0
+[2026-08-13T10:37:31+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:37:31+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:38:15+08:00] wave 2 done: procs=34 wall_max=44.4s cpu_total_s=693 cpu_hours=0.192 failures=0
+[2026-08-13T10:38:15+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:38:16+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:39:01+08:00] wave 3 done: procs=34 wall_max=45.1s cpu_total_s=701.3 cpu_hours=0.195 failures=0
+[2026-08-13T10:39:01+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:39:01+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:39:39+08:00] wave 4 done: procs=34 wall_max=38.4s cpu_total_s=640.6 cpu_hours=0.178 failures=0
+[2026-08-13T10:39:42+08:00] session done: 121389 ledger rows; total CPU-hours=773.548 failures=0
+[2026-08-13T10:39:42+08:00] FINAL
+[2026-08-13T10:40:04+08:00] session start: session=902 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:40:04+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:40:04+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T10:40:04+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:40:05+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:40:05+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:41:02+08:00] wave 1 done: procs=34 wall_max=56.9s cpu_total_s=839.7 cpu_hours=0.233 failures=0
+[2026-08-13T10:41:02+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:41:02+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:41:53+08:00] wave 2 done: procs=34 wall_max=51.1s cpu_total_s=844.4 cpu_hours=0.235 failures=0
+[2026-08-13T10:41:53+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:41:53+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:42:36+08:00] wave 3 done: procs=34 wall_max=43s cpu_total_s=668.9 cpu_hours=0.186 failures=0
+[2026-08-13T10:42:36+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:42:37+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:43:19+08:00] wave 4 done: procs=34 wall_max=42.1s cpu_total_s=650.1 cpu_hours=0.181 failures=0
+[2026-08-13T10:43:20+08:00] session done: 121525 ledger rows; total CPU-hours=774.382 failures=0
+[2026-08-13T10:43:20+08:00] FINAL
+[2026-08-13T10:43:42+08:00] session start: session=903 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:43:42+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:43:42+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T10:43:42+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:43:43+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:43:43+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:44:33+08:00] wave 1 done: procs=34 wall_max=50s cpu_total_s=714 cpu_hours=0.198 failures=0
+[2026-08-13T10:44:33+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:44:33+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:45:33+08:00] wave 2 done: procs=34 wall_max=60.5s cpu_total_s=770.6 cpu_hours=0.214 failures=0
+[2026-08-13T10:45:34+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:45:34+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:46:39+08:00] wave 3 done: procs=34 wall_max=65.4s cpu_total_s=804.5 cpu_hours=0.223 failures=0
+[2026-08-13T10:46:40+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:46:40+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:47:47+08:00] wave 4 done: procs=34 wall_max=67.3s cpu_total_s=831.8 cpu_hours=0.231 failures=0
+[2026-08-13T10:47:49+08:00] session done: 121661 ledger rows; total CPU-hours=775.249 failures=0
+[2026-08-13T10:47:49+08:00] FINAL
+[2026-08-13T10:48:13+08:00] session start: session=904 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:48:13+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:48:14+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T10:48:14+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:48:16+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:48:16+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:49:39+08:00] wave 1 done: procs=34 wall_max=82.3s cpu_total_s=860 cpu_hours=0.239 failures=0
+[2026-08-13T10:49:39+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:49:39+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:50:25+08:00] wave 2 done: procs=34 wall_max=45.7s cpu_total_s=706.9 cpu_hours=0.196 failures=0
+[2026-08-13T10:50:25+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:50:25+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:51:13+08:00] wave 3 done: procs=34 wall_max=48.2s cpu_total_s=716.2 cpu_hours=0.199 failures=0
+[2026-08-13T10:51:14+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:51:14+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:52:04+08:00] wave 4 done: procs=34 wall_max=49.9s cpu_total_s=707.9 cpu_hours=0.197 failures=0
+[2026-08-13T10:52:06+08:00] session done: 121797 ledger rows; total CPU-hours=776.08 failures=0
+[2026-08-13T10:52:06+08:00] FINAL
+[2026-08-13T10:52:28+08:00] session start: session=905 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:52:28+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:52:28+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T10:52:28+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:52:30+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:52:30+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:53:09+08:00] wave 1 done: procs=34 wall_max=38.9s cpu_total_s=642.2 cpu_hours=0.178 failures=0
+[2026-08-13T10:53:09+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:53:09+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:53:49+08:00] wave 2 done: procs=34 wall_max=39.5s cpu_total_s=647.6 cpu_hours=0.18 failures=0
+[2026-08-13T10:53:49+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:53:49+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:54:30+08:00] wave 3 done: procs=34 wall_max=41.5s cpu_total_s=667.7 cpu_hours=0.185 failures=0
+[2026-08-13T10:54:30+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:54:31+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:55:11+08:00] wave 4 done: procs=34 wall_max=39.3s cpu_total_s=647.3 cpu_hours=0.18 failures=0
+[2026-08-13T10:55:12+08:00] session done: 121933 ledger rows; total CPU-hours=776.804 failures=0
+[2026-08-13T10:55:12+08:00] FINAL
+[2026-08-13T10:55:35+08:00] session start: session=906 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T10:55:35+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T10:55:35+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T10:55:35+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T10:55:39+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T10:55:39+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:56:34+08:00] wave 1 done: procs=34 wall_max=54.9s cpu_total_s=767.8 cpu_hours=0.213 failures=0
+[2026-08-13T10:56:34+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:56:35+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:57:45+08:00] wave 2 done: procs=34 wall_max=70.2s cpu_total_s=919.5 cpu_hours=0.255 failures=0
+[2026-08-13T10:57:45+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:57:45+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T10:58:58+08:00] wave 3 done: procs=34 wall_max=72.7s cpu_total_s=855.5 cpu_hours=0.238 failures=0
+[2026-08-13T10:58:58+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T10:58:58+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T11:00:12+08:00] wave 4 done: procs=34 wall_max=74.3s cpu_total_s=902.4 cpu_hours=0.251 failures=0
+[2026-08-13T11:00:18+08:00] session done: 122069 ledger rows; total CPU-hours=777.761 failures=0
+[2026-08-13T11:00:18+08:00] FINAL
+[2026-08-13T11:00:41+08:00] session start: session=907 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T11:00:41+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T11:00:42+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T11:00:42+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T11:00:49+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T11:00:50+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T11:01:54+08:00] wave 1 done: procs=34 wall_max=64.9s cpu_total_s=871.4 cpu_hours=0.242 failures=0
+[2026-08-13T11:01:54+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T11:01:54+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T11:02:46+08:00] wave 2 done: procs=34 wall_max=51.4s cpu_total_s=764.7 cpu_hours=0.212 failures=0
+[2026-08-13T11:02:46+08:00] wave 3: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T11:02:51+08:00] wave 3: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T11:02:51+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T11:03:35+08:00] wave 3 done: procs=34 wall_max=44.1s cpu_total_s=693.4 cpu_hours=0.193 failures=0
+[2026-08-13T11:03:35+08:00] wave 4: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T11:03:36+08:00] wave 4: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 09:48:46)
+[2026-08-13T11:03:36+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T11:04:20+08:00] wave 4 done: procs=34 wall_max=44.6s cpu_total_s=688 cpu_hours=0.191 failures=0
+[2026-08-13T11:04:23+08:00] session done: 122205 ledger rows; total CPU-hours=778.599 failures=0
+[2026-08-13T11:04:23+08:00] FINAL
+[2026-08-13T11:04:46+08:00] session start: session=908 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T11:04:46+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T11:04:46+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T11:04:46+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T11:05:01+08:00] wave 1: cargo build failed (exit 101) or binaries missing; aborting (exit 2)
+[2026-08-13T11:05:25+08:00] session start: session=909 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T11:05:25+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T11:05:25+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T11:05:26+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T11:05:28+08:00] wave 1: cargo build failed (exit 101) or binaries missing; aborting (exit 2)
+[2026-08-13T11:05:50+08:00] session start: session=910 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T11:05:50+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T11:05:50+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T11:05:50+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T11:06:01+08:00] wave 1: cargo build failed (exit 101) or binaries missing; aborting (exit 2)
+[2026-08-13T11:06:23+08:00] session start: session=911 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T11:06:24+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T11:06:24+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T11:06:24+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T11:06:27+08:00] wave 1: cargo build failed (exit 101) or binaries missing; aborting (exit 2)
+[2026-08-13T11:06:50+08:00] session start: session=912 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T11:06:50+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T11:06:50+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T11:06:50+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T11:06:53+08:00] wave 1: cargo build failed (exit 101) or binaries missing; aborting (exit 2)
+[2026-08-13T11:07:14+08:00] session start: session=913 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T11:07:14+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T11:07:15+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T11:07:15+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T11:07:15+08:00] wave 1: cargo build failed (exit 101) or binaries missing; aborting (exit 2)
+[2026-08-13T11:07:37+08:00] session start: session=914 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T11:07:37+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T11:07:37+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T11:07:38+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T11:07:38+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 11:06:00)
+[2026-08-13T11:07:40+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T11:09:02+08:00] wave 1 done: procs=34 wall_max=82.3s cpu_total_s=910.9 cpu_hours=0.253 failures=0
+[2026-08-13T11:09:02+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T11:09:02+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T11:10:21+08:00] wave 2 done: procs=34 wall_max=79s cpu_total_s=833.4 cpu_hours=0.231 failures=0
+[2026-08-13T11:10:21+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T11:10:22+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T11:12:06+08:00] wave 3 done: procs=34 wall_max=103.7s cpu_total_s=936 cpu_hours=0.26 failures=0
+[2026-08-13T11:12:08+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T11:12:11+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T11:13:39+08:00] wave 4 done: procs=34 wall_max=89.2s cpu_total_s=851.1 cpu_hours=0.236 failures=0
+[2026-08-13T11:13:44+08:00] session done: 122341 ledger rows; total CPU-hours=779.58 failures=0
+[2026-08-13T11:13:44+08:00] FINAL
+[2026-08-13T11:14:07+08:00] session start: session=915 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T11:14:07+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T11:14:07+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T11:14:08+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T11:14:11+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 11:06:00)
+[2026-08-13T11:14:11+08:00] wave 1 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T11:15:32+08:00] wave 1 done: procs=34 wall_max=81s cpu_total_s=868 cpu_hours=0.241 failures=0
+[2026-08-13T11:15:32+08:00] wave 2: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T11:15:33+08:00] wave 2 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T11:16:42+08:00] wave 2 done: procs=34 wall_max=69.1s cpu_total_s=820.6 cpu_hours=0.228 failures=0
+[2026-08-13T11:16:42+08:00] wave 3: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T11:16:42+08:00] wave 3 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T11:17:53+08:00] wave 3 done: procs=34 wall_max=71.1s cpu_total_s=892.2 cpu_hours=0.248 failures=0
+[2026-08-13T11:17:53+08:00] wave 4: tree unchanged, reusing binaries (deterministic schedule, same code state)
+[2026-08-13T11:17:54+08:00] wave 4 start: 34 processes (2 copies x 17 targets)
+[2026-08-13T11:19:05+08:00] wave 4 done: procs=34 wall_max=71.5s cpu_total_s=834.4 cpu_hours=0.232 failures=0
+[2026-08-13T11:19:09+08:00] session done: 122477 ledger rows; total CPU-hours=780.529 failures=0
+[2026-08-13T11:19:09+08:00] FINAL
+[2026-08-13T11:19:38+08:00] session start: session=916 waves=4 copies=2 wave_timeout=1800s
+[2026-08-13T11:19:38+08:00] machine: 13th Gen Intel(R) Core(TM) i9-13900HX; 24 physical / 32 logical cores; Microsoft Windows 11 专业版 10.0.26200
+[2026-08-13T11:19:39+08:00] toolchain: rustc 1.97.1 (8bab26f4f 2026-07-14) | HEAD=ce455e3ef3037e08a305d230e4e8203754d6cb40
+[2026-08-13T11:19:39+08:00] wave 1: tree changed since last build; rebuilding (cargo test -p consema-conformance --no-run --locked)
+[2026-08-13T11:19:44+08:00] wave 1: build ok (cargo exit 0; newest parse_fuzz exe: parse_fuzz-34cba732cb94b90f.exe mtime 2026-08-13 11:06:00)
+[2026-08-13T11:19:44+08:00] wave 1 start: 34 processes (2 copies x 17 targets)

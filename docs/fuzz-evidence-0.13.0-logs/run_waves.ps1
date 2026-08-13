@@ -14,9 +14,10 @@
 #   * tree-hash check (git HEAD + porcelain status): if the working tree
 #     changed since the last build (e.g. fix agents landing), rebuild the
 #     consema-conformance test binaries first, so every wave runs the current
-#     release candidate; git is resolved once per session, PATH first then
-#     known absolute installs (codex runtime git, Git for Windows; the machine
-#     git was removed 2026-08-11 with the hermes bundle). If no git exists
+#     release candidate; git is resolved once per session, PATH first, then
+#     the $env:CONSEMA_GIT_EXE override, then known absolute installs (codex
+#     runtime git, Git for Windows; the machine git was removed 2026-08-11
+#     with the hermes bundle). If no git exists
 #     anywhere, the check degrades loudly instead of silently: an INCIDENT
 #     NOTE is logged once and the tree-hash is salted per call, forcing a
 #     rebuild every wave (a needless rebuild beats a false "unchanged");
@@ -105,8 +106,14 @@ function Get-GitExe {
         $script:gitExe = $null  # cached path vanished (e.g. runtime deleted)
     }
     if ($null -eq $script:gitExe) {
+        # Candidate order: PATH first (documented), then the $env:CONSEMA_GIT_EXE
+        # override (lets operators point at their own pinned git without editing
+        # this script), then the known absolute installs (codex runtime git, Git
+        # for Windows). The codex-runtime path below is a machine-local default,
+        # not a policy fact; on other machines set CONSEMA_GIT_EXE.
         $script:gitExe = @(
             (Get-Command git -ErrorAction SilentlyContinue).Source,
+            $env:CONSEMA_GIT_EXE,
             'C:\Users\franck\.cache\codex-runtimes\codex-primary-runtime\dependencies\native\git\cmd\git.exe',
             'C:\Program Files\Git\cmd\git.exe',
             "$env:LOCALAPPDATA\Programs\Git\cmd\git.exe"

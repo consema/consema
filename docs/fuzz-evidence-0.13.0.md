@@ -108,7 +108,6 @@
 **2026-08-10 会话 69-78 累计（追加式）**：账本 12,937 行 / **78.971 CPU-hours**（session 78 的 session done 快照，2026-08-10 15:53:39；零失败——除 session 9 已分类 10 行 exit=-1）。每格式家族累计（CPU-hours，本机复算）：json 9.6 / toml 5.8 / yaml 13.0 / ini 12.6 / properties 14.7 / xml 3.6 / plist 4.9 / hcl 9.6；protocol（单 target）5.1。相对每格式 72h 门槛最接近 properties **20.4%**（14.7/72；其余：yaml 18.0%、ini 17.5%、hcl/json 13.4%、toml 8.0%、protocol 7.2%、plist 6.8%、xml 5.0%）；**每格式 72h 门槛仍开放，完成路径不变（§7）**。session 79+ 驱动中（waves.log 持续追加）；发布记录数字以本快照为准。
 
 **2026-08-10 会话 12 快照（追加式）**：8 waves × 2 copies，零失败；账本 4,335 行 / 27.852 CPU-hours；最接近的 properties-parse 4.8%（3.429/72）。发布记录数字以本表快照为准。
-，发布记录数字以本表快照为准）
 
 驱动结束后按 §4.4 协议把 session 10 的 wave 43 与 waves 44-65 全部并入：**4,063 行** = session 7 的 17 + session 8 的 1530 + session 9 的 102 + session 10 全量 + session 11 全量（waves 1-65 全部入账）。其中 4,053 行 exit_code=0，10 行 exit=-1（session 9 wave 3 外部终止、已分类非 fuzz finding，见 §3.1）。每 target 239 次运行；累计计划变异 **1,099,400,000（10.994 亿）次**。时钟状态：全部 running（clean）——本日无任何新 crash/panic/hang/limit bypass，无 target 清零。
 
