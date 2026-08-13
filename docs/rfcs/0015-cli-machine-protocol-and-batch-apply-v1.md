@@ -1,6 +1,6 @@
 # RFC 0015: CLI machine protocol and batch apply v1
 
-- Status: Draft for Consema 0.12.0 implementation
+- Status: Implemented in Consema 0.12.0
 - Date: 2026-08-07
 - Scope: the machine-readable protocol of the `consema` CLI (envelope,
   exit-code classification, batch-plan/batch-result manifests, detection

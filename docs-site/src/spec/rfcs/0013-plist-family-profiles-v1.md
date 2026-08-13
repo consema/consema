@@ -1,6 +1,6 @@
 # RFC 0013: Property List family profiles v1
 
-- Status: Draft for Consema 0.10.0 implementation
+- Status: Implemented in Consema 0.10.0
 - Date: 2026-08-06
 - Scope: `plist.xml@1` and `plist.binary@1` profiles; one
   representation-independent native value model; XML tag/trivia and binary

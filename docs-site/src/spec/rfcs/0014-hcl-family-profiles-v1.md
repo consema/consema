@@ -1,6 +1,6 @@
 # RFC 0014: HCL family profiles v1
 
-- Status: Draft for Consema 0.11.0 implementation
+- Status: Implemented in Consema 0.11.0
 - Date: 2026-08-06
 - Scope: `hcl.native@1` and `hcl.tfvars@1` profiles; one native syntax
   system shared by both profiles (body, attribute, block, label, expression,
