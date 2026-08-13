@@ -3,6 +3,9 @@
 **/*.rs.bk
 *.log
 !docs/fuzz-evidence-0.13.0-logs/waves.log
+!docs/fuzz-evidence-0.13.0-logs/wave-*.out.log
+!docs/fuzz-evidence-0.13.0-logs/wave-*.err.log
+!docs/fuzz-evidence-0.13.0-logs/workspace-gate-*.log
 *.tmp
 .DS_Store
 Thumbs.db

@@ -1,0 +1,2008 @@
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.11s
+     Running unittests src\lib.rs (target\debug\deps\consema-176678c8f5eba2e5.exe)
+
+running 31 tests
+test conversion::tests::hcl_conversion_derived_expressions_fail_atomically ... ok
+test conversion::tests::xml_element_tree_record_is_consumed_only_by_the_xml_family ... ok
+test conversion::tests::hcl_body_record_is_consumed_only_by_the_hcl_family ... ok
+test conversion::tests::explicitly_lossy_json_projection_remains_observable ... ok
+test conversion::tests::properties_conversion_failures_publish_no_partial_target ... ok
+test conversion::tests::json_family_dialect_conversion_is_exact_or_explicitly_fails ... ok
+test conversion::tests::properties_duplicate_collapse_is_audited_as_authorized_loss ... ok
+test conversion::tests::hcl_native_converts_to_canonical_tfvars_within_the_family ... ok
+test conversion::tests::properties_and_json_convert_exactly_in_both_directions ... ok
+test conversion::tests::toml_to_json_is_exact_and_materialization_failure_has_no_document ... ok
+test conversion::tests::explicit_non_record_projection_targets_convert_across_families ... ok
+test conversion::tests::xml_converts_to_canonical_xml_exactly ... ok
+test conversion::tests::json_cannot_materialize_into_record_formats ... ok
+test conversion::tests::ini_conversion_failures_publish_no_partial_target ... ok
+test conversion::tests::record_envelopes_fail_every_non_owning_target_atomically ... ok
+test conversion::tests::ini_and_json_convert_exactly_in_both_directions ... ok
+test conversion::tests::yaml_sharing_and_cycles_require_explicit_tree_projection_policy ... ok
+test conversion::tests::plist_value_tree_record_is_consumed_only_by_the_plist_family ... ok
+test registry::tests::registry_parse_document_round_trips_every_profile ... ok
+test conversion::tests::json_to_toml_keeps_both_stages_and_exact_target_closure ... ok
+test tests::common_document_facade_is_opaque_and_typed ... ok
+test tests::facade_exposes_all_format_implementations ... ok
+test conversion::tests::transformed_conversion_report_externalizes_both_authorized_events ... ok
+test registry::tests::registry_query_domains_are_sorted_and_unique ... ok
+test tests::facade_exposes_strict_dual_protocol_transports ... ok
+test conversion::tests::yaml_compat_profile_is_explicit_at_both_conversion_stages ... ok
+test registry::tests::registry_family_ids_match_parsed_backend_documents ... ok
+test registry::tests::registry_lists_eight_families_and_sixteen_profiles ... ok
+test conversion::tests::record_member_content_from_baseline_sources_stays_content ... ok
+test conversion::tests::yaml_and_json_conversion_closes_exactly_in_both_directions ... ok
+test conversion::tests::plist_converts_between_profiles_exactly ... ok
+
+test result: ok. 31 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\bin\consema\main.rs (target\debug\deps\consema-b038f5b9b7fce006.exe)
+
+running 164 tests
+test args::tests::command_names_are_exact_and_abbreviations_are_rejected ... ok
+test args::tests::profile_and_format_alias_conflicts_are_rejected ... ok
+test args::tests::pretty_requires_json ... ok
+test args::tests::command_specific_flags_are_scoped_to_their_commands ... ok
+test args::tests::equals_form_carries_dash_prefixed_values ... ok
+test args::tests::every_usage_error_maps_to_a_frozen_cli_usage_code ... ok
+test args::tests::duplicate_flags_are_rejected ... ok
+test args::tests::every_closed_set_command_parses_with_its_arguments ... ok
+test args::tests::double_dash_ends_flag_parsing ... ok
+test args::tests::global_flags_parse_before_and_after_the_command ... ok
+test args::tests::non_commands_are_rejected_including_detect_and_version ... ok
+test apply::tests::entry_redacted_flag_follows_the_policy_on_summary_key_names ... ok
+test args::tests::missing_command_is_usage ... ok
+test args::tests::non_utf8_arguments_are_rejected_at_collection ... ok
+test args::tests::unknown_arguments_and_single_dash_tokens_are_rejected ... ok
+test args::tests::help_and_version_skip_semantic_validation_but_not_scan_errors ... ok
+test args::tests::numeric_flag_values_are_validated ... ok
+test args::tests::parse_class_commands_demand_an_explicit_profile ... ok
+test args::tests::positional_bounds_are_enforced_per_command ... ok
+test capabilities::tests::capabilities_usage_rejections_are_frozen ... ok
+test args::tests::missing_and_empty_flag_values_are_usage ... ok
+test conformance_cmd::tests::every_self_check_passes_independently ... ok
+test conformance_cmd::tests::the_embedded_subset_runs_successfully_through_the_command ... ok
+test capabilities::tests::capabilities_human_report_lists_the_facade_inventory ... ok
+test detect::tests::bplist00_header_is_a_plist_binary_fact ... ok
+test detect::tests::byte_facts_and_bom_facts_are_deterministic ... ok
+test detect::tests::section_line_is_ambiguous_between_ini_and_toml ... ok
+test detect::tests::key_value_line_is_ambiguous_between_ini_and_properties ... ok
+test detect::tests::unknown_content_has_no_marker_and_no_candidates ... ok
+test detect::tests::spaced_assignment_is_the_toml_hcl_shape ... ok
+test detect::tests::xml_declaration_is_ambiguous_between_xml_and_plist ... ok
+test detect::tests::yaml_markers_resolve_to_the_yaml_family ... ok
+test detect::tests::leading_brace_and_bracket_are_json_family_facts ... ok
+test edit_cmd::tests::edit_output_flag_is_refused_as_usage ... ok
+test explain::tests::explain_contract_by_inferred_kind ... ok
+test explain::tests::explain_error_code_with_explicit_kind ... ok
+test explain::tests::explain_capability_kind_is_reserved_with_a_data_error ... ok
+test edit_cmd::tests::fixture_request_bytes_are_canonical_and_stable ... ok
+test explain::tests::explain_kind_without_id_is_usage ... ok
+test explain::tests::explain_id_without_version_is_a_data_error ... ok
+test explain::tests::explain_profile_id_round_trips_the_profile_descriptor ... ok
+test explain::tests::explain_profile_reports_the_profile_descriptor_record ... ok
+test convert_cmd::tests::convert_atomic_failure_is_a_data_error_without_target_bytes ... ok
+test convert_cmd::tests::convert_output_flag_is_usage_exit_one ... ok
+test explain::tests::explain_unknown_id_is_a_data_error ... ok
+test convert_cmd::tests::convert_human_mode_writes_the_target_bytes ... ok
+test convert_cmd::tests::convert_request_negatives_are_rejected ... ok
+test fsio::tests::temp_file_names_follow_the_frozen_shape ... ok
+test convert_cmd::tests::convert_json_to_toml_round_trips_and_is_byte_deterministic ... ok
+test convert_cmd::tests::convert_java_properties_source_to_toml_end_to_end ... ok
+test edit_cmd::tests::edit_default_section_entry_is_targetable ... ok
+test edit_cmd::tests::edit_human_view_renders_operations_without_redaction_hits ... ok
+test edit_cmd::tests::edit_unknown_operation_id_is_a_data_error ... ok
+test edit_cmd::tests::edit_recovered_source_is_a_data_error_with_the_format_code ... ok
+test edit_cmd::tests::edit_missing_target_is_a_precondition_failure ... ok
+test edit_cmd::tests::edit_human_view_renders_operations_and_redacts ... ok
+test edit_cmd::tests::edit_write_flag_is_refused_as_usage_without_envelope ... ok
+test edit_cmd::tests::edit_dry_run_emits_a_byte_valid_edit_payload ... ok
+test edit_cmd::tests::edit_dry_run_equivalence_with_a_sdk_commit ... ok
+test edit_cmd::tests::edit_unwired_family_operations_are_data_errors ... ok
+test edit_cmd::tests::edit_request_negatives_are_rejected ... ok
+test fsio::tests::injected_inspection_failure_classifies_by_its_kind ... ok
+test fsio::tests::injected_rename_failure_is_permission_and_leaves_no_residue ... ok
+test fsio::tests::injected_write_disk_full_fails_and_cleans_the_temp_file ... ok
+test fsio::tests::injected_temp_creation_failure_is_permission_or_io ... ok
+test fsio::tests::write_atomic_rejects_a_directory_target ... ok
+test inspect::tests::inspect_parse_facts_report_recovered_files_with_exit_zero ... ok
+test inspect::tests::inspect_json_emits_the_frozen_payload_shape ... ok
+test inspect::tests::inspect_hcl_fatal_is_a_data_error_with_the_registered_fallback ... ok
+test inspect::tests::inspect_unreadable_file_is_a_data_error_with_an_envelope ... ok
+test inspect::tests::inspect_ini_category_contradiction_recovery_binds_the_registry_category ... ok
+test materialize_cmd::tests::materialize_output_flag_is_usage_exit_one ... ok
+test materialize_cmd::tests::materialize_human_mode_writes_raw_bytes_to_stdout ... ok
+test fsio::tests::write_atomic_rejects_a_missing_parent_directory ... ok
+test output::tests::emit_envelope_pretty_indents_and_keeps_semantics ... ok
+test output::tests::indenter_handles_empty_containers_and_primitives ... ok
+test output::tests::emit_envelope_writes_one_canonical_line_ending_in_lf ... ok
+test output::tests::indenter_inserts_only_whitespace_outside_strings ... ok
+test output::tests::indenter_rejects_unterminated_strings ... ok
+test fsio::tests::temp_creation_collisions_retry_with_a_fresh_nonce ... ok
+test fsio::tests::injected_read_back_failure_is_reported_truthfully ... ok
+test materialize_cmd::tests::materialize_json_to_toml_round_trips_and_is_byte_deterministic ... ok
+test materialize_cmd::tests::materialize_record_gate_rejects_cross_family_targets ... ok
+test materialize_cmd::tests::materialize_unrepresentable_target_is_a_data_error ... ok
+test fsio::tests::injected_read_back_digest_mismatch_is_an_io_failure ... ok
+test inspect::tests::inspect_reports_file_facts_and_ambiguity_successfully ... ok
+test fsio::tests::write_atomic_creates_a_missing_target_and_verifies_the_digest ... ok
+test inspect::tests::inspect_limit_budget_is_a_limit_error ... ok
+test project_cmd::tests::project_java_properties_source_is_refused_at_the_family_gate ... ok
+test fsio::tests::write_atomic_writes_empty_bytes ... ok
+test fsio::tests::write_atomic_replaces_an_existing_target_atomically ... ok
+test project_cmd::tests::project_recovered_source_is_a_data_error ... ok
+test project_cmd::tests::project_json_duplicate_keys_fail_as_data_error ... ok
+test inspect::tests::inspect_xml_fatal_is_a_data_error_with_the_registered_fallback ... ok
+test inspect::tests::inspect_plist_fatal_is_a_data_error_with_the_registered_fallback ... ok
+test inspect::tests::inspect_unknown_profile_value_is_usage ... ok
+test query_cmd::tests::query_human_report_renders_the_same_results ... ok
+test apply::tests::machine_tampered_patch_is_failed_original_mismatch ... ok
+test query_cmd::tests::query_native_domain_is_rejected_clearly ... ok
+test project_cmd::tests::wire_projection_request_accepts_published_java_properties_targets ... ok
+test project_cmd::tests::project_usage_and_data_rejections ... ok
+test project_cmd::tests::project_toml_success_maps_entry_mapping ... ok
+test plan::tests::plan_invalid_redact_keys_pattern_is_usage_without_envelope ... ok
+test project_cmd::tests::project_json_success_round_trips_and_is_byte_deterministic ... ok
+test redact::tests::byte_payloads_under_non_matching_keys_are_preserved_exactly ... ok
+test redact::tests::every_frozen_pattern_matches_its_key_names ... ok
+test query_cmd::tests::query_rejects_request_profile_contradicting_profile_flag ... ok
+test query_cmd::tests::query_json_success_round_trips_and_matches_sdk_bytes ... ok
+test query_cmd::tests::query_unknown_profile_is_usage_exit_one_without_envelope ... ok
+test plan::tests::plan_batch_count_limit_is_a_limit_error ... ok
+test query_cmd::tests::query_object_entries_keep_document_order ... ok
+test plan::tests::plan_human_view_renders_all_planned_operations ... ok
+test redact::tests::invalid_redact_keys_patterns_are_frozen_usage_failures ... ok
+test redact::tests::matching_keys_are_deduplicated_in_first_seen_order ... ok
+test redact::tests::key_names_that_only_look_secretish_never_match ... ok
+test redact::tests::extra_redact_keys_globs_compile_and_match_whole_key_names ... ok
+test redact::tests::nested_structures_redact_recursively ... ok
+test redact::tests::non_string_values_under_matching_keys_are_replaced_too ... ok
+test redact::tests::redact_text_replaces_values_under_matching_keys_only ... ok
+test query_cmd::tests::query_recovered_source_is_a_data_error ... ok
+test redact::tests::redact_value_replaces_values_and_counts_each_replacement ... ok
+test redact::tests::redaction_facts_honor_the_redacted_equals_count_invariant ... ok
+test redact::tests::redaction_is_deterministic_across_calls ... ok
+test redact::tests::redaction_never_touches_patch_precondition_bytes ... ok
+test redact::tests::sequences_of_objects_redact_each_item ... ok
+test redact::tests::show_secrets_is_the_sole_opt_out_and_returns_the_value_untouched ... ok
+test redact::tests::values_that_look_like_key_names_are_never_redacted ... ok
+test registry::tests::profile_by_id_resolves_only_facade_profiles ... ok
+test registry::tests::v7_registries_expose_contracts_and_sorted_error_codes ... ok
+test fsio::tests::write_atomic_rejects_a_readonly_target_and_measures_raw_rename ... ok
+test registry::tests::registry_enumerates_all_sixteen_profiles_with_families ... ok
+test registry::tests::versioned_id_parsing_is_strict ... ok
+test plan::tests::plan_human_view_redacts_matching_key_names ... ok
+test plan::tests::plan_request_decode_failure_is_a_data_error ... ok
+test tests::every_exit_class_maps_through_the_bin_wiring ... ok
+test capabilities::tests::capabilities_json_payload_matches_the_rfc_record ... ok
+test tests::apply_is_wired_and_a_missing_plan_is_a_data_error ... ok
+test tests::help_and_version_exit_zero_on_stdout ... ok
+test tests::malformed_arguments_map_to_usage_exit_one ... ok
+test fsio::tests::write_atomic_never_transcodes_bytes_or_newlines ... ok
+test tests::unknown_command_and_unknown_arguments_exit_usage_with_no_stdout ... ok
+test tests::non_utf8_process_arguments_exit_usage ... ok
+test query_cmd::tests::query_request_transport_and_wrapper_negatives_are_rejected ... ok
+test tests::conformance_succeeds_with_a_human_report_on_stdout ... ok
+test fsio::tests::write_many_reports_per_file_results_without_aborting_the_batch ... ok
+test tests::conformance_failure_is_reported_as_internal_exit_five ... ok
+test tests::conformance_json_emits_a_byte_valid_envelope_loop ... ok
+test fsio::tests::write_atomic_digests_are_deterministic ... ok
+test plan::tests::plan_output_write_failures_are_precondition_errors ... ok
+test query_cmd::tests::query_require_one_fail_not_null_is_a_data_error ... ok
+test fsio::tests::windows_junction_is_detected_as_symlink_and_refused ... ok
+test apply::tests::machine_readonly_target_is_failed_read_only ... ok
+test plan::tests::plan_mixed_batch_exits_zero_with_planned_and_failed_entries ... ok
+test plan::tests::plan_read_failures_are_per_file_failed_entries ... ok
+test inspect::tests::inspect_recovered_format_local_diagnostics_report_with_fallback_binding ... ok
+test plan::tests::plan_manifest_bytes_match_the_output_file ... ok
+test apply::tests::machine_stale_source_is_skipped_stale_without_rewrite ... ok
+test plan::tests::plan_output_file_round_trips_through_the_typed_decoder ... ok
+test apply::tests::machine_write_failure_marks_failed_and_continues_the_batch ... ok
+test apply::tests::machine_happy_path_writes_targets_and_completes_all_entries ... ok
+test apply::tests::machine_resume_skips_completed_and_only_rewrites_pending ... ok
+test apply::tests::machine_plan_failed_entry_is_re_reported_failed ... ok
+test apply::tests::machine_resume_external_modification_is_skipped_stale ... ok
+test apply::tests::machine_interruption_persists_pending_before_write_and_resume_completes ... ok
+
+test result: ok. 164 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.12s
+
+     Running tests\cli_m4.rs (target\debug\deps\cli_m4-8cd91c3718aac143.exe)
+
+running 19 tests
+test capabilities_rejects_extra_positionals_as_usage ... ok
+test capabilities_human_output_is_deterministic_data ... ok
+test explain_capability_kind_is_a_data_error_until_a_declaration_source_exists ... ok
+test inspect_unreadable_file_is_a_data_error_with_an_envelope ... ok
+test inspect_missing_path_argument_is_usage ... ok
+test explain_kind_without_id_is_usage ... ok
+test inspect_recovered_json_reports_successfully ... ok
+test explain_unknown_id_is_a_data_error ... ok
+test inspect_reports_byte_and_bom_facts_deterministically ... ok
+test inspect_limit_budget_is_a_limit_error ... ok
+test capabilities_reports_the_full_facade_inventory ... ok
+test inspect_fatal_parse_failure_is_a_data_error ... ok
+test inspect_parse_facts_require_an_explicit_profile_and_are_complete ... ok
+test inspect_format_local_fatal_is_a_data_error_not_an_internal_error ... ok
+test inspect_reports_ambiguity_successfully_with_a_complete_envelope ... ok
+test inspect_unknown_profile_value_is_usage ... ok
+test inspect_recovered_files_exit_zero_with_a_full_report ... ok
+test explain_contract_and_error_code_and_profile_succeed ... ok
+test detection_ambiguity_cases_are_first_class_reports ... ok
+
+test result: ok. 19 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.14s
+
+     Running tests\cli_m5_commands.rs (target\debug\deps\cli_m5_commands-3556b52ab4a036e3.exe)
+
+running 7 tests
+test convert_request_file_is_accepted_for_the_two_stage_request ... ok
+test project_usage_rejection_and_missing_request_input ... ok
+test query_human_mode_prints_match_lines_only ... ok
+test materialize_output_flag_is_refused_until_fsio ... ok
+test query_malformed_request_is_a_data_error_with_envelope ... ok
+test query_request_file_end_to_end_emits_a_success_envelope ... ok
+test query_unknown_profile_is_usage_without_envelope ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests\cli_m7_plan.rs (target\debug\deps\cli_m7_plan-b33a63a753f2fa5e.exe)
+
+running 6 tests
+test edit_write_flag_is_usage_without_envelope ... ok
+test edit_request_file_end_to_end_is_a_dry_run ... ok
+test plan_mixed_batch_with_fixture_files_exits_zero ... ok
+test plan_request_file_end_to_end_emits_a_batch_plan_envelope ... ok
+test plan_output_writes_the_byte_identical_manifest_record ... ok
+test plan_human_view_redacts_secret_shaped_key_names ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests\cli_plan_apply.rs (target\debug\deps\cli_plan_apply-dcf134b175dd3942.exe)
+
+running 17 tests
+test apply_directory_target_is_failed_data_io_exit_four ... ok
+test apply_plan_failed_entries_are_re_reported_failed ... ok
+test apply_json_envelope_payload_is_byte_identical_to_the_result_file ... ok
+test apply_stale_source_is_skipped_stale_exit_four ... ok
+test apply_usage_failures_never_emit_an_envelope ... ok
+test apply_disk_full_injection_is_failed_io_exit_four ... ok
+test apply_tampered_patch_original_bytes_is_failed_original_mismatch ... ok
+test apply_full_round_trip_writes_targets_and_result_manifest ... ok
+test apply_readonly_target_is_failed_read_only_exit_four ... ok
+test apply_multi_file_batch_completes_in_plan_order ... ok
+test apply_permission_failure_injection_is_failed_permission_exit_four ... ok
+test apply_rerun_external_modification_is_skipped_stale ... ok
+test apply_symlink_or_junction_target_is_failed_symlink_policy ... ok
+test apply_redacted_flag_follows_the_redaction_policy ... ok
+test apply_rerun_skips_completed_files_and_redoes_pending ... ok
+test apply_cli_layer_failures_classify_correctly ... ok
+test apply_interruption_leaves_pending_manifest_and_rerun_resumes ... ok
+
+test result: ok. 17 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+     Running tests\cli_skeleton.rs (target\debug\deps\cli_skeleton-8bf475485f7b2e04.exe)
+
+running 13 tests
+test conformance_exits_zero_with_a_human_report_on_stdout ... ok
+test conformance_json_emits_a_byte_valid_envelope_that_decodes_back ... ok
+test help_exits_zero_and_prints_the_full_command_surface_on_stdout ... ok
+test no_recognized_command_remains_unimplemented ... ok
+test pretty_without_json_is_usage_exit_one ... ok
+test version_exits_zero_and_is_not_a_command ... ok
+test conformance_pretty_json_indents_without_changing_semantics ... ok
+test missing_command_is_usage_exit_one ... ok
+test unknown_arguments_are_rejected ... ok
+test unknown_command_and_abbreviation_guessing_are_usage_exit_one ... ok
+test parse_class_commands_without_profile_are_usage_exit_one ... ok
+test stdout_carries_only_result_data_and_stderr_only_diagnostics ... ok
+test observed_exit_codes_stay_within_the_closed_set ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.29s
+
+     Running tests\readme_json5_example.rs (target\debug\deps\readme_json5_example-4f2f1ba726c56358.exe)
+
+running 1 test
+test readme_json5_example_is_exact ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\readme_xml_example.rs (target\debug\deps\readme_xml_example-ae0374956803725a.exe)
+
+running 1 test
+test readme_xml_example_is_exact ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_conformance-43fed67cbe9f0961.exe)
+
+running 63 tests
+test ini_windows_oracle::tests::published_windows_oracle_manifest_is_conformant ... ok
+test ini_qt_oracle::tests::published_qt_oracle_manifest_is_conformant ... ok
+test ini_dotnet_oracle::tests::published_dotnet_oracle_manifest_is_conformant ... ok
+test ini_python_oracle::tests::published_python_oracle_manifest_is_conformant ... ok
+test ini_qt_oracle::tests::qt_oracle_expectation_and_digest_mutations_are_observed ... ok
+test json_family_v2::tests::reference_corpus_classification_drives_results ... ok
+test ini_windows_oracle::tests::windows_oracle_expectation_and_digest_mutations_are_observed ... ok
+test ini_python_oracle::tests::python_oracle_expectation_and_digest_mutations_are_observed ... ok
+test json_family_v2::tests::pinned_json5_reference_corpus_is_conformant ... ok
+test ini_python_oracle::tests::python_oracle_unknown_exception_and_duplicate_id_are_rejected ... ok
+test ini_windows_oracle::tests::windows_oracle_metadata_unknown_query_and_input_fail_closed ... ok
+test ini_qt_oracle::tests::qt_oracle_metadata_unknown_input_outcome_and_duplicate_id_fail_closed ... ok
+test ini_dotnet_oracle::tests::dotnet_oracle_expectation_and_digest_mutations_are_observed ... ok
+test json_family_v2::tests::embedded_json_family_v2_suite_is_conformant ... ok
+test json_family_v2::tests::vector_expectations_drive_results ... ok
+test ini_v1::tests::published_ini_v1_suite_is_conformant ... ok
+test ini_python_oracle::tests::python_oracle_metadata_unknown_input_and_outcome_fail_closed ... ok
+test portable_graph_v1::tests::published_portable_graph_v1_suite_is_conformant ... ok
+test semantic_model_v6::tests::line_format_internal_failure_codes_are_v6_registry_bound ... ok
+test properties_jdk25::tests::jdk25_oracle_expectation_mutation_is_observed ... ok
+test properties_jdk25::tests::published_jdk25_oracle_manifest_is_conformant ... ok
+test properties_jdk25::tests::jdk25_oracle_digest_and_adapter_mutations_fail_closed ... ok
+test ini_dotnet_oracle::tests::dotnet_oracle_metadata_unknown_fields_and_duplicate_id_fail_closed ... ok
+test protocol_v2::tests::published_protocol_v2_suite_is_conformant ... ok
+test source_v1::tests::published_source_v1_suite_is_conformant ... ok
+test cli_v1::tests::vector_canonical_envelope_matches_the_protocol_canonical_form ... ok
+test portable_graph_v1::tests::graph_vector_inputs_and_expectations_drive_results ... ok
+test syntax_query_v1::tests::published_syntax_query_v1_suite_is_conformant ... ok
+test properties_v1::tests::published_properties_v1_suite_is_conformant ... ok
+test xml_v1::tests::syntax_query_text_assertion_supports_utf16_sources ... ok
+test cli_v1::tests::cli_suite_identifier_is_checked ... ok
+test hcl_v1::tests::hcl_suite_identifier_is_checked ... ok
+test operations_v1::tests::operation_vectors_drive_expected_output ... ok
+test properties_jdk25::tests::jdk25_oracle_unknown_input_outcome_and_duplicate_id_are_rejected ... ok
+test plist_v1::tests::plist_suite_identifier_is_checked ... ok
+test operations_v1::tests::published_operations_v1_suite_is_conformant ... ok
+test ini_v1::tests::vector_inputs_and_expectations_drive_the_runner ... ok
+test source_v1::tests::vector_input_and_expectations_drive_source_cases ... ok
+test tests::published_v1_suite_is_conformant ... ok
+test protocol_v2::tests::protocol_v2_vectors_drive_input_and_expectations ... ok
+test ini_v1::tests::suite_identity_unknown_cases_and_duplicate_ids_are_rejected ... ok
+test xml_v1::tests::xml_suite_identifier_is_checked ... ok
+test toml_v1::tests::published_toml_v1_suite_is_conformant ... ok
+test hcl_v1::tests::hcl_vector_data_drives_expected_outputs ... ok
+test tests::unknown_case_ids_fail_and_duplicates_are_rejected ... ok
+test yaml_v1::tests::published_yaml_v1_suite_is_conformant ... ok
+test tests::vector_data_drives_expected_outputs ... ok
+test xml_v1::tests::xml_v1_suite_passes_fully ... ok
+test hcl_v1::tests::hcl_v1_suite_passes_fully ... ok
+test syntax_query_v1::tests::syntax_query_vectors_drive_input_and_expectations ... ok
+test properties_v1::tests::vector_inputs_and_expectations_drive_the_runner ... ok
+test properties_v1::tests::suite_identity_unknown_cases_and_duplicate_ids_are_rejected ... ok
+test yaml_v1::tests::yaml_vectors_drive_inputs_and_expectations ... ok
+test plist_v1::tests::binary_structure_offset_table_offset_is_the_exact_trailer_field ... ok
+test plist_v1::tests::plist_v1_suite_passes_fully ... ok
+test semantic_model_v5::tests::published_semantic_model_v5_suite_is_conformant ... ok
+test semantic_model_v6::tests::published_semantic_model_v6_suite_is_conformant ... ok
+test protocol_v1::tests::published_protocol_v1_suite_is_conformant ... ok
+test cli_v1::tests::duplicate_case_ids_are_rejected ... ok
+test cli_v1::tests::cli_v1_suite_passes_fully ... ok
+test semantic_model_v5::tests::semantic_model_v5_vectors_drive_inputs_and_expectations ... ok
+test semantic_model_v6::tests::semantic_model_v6_vectors_drive_inputs_and_expectations ... ok
+test cli_v1::tests::vector_data_drives_expected_outputs ... ok
+
+test result: ok. 63 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running unittests src\bin\consema-toml-test-decoder.rs (target\debug\deps\consema_toml_test_decoder-202404bb89668ab8.exe)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\bin\consema-yaml-test-adapter.rs (target\debug\deps\consema_yaml_test_adapter-0607df3d8fdeb2be.exe)
+
+running 1 test
+test tests::profile_selection_is_only_driven_by_explicit_version ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\cli_e2e.rs (target\debug\deps\cli_e2e-e978252cc460c3a6.exe)
+
+running 5 tests
+test interruption_recovery_semantics_hold_at_the_record_level ... ok
+test envelope_round_trips_are_byte_deterministic_on_both_transports ... ok
+test the_batch_state_machine_plan_to_result_holds_through_the_lib ... ok
+test exit_classification_over_the_vector_corpus_is_exhaustive ... ok
+test the_full_cli_vector_suite_passes_over_the_lib_api ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests\cli_hardening.rs (target\debug\deps\cli_hardening-bf648f3fb77e3d3c.exe)
+
+running 8 tests
+test pathological_batch_results_never_panic ... ok
+test pathological_batch_plans_never_panic ... ok
+test envelope_field_order_and_presence_are_strict ... ok
+test deeply_nested_envelopes_are_bounded_by_protocol_limits ... ok
+test malformed_envelopes_reject_with_documented_codes ... ok
+test pvce_envelopes_never_panic_on_garbage ... ok
+test huge_manifests_never_panic_and_stay_bounded ... ok
+test envelope_truncations_and_mutations_never_panic ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.19s
+
+     Running tests\hardening.rs (target\debug\deps\hardening-6c25c619c22586c8.exe)
+
+running 12 tests
+test bounded_source_and_patch_corpus_never_panics_or_returns_partial_facts ... ok
+test cancelled_query_never_reports_completed_result ... ok
+test mutated_pvce_corpus_is_strictly_bounded ... ok
+test completed_public_objects_are_send_and_sync ... ok
+test bounded_utf8_malicious_corpus_never_panics_or_fakes_completion ... ok
+test bounded_materialization_never_returns_partial_documents ... ok
+test structural_transactions_are_snapshot_bound_and_atomic ... ok
+test bounded_toml_corpus_never_panics_or_fakes_completion ... ok
+test real_project_json_family_fixtures_close_through_strict_json ... ok
+test bounded_json5_mutation_corpus_never_panics_or_fakes_completion ... ok
+test bounded_protocol_corpus_never_panics_or_bypasses_payload_validation ... ok
+test protocol_v3_payloads_remain_registry_bound_under_mutation ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.28s
+
+     Running tests\hcl_fixtures.rs (target\debug\deps\hcl_fixtures-ffb84747899f331e.exe)
+
+running 2 tests
+test hcl_fixtures_form_completely_and_round_trip_byte_exactly ... ok
+test hcl_fixtures_project_and_materialize_back_to_the_same_record ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\hcl_hardening.rs (target\debug\deps\hcl_hardening-c804240a3f93dcd8.exe)
+
+running 8 tests
+test published_types_are_send_and_sync ... ok
+test hcl_parse_limits_reject_before_publishing_a_document ... ok
+test recovered_documents_keep_exhaustive_coverage_and_diagnostics ... ok
+test malformed_hcl_never_forms_partial_documents ... ok
+test default_limits_truncate_deep_nesting_on_a_small_stack_thread ... ok
+test adversarial_nesting_never_panics_or_overflow_the_stack ... ok
+test published_hcl_vector_suite_is_conformant ... ok
+test mutation_and_truncation_never_panic_or_fabricate ... ok
+
+test result: ok. 8 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests\line_format_fixtures.rs (target\debug\deps\line_format_fixtures-38bfa4c257437cb9.exe)
+
+running 4 tests
+test properties_latin1_container_is_not_accidentally_utf8 ... ok
+test ini_byte_container_fixtures_retain_their_declared_transport_facts ... ok
+test production_ini_fixtures_close_without_normalizing_source_bytes ... ok
+test production_properties_fixtures_close_or_reject_scalar_projection_explicitly ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests\line_formats_hardening.rs (target\debug\deps\line_formats_hardening-da2e06b974394309.exe)
+
+running 6 tests
+test line_format_publication_objects_are_send_and_sync ... ok
+test line_format_materialization_limits_never_publish_partial_documents ... ok
+test line_format_transactions_are_snapshot_bound_conflict_atomic_and_replayable ... ok
+test bounded_properties_mutation_corpus_never_panics_or_publishes_partial_semantics ... ok
+test bounded_ini_mutation_corpus_never_panics_or_publishes_partial_semantics ... ok
+test line_format_length_and_continuation_bombs_fail_before_document_publication ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests\mutation_corpus.rs (target\debug\deps\mutation_corpus-7e4a8059f38fde03.exe)
+
+running 2 tests
+test mutation_corpus_replay_full ... ignored, manual evidence run: full 175k-case replay, tens of seconds
+test mutation_corpus_replay_bounded ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 2.57s
+
+     Running tests\operation_fuzz.rs (target\debug\deps\operation_fuzz-5dea7bc9e37e300f.exe)
+
+running 16 tests
+test hcl_operation_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test ini_operation_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test json_operation_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test plist_operation_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test properties_operation_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test toml_operation_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test xml_operation_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test yaml_operation_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test xml_operation_fuzz_bounded ... ok
+test plist_operation_fuzz_bounded ... ok
+test toml_operation_fuzz_bounded ... ok
+test hcl_operation_fuzz_bounded ... ok
+test json_operation_fuzz_bounded ... ok
+test ini_operation_fuzz_bounded ... ok
+test yaml_operation_fuzz_bounded ... ok
+test properties_operation_fuzz_bounded ... ok
+
+test result: ok. 8 passed; 0 failed; 8 ignored; 0 measured; 0 filtered out; finished in 0.34s
+
+     Running tests\parse_fuzz.rs (target\debug\deps\parse_fuzz-2879443efc843eef.exe)
+
+running 16 tests
+test hcl_parse_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test ini_parse_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test json_parse_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test plist_parse_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test properties_parse_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test toml_parse_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test xml_parse_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test yaml_parse_fuzz_long_run ... ignored, manual evidence run: several minutes per target
+test xml_parse_fuzz_bounded ... ok
+test plist_parse_fuzz_bounded ... ok
+test toml_parse_fuzz_bounded ... ok
+test hcl_parse_fuzz_bounded ... ok
+test json_parse_fuzz_bounded ... ok
+test yaml_parse_fuzz_bounded ... ok
+test ini_parse_fuzz_bounded ... ok
+test properties_parse_fuzz_bounded ... ok
+
+test result: ok. 8 passed; 0 failed; 8 ignored; 0 measured; 0 filtered out; finished in 0.49s
+
+     Running tests\plist_fixtures.rs (target\debug\deps\plist_fixtures-4ad1f4ee9dc5f26c.exe)
+
+running 5 tests
+test plist_archiver_fixture_preserves_uids_without_rebuilding_tables ... ok
+test plist_utf16_xml_fixture_round_trips ... ok
+test plist_fixtures_convert_between_representations_with_native_equality ... ok
+test plist_fixtures_form_completely_and_round_trip_byte_exactly ... ok
+test plist_fixtures_project_exactly_and_materialize_back_to_the_same_record ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.02s
+
+     Running tests\plist_hardening.rs (target\debug\deps\plist_hardening-23e2d8c893eb3052.exe)
+
+running 7 tests
+test published_types_are_send_and_sync ... ok
+test plist_parse_limits_reject_before_publishing_a_document ... ok
+test recovered_documents_keep_exhaustive_coverage_and_diagnostics ... ok
+test malformed_xml_never_forms_partial_documents ... ok
+test binary_mutation_and_truncation_never_panic_or_fabricate ... ok
+test published_plist_vector_suite_is_conformant ... ok
+test xml_mutation_and_truncation_never_panic_or_fabricate ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.17s
+
+     Running tests\property_graph.rs (target\debug\deps\property_graph-9e2ba4593a03e371.exe)
+
+running 4 tests
+test known_finding_m2_f2_is_fixed ... ok
+test anchor_graph_round_trips_through_pgce ... ok
+test pgce_round_trips_exactly ... ok
+test yaml_anchors_and_aliases_resolve ... ok
+
+test result: ok. 4 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running tests\property_plist.rs (target\debug\deps\property_plist-e25254213501ec75.exe)
+
+running 1 test
+test binary_offset_table_decodes_exactly ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests\property_protocol.rs (target\debug\deps\property_protocol-7b33bae6d200065f.exe)
+
+running 6 tests
+test pvce_reencoded_bytes_are_stable ... ok
+test transported_values_materialize_completely ... ok
+test varint_integer_round_trips_magnitudes ... ok
+test pvce_transport_round_trips ... ok
+test canonical_json_transport_round_trips ... ok
+test arbitrary_bytes_never_panic ... ok
+
+test result: ok. 6 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.15s
+
+     Running tests\protocol_fuzz.rs (target\debug\deps\protocol_fuzz-d942678b0b805709.exe)
+
+running 2 tests
+test protocol_decode_fuzz_long_run ... ignored, manual evidence run: several minutes
+test protocol_decode_fuzz_bounded ... ok
+
+test result: ok. 1 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.20s
+
+     Running tests\xml_encoding_corpus.rs (target\debug\deps\xml_encoding_corpus-7b4b27b14c6541a2.exe)
+
+running 7 tests
+test invalid_sequences_never_fabricate_complete_documents ... ok
+test explicit_encoding_selection_must_agree_with_bom ... ok
+test utf16_without_bom_never_guesses_endianness ... ok
+test declaration_encoding_conflicts_are_recovered ... ok
+test utf8_bom_is_retained_and_span_closed ... ok
+test utf16le_and_be_bom_documents_round_trip ... ok
+test non_bmp_content_and_names_round_trip_in_both_encodings ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\xml_fixtures.rs (target\debug\deps\xml_fixtures-eaaead0445b0a0c7.exe)
+
+running 2 tests
+test xml_fixtures_form_completely_and_round_trip_byte_exactly ... ok
+test xml_fixtures_project_exactly_and_materialize_back_to_the_same_record ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\xml_hardening.rs (target\debug\deps\xml_hardening-972457f69df1c760.exe)
+
+running 10 tests
+test mixed_content_limit_publishes_diagnostics_for_every_drop ... ok
+test cyclic_entities_are_bounded_and_recovered ... ok
+test xml_parse_limits_reject_before_publishing_a_document ... ok
+test namespace_attacks_never_fabricate_expanded_names ... ok
+test malformed_xml_never_forms_partial_documents ... ok
+test recovered_documents_keep_exhaustive_coverage ... ok
+test truncation_and_mutation_of_utf16_never_panic ... ok
+test billion_laughs_variants_are_bounded_by_document_wide_accounting ... ok
+test mutation_and_truncation_never_panic_or_fabricate ... ok
+test deep_reference_nesting_hits_the_depth_limit ... ok
+
+test result: ok. 10 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+     Running tests\xml_publication.rs (target\debug\deps\xml_publication-2844f0c9e37032b5.exe)
+
+running 3 tests
+test xml_publication_objects_are_send_and_sync ... ok
+test bounded_materialization_never_publishes_partial_documents ... ok
+test xml_fixture_diagnostics_stay_below_the_maximum ... ok
+
+test result: ok. 3 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests\yaml_fixtures.rs (target\debug\deps\yaml_fixtures-2e51c3c18ded4d31.exe)
+
+running 2 tests
+test yaml_fixture_tree_projection_is_explicit_about_sharing ... ok
+test real_project_yaml_fixtures_close_through_graph_and_pgce ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests\yaml_hardening.rs (target\debug\deps\yaml_hardening-ce89c09eee0b7540.exe)
+
+running 5 tests
+test yaml_parse_limits_reject_before_publishing_a_document ... ok
+test custom_tags_are_data_and_require_an_explicit_loss_policy ... ok
+test alias_bomb_stays_a_small_graph_and_tree_duplication_is_bounded ... ok
+test mutated_pgce_is_rejected_or_remains_canonical ... ok
+test malformed_and_truncated_yaml_never_forms_partial_documents ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_core-941c486a65dfa14c.exe)
+
+running 28 tests
+test query::tests::hcl_domain_constructors_are_stable ... ok
+test query::tests::cursor_declared_terminal_is_hidden_until_exhaustion ... ok
+test query::tests::operator_free_root_result_obeys_max_results ... ok
+test query::tests::hcl_kind_and_accessor_arguments_are_validated ... ok
+test query::tests::cursor_cancellation_stops_stream_with_cancelled_terminal ... ok
+test query::tests::hcl_native_chain_validates_and_reports_the_output_role ... ok
+test query::tests::invalid_role_composition_is_rejected_before_execution ... ok
+test query::tests::hcl_validation_rejects_foreign_operators_and_composition ... ok
+test query::tests::line_format_domains_have_distinct_root_and_syntax_roles ... ok
+test query::tests::cursor_reports_resource_failure_with_failed_terminal ... ok
+test query::tests::plist_binary_structure_operators_accept_any_structure_input ... ok
+test query::tests::plist_domains_have_distinct_root_roles ... ok
+test query::tests::protocol_schema_round_trips_and_rejects_unknown_fields ... ok
+test query::tests::syntax_kind_names_are_validated_before_binding ... ok
+test value::tests::arbitrary_integer_round_trip ... ok
+test value::tests::extension_semantic_support_requires_contract_validation ... ok
+test query::tests::cursor_and_materialized_execution_share_identity_and_order ... ok
+test query::tests::stable_failure_metadata_is_language_neutral ... ok
+test value::tests::decimal_normalization_controls_equality_and_hash ... ok
+test value::tests::negative_year_leap_rule_uses_absolute_remainders ... ok
+test value::tests::object_order_is_strict_and_duplicates_fail ... ok
+test query::tests::plist_operator_arguments_are_validated_before_binding ... ok
+test query::tests::duplicate_value_results_keep_object_order ... ok
+test query::tests::xml_content_parent_rejects_document_input_role ... ok
+test query::tests::builder_produces_the_same_immutable_definition ... ok
+test value::tests::float_bits_are_strict ... ok
+test query::tests::plist_native_operator_roles_compose_and_reject ... ok
+test query::tests::cursor_require_one_enforces_cardinality_at_exhaustion ... ok
+
+test result: ok. 28 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_document-8b90744ab93b8d6c.exe)
+
+running 37 tests
+test source::tests::bom_policy_keeps_legacy_marker_bytes_as_content ... ok
+test source::tests::decodes_all_v1_text_encodings_without_losing_raw_bytes ... ok
+test edit_plan::tests::plan_requires_stable_source_and_matching_operation_metadata ... ok
+test materialization::tests::request_keeps_every_explicit_policy ... ok
+test tests::empty_binary_source_has_an_empty_valid_index ... ok
+test source_patch::tests::patch_creation_and_application_are_exact_and_repeatable ... ok
+test tests::exact_coverage_rejects_gaps ... ok
+test source::tests::multiscalar_big5_mapping_exposes_only_real_raw_boundaries ... ok
+test materialization::tests::provenance_is_target_bound_and_limited ... ok
+test source::tests::rejects_conflicts_unsupported_boms_and_invalid_sequences ... ok
+test source::tests::source_v2_publishes_only_the_frozen_windows_code_pages ... ok
+test source::tests::utf16_locations_account_for_surrogate_pairs ... ok
+test source_patch::tests::limits_are_checked_before_target_allocation ... ok
+test source_patch::tests::derives_exact_patch_from_document_change_facts ... ok
+test source::tests::windows_code_pages_decode_strictly_with_exact_boundaries ... ok
+test source_patch::tests::redacted_bytes_are_required_for_application_but_hidden_from_debug ... ok
+test source::tests::bom_is_retained_as_decoded_scalar_and_recorded ... ok
+test source::tests::binary_source_has_no_decoded_claims ... ok
+test operation_registry::tests::registry_rejects_ambiguous_or_unstable_schemas ... ok
+test source_patch::tests::target_digest_and_encoding_drift_are_rejected ... ok
+test source::tests::location_conversion_requires_exact_scalar_boundaries ... ok
+test tests::node_refs_are_snapshot_bound ... ok
+test tests::binary_regions_cover_exact_bytes_without_token_claims ... ok
+test tests::hcl_roles_issue_and_report_stable_identities ... ok
+test operation_registry::tests::registry_canonicalizes_and_resolves_exact_versions ... ok
+test source::tests::source_limits_are_enforced_before_decoding_expands_data ... ok
+test untouched_proof::tests::proof_detects_region_digest_and_target_tampering ... ok
+test source_patch::tests::overlapping_and_duplicate_insertions_are_not_valid_patches ... ok
+test source::tests::checkpointed_locations_remain_exact_beyond_one_stride ... ok
+test tests::plist_roles_issue_and_report_stable_identities ... ok
+test source_patch::tests::stale_base_and_original_mismatch_fail_before_a_result_exists ... ok
+test tests::binary_regions_reject_wrong_roles_empty_kinds_and_gaps ... ok
+test untouched_proof::tests::proof_covers_every_and_only_untouched_byte ... ok
+test untouched_proof::tests::transferred_proof_rejects_noncanonical_regions ... ok
+test source::tests::sha256_content_identity_uses_exact_raw_bytes ... ok
+test untouched_proof::tests::no_replacements_prove_the_complete_snapshot ... ok
+test source::tests::per_call_coordinate_conversion_does_not_rescan_large_utf8_sources ... ok
+
+test result: ok. 37 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.92s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_graph-c0ee402ce7ed8f25.exe)
+
+running 21 tests
+test pgce::tests::empty_graph_byte_vector_is_frozen ... ok
+test pgce::tests::encode_and_decode_limits_fail_atomically ... ok
+test query::tests::graph_query_definitions_use_the_existing_language_neutral_envelope ... ok
+test pgce::tests::decoder_rejects_noncanonical_node_numbering ... ok
+test pgce::tests::isomorphic_builder_numbering_has_identical_pgce ... ok
+test query::tests::association_operators_keep_order_and_shared_identity ... ok
+test query::tests::filters_selection_limits_and_cancellation_are_explicit ... ok
+test pgce::tests::decoder_rejects_nonminimal_varint_trailing_and_invalid_reference ... ok
+test query::tests::reachable_nodes_visit_shared_nodes_once_across_roots ... ok
+test query::tests::reachable_order_is_canonical_and_cycles_do_not_expand ... ok
+test tests::builder_rejects_incomplete_unreachable_duplicate_and_invalid_tag ... ok
+test pgce::tests::pgce_failures_have_stable_v5_codes ... ok
+test tests::root_and_association_order_are_strict ... ok
+test tests::scalar_graph_is_immutable_and_inspectable ... ok
+test tests::sharing_cycles_and_duplicate_arbitrary_keys_are_values ... ok
+test tests::strict_equality_ignores_builder_ids_but_preserves_topology ... ok
+test tests::graph_build_failures_have_stable_v5_codes ... ok
+test tests::limits_fail_before_a_graph_exists ... ok
+test query::tests::validation_is_domain_and_role_typed ... ok
+test pgce::tests::scalar_byte_vector_is_frozen ... ok
+test pgce::tests::shared_cycles_and_arbitrary_mapping_keys_round_trip ... ok
+
+test result: ok. 21 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_hcl-643841335ada1069.exe)
+
+running 378 tests
+test document::tests::lone_cr_is_recovered ... ok
+test document::tests::bom_is_recovered_with_byte_order_mark_code ... ok
+test document::tests::crate_parse_entry_dispatches_thinly ... ok
+test document::tests::tfvars_attribute_only_document_is_complete ... ok
+test document::tests::duplicate_attribute_rule_applies_unchanged_under_tfvars ... ok
+test document::tests::tfvars_accepts_the_full_expression_grammar ... ok
+test document::tests::native_profile_admits_top_level_blocks ... ok
+test document::tests::parse_dispatches_by_profile ... ok
+test document::tests::snapshot_identity_is_fresh_per_document_and_stable ... ok
+test document::tests::frozen_public_surface_reports_consistent_facts ... ok
+test document::tests::tfvars_block_labels_and_nested_body_survive_the_gate ... ok
+test document::tests::tfvars_failed_block_is_parser_recovery_not_gate_rejection ... ok
+test document::tests::tfvars_top_level_block_is_recovered_and_preserved ... ok
+test edit::tests::block_operations_match_the_conformance_vector ... ok
+test edit::tests::attribute_operations_match_the_conformance_vector ... ok
+test edit::tests::every_attribute_operation_works_under_both_profiles ... ok
+test edit::tests::dry_run_matches_commit ... ok
+test edit::tests::duplicate_attribute_creation_is_rejected ... ok
+test edit::tests::empty_transaction_commits_an_unchanged_document ... ok
+test edit::tests::constructor_values_render_and_verify ... ok
+test edit::tests::change_set_maps_replaced_deleted_and_unmapped ... ok
+test edit::tests::empty_documents_and_empty_bodies_accept_inserts ... ok
+test edit::tests::eof_terminated_inserts_add_a_separating_newline ... ok
+test document::tests::lossless_index_and_kinds_are_parallel_and_exact ... ok
+test document::tests::profile_gate_diagnostics_merge_with_parse_diagnostics_deterministically ... ok
+test edit::tests::failed_transactions_leave_the_base_byte_exact ... ok
+test edit::tests::heredocs_and_multiline_sources_edit_correctly ... ok
+test document::tests::invalid_utf8_is_a_fatal_formation_failure ... ok
+test document::tests::render_is_byte_exact_for_complete_and_recovered ... ok
+test document::tests::tfvars_emits_one_diagnostic_per_top_level_block_in_source_order ... ok
+test document::tests::tfvars_nested_block_needs_no_own_diagnostic ... ok
+test edit::tests::conflict_vector_codes_and_atomicity ... ok
+test edit::tests::limits_are_enforced_atomically ... ok
+test edit::tests::operation_ids_match_the_frozen_surface ... ok
+test edit::tests::piece_index_walk_finds_line_ends_indents_and_braces ... ok
+test edit::tests::nested_body_operations_resolve_through_body_paths ... ok
+test edit::tests::insert_placements_first_last_and_after ... ok
+test edit::tests::remove_block_by_occurrence_selects_the_nth ... ok
+test edit::tests::rename_preserves_expression_semantics ... ok
+test edit::tests::remove_consumes_owned_trivia ... ok
+test edit::tests::tfvars_gate_refuses_block_operations_atomically ... ok
+test edit::tests::unrepresentable_values_fail_atomically ... ok
+test edit::tests::string_escaping_round_trips_through_edits ... ok
+test expression::tests::canonical_decimal_bounded_honors_an_explicit_digit_budget ... ok
+test expression::tests::canonical_decimal_fails_fast_on_exponent_folding_overflow ... ok
+test expression::tests::canonical_decimal_folds_spellings_to_canonical_form ... ok
+test expression::tests::canonical_decimal_min_bound_exponent_fails_not_panics ... ok
+test edit::tests::sequential_edits_fold_and_verify ... ok
+test expression::tests::canonical_decimal_keeps_large_but_allowed_exponents ... ok
+test expression::tests::canonical_decimal_rejects_invalid_spellings ... ok
+test expression::tests::canonical_decimal_rejects_unrepresentable_exponents ... ok
+test expression::tests::canonical_decimal_overflow_fails_parse_with_number_digits_limit ... ok
+test expression::tests::children_cover_template_call_traversal_for_and_object ... ok
+test expression::tests::children_of_binary_and_conditional_follow_source_order ... ok
+test expression::tests::expression_kind_names_round_trip ... ok
+test expression::tests::expression_text_derives_exact_source_slice ... ok
+test expression::tests::expression_text_handles_multibyte_decoded_offsets ... ok
+test expression::tests::heredoc_facts_carry_mode_marker_and_closing_facts ... ok
+test expression::tests::heredoc_mode_spellings_are_stable ... ok
+test expression::tests::is_literal_complete_accepts_constructors ... ok
+test expression::tests::is_literal_complete_accepts_literal_terms ... ok
+test expression::tests::is_literal_complete_accepts_templates_without_interpolation ... ok
+test expression::tests::is_literal_complete_paren_preserves_boundary ... ok
+test expression::tests::is_literal_complete_rejects_derived_constructors ... ok
+test expression::tests::is_literal_complete_rejects_all_derived_forms ... ok
+test expression::tests::is_literal_complete_rejects_templates_with_interpolation_or_directive ... ok
+test expression::tests::is_literal_complete_unary_minus_boundary ... ok
+test expression::tests::literal_entry_accessors_report_key_and_value ... ok
+test expression::tests::literal_value_equality_and_hash ... ok
+test expression::tests::literal_value_projects_constructors ... ok
+test expression::tests::literal_value_projects_booleans_and_null ... ok
+test expression::tests::literal_value_fails_for_derived_expressions ... ok
+test expression::tests::literal_value_projects_literal_templates ... ok
+test expression::tests::literal_value_projects_numbers_and_signs ... ok
+test expression::tests::number_accessors_and_from_spelling ... ok
+test expression::tests::number_equality_is_canonical_decimal_equality ... ok
+test expression::tests::separator_and_operator_spellings_round_trip ... ok
+test expression::tests::structural_equality_ignores_spans ... ok
+test expression::tests::structural_equality_is_canonical_for_numbers ... ok
+test expression::tests::structural_inequality_across_kinds_and_children ... ok
+test expression::tests::template_equality_is_part_wise_with_exact_literal_text ... ok
+test lexer::tests::all_thirty_kinds_assembled ... ok
+test lexer::tests::bom_elsewhere_recovered ... ok
+test lexer::tests::bom_inside_string_is_literal ... ok
+test lexer::tests::comment_bytes_inside_interpolation_are_absorbed ... ok
+test lexer::tests::comments_inside_interpolation_are_scanned ... ok
+test lexer::tests::diagnostic_truncation_marker ... ok
+test lexer::tests::directive_piece_shapes ... ok
+test lexer::tests::dot_number_after_identifier_is_token_sequence ... ok
+test lexer::tests::double_colon_is_error_token ... ok
+test lexer::tests::empty_quoted_template ... ok
+test lexer::tests::empty_source_lexes_to_eof_only ... ok
+test lexer::tests::eof_token_is_zero_length_last ... ok
+test lexer::tests::escaped_interpolation_markers_are_literal ... ok
+test lexer::tests::hash_and_slash_line_comments ... ok
+test lexer::tests::heredoc_basic_pieces ... ok
+test lexer::tests::heredoc_bytes_limit_fatal ... ok
+test lexer::tests::heredoc_closing_line_crlf ... ok
+test lexer::tests::heredoc_closing_line_leading_spaces ... ok
+test lexer::tests::heredoc_closing_line_trailing_whitespace ... ok
+test lexer::tests::heredoc_content_interpolation_pieces ... ok
+test lexer::tests::heredoc_escaped_interpolation_literal ... ok
+test lexer::tests::heredoc_inside_interpolation_absorbed ... ok
+test lexer::tests::heredoc_marker_followed_by_junk_rejected ... ok
+test lexer::tests::heredoc_marker_line_with_content_is_content ... ok
+test lexer::tests::heredoc_quoted_marker_rejected ... ok
+test lexer::tests::heredoc_strip_indent_introducer ... ok
+test lexer::tests::heredoc_unterminated_at_eof ... ok
+test lexer::tests::heredoc_unterminated_with_content_lines ... ok
+test lexer::tests::identifiers_ascii_hyphen_and_underscore_continue ... ok
+test lexer::tests::identifier_length_limit_fatal ... ok
+test lexer::tests::identifiers_unicode_letters ... ok
+test lexer::tests::inline_comment_spans_lines ... ok
+test lexer::tests::interpolation_containing_heredoc ... ok
+test lexer::tests::interpolation_count_limit_fatal ... ok
+test lexer::tests::interpolation_piece_shapes ... ok
+test lexer::tests::interpolation_nested_braces ... ok
+test lexer::tests::interpolation_nested_quoted_template ... ok
+test lexer::tests::interpolation_multiline ... ok
+test lexer::tests::invalid_characters_recovered ... ok
+test lexer::tests::interpolation_strip_markers ... ok
+test lexer::tests::invalid_escape_sequences_recovered ... ok
+test lexer::tests::invalid_utf8_fatal ... ok
+test lexer::tests::invalid_number_forms_recovered ... ok
+test lexer::tests::keyword_spellings_are_identifiers ... ok
+test lexer::tests::leading_bom_recovered ... ok
+test lexer::tests::leading_underscore_identifier_rejected ... ok
+test lexer::tests::linebreak_lf_and_crlf_spans ... ok
+test lexer::tests::lone_cr_is_recovered ... ok
+test lexer::tests::number_following_operator_not_extended ... ok
+test lexer::tests::number_token_spans_matrix ... ok
+test lexer::tests::punctuation_tokens ... ok
+test lexer::tests::recovery_regions_limit_fatal ... ok
+test lexer::tests::region_lex_binds_spans_to_authority ... ok
+test lexer::tests::string_length_limit_fatal ... ok
+test lexer::tests::quoted_template_basic_pieces ... ok
+test lexer::tests::operators_have_exact_spans ... ok
+test lexer::tests::template_depth_limit_fatal ... ok
+test lexer::tests::token_count_limit_fatal ... ok
+test lexer::tests::mutation_closure_never_panics ... ok
+test lexer::tests::unterminated_directive_at_eof ... ok
+test lexer::tests::syntax_pieces_limit_fatal ... ok
+test lexer::tests::heredoc_lines_limit_fatal ... ok
+test lexer::tests::unterminated_inline_comment_recovered ... ok
+test lexer::tests::unterminated_interpolation_at_eof ... ok
+test lexer::tests::unterminated_string_at_eof ... ok
+test lexer::tests::valid_escape_sequences ... ok
+test lexer::tests::whitespace_run_spans ... ok
+test lexer::tests::unterminated_string_ends_at_line ... ok
+test materialization::tests::analyzed_paths_are_recorded_before_failure ... ok
+test materialization::tests::closure_catches_reparsed_model_mismatch ... ok
+test materialization::tests::binary_float32_payloads_convert_exactly ... ok
+test lexer::tests::truncation_closure_keeps_coverage ... ok
+test materialization::tests::empty_body_materializes_to_an_empty_document ... ok
+test materialization::tests::duplicate_attribute_in_a_body_is_unrepresentable ... ok
+test materialization::tests::escaped_lengths_are_exact ... ok
+test materialization::tests::canonical_document_matches_the_published_vector_render ... ok
+test materialization::tests::constructors_layout_one_item_per_line_at_indentation ... ok
+test materialization::tests::empty_constructors_render_single_line_at_any_depth ... ok
+test materialization::tests::expression_kind_mismatch_is_invalid_request ... ok
+test materialization::tests::expression_fingerprint_field_validates ... ok
+test materialization::tests::huge_integers_round_trip_exactly ... ok
+test materialization::tests::expression_text_may_carry_trailing_trivia ... ok
+test materialization::tests::fingerprint_is_stable_and_distinguishes_structure ... ok
+test materialization::tests::invalid_names_and_types_are_unrepresentable ... ok
+test materialization::tests::labels_are_always_quoted_and_escaped ... ok
+test materialization::tests::canonical_number_spellings_fold_and_round_trip ... ok
+test materialization::tests::native_target_materializes_block_records ... ok
+test materialization::tests::non_finite_real_payloads_are_unrepresentable ... ok
+test materialization::tests::old_split_record_shape_is_rejected_with_a_precise_diagnostic ... ok
+test materialization::tests::negative_numbers_reparse_as_unary_minus_and_match ... ok
+test materialization::tests::provenance_covers_every_input_node_and_is_target_bound ... ok
+test materialization::tests::provenance_spans_are_exact ... ok
+test materialization::tests::reparse_closure_matches_the_published_vector_render_and_fingerprint ... ok
+test materialization::tests::request_validation_matrix_fails_exactly ... ok
+test materialization::tests::minimal_string_escaping_round_trips_exact_text ... ok
+test materialization::tests::object_keys_emit_bare_identifiers_and_quoted_others ... ok
+test materialization::tests::tfvars_target_materializes_attribute_only_records ... ok
+test materialization::tests::materialize_parse_materialize_is_a_fixed_point ... ok
+test materialization::tests::resource_limits_fail_with_exact_names ... ok
+test materialization::tests::over_deep_expression_text_hits_the_depth_limit ... ok
+test materialization::tests::projection_to_materialization_loop_closes_with_reparse_equality ... ok
+test materialization::tests::tfvars_target_rejects_block_records ... ok
+test materialization::tests::wrong_record_name_is_invalid_request ... ok
+test native::tests::block_accessors_report_type_labels_body_and_span ... ok
+test native::tests::attribute_accessors_report_name_equals_and_expression ... ok
+test native::tests::block_label_carries_quote_and_naked_facts ... ok
+test native::tests::body_item_accessors_are_exclusive ... ok
+test native::tests::body_len_and_empty ... ok
+test materialization::tests::unparseable_expression_text_is_invalid_request ... ok
+test native::tests::body_preserves_interleaved_item_order ... ok
+test native::tests::document_binds_snapshot_and_body ... ok
+test native::tests::error_region_carries_span_and_code ... ok
+test native::tests::syntax_kind_closed_set_has_exactly_thirty_kinds ... ok
+test native::tests::syntax_kind_spellings_match_the_rfc_721_list ... ok
+test operation_registry::tests::native_profile_publishes_the_frozen_six_operation_surface ... ok
+test operation_registry::tests::tfvars_profile_publishes_attribute_operations_only ... ok
+test parser::tests::attribute_and_block_may_share_a_name ... ok
+test parser::tests::attribute_count_limit_is_fatal ... ok
+test parser::tests::attribute_splat_nests_attribute_steps ... ok
+test parser::tests::all_thirty_syntax_kinds_appear_in_one_document ... ok
+test parser::tests::bare_identifier_before_equals_is_an_item_error ... ok
+test parser::tests::binary_chain_length_limit_is_fatal ... ok
+test parser::tests::binary_operators_are_left_associative ... ok
+test parser::tests::block_count_limit_is_fatal ... ok
+test parser::tests::block_span_covers_labels_through_closing_brace ... ok
+test parser::tests::block_type_followed_by_newline_is_recovered ... ok
+test parser::tests::block_with_naked_labels_and_nested_body ... ok
+test parser::tests::block_with_quoted_labels_decodes_escapes ... ok
+test parser::tests::body_depth_limit_is_fatal ... ok
+test parser::tests::body_item_count_limit_is_fatal ... ok
+test parser::tests::boolean_and_null_literals ... ok
+test parser::tests::comparison_and_equality_levels ... ok
+test parser::tests::body_preserves_interleaved_item_order ... ok
+test parser::tests::conditional_branches_are_right_associative ... ok
+test parser::tests::conditional_missing_colon_is_rejected ... ok
+test parser::tests::conditional_never_binds_tighter_than_or ... ok
+test parser::tests::crlf_line_endings_are_accepted ... ok
+test parser::tests::default_depth_budgets_keep_the_measured_stack_margin ... ok
+test parser::tests::diagnostics_are_truncated_with_the_house_marker ... ok
+test parser::tests::doubled_star_is_rejected ... ok
+test parser::tests::directive_with_trailing_junk_is_recovered ... ok
+test parser::tests::directives_parse_all_kinds ... ok
+test parser::tests::duplicate_attribute_excludes_the_second_occurrence ... ok
+test parser::tests::duplicate_attribute_inside_one_line_block ... ok
+test parser::tests::duplicate_attributes_in_nested_bodies_are_independent ... ok
+test parser::tests::empty_block_and_one_line_empty_block ... ok
+test parser::tests::empty_heredoc_is_valid ... ok
+test parser::tests::empty_source_is_complete_with_empty_body ... ok
+test parser::tests::equals_after_block_label_is_recovered ... ok
+test parser::tests::eof_terminates_the_last_attribute_without_newline ... ok
+test parser::tests::error_region_limit_is_fatal ... ok
+test parser::tests::escaped_openers_decode_to_literal_text ... ok
+test parser::tests::error_regions_merge_lexer_and_parser_regions_in_source_order ... ok
+test parser::tests::expansion_marker_on_non_final_argument_is_rejected ... ok
+test parser::tests::expression_depth_limit_is_fatal ... ok
+test parser::tests::expression_text_is_the_exact_source_slice ... ok
+test parser::tests::expression_kind_names_cover_the_closed_set ... ok
+test parser::tests::for_as_first_tuple_element_has_for_priority ... ok
+test parser::tests::for_as_later_object_key_is_valid ... ok
+test parser::tests::for_expression_collection_parses_full_expression ... ok
+test parser::tests::for_extent_limit_is_fatal ... ok
+test parser::tests::for_object_expression_with_grouping_and_guard ... ok
+test parser::tests::for_tuple_expression_with_key_value_and_guard ... ok
+test parser::tests::formed_accessors_report_all_facts ... ok
+test parser::tests::for_tuple_single_identifier_form ... ok
+test parser::tests::full_splat_nests_attribute_and_index_steps ... ok
+test parser::tests::function_call_ignores_newlines_between_arguments ... ok
+test parser::tests::function_call_trailing_comma_without_expansion ... ok
+test parser::tests::function_call_with_trailing_comma_and_expansion ... ok
+test parser::tests::heredoc_closing_line_allows_tabs_and_trailing_whitespace ... ok
+test parser::tests::heredoc_crlf_content_keeps_raw_bytes ... ok
+test parser::tests::heredoc_interpolation_and_escaped_opener ... ok
+test parser::tests::heredoc_plain_mode_facts_and_parts ... ok
+test parser::tests::heredoc_strip_indent_mode_is_a_preserved_fact ... ok
+test parser::tests::incomplete_expression_region_ends_at_end_of_line ... ok
+test parser::tests::index_after_function_call_is_a_newline_recovery ... ok
+test parser::tests::inline_comment_spanning_lines_stays_inside_the_expression ... ok
+test parser::tests::invalid_body_item_becomes_an_error_region ... ok
+test parser::tests::interpolation_part_assembly_with_spans ... ok
+test parser::tests::keyword_spellings_are_traversal_roots ... ok
+test parser::tests::keyword_spellings_are_valid_attribute_names ... ok
+test parser::tests::label_count_limit_is_fatal ... ok
+test parser::tests::line_comment_terminates_the_attribute ... ok
+test parser::tests::logical_levels_bind_loosest ... ok
+test parser::tests::malformed_directive_is_recovered ... ok
+test parser::tests::missing_expression_is_an_attribute_failure ... ok
+test parser::tests::missing_newline_after_block_is_recovered ... ok
+test parser::tests::missing_newline_after_attribute_survives_and_eats_the_line ... ok
+test parser::tests::multiplication_binds_tighter_than_addition ... ok
+test parser::tests::namespaced_function_call_is_rejected ... ok
+test parser::tests::missing_newline_inside_block_preserves_the_closing_brace ... ok
+test parser::tests::nested_template_inside_interpolation ... ok
+test parser::tests::number_digit_limit_is_fatal ... ok
+test parser::tests::numeric_attribute_access_is_rejected ... ok
+test parser::tests::number_expression_keeps_canonical_decimal ... ok
+test parser::tests::object_key_literally_spelled_for_has_for_priority ... ok
+test parser::tests::object_entry_limit_is_fatal ... ok
+test parser::tests::heredoc_marker_line_with_extra_content_is_literal ... ok
+test parser::tests::object_constructor_key_forms_and_separators ... ok
+test parser::tests::one_line_block_missing_close_is_recovered ... ok
+test parser::tests::one_line_block_with_broken_attribute_keeps_the_block ... ok
+test parser::tests::object_duplicate_keys_are_preserved_in_order ... ok
+test parser::tests::one_line_block_with_invalid_content_is_recovered ... ok
+test parser::tests::one_line_block_with_single_attribute ... ok
+test parser::tests::orphan_closing_delimiter_is_consumed_with_a_diagnostic ... ok
+test parser::tests::parentheses_ignore_newlines ... ok
+test parser::tests::quoted_label_with_interpolation_is_recovered ... ok
+test parser::tests::quoted_template_literal_decodes_escapes ... ok
+test parser::tests::recovery_region_limit_is_fatal ... ok
+test parser::tests::repeated_blocks_keep_per_occurrence_identity ... ok
+test parser::tests::render_is_byte_exact ... ok
+test parser::tests::single_attribute_is_complete_with_exact_spans ... ok
+test parser::tests::single_identifier_for_directive_is_valid ... ok
+test parser::tests::steps_continue_after_a_splat ... ok
+test parser::tests::strip_markers_are_span_internal_facts ... ok
+test parser::tests::traversal_after_parenthesized_expression_is_rejected ... ok
+test parser::tests::traversal_getattr_and_index_steps ... ok
+test parser::tests::traversal_index_key_may_be_an_expression ... ok
+test parser::tests::triple_duplicates_report_each_duplicate ... ok
+test parser::tests::trivia_only_source_is_complete_with_empty_body ... ok
+test parser::tests::tuple_constructor_with_separators_and_trailing_comma ... ok
+test parser::tests::tuple_element_limit_is_fatal ... ok
+test parser::tests::tuple_missing_separator_is_recovered_but_elements_survive ... ok
+test parser::tests::unary_compound_matrix ... ok
+test parser::tests::unary_minus_applies_to_the_full_term ... ok
+test parser::tests::unary_plus_is_rejected ... ok
+test parser::tests::unclosed_block_is_recovered_with_region_to_eof ... ok
+test parser::tests::unrepresentable_exponent_is_fatal ... ok
+test parser::tests::unterminated_bracket_without_close_extends_to_end_of_file ... ok
+test parser::tests::unterminated_heredoc_kills_the_item_and_the_next_survives ... ok
+test parser::tests::unterminated_quoted_string_kills_the_item_and_the_next_survives ... ok
+test parser::tests::unterminated_bracket_extends_to_the_matching_close ... ok
+test parser::tests::variable_ref_without_steps ... ok
+test projection::tests::block_labels_carry_text_only ... ok
+test projection::tests::blocks_recurse_into_nested_body_records ... ok
+test projection::tests::empty_body_projects_an_empty_record ... ok
+test projection::tests::duplicate_object_keys_are_preserved_in_order ... ok
+test projection::tests::derived_expressions_fail_atomically_without_policy ... ok
+test projection::tests::body_record_projects_the_literal_complete_matrix ... ok
+test projection::tests::expression_contract_rejects_tampered_payloads ... ok
+test projection::tests::conformance_vector_literal_complete_record_round_trip ... ok
+test projection::tests::expression_record_reproduces_the_validated_payload ... ok
+test projection::tests::kind_family_spellings_are_stable_and_closed ... ok
+test projection::tests::fingerprint_is_structural_and_span_independent ... ok
+test projection::tests::number_keys_project_as_canonical_decimal_strings ... ok
+test projection::tests::parenthesized_scalar_keys_reduce_to_canonical_spellings ... ok
+test projection::tests::project_expression_policy_substitutes_extended_values ... ok
+test projection::tests::provenance_uses_nested_value_paths ... ok
+test projection::tests::projection_limits_are_atomic ... ok
+test projection::tests::recovered_documents_never_project ... ok
+test projection::tests::literal_complete_boundary_matches_the_vector ... ok
+test projection::tests::substituted_expression_provenance_keeps_value_and_expression ... ok
+test projection::tests::tfvars_complete_documents_project_the_same_record ... ok
+test projection::tests::templates_project_exact_decoded_code_points ... ok
+test query::tests::attribute_name_and_block_type_select_facts ... ok
+test projection::tests::unary_minus_projects_typed_canonical_members ... ok
+test projection::tests::tuple_or_object_paren_keys_fail_atomically ... ok
+test query::tests::attribute_name_equals_is_exact ... ok
+test query::tests::blocks_and_labels_chain_matches_the_vector ... ok
+test query::tests::block_nested_body_chain_matches_the_vector ... ok
+test query::tests::body_attributes_and_blocks_preserve_source_order ... ok
+test query::tests::body_block_type_equals_filters_from_a_body ... ok
+test query::tests::cancellation_fails_before_results ... ok
+test query::tests::body_walk_filters_and_renders_the_vector_chain ... ok
+test query::tests::body_items_mix_attributes_and_blocks_in_source_order ... ok
+test query::tests::cursor_terminates_with_cancelled_when_token_is_cancelled ... ok
+test query::tests::distinct_by_identity_keeps_first_occurrences ... ok
+test query::tests::each_executor_guards_its_own_domain ... ok
+test query::tests::document_body_emits_the_root_body_once ... ok
+test query::tests::error_regions_expose_recovered_regions ... ok
+test query::tests::expression_children_navigate_in_source_order ... ok
+test query::tests::expression_is_literal_filters_by_literal_completeness ... ok
+test query::tests::expression_kind_is_filters_by_closed_kind ... ok
+test query::tests::foreign_domain_is_rejected ... ok
+test query::tests::literal_accessor_accepts_the_owning_attribute_directly ... ok
+test query::tests::literal_accessor_non_literal_expression_is_a_query_failure ... ok
+test query::tests::literal_accessor_type_mismatch_is_a_query_failure ... ok
+test query::tests::require_one_cardinality_is_enforced ... ok
+test query::tests::literal_accessors_return_typed_values ... ok
+test query::tests::result_limit_is_fatal ... ok
+test query::tests::structure_order_merge_orders_branches_by_document_position ... ok
+test query::tests::syntax_kind_filter_selects_pieces ... ok
+test query::tests::syntax_pieces_are_source_ordered_with_ordinals ... ok
+test query::tests::syntax_take_limits_the_result ... ok
+test query::tests::syntax_text_equals_matches_decoded_text ... ok
+test tests::encoding_selection_accepts_utf8_only ... ok
+test query::tests::tfvars_documents_query_through_the_shared_native_domain ... ok
+test tests::encoding_selection_error_is_displayed_stably ... ok
+test tests::encoding_selection_rejects_non_utf8_exclusions ... ok
+test query::tests::template_parts_and_constructor_navigation ... ok
+test tests::parse_limits_defaults_are_frozen ... ok
+test tests::parse_rejects_non_utf8_explicit_selection_before_any_byte_is_read ... ok
+test tests::explicit_utf8_selection_never_disturbs_bom_content_recovery ... ok
+test tests::profile_ids_are_stable ... ok
+test tests::profiles_are_copy_and_distinct ... ok
+test parser::tests::deep_nesting_truncates_before_the_stack_on_a_small_thread ... ok
+test parser::tests::truncation_and_mutation_never_panic ... ok
+
+test result: ok. 378 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_ini-2b4eaebedee95e12.exe)
+
+running 41 tests
+test edit::tests::every_edit_failure_maps_to_a_frozen_v6_or_common_code ... ok
+test edit::tests::multiple_section_insertions_map_the_old_document_once ... ok
+test edit::tests::appending_after_an_eof_entry_introduces_one_profile_newline ... ok
+test edit::tests::section_dependencies_names_and_collisions_fail_atomically ... ok
+test edit::tests::policy_conflicts_and_duplicate_targets_fail_before_a_patch_exists ... ok
+test edit::tests::section_insert_rename_and_remove_have_exact_ownership ... ok
+test projection::tests::object_projection_rejects_then_explicitly_reports_profile_collisions ... ok
+test materialization::tests::python_explicit_text_encodings_are_representability_checked ... ok
+test materialization::tests::malformed_shapes_unrepresentable_values_and_limits_fail_atomically ... ok
+test edit::tests::portable_semantic_edit_is_atomic_and_replayable ... ok
+test query::tests::native_query_keeps_profile_equivalence_duplicates_and_ownership ... ok
+test edit::tests::selected_utf16_and_code_page_encodings_are_preserved ... ok
+test edit::tests::section_removal_owns_python_continuations_but_not_comments ... ok
+test edit::tests::literal_and_snapshot_failures_are_explicit ... ok
+test edit::tests::python_preserves_multiline_trivia_and_canonicalizes_shape_changes ... ok
+test materialization::tests::object_input_is_unique_and_cannot_fabricate_windows_case_collisions ... ok
+test edit::tests::entry_insert_rename_and_remove_preserve_unowned_comments ... ok
+test materialization::tests::all_canonical_profiles_close_exactly ... ok
+test edit::tests::python_first_line_comment_markers_remain_literal_content ... ok
+test materialization::tests::windows_code_page_is_strict_and_duplicate_entry_mapping_survives ... ok
+test edit::tests::inserted_values_use_each_profiles_canonical_entry_representation ... ok
+test projection::tests::recovered_and_each_projection_limit_fail_without_values ... ok
+test edit::tests::removing_a_python_multiline_entry_owns_its_continuations_only ... ok
+test python_case::tests::unicode_17_new_letters_remain_unassigned_under_the_frozen_profile ... ok
+test edit::tests::windows_entry_edits_keep_ordered_case_equivalent_occurrences ... ok
+test query::tests::query_validation_limits_and_cursor_cancellation_are_explicit ... ok
+test edit::tests::windows_preserves_quotes_and_falls_back_for_unquoted_whitespace ... ok
+test tests::python_duplicates_recover_and_handles_are_snapshot_bound ... ok
+test query::tests::syntax_query_matches_decoded_text_for_utf16_and_keeps_order ... ok
+test tests::windows_profile_requires_explicit_code_page_for_non_ascii_bytes ... ok
+test projection::tests::continuation_and_quote_origins_are_distinct ... ok
+test python_case::tests::unicode_16_full_lowercase_examples_are_exact ... ok
+test projection::tests::exact_projection_preserves_duplicate_sections_and_entries ... ok
+test tests::every_formation_limit_fails_without_a_document ... ok
+test edit::tests::entry_keys_placements_and_dependencies_are_validated_before_rendering ... ok
+test tests::portable_profile_recovers_counterexamples_without_fabricating_entries ... ok
+test tests::windows_profile_accepts_utf16le_and_marks_case_ambiguity ... ok
+test python_case::tests::table_is_exhaustive_against_the_msrv_unicode_16_runtime ... ok
+test operation_registry::tests::every_ini_profile_publishes_the_same_frozen_eight_operation_surface ... ok
+test tests::portable_profile_is_lossless_and_keeps_empty_distinct ... ok
+test tests::python_profile_keeps_default_raw_values_and_multiline_identity ... ok
+
+test result: ok. 41 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_json-8702ea863c2dcf4f.exe)
+
+running 45 tests
+test parser::tests::string_decoder_rejects_isolated_surrogate ... ok
+test edit::tests::move_member_rejects_cross_object_self_and_concurrent_conflicts ... ok
+test edit::tests::object_key_replacement_must_remain_a_string ... ok
+test edit::tests::preserve_compatible_keeps_string_escape_style ... ok
+test edit::tests::preserve_compatible_rejects_category_change ... ok
+test edit::tests::canonical_for_profile_is_independent_of_old_spelling ... ok
+test edit::tests::json5_structural_edits_quote_names_and_allow_frozen_non_finite_values ... ok
+test edit::tests::dry_run_and_commit_have_identical_patch_and_target_digest ... ok
+test edit::tests::preserve_compatible_rejects_unrepresentable_fraction_scale ... ok
+test edit::tests::json5_scalar_edits_preserve_compatible_lexical_categories ... ok
+test edit::tests::recovered_documents_are_rejected_at_commit ... ok
+test edit::tests::object_structural_edits_preserve_duplicate_identity_comments_and_trailing_comma ... ok
+test edit::tests::move_member_keeps_trivia_in_place_and_publishes_exact_artifacts ... ok
+test edit::tests::wrong_snapshot_is_rejected_atomically ... ok
+test edit::tests::preserve_compatible_keeps_decimal_fraction_scale ... ok
+test materialization::tests::pretty_style_and_request_failures_are_explicit ... ok
+test parser::tests::json5_invalid_escape_after_identifier_start_recovers_without_panicking ... ok
+test parser::tests::json5_number_grammar_is_exact ... ok
+test operation_registry::tests::every_json_profile_publishes_the_frozen_structural_surface ... ok
+test parser::tests::number_grammar_is_bounded ... ok
+test projection::tests::duplicate_policy_keeps_key_provenance_of_retained_occurrence ... ok
+test edit::tests::array_insert_and_remove_cover_empty_singleton_and_end_placements ... ok
+test projection::tests::exact_node_policy_overrides_global_and_rejects_non_object_targets ... ok
+test edit::tests::preserve_else_canonical_reports_actual_fallback ... ok
+test projection::tests::json5_target_is_profile_bound_and_keeps_non_finite_bits ... ok
+test materialization::tests::compact_materialization_round_trips_exact_core_kinds ... ok
+test edit::tests::semantic_edit_changes_only_literal_and_keeps_trivia ... ok
+test materialization::tests::entry_mapping_keeps_duplicate_names_and_order ... ok
+test materialization::tests::json5_materialization_is_bit_exact_and_profile_bound ... ok
+test parser::tests::json5_string_decoder_handles_extensions_without_rounding ... ok
+test projection::tests::best_exact_uses_entry_mapping_for_duplicates ... ok
+test projection::tests::key_provenance_limit_fails_whole_projection ... ok
+test projection::tests::object_projection_emits_distinct_key_association_provenance ... ok
+test edit::tests::structural_conflicts_fail_before_a_document_exists ... ok
+test edit::tests::preserve_compatible_keeps_exponent_marker_and_sign ... ok
+test projection::tests::object_projection_requires_explicit_duplicate_loss ... ok
+test query::tests::duplicate_member_query_keeps_source_order_and_identity ... ok
+test projection::tests::recovered_documents_are_rejected_at_projection ... ok
+test query::tests::json5_requires_v2_and_exposes_extended_kinds ... ok
+test query::tests::lossless_syntax_query_filters_kind_and_exact_source_text ... ok
+test query::tests::operator_free_root_result_obeys_max_results ... ok
+test query::tests::syntax_query_limits_and_cancellation_fail_without_completed_results ... ok
+test tests::jsonc_lossless_syntax_kinds_align_with_exact_coverage ... ok
+test tests::strict_document_round_trips_and_preserves_duplicates ... ok
+test tests::json5_profile_preserves_extensions_and_exact_native_values ... ok
+
+test result: ok. 45 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_plist-e1b853ef015a8961.exe)
+
+running 296 tests
+test document::tests::accessors_delegate_per_representation ... ok
+test document::tests::xml_with_utf16_source_converts_to_binary ... ok
+test document::tests::conversion_node_and_report_event_limits_are_fatal ... ok
+test document::tests::inexpressible_facts_fail_atomically ... ok
+test document::tests::inexpressible_failure_reports_the_offending_node ... ok
+test document::tests::integer_edges_round_trip_through_conversion ... ok
+test edit::tests::conflict_vector_codes_and_atomicity ... ok
+test document::tests::epoch_offset_round_trips_between_representations ... ok
+test document::tests::report_events_are_deterministic_and_complete ... ok
+test document::tests::recovered_documents_cannot_be_converted ... ok
+test document::tests::binary_xml_binary_round_trip_keeps_native_model ... ok
+test document::tests::same_representation_target_is_not_a_conversion ... ok
+test document::tests::conversion_target_formation_limits_apply ... ok
+test document::tests::base64_padding_and_bytes_round_trip ... ok
+test document::tests::empty_values_round_trip ... ok
+test document::tests::binary_to_xml_conversion_reports_representation_change ... ok
+test document::tests::emitted_xml_has_the_apple_header_spelling ... ok
+test document::tests::xml_to_binary_conversion_writes_the_count_fifteen_key_extended ... ok
+test document::tests::real_spellings_round_trip_through_conversion ... ok
+test document::tests::xml_to_binary_conversion_reports_representation_change ... ok
+test edit::tests::binary_shared_reference_edits_preserve_identity ... ok
+test edit::tests::binary_uid_and_special_values_round_trip_through_edits ... ok
+test document::tests::parse_dispatches_by_profile ... ok
+test document::tests::cr_strings_use_character_references_and_round_trip ... ok
+test document::tests::xml_binary_xml_round_trip_keeps_native_model ... ok
+test document::tests::civil_date_round_trips_against_the_parser_calendar ... ok
+test edit::tests::binary_rename_dict_key_binds_a_fresh_key_object ... ok
+test document::tests::string_escaping_round_trips ... ok
+test document::tests::duplicate_keys_and_equal_scalars_round_trip ... ok
+test edit::tests::binary_appends_keep_orphans_and_reparse_closure_holds ... ok
+test edit::tests::binary_structural_edits_match_the_conformance_vector ... ok
+test document::tests::date_spellings_round_trip_through_conversion ... ok
+test edit::tests::change_set_maps_replaced_deleted_and_unmapped ... ok
+test edit::tests::empty_transaction_commits_an_unchanged_document ... ok
+test edit::tests::binary_ref_size_growth_rewrites_container_refs ... ok
+test edit::tests::dry_run_matches_commit ... ok
+test edit::tests::escaped_key_content_round_trips_through_rename ... ok
+test edit::tests::insert_dict_entry_duplicate_keys_are_preserved ... ok
+test edit::tests::insert_operations_write_the_fifteen_count_boundary_extended ... ok
+test edit::tests::xml_inserts_into_self_closing_containers ... ok
+test edit::tests::root_set_value_replaces_the_root_value ... ok
+test edit::tests::xml_layout_walk_assigns_ordinals_and_spans ... ok
+test materialization::tests::analyzed_paths_are_recorded_before_failure ... ok
+test edit::tests::unrepresentable_values_fail_on_xml_and_succeed_on_binary ... ok
+test materialization::tests::binary_canonical_matches_the_published_vector_hex ... ok
+test materialization::tests::binary_style_writes_minimal_integer_widths ... ok
+test edit::tests::limits_are_enforced_atomically ... ok
+test materialization::tests::binary_style_preserves_fractional_seconds_exactly ... ok
+test edit::tests::duplicate_key_occurrence_selects_the_nth_association ... ok
+test materialization::tests::base64_wraps_against_the_indented_budget ... ok
+test materialization::tests::empty_dict_and_array_use_the_empty_spelling ... ok
+test edit::tests::remove_consumes_leading_whitespace_only ... ok
+test materialization::tests::binary_style_preserves_binary_only_facts ... ok
+test materialization::tests::binary_canonical_normalizes_widths_and_deduplicates ... ok
+test materialization::tests::a_projected_binary_record_closes_the_loop_both_styles ... ok
+test materialization::tests::extended_sizes_cover_large_containers ... ok
+test edit::tests::xml_utf16_sources_edit_correctly ... ok
+test materialization::tests::decimal_payloads_are_admitted ... ok
+test materialization::tests::fractional_date_fails_without_the_policy ... ok
+test materialization::tests::cr_in_strings_escapes_as_a_character_reference ... ok
+test materialization::tests::a_projected_xml_record_closes_the_loop_both_styles ... ok
+test edit::tests::failed_transactions_leave_the_base_byte_exact ... ok
+test materialization::tests::fractional_date_truncates_and_reports_under_the_policy ... ok
+test materialization::tests::huge_integers_and_uids_fail_with_exact_kinds ... ok
+test materialization::tests::identical_scalars_deduplicate_at_first_occurrence ... ok
+test edit::tests::xml_six_operations_match_the_conformance_vector ... ok
+test materialization::tests::input_node_and_depth_limits_fail_with_exact_names ... ok
+test materialization::tests::every_value_kind_round_trips_both_styles ... ok
+test materialization::tests::plan_binary_orders_keys_before_values ... ok
+test materialization::tests::negative_zero_real_survives_the_xml_closure ... ok
+test materialization::tests::keys_keep_input_order_and_duplicates ... ok
+test materialization::tests::provenance_limits_fail_atomically ... ok
+test materialization::tests::record_validation_matrix_fails_exactly ... ok
+test materialization::tests::request_validation_matrix_fails_exactly ... ok
+test materialization::tests::provenance_spans_are_exact_for_both_styles ... ok
+test materialization::tests::provenance_covers_every_value_node_and_is_target_bound ... ok
+test materialization::tests::the_old_record_shape_is_rejected_with_a_precise_diagnostic ... ok
+test materialization::tests::the_apple_header_spelling_is_exact ... ok
+test materialization::tests::the_fifteen_count_boundary_uses_the_extended_size_spelling ... ok
+test materialization::tests::the_sixteen_count_neighbor_keeps_the_extended_spelling ... ok
+test materialization::tests::large_binary_outputs_grow_the_offset_width ... ok
+test native::tests::array_preserves_element_order ... ok
+test materialization::tests::xml_inexpressible_facts_fail_atomically ... ok
+test native::tests::array_accepts_empty ... ok
+test native::tests::boolean_equality_is_exact ... ok
+test native::tests::boolean_wraps_true_and_false ... ok
+test native::tests::builder_builds_document_with_resolvable_root ... ok
+test native::tests::container_depth_limit_is_enforced ... ok
+test native::tests::cycles_are_rejected ... ok
+test native::tests::data_accepts_empty_and_keeps_exact_bytes ... ok
+test materialization::tests::xml_conversion_of_a_binary_document_renders_canonically ... ok
+test native::tests::data_equality_and_hash ... ok
+test native::tests::dict_accepts_empty ... ok
+test native::tests::date_equality_is_bit_exact_including_signed_zero ... ok
+test native::tests::date_holds_exact_seconds_since_plist_epoch ... ok
+test native::tests::dict_preserves_association_order_and_duplicates ... ok
+test native::tests::dict_positions_of_key_are_source_ordered ... ok
+test materialization::tests::xml_canonical_matches_the_published_vector_render ... ok
+test native::tests::epoch_offset_constant_is_exact ... ok
+test native::tests::equal_documents_hash_equally ... ok
+test native::tests::integer_equality_is_exact ... ok
+test native::tests::date_rejects_non_finite_seconds ... ok
+test native::tests::integer_wraps_exact_i64_range ... ok
+test native::tests::key_delegates_string_facts ... ok
+test materialization::tests::scalar_root_values_round_trip ... ok
+test native::tests::key_identity_compares_by_exact_code_units ... ok
+test native::tests::real_double_keeps_exact_bits ... ok
+test native::tests::real_from_bits_is_the_parser_path_and_masks_float32 ... ok
+test native::tests::out_of_bounds_references_are_rejected ... ok
+test native::tests::object_limit_is_enforced ... ok
+test native::tests::real_nan_and_infinity_are_admitted_and_bit_exact ... ok
+test native::tests::real_single_keeps_float32_width_fact ... ok
+test native::tests::shared_identity_is_one_node_with_multiple_owners ... ok
+test native::tests::string_equality_and_hash_follow_code_units ... ok
+test native::tests::string_keeps_unpaired_surrogates_exact ... ok
+test native::tests::string_preserves_exact_code_units_and_status ... ok
+test native::tests::structural_equality_ignores_arena_indices_and_sharing ... ok
+test native::tests::unreachable_nodes_do_not_affect_structural_equality ... ok
+test native::tests::uid_wraps_zero_and_max ... ok
+test native::tests::structural_equality_requires_content_and_order_equality ... ok
+test native::tests::value_kind_has_stable_wire_spellings ... ok
+test native::tests::value_ref_identity_compares_by_index ... ok
+test native::tests::value_kind_reports_closed_type_set_and_accessors ... ok
+test operation_registry::tests::every_plist_profile_publishes_the_frozen_six_operation_surface ... ok
+test parser_binary::tests::all_types_facts_expose_the_binary_structure ... ok
+test parser_binary::tests::ascii_string_high_bit_bytes_are_rejected ... ok
+test parser_binary::tests::all_value_kinds_parse_into_the_shared_native_model ... ok
+test parser_binary::tests::binary_facts_limit_is_fatal ... ok
+test parser_binary::tests::container_depth_limit_is_fatal ... ok
+test parser_binary::tests::cross_object_cycles_are_recovered ... ok
+test parser_binary::tests::date_holds_exact_seconds_since_the_plist_epoch ... ok
+test parser_binary::tests::diagnostics_are_deterministically_ordered ... ok
+test parser_binary::tests::duplicate_key_group_limit_is_fatal ... ok
+test parser_binary::tests::duplicate_offset_entries_are_distinct_objects_with_equal_values ... ok
+test parser_binary::tests::empty_containers_are_complete ... ok
+test parser_binary::tests::duplicate_keys_are_preserved_in_source_order ... ok
+test parser_binary::tests::extended_size_limits_are_fatal ... ok
+test parser_binary::tests::extended_size_marker_past_end_of_source_recovers ... ok
+test parser_binary::tests::extended_size_marker_must_be_an_integer_marker ... ok
+test parser_binary::tests::excluded_markers_are_recovered_with_a_stable_diagnostic ... ok
+test parser_binary::tests::extended_sizes_are_read_as_unsigned_integer_objects ... ok
+test parser_binary::tests::float32_width_fact_survives_parsing ... ok
+test parser_binary::tests::forward_references_are_valid ... ok
+test parser_binary::tests::gap_between_objects_and_offset_table_is_padding ... ok
+test parser_binary::tests::header_version_strings_other_than_00_are_recovered_but_parsed ... ok
+test parser_binary::tests::minimal_42_byte_file_forms_complete_document ... ok
+test parser_binary::tests::integer_widths_follow_the_rfc_513_sign_rules ... ok
+test parser_binary::tests::non_finite_date_payload_is_recovered ... ok
+test parser_binary::tests::minimal_facts_and_regions_are_exact ... ok
+test parser_binary::tests::non_string_dict_keys_are_recovered ... ok
+test parser_binary::tests::object_marker_past_end_of_source_recovers_like_a_bad_offset_entry ... ok
+test parser_binary::tests::object_count_limit_is_fatal ... ok
+test parser_binary::tests::object_extent_beyond_the_table_is_recovered ... ok
+test parser_binary::tests::offset_table_entry_windows_past_end_of_source_recover ... ok
+test parser_binary::tests::offset_table_entries_out_of_range_cut_the_prefix ... ok
+test parser_binary::tests::per_value_limits_are_fatal ... ok
+test parser_binary::tests::prefix_recovery_keeps_proven_objects_and_facts ... ok
+test parser_binary::tests::shared_references_preserve_arena_identity ... ok
+test parser_binary::tests::source_bytes_limit_is_fatal ... ok
+test parser_binary::tests::reference_to_an_unproven_object_drops_the_native_document ... ok
+test parser_binary::tests::recovery_regions_limit_is_fatal ... ok
+test parser_binary::tests::read_be_u64_rejects_windows_past_end_of_source ... ok
+test parser_binary::tests::trailer_num_objects_zero_is_rejected ... ok
+test parser_binary::tests::table_windows_past_end_of_source_follow_the_trailer_recovery ... ok
+test parser_binary::tests::structural_regions_cover_the_source_exactly ... ok
+test parser_binary::tests::trailer_sort_version_accepts_zero_and_one ... ok
+test parser_binary::tests::trailer_sufficiency_checks_are_enforced ... ok
+test parser_binary::tests::trailer_top_object_out_of_range_is_rejected ... ok
+test parser_binary::tests::trailer_total_length_mismatch_is_recovered ... ok
+test parser_binary::tests::trailer_unused_bytes_must_be_zero ... ok
+test parser_binary::tests::trailer_offset_table_offset_range_is_rejected ... ok
+test parser_binary::tests::trailer_width_fields_are_bounded ... ok
+test parser_binary::tests::uid_values_above_32_bits_are_recovered ... ok
+test parser_binary::tests::uid_widths_leading_zeros_and_32_bit_bound ... ok
+test parser_binary::tests::utf16be_strings_preserve_code_units_and_surrogates ... ok
+test parser_binary::tests::unproven_top_object_drops_the_native_document ... ok
+test parser_binary::tests::undersized_sources_are_fatal ... ok
+test parser_xml::tests::bom_sources_are_complete_and_byte_exact ... ok
+test parser_binary::tests::width_and_table_limits_are_fatal ... ok
+test parser_xml::tests::cdata_and_text_outside_values_are_error_regions ... ok
+test edit::tests::every_operation_works_on_both_representations ... ok
+test parser_xml::tests::diagnostics_are_deterministically_ordered ... ok
+test parser_xml::tests::data_base64_violations_are_recovered ... ok
+test parser_xml::tests::data_empty_forms_distinguish_self_closing_and_explicit ... ok
+test parser_xml::tests::declaration_rules_and_pieces ... ok
+test parser_xml::tests::data_base64_decodes_padding_and_whitespace ... ok
+test parser_xml::tests::declaration_encoding_conflict_is_recovered ... ok
+test parser_xml::tests::all_value_kinds_parse_into_the_shared_native_model ... ok
+test parser_xml::tests::dict_pairing_recovery_matrix ... ok
+test parser_xml::tests::date_forms_and_calendar_edges ... ok
+test parser_xml::tests::different_spellings_produce_equal_documents ... ok
+test parser_xml::tests::doctype_internal_subset_is_recovered ... ok
+test parser_xml::tests::duplicate_key_group_limit_is_fatal ... ok
+test parser_xml::tests::doctype_is_optional_and_exact ... ok
+test parser_xml::tests::duplicate_keys_are_preserved_in_source_order ... ok
+test parser_xml::tests::empty_scalars_are_recovered ... ok
+test parser_xml::tests::encoding_selection_conflicts_are_fatal ... ok
+test parser_xml::tests::doctype_name_and_identifier_mismatches_are_recovered ... ok
+test parser_xml::tests::empty_containers_and_strings_are_complete ... ok
+test parser_xml::tests::fine_grained_kinds_cover_every_document_part ... ok
+test parser_xml::tests::invalid_utf8_is_fatal ... ok
+test parser_xml::tests::kind_names_round_trip_through_as_str_and_from_name ... ok
+test parser_xml::tests::key_outside_dict_is_recovered ... ok
+test parser_xml::tests::minimal_string_document_is_complete_and_byte_exact ... ok
+test parser_xml::tests::integer_range_and_grammar_violations_are_recovered ... ok
+test parser_xml::tests::mismatched_and_extra_end_tags_are_recovered ... ok
+test parser_xml::tests::integer_decimal_hex_and_sign_forms ... ok
+test parser_xml::tests::missing_root_is_recovered ... ok
+test parser_xml::tests::nested_plist_elements_are_unknown_not_root ... ok
+test parser_xml::tests::nesting_and_container_depth_limits_are_fatal ... ok
+test parser_xml::tests::object_count_limit_is_fatal ... ok
+test parser_xml::tests::pi_target_xml_is_recovered ... ok
+test parser_xml::tests::per_value_limits_are_fatal ... ok
+test parser_xml::tests::prefixed_names_and_xmlns_are_recovered ... ok
+test parser_xml::tests::prolog_and_epilog_trivia_are_complete ... ok
+test parser_xml::tests::recovery_regions_limit_is_fatal ... ok
+test parser_xml::tests::pieces_cover_every_byte_exhaustively ... ok
+test parser_xml::tests::recovered_document_keeps_proven_parts ... ok
+test parser_xml::tests::real_forms_and_special_spellings ... ok
+test parser_xml::tests::root_tag_pieces_partition_exactly ... ok
+test parser_xml::tests::root_value_count_zero_and_two_are_recovered ... ok
+test parser_xml::tests::scalar_child_elements_drop_the_scalar ... ok
+test parser_xml::tests::real_grammar_violations_are_recovered ... ok
+test parser_xml::tests::root_version_contract ... ok
+test parser_xml::tests::source_bytes_limit_is_fatal ... ok
+test parser_xml::tests::string_cdata_and_crlf_normalization ... ok
+test parser_xml::tests::string_entities_and_character_references_resolve ... ok
+test parser_xml::tests::string_preserves_whitespace_and_unicode ... ok
+test parser_xml::tests::string_unknown_entity_is_recovered_without_partial_text ... ok
+test parser_xml::tests::syntax_pieces_limit_is_fatal ... ok
+test parser_xml::tests::string_malformed_references_are_recovered ... ok
+test parser_xml::tests::trailing_content_after_plist_is_recovered ... ok
+test parser_xml::tests::true_false_forms_and_content_recovery ... ok
+test parser_xml::tests::unclosed_elements_are_recovered ... ok
+test parser_binary::tests::truncation_and_mutation_never_panic_or_fake_complete ... ok
+test parser_xml::tests::utf16_without_bom_is_fatal ... ok
+test parser_xml::tests::unknown_elements_cover_whole_subtrees_as_error_regions ... ok
+test parser_xml::tests::whitespace_runs_split_into_trivia_kinds ... ok
+test projection::tests::conformance_vector_atomic_failures ... ok
+test parser_xml::tests::utf16le_and_be_sources_round_trip ... ok
+test projection::tests::integer_edges_project_exactly ... ok
+test projection::tests::recovered_documents_fail_with_incomplete_document ... ok
+test projection::tests::projection_limits_are_atomic ... ok
+test projection::tests::require_object_collision_policies ... ok
+test projection::tests::require_object_provenance_keeps_retained_and_collapsed ... ok
+test projection::tests::require_object_unpaired_surrogate_fails_atomically ... ok
+test projection::tests::value_tree_maps_exact_binary_facts ... ok
+test projection::tests::unpaired_surrogate_root_fails_atomically ... ok
+test projection::tests::conformance_vector_require_object_policies ... ok
+test projection::tests::require_object_unique_scalars_are_exact ... ok
+test projection::tests::value_tree_shared_identity_keeps_occurrence_provenance ... ok
+test projection::tests::conformance_vector_value_tree_record ... ok
+test projection::tests::require_object_rejection_matrix ... ok
+test projection::tests::value_tree_preserves_association_order_and_duplicate_keys ... ok
+test projection::tests::value_tree_provenance_uses_nested_value_paths ... ok
+test projection::tests::value_tree_root_scalars_project_typed_leaves ... ok
+test query::tests::binary_domain_rejects_xml_documents ... ok
+test query::tests::array_elements_preserve_element_order ... ok
+test projection::tests::value_tree_uid_policy_excludes_or_typed_member ... ok
+test query::tests::cancellation_fails_before_results ... ok
+test query::tests::binary_operators_emit_facts_once_through_a_chain ... ok
+test query::tests::cursor_terminates_with_cancelled_when_token_is_cancelled ... ok
+test query::tests::dict_entry_key_emits_key_matches ... ok
+test projection::tests::value_tree_projects_all_value_kinds_and_record_shape ... ok
+test query::tests::document_root_emits_the_root_value ... ok
+test query::tests::dict_entries_preserve_source_order_and_duplicates ... ok
+test query::tests::dict_key_equals_is_exact_and_case_sensitive ... ok
+test query::tests::dict_entry_value_navigates_to_associated_values ... ok
+test query::tests::object_refs_emit_reference_facts ... ok
+test query::tests::nested_dicts_navigate_through_entry_values ... ok
+test query::tests::foreign_domain_is_rejected ... ok
+test query::tests::duplicate_key_group_expands_every_same_key_association ... ok
+test query::tests::object_table_emits_object_facts ... ok
+test query::tests::offset_table_emits_offset_facts ... ok
+test query::tests::recovered_without_native_document_yields_no_root ... ok
+test query::tests::require_one_cardinality_is_enforced ... ok
+test query::tests::shared_identity_survives_native_querying ... ok
+test query::tests::result_limit_is_fatal ... ok
+test query::tests::syntax_domain_rejects_binary_documents ... ok
+test query::tests::syntax_pieces_are_source_ordered_with_ordinals ... ok
+test query::tests::syntax_kind_filter_selects_pieces ... ok
+test query::tests::syntax_take_limits_the_result ... ok
+test query::tests::syntax_text_equals_matches_decoded_text ... ok
+test query::tests::top_object_emits_marker_and_refs ... ok
+test query::tests::syntax_utf16_source_decodes_span_text ... ok
+test query::tests::trailer_facts_emit_all_fields ... ok
+test tests::parse_limits_defaults_derive_arena_limits ... ok
+test query::tests::value_as_boolean_is_validates_and_filters ... ok
+test tests::parse_entry_dispatches_by_profile ... ok
+test tests::parse_xml_entry_accepts_explicit_text_encodings ... ok
+test query::tests::typed_accessors_validate_before_returning ... ok
+test query::tests::value_type_is_filters_by_closed_kind ... ok
+test tests::parse_xml_entry_forms_a_complete_document ... ok
+test tests::parse_xml_entry_rejects_incompatible_selections ... ok
+test tests::profile_ids_are_stable ... ok
+test parser_xml::tests::truncation_and_mutation_never_panic_or_fake_complete ... ok
+
+test result: ok. 296 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_properties-790b148cb806acfe.exe)
+
+running 36 tests
+test tests::latin1_treats_unicode_bom_bytes_as_content ... ok
+test projection::tests::every_projection_limit_fails_without_partial_output ... ok
+test edit::tests::rename_replaces_the_complete_continued_key_ownership ... ok
+test materialization::tests::invalid_requests_shapes_and_limits_fail_atomically ... ok
+test tests::formation_preserves_lines_continuations_escapes_and_duplicates ... ok
+test edit::tests::patch_proof_and_dry_run_close_over_the_exact_committed_bytes ... ok
+test edit::tests::semantic_value_preserves_exact_unpaired_java_units_with_unicode_escapes ... ok
+test materialization::tests::duplicate_entry_mapping_and_unique_object_close_exactly ... ok
+test tests::reader_honors_an_explicit_matching_utf16_bom ... ok
+test edit::tests::transaction_conflicts_fail_before_any_document_is_published ... ok
+test projection::tests::empty_keys_and_values_have_exact_zero_width_provenance_anchors ... ok
+test materialization::tests::latin1_canonical_uses_uppercase_utf16_escapes_without_bom ... ok
+test operation_registry::tests::both_profiles_publish_the_same_frozen_five_operation_surface ... ok
+test projection::tests::object_projection_requires_or_explicitly_collapses_duplicates ... ok
+test projection::tests::exact_projection_preserves_duplicates_and_fragmented_origins ... ok
+test query::tests::logical_query_returns_exact_natural_line_constituents ... ok
+test query::tests::native_query_preserves_exact_keys_duplicates_and_escape_ownership ... ok
+test tests::java_string_preserves_exact_unpaired_code_units ... ok
+test projection::tests::unpaired_surrogates_and_recovery_fail_atomically ... ok
+test edit::tests::empty_transaction_is_a_verified_identity_transition ... ok
+test tests::malformed_unicode_escape_recovers_without_partial_property ... ok
+test edit::tests::insertions_honor_all_property_relative_placements_and_duplicates ... ok
+test edit::tests::selected_encoding_is_preserved_and_unrepresentable_reader_text_fails ... ok
+test materialization::tests::reader_canonical_escapes_structure_and_controls ... ok
+test edit::tests::literal_value_requires_one_exact_value_ownership_interval ... ok
+test materialization::tests::reader_utf16_and_strict_code_pages_are_explicit ... ok
+test tests::terminal_odd_backslash_matches_jdk_line_reader_eof_rule ... ok
+test query::tests::validation_limits_and_cursor_cancellation_are_explicit ... ok
+test tests::profile_and_encoding_selection_must_match ... ok
+test projection::tests::object_key_origins_keep_property_identity ... ok
+test edit::tests::removal_owns_all_continuation_lines_but_not_adjacent_comments ... ok
+test tests::unicode_escape_may_cross_a_continuation_without_stealing_its_syntax ... ok
+test tests::unicode_escape_preserves_an_unpaired_java_surrogate ... ok
+test edit::tests::semantic_value_preserves_direct_style_and_falls_back_only_when_required ... ok
+test query::tests::syntax_query_supports_text_raw_bytes_and_utf16be ... ok
+test edit::tests::snapshot_role_recovery_and_resource_contracts_are_enforced ... ok
+
+test result: ok. 36 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_protocol-b8f2da25c34f6445.exe)
+
+running 98 tests
+test contract::tests::registry_is_sorted_and_identifiers_are_strict ... ok
+test diagnostic::tests::core_snapshot_location_requires_explicit_binding ... ok
+test cli::tests::envelope_command_payload_schema_must_match ... ok
+test change::tests::missing_locator_never_serializes_process_local_node ... ok
+test cli::tests::envelope_rejects_invalid_product_version_and_redaction ... ok
+test change::tests::actual_json_change_set_externalizes_and_round_trips ... ok
+test cli::tests::envelope_diagnostics_are_bound_to_the_v7_registry ... ok
+test contract::tests::transport_envelope_is_not_a_nested_payload_contract ... ok
+test cli::tests::batch_plan_cross_constraints_are_enforced ... ok
+test contract::tests::unknown_contract_and_schema_mismatch_are_distinct ... ok
+test conversion::tests::exact_two_stage_report_round_trips ... ok
+test conversion::tests::overall_fidelity_cannot_hide_a_worse_stage ... ok
+test change::tests::overlapping_edits_and_invalid_mapping_topology_fail ... ok
+test cli::tests::rfc_envelope_example_typo_is_strictly_rejected ... ok
+test diagnostic::tests::diagnostic_round_trip_preserves_fixes_and_locations ... ok
+test diagnostic::tests::diagnostic_code_and_category_are_registry_bound ... ok
+test execution::tests::selected_registry_controls_new_nested_failure_codes ... ok
+test error_registry::tests::every_query_failure_has_a_registered_code ... ok
+test execution::tests::completion_rejects_contradictory_states ... ok
+test contract::tests::matching_schema_does_not_bypass_full_payload_validation ... ok
+test exit_class::tests::class_to_code_table_is_exhaustive_and_closed ... ok
+test exit_class::tests::data_family_and_formation_failures_classify_two ... ok
+test cli::tests::batch_result_notation_round_trips_with_all_statuses ... ok
+test cli::tests::batch_result_status_presence_rules_are_enforced ... ok
+test error_registry::tests::registry_is_sorted_unique_and_contains_every_protocol_code ... ok
+test contract::tests::envelope_round_trips_over_both_transports ... ok
+test cli::tests::envelope_registered_contract_can_be_wrapped_as_protocol_message ... ok
+test exit_class::tests::envelope_names_round_trip ... ok
+test diagnostic::tests::json5_diagnostics_require_semantic_model_v4 ... ok
+test exit_class::tests::every_resource_limit_classifies_three ... ok
+test execution::tests::execution_and_cancellation_round_trip_without_serializing_tokens ... ok
+test exit_class::tests::internal_family_classifies_five ... ok
+test exit_class::tests::precondition_family_classifies_four ... ok
+test exit_class::tests::report_as_result_rules_classify_success ... ok
+test exit_class::tests::unlisted_format_codes_pass_through_as_data ... ok
+test exit_class::tests::usage_family_classifies_one ... ok
+test contract::tests::v2_envelopes_source_snapshots_and_patches_without_changing_v1 ... ok
+test cli::tests::rfc_envelope_canonical_json_bytes_match_exactly ... ok
+test graph_projection::tests::invalid_locations_and_partial_failure_provenance_are_rejected ... ok
+test graph_query::tests::dangling_or_wrong_kind_associations_are_rejected ... ok
+test graph_projection::tests::process_local_node_requires_a_caller_locator ... ok
+test graph_projection::tests::exact_graph_projection_and_reference_provenance_round_trip ... ok
+test java_utf16::tests::noncanonical_units_mismatched_bytes_and_status_fail ... ok
+test java_utf16::tests::odd_bytes_and_preallocation_limits_fail ... ok
+test java_utf16::tests::every_java_utf16_shape_round_trips_exactly ... ok
+test line_query::tests::domain_role_ordinals_completion_and_limits_are_strict ... ok
+test line_query::tests::raw_line_format_nodes_never_cross_the_wire ... ok
+test graph_query::tests::completed_mapping_query_round_trips_with_canonical_ids ... ok
+test line_query::tests::every_ini_role_round_trips_in_its_exact_domain ... ok
+test cli::tests::batch_plan_notation_round_trips_on_both_transports ... ok
+test materialization::tests::materialization_request_v1_rejects_windows_code_pages ... ok
+test materialization::tests::failed_result_round_trip_has_no_target_source_or_bytes ... ok
+test materialization::tests::complete_result_round_trip_keeps_snapshot_and_explicit_outcome ... ok
+test materialization::tests::provenance_rejects_missing_or_ambiguous_external_node_locators ... ok
+test materialization::tests::provenance_round_trip_keeps_external_identity ... ok
+test materialization::tests::request_round_trip_keeps_every_explicit_field ... ok
+test materialization::tests::result_v2_rejects_snapshot_v1_and_failed_result_has_no_target ... ok
+test operation::tests::empty_edit_plan_round_trip_preserves_exact_digests ... ok
+test contract::tests::v5_envelopes_every_new_contract_without_changing_v4 ... ok
+test operation::tests::operation_registry_round_trip_revalidates_sorted_contracts ... ok
+test portable_graph::tests::explicit_limits_apply_before_graph_allocation ... ok
+test portable_graph::tests::readable_and_pgce_disagreement_is_rejected ... ok
+test materialization::tests::complete_result_v2_round_trips_code_page_snapshot ... ok
+test portable_graph::tests::readable_graph_and_pgce_round_trip_shared_cyclic_topology ... ok
+test portable_graph::tests::builder_numbering_is_replaced_by_canonical_ids ... ok
+test materialization::tests::materialization_request_v2_round_trips_windows_code_page ... ok
+test projection::tests::failed_result_cannot_carry_value_or_process_local_handle ... ok
+test projection::tests::complete_projection_round_trip_keeps_provenance ... ok
+test contract::tests::v3_envelopes_every_new_contract_without_changing_v2 ... ok
+test projection::tests::projection_event_codes_are_registry_bound ... ok
+test projection::tests::request_round_trip_includes_resolved_query_scope ... ok
+test projection::tests::successful_null_value_is_distinct_from_absent_value ... ok
+test query::tests::frozen_query_result_v1_rejects_newer_roles ... ok
+test projection::tests::v3_projection_event_codes_do_not_change_the_v1_contract ... ok
+test query::tests::native_results_require_external_locators ... ok
+test line_query::tests::every_properties_role_round_trips_in_its_exact_domain ... ok
+test query::tests::portable_query_result_preserves_path_and_value ... ok
+test query::tests::query_definition_envelope_preserves_existing_schema ... ok
+test registry::tests::capability_cross_field_invariants_are_enforced ... ok
+test registry::tests::profile_descriptor_is_normalized_and_strict ... ok
+test source::tests::patch_decoder_rejects_noncanonical_order_and_uppercase_digest ... ok
+test source::tests::snapshot_decoder_rejects_forged_digest_and_encoding ... ok
+test source::tests::source_patch_round_trips_and_remains_applicable ... ok
+test source::tests::source_v1_rejects_v2_code_pages_and_bom_policy ... ok
+test yaml_query::tests::domain_role_mismatch_and_nonincreasing_ordinals_fail ... ok
+test source::tests::source_snapshot_v2_rejects_contradictory_bom_policy ... ok
+test value_transport::tests::fixed_fields_and_limits_are_strict ... ok
+test value_transport::tests::valid_but_noncanonical_json_is_rejected ... ok
+test source::tests::source_snapshot_round_trips_all_facts_through_both_transports ... ok
+test value_transport::tests::every_core_kind_round_trips_through_both_transports ... ok
+test yaml_query::tests::raw_yaml_node_never_crosses_the_wire ... ok
+test yaml_query::tests::every_yaml_role_round_trips_in_its_exact_domain ... ok
+test source::tests::source_snapshot_v2_round_trips_code_page_and_bom_policy ... ok
+test contract::tests::v6_envelopes_all_eight_new_pairs_and_old_registries_reject_them ... ok
+test error_registry::tests::published_error_code_manifest_is_strictly_valid ... ok
+test source::tests::source_encoding_contract_is_exact_and_canonical ... ok
+test source::tests::source_patch_v2_round_trips_and_applies_code_page_bytes ... ok
+test registry_manifest::tests::versioned_registry_manifests_round_trip_and_are_self_consistent ... ok
+
+test result: ok. 98 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.03s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_pvce-5e1f3dec8001beae.exe)
+
+running 9 tests
+test tests::core_decode_rejects_extension_roots ... ok
+test tests::rejects_non_minimal_version_varint ... ok
+test tests::bounded_encode_rejects_each_resource_limit ... ok
+test tests::extended_root_round_trips_opaquely ... ok
+test tests::object_order_affects_encoding_and_is_strict ... ok
+test tests::every_core_kind_round_trips ... ok
+test tests::object_byte_vector_is_frozen ... ok
+test tests::byte_vector_is_frozen ... ok
+test tests::rejects_noncanonical_zero_integer ... ok
+
+test result: ok. 9 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_toml-a70621fc4ce62e9e.exe)
+
+running 24 tests
+test materialization::tests::unrepresentable_values_and_implicit_mapping_conversion_fail ... ok
+test tests::item_handles_are_snapshot_and_role_bound ... ok
+test edit::tests::invalid_or_conflicting_transactions_leave_the_base_unchanged ... ok
+test edit::tests::semantic_boundaries_are_rejected_instead_of_rounded ... ok
+test edit::tests::structural_dependencies_and_table_rules_fail_atomically ... ok
+test edit::tests::dry_run_and_commit_have_identical_patch_and_target_digest ... ok
+test materialization::tests::explicit_unique_mapping_conversion_is_reported_and_reversible_as_object ... ok
+test edit::tests::array_insert_and_remove_cover_empty_and_commented_arrays ... ok
+test operation_registry::tests::toml_profile_publishes_the_frozen_structural_surface ... ok
+test query::tests::array_query_obeys_selection_and_cancellation ... ok
+test materialization::tests::canonical_document_round_trips_scalar_container_and_temporal_values ... ok
+test query::tests::nested_entry_query_retains_direct_toml_roles ... ok
+test edit::tests::root_and_standard_table_insertions_preserve_ownership ... ok
+test projection::tests::all_toml_value_categories_project_exactly_with_provenance ... ok
+test edit::tests::literal_and_semantic_edits_change_only_scalar_spans ... ok
+test tests::syntax_and_resource_failures_never_form_documents ... ok
+test edit::tests::inline_table_operations_preserve_exact_association_identity ... ok
+test tests::complete_document_preserves_source_and_native_categories ... ok
+test projection::tests::leap_second_and_limits_fail_without_partial_values ... ok
+test tests::toml_lossless_syntax_kinds_distinguish_newlines_and_punctuation ... ok
+test query::tests::lossless_syntax_query_preserves_piece_order_kind_and_text ... ok
+test tests::dotted_keys_retain_each_logical_segment ... ok
+test edit::tests::empty_standard_table_insertion_uses_its_header_newline_and_crlf ... ok
+test edit::tests::exact_literal_rejects_trivia_containers_and_extra_assignments ... ok
+
+test result: ok. 24 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_xml-83ac366bb9faf0ee.exe)
+
+running 104 tests
+test entity::tests::amplification_ratio_bounds_expansion ... ok
+test edit::tests::name_facts_failure_matrix_never_renders_partial_targets ... ok
+test edit::tests::conflicting_targets_and_stale_snapshots_fail ... ok
+test edit::tests::edit_failure_matrix_never_renders_partial_targets ... ok
+test edit::tests::change_set_maps_renamed_unmapped_and_removed_deleted ... ok
+test entity::tests::xml_character_boundaries ... ok
+test edit::tests::attribute_and_content_after_placement_succeed ... ok
+test edit::tests::inserted_content_is_xml_escaped ... ok
+test edit::tests::dry_run_matches_commit ... ok
+test edit::tests::insert_remove_element_with_anchors ... ok
+test edit::tests::recovered_base_documents_are_rejected_before_any_edit ... ok
+test edit::tests::remove_element_removes_full_extent_including_end_tag ... ok
+test edit::tests::remove_root_is_rejected ... ok
+test edit::tests::remove_element_on_utf16_source_removes_end_tag ... ok
+test edit::tests::rename_element_rewrites_both_tags ... ok
+test edit::tests::set_and_rename_attribute ... ok
+test edit::tests::rename_element_on_utf16_sources_succeeds ... ok
+test edit::tests::insert_element_end_into_empty_element_places_before_slash_close ... ok
+test entity::tests::predefined_entities_have_their_xml_meanings ... ok
+test entity::tests::replacement_text_never_creates_markup ... ok
+test edit::tests::set_attribute_value_on_utf16_sources_encodes_value ... ok
+test entity::tests::byte_and_scalar_budgets_apply ... ok
+test edit::tests::insert_element_on_utf16_sources_encodes_markup ... ok
+test edit::tests::insert_remove_attribute_with_placement ... ok
+test edit::tests::prefixed_attribute_operations_validate_bindings ... ok
+test edit::tests::insert_attribute_on_utf16_sources_encodes_value ... ok
+test edit::tests::multi_operation_transaction_is_atomic ... ok
+test entity::tests::depth_and_reference_limits_apply ... ok
+test edit::tests::replace_text_maps_to_replaced ... ok
+test edit::tests::replace_text_on_utf16_sources_encodes_replacement ... ok
+test edit::tests::replace_text_escapes_and_replaces_whole_occurrence ... ok
+test entity::tests::declaration_limit_is_document_wide ... ok
+test materialization::tests::compact_document_round_trips_the_projection ... ok
+test materialization::tests::crlf_newline_is_honored ... ok
+test materialization::tests::invalid_record_is_rejected ... ok
+test materialization::tests::failure_matrix_asserts_exact_variants ... ok
+test materialization::tests::internal_entities_round_trip_with_doctype ... ok
+test edit::tests::prefixed_rename_respects_scope ... ok
+test materialization::tests::mixed_content_and_references_round_trip ... ok
+test materialization::tests::namespace_documents_reproduce_the_record_bindings ... ok
+test materialization::tests::provenance_is_target_bound_and_direct ... ok
+test materialization::tests::projection_materialize_projection_is_stable ... ok
+test materialization::tests::wrong_profile_or_style_is_rejected ... ok
+test materialization::tests::utf16le_output_carries_bom ... ok
+test namespace::tests::child_scope_shadows_parent_binding ... ok
+test namespace::tests::declaration_attributes_get_the_xmlns_namespace ... ok
+test namespace::tests::default_namespace_applies_to_elements_not_attributes ... ok
+test namespace::tests::equality_ignores_prefix_spelling ... ok
+test namespace::tests::prefixed_name_requires_in_scope_binding ... ok
+test namespace::tests::xml_prefix_cannot_be_rebound ... ok
+test namespace::tests::unprefixed_attributes_never_see_the_default_namespace ... ok
+test namespace::tests::xml_prefix_is_permanently_bound ... ok
+test namespace::tests::xmlns_prefix_is_reserved_everywhere ... ok
+test parser::tests::crlf_line_endings_are_preserved_raw_and_normalized_semantically ... ok
+test operation_registry::tests::every_xml_profile_publishes_the_frozen_eight_operation_surface ... ok
+test parser::tests::declaration_pieces_stay_byte_exact_with_utf16_bom_and_full_attributes ... ok
+test parser::tests::declaration_pieces_stay_byte_exact_with_utf8_bom ... ok
+test parser::tests::element_span_covers_the_full_start_tag ... ok
+test parser::tests::dtd_comment_text_is_not_misread_as_excluded_markup ... ok
+test parser::tests::declaration_pieces_stay_byte_exact_with_utf16_boms ... ok
+test parser::tests::default_namespace_applies_to_elements_only ... ok
+test parser::tests::end_tag_pieces_cover_open_name_and_close ... ok
+test parser::tests::duplicate_expanded_attributes_are_recovered ... ok
+test parser::tests::extra_end_tag_publishes_a_diagnostic ... ok
+test parser::tests::external_and_parameter_entities_are_rejected_as_recovered ... ok
+test parser::tests::excluded_dtd_markup_outside_comments_is_recovered ... ok
+test parser::tests::internal_entities_expand_with_provenance ... ok
+test parser::tests::fine_grained_kinds_cover_every_document_part ... ok
+test parser::tests::mismatched_end_tag_is_recovered ... ok
+test parser::tests::missing_root_is_recovered ... ok
+test parser::tests::mixed_content_keeps_source_order ... ok
+test parser::tests::predefined_and_character_references_resolve ... ok
+test parser::tests::piece_coverage_is_exhaustive ... ok
+test parser::tests::standalone_value_span_points_at_the_value ... ok
+test parser::tests::utf16_single_quoted_attribute_is_detected ... ok
+test parser::tests::prefixed_names_resolve_through_bindings ... ok
+test parser::tests::unbound_prefix_is_recovered_not_fatal ... ok
+test parser::tests::unknown_entity_is_recovered_with_no_partial_text ... ok
+test parser::tests::utf16_without_bom_is_rejected_by_profile ... ok
+test parser::tests::whitespace_runs_split_into_whitespace_and_line_break_kinds ... ok
+test parser::tests::well_formed_document_is_complete_and_byte_exact ... ok
+test projection::tests::element_tree_provenance_uses_nested_value_paths ... ok
+test projection::tests::simple_entry_mapping_attribute_policy_matrix ... ok
+test projection::tests::key_spelling_collision_uses_collision_policy ... ok
+test projection::tests::simple_entry_mapping_admission_and_recursion ... ok
+test projection::tests::recovered_documents_never_project ... ok
+test projection::tests::simple_entry_mapping_key_spelling_and_keep_policies ... ok
+test projection::tests::simple_entry_mapping_text_key_policy_matrix ... ok
+test projection::tests::text_content_normalizes_line_endings ... ok
+test projection::tests::text_content_subtree_must_be_an_element ... ok
+test projection::tests::text_content_text_only_discards_cdata_and_reports ... ok
+test query::tests::attributes_and_values_query ... ok
+test query::tests::content_parent_navigates_back ... ok
+test query::tests::domain_mismatch_is_rejected ... ok
+test query::tests::in_scope_namespaces_include_ancestors ... ok
+test query::tests::name_equals_original_and_expanded ... ok
+test query::tests::node_kind_is_filters_mixed_output ... ok
+test query::tests::prolog_navigation_exposes_declaration_and_pi ... ok
+test query::tests::references_query_by_kind_and_name ... ok
+test query::tests::require_one_cardinality_is_enforced ... ok
+test query::tests::root_and_children_preserve_mixed_content_order ... ok
+test query::tests::descendants_are_bounded_pre_order ... ok
+test query::tests::syntax_query_filters_kind_text_and_take ... ok
+test parser::tests::many_small_elements_formation_scales_linearly ... ok
+
+test result: ok. 104 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.18s
+
+     Running unittests src\lib.rs (target\debug\deps\consema_yaml-f0e0b829b4085bca.exe)
+
+running 62 tests
+test backend::tests::backend_spans_are_unicode_scalar_offsets_not_raw_bytes ... ok
+test backend::tests::backend_limits_fail_without_partial_events ... ok
+test edit::tests::edit_failures_publish_stable_v5_codes ... ok
+test native::tests::exact_empty_scalar_only_rewrites_the_plain_placeholder ... ok
+test offsets::tests::utf8_resolution_matches_raw_byte_at_exactly ... ok
+test backend::tests::backend_preserves_styles_resolved_tags_anchors_aliases_and_documents ... ok
+test edit::tests::structural_edits_keep_utf16_and_reject_ambiguous_same_container_transactions ... ok
+test materialization::tests::block_materialization_preserves_arbitrary_mapping_order ... ok
+test materialization::tests::document_scoped_anchors_reject_cross_root_sharing ... ok
+test edit::tests::anchor_rename_updates_only_dependent_aliases_and_dry_run_matches ... ok
+test edit::tests::utf16_edits_keep_encoding_and_explicit_tag_anchor_boundaries ... ok
+test edit::tests::alias_insertion_requires_the_exact_latest_visible_definition ... ok
+test edit::tests::wrong_snapshots_invalid_literals_and_duplicate_targets_fail_without_documents ... ok
+test materialization::tests::ambiguous_entry_mapping_requires_explicit_object_transformation ... ok
+test materialization::tests::unsupported_value_categories_fail_without_partial_documents ... ok
+test materialization::tests::utf16_and_crlf_are_explicit_and_reparsed ... ok
+test native::tests::scalar_profiles_are_intentionally_different ... ok
+test native::tests::timestamp_and_binary_validation_are_bounded_data_only ... ok
+test edit::tests::canonical_fallback_is_explicit_and_keeps_anchor_properties ... ok
+test projection::tests::multidocument_stream_requires_an_explicit_non_value_target ... ok
+test edit::tests::flow_insertions_and_removals_preserve_order_and_arbitrary_keys ... ok
+test edit::tests::last_block_removal_retains_collection_kind_and_rejects_live_aliases ... ok
+test projection::tests::cycles_never_enter_portable_values_and_custom_tags_need_policy ... ok
+test operation_registry::tests::both_yaml_profiles_publish_only_the_frozen_implemented_surface ... ok
+test materialization::tests::flow_materialization_anchors_a_cycle_and_round_trips ... ok
+test offsets::tests::unsorted_lookups_restart_and_stay_correct ... ok
+test projection::tests::exact_graph_projection_relates_nodes_edges_and_aliases ... ok
+test projection::tests::non_finite_bits_are_frozen_and_leap_seconds_are_not_rounded ... ok
+test projection::tests::mapping_and_provenance_limits_are_explicit_and_atomic ... ok
+test materialization::tests::portable_value_materialization_reprojects_exact_scalars_and_mappings ... ok
+test projection::tests::projection_failures_publish_stable_v5_codes ... ok
+test offsets::tests::utf16_bom_resolution_matches_raw_byte_at_exactly ... ok
+test edit::tests::semantic_and_literal_scalar_edits_are_atomic_and_style_aware ... ok
+test projection::tests::scalar_and_mapping_lowering_is_exact_and_bounded ... ok
+test query::tests::definitions_reject_wrong_roles_and_unknown_yaml_kinds_before_binding ... ok
+test projection::tests::value_projection_rejects_then_explicitly_duplicates_acyclic_sharing ... ok
+test query::tests::query_limits_and_cancellation_fail_without_completed_prefixes ... ok
+test query::tests::native_query_keeps_arbitrary_entries_and_shared_alias_identity ... ok
+test query::tests::syntax_query_supports_utf16_text_and_source_order ... ok
+test syntax::tests::classifies_presentation_styles_and_trivia ... ok
+test syntax::tests::nested_mapping_after_plain_value_retains_node_properties ... ok
+test syntax::tests::node_property_characters_inside_plain_scalars_remain_scalar_text ... ok
+test syntax::tests::plain_hash_and_colon_are_not_always_indicators ... ok
+test tests::aliases_compose_to_shared_cycles_without_expansion ... ok
+test tests::block_scalar_keywords_are_strings ... ok
+test tests::explicit_standard_tags_are_kind_and_grammar_checked ... ok
+test tests::exact_multidocument_stream_is_profile_bound ... ok
+test tests::multiline_plain_scalar_does_not_fabricate_node_properties ... ok
+test edit::tests::block_insertions_are_style_aware_and_reversible_with_crlf_comments ... ok
+test tests::mappings_keep_arbitrary_keys_duplicates_and_order ... ok
+test tests::native_handles_retain_exact_anchor_alias_and_association_spans ... ok
+test tests::profile_directives_are_not_silently_cross_loaded ... ok
+test tests::plain_yaml11_keywords_resolve_only_under_compat_profile ... ok
+test tests::profiles_resolve_plain_scalars_but_never_construct_custom_tags ... ok
+test tests::quoted_tilde_keeps_exact_content_through_the_alias_path ... ok
+test tests::plain_core_keywords_resolve_per_core_schema ... ok
+test tests::syntax_and_resource_failures_form_no_document ... ok
+test tests::utf16_bom_source_is_retained_and_location_aware ... ok
+test tests::standard_repository_tags_survive_graph_projection_without_constructors ... ok
+test tests::quoted_core_keywords_are_exact_strings ... ok
+test tests::quoted_yaml11_keywords_are_strings_in_both_profiles ... ok
+test materialization::tests::large_flat_materialization_stays_within_linear_budget ... ok
+
+test result: ok. 62 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 1.07s
+
+   Doc-tests consema
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_conformance
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_core
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_document
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_graph
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_hcl
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_ini
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_json
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_plist
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_properties
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_protocol
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_pvce
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_toml
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_xml
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests consema_yaml
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
