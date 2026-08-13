@@ -6,7 +6,8 @@
 - Scope: the normative 1.0 compatibility and support policy. It freezes,
   effective from `1.0.0` (and governing the `0.x` tail from acceptance), the
   patch/minor/major semantic boundaries, the compatibility surfaces, the
-  Rust MSRV window, the Go version window, the supported OS/architecture
+  Rust MSRV window, the Go version window, the TypeScript/Python/Kotlin
+  version windows, the supported OS/architecture
   matrix, the security fix policy with response SLA, the previous-minor
   branch support period, the deprecation notice period, the
   contract/Profile retirement process, and the toolchain freeze timing
@@ -24,7 +25,8 @@
   最低版本冻结）；`docs/fc-manifest-0.13.0.json`（`rust_compiler_msrv`
   冻结记录）；`docs/support-policy.md`（0.1 草案，本文为其契约化版本）
 - External behavior references: none. This RFC constrains the already
-  frozen public surfaces (Rust crates API, Go module API, the CLI machine
+  frozen public surfaces (Rust crates API, Go module API, TypeScript,
+  Python, and Kotlin package APIs, the CLI machine
   protocol of RFC 0015, the semantic-model contract registry, the shared
   conformance vectors) rather than defining new runtime behavior; the
   external contracts are the conformance vectors and the published support
@@ -37,8 +39,11 @@ that takes effect at `1.0.0`. Roadmap §21.4 requires seven items to be
 public before `1.0.0` — Rust MSRV window, Go version window, supported
 OS/architectures, security fix policy, previous-minor branch support
 period, deprecation notice period, and the contract/Profile retirement
-process — plus the toolchain freeze timing (§21.4, line 1863). This RFC is
-the normative statement of all of them, fulfilling roadmap §27 R-20
+process — plus the toolchain freeze timing (§21.4, line 1863). Per the
+2026-08-11 five-language equal-status decision
+(docs/multi-language-implementation-plan.md), the TypeScript, Python, and
+Kotlin version windows join the same commitment (Sections 9.3-9.5). This
+RFC is the normative statement of all of them, fulfilling roadmap §27 R-20
 (due `0.19.0`).
 
 ### 1.1 Motivation
@@ -57,7 +62,11 @@ the normative statement of all of them, fulfilling roadmap §27 R-20
 - §26.4 names the opposite risk — freezing production promises too early.
   This RFC therefore fixes the *rules* now and fixes the *toolchain
   numbers* only at the two freeze points already defined by §21.4
-  (Rust Feature-Complete — done at 0.13.0 — and Go RC — pending).
+  (Rust Feature-Complete — done at 0.13.0 — and Go RC — pending). The
+  TypeScript/Python/Kotlin declared minimums are manifest-embedded and
+  CI-verified at pinned versions ("really verified in CI" by construction,
+  five-language-ci-design §1.2); their freeze follows the same
+  release-train discipline (Section 9.7).
 
 ### 1.2 Normative standing
 
@@ -99,9 +108,10 @@ conformance, and rejected alternatives. Mapping for this policy RFC:
 - The branch support lifecycle (latest / previous / security-only / EOL)
   and the contract lifecycle (published / deprecated / retired)
   (Section 5).
-- The Rust MSRV window and the Go version window, including the freeze
+- The Rust MSRV window, the Go version window, and the
+  TypeScript/Python/Kotlin version windows, including the freeze
   timing (Section 9).
-- The supported OS/architecture matrix (Section 9.3).
+- The supported OS/architecture matrix (Section 9.6).
 - The security fix policy, response SLA, and disclosure process
   (Section 8).
 - The deprecation notice period and the contract/Profile retirement
@@ -121,7 +131,7 @@ conformance, and rejected alternatives. Mapping for this policy RFC:
   (Section 8.5).
 - Concrete future toolchain versions: per §21.4, numbers are frozen at the
   Rust Feature-Complete and Go RC freeze points, not pre-written in a
-  multi-year policy (Section 9.4).
+  multi-year policy (Section 9.7).
 - The Go module publish path and module topology: RFC 0016 §3 owns them.
 - Any new format-family capability, Profile, or contract: those still
   require their own RFC (§12.3).
@@ -135,6 +145,9 @@ defines five public surfaces, each with a stability class:
 |---|---|---|
 | Rust public API | `consema` facade and all backend crates' public items | frozen at `1.0.0` (breaking ⇒ major) |
 | Go public API | `consema.dev/consema` module public items (RFC 0016) | frozen at `1.0.0` (breaking ⇒ major) |
+| TypeScript public API | `@consema/consema` package public items (consema-ts) | frozen at `1.0.0` (breaking ⇒ major) |
+| Python public API | `consema` package public items (consema-py) | frozen at `1.0.0` (breaking ⇒ major) |
+| Kotlin public API | `dev.consema:consema-kotlin` module public items (consema-kt) | frozen at `1.0.0` (breaking ⇒ major) |
 | Machine protocol | RFC 0015 envelope, batch manifests, exit classes, command schemas | frozen as v1 candidates at 0.12.0; stable from `1.0.0` |
 | Contract registry | `namespace.contract@N` records, error codes, constructors | published records frozen forever (Section 11) |
 | Conformance vectors | `conformance/vectors/` (shared authority, roadmap §17) | versioned; additions additive, corrections only via the §11.3 process |
@@ -176,7 +189,8 @@ bug or security fixes only. A patch release must not:
 - change any published `namespace.contract@N`;
 - change output order, default loss policy, or format
   acceptance/recovery boundaries;
-- raise the MSRV or the Go minimum version (§21.1, line 1820).
+- raise the Rust MSRV or any declared minimum version — Go,
+  TypeScript, Python, or Kotlin (§21.1, line 1820; Section 9).
 
 ### 4.2 minor (`1.x.0`)
 
@@ -235,8 +249,8 @@ The rules above bind from acceptance of this RFC. Between now and
 - `-alpha.n` / `-beta.n` / `-rc.n` semantics are unchanged from §12.1:
   only blocking defects, security issues, and documentation errors may
   change an `-rc` candidate.
-- The MSRV/Go-minimum disciplines of Section 9 bind now, not only at
-  `1.0.0`.
+- The MSRV/declared-minimum disciplines of Section 9 bind now, not only
+  at `1.0.0`.
 
 ## 5. Lifecycle state machines
 
@@ -412,10 +426,10 @@ the disposition is publicly stated.
 ### 9.1 Rust MSRV window
 
 - **Declared MSRV**: every release declares the exact `rust-version` in
-  the manifest. The current value is `1.85` (`Cargo.toml:33`, edition
-  2024, `unsafe_code = "forbid"`). "1.85" is a current declared value, not
-  a multi-year promise; the committed window is the *policy*, the number
-  is frozen per Section 9.4.
+  the manifest. The current value is `1.85` (consema-rs/Cargo.toml:33,
+  edition 2024, `unsafe_code = "forbid"`). "1.85" is a current declared
+  value, not a multi-year promise; the committed window is the *policy*,
+  the number is frozen per Section 9.7.
 - **Support window**: all Rust versions from the MSRV through the current
   stable.
 - **Bumps**: MSRV increases happen only in minor releases — never in
@@ -429,7 +443,7 @@ the disposition is publicly stated.
   MSRV 1.85 with measured toolchain rustc 1.97.1 in
   `docs/fc-manifest-0.13.0.json` (`rust_compiler_msrv`); the release
   verification baseline runs both current stable and MSRV
-  (CHANGELOG.md:30-33).
+  (root CHANGELOG.md:116-119).
 
 ### 9.2 Go version window
 
@@ -448,13 +462,62 @@ the disposition is publicly stated.
   current stable (go vet, static analysis, race detector, fuzz per
   §21.2).
 - **Freeze record**: the minimum and the verification toolchain are
-  formally frozen at the Go RC freeze point (Section 9.4) and recorded in
+  formally frozen at the Go RC freeze point (Section 9.7) and recorded in
   the corresponding release manifest. (Current environment fact: go1.26.5
   at 2026-08-07; the oracle's `go 1.22` directive is a legacy of the
   differential-oracle module, not SDK policy — go-implementation-plan
   §0.1.)
 
-### 9.3 Supported OS / architectures
+### 9.3 TypeScript / Node version window
+
+- **Declared minimum**: `engines.node` declares the minimum Node version;
+  the value is `>= 26` (consema-ts/typescript/package.json:9-10),
+  CI-verified at the pinned '26.x' (consema-ts ci-typescript.yml,
+  setup-node).
+- **Support window**: all Node versions from the declared minimum through
+  the current stable toolchain. For the three L5 languages the CI-pinned
+  version *is* the declared minimum ("really verified in CI" by
+  construction, five-language-ci-design §1.2).
+- **Bumps**: minimum-version increases follow the same discipline as the
+  Rust MSRV — minor-only, never in patch, never reinterpreting published
+  contracts, with the CHANGELOG noting the lowest stayable version.
+- **Verification**: CI runs the suite on the declared minimum
+  (`npm ci` + `npm run check` + `npm test`).
+- **Freeze record**: the declared minimum is manifest-embedded and
+  CI-verified; the formal freeze follows Section 9.7.
+
+### 9.4 Python version window
+
+- **Declared minimum**: `requires-python` declares the minimum Python
+  version; the value is `>= 3.12` (consema-py/python/pyproject.toml:21),
+  CI-verified at the pinned '3.12.x' (consema-py ci-python.yml,
+  setup-python).
+- **Support window**: all Python versions from the declared minimum
+  through the current stable toolchain ("really verified in CI" by
+  construction, five-language-ci-design §1.2).
+- **Bumps**: same discipline as Section 9.3 — minor-only, never in patch,
+  never reinterpreting published contracts.
+- **Verification**: CI runs compileall + the full pytest suite plus the
+  zero-dependency assertion on the declared minimum (ci-python.yml).
+- **Freeze record**: the declared minimum is manifest-embedded and
+  CI-verified; the formal freeze follows Section 9.7.
+
+### 9.5 Kotlin / JVM version window
+
+- **Declared minimum**: the Gradle build declares Kotlin `2.2.0` on JVM 17
+  (consema-kt/kotlin/build.gradle.kts:6-7, 24, `jvmToolchain(17)`),
+  CI-verified with Temurin 17 (consema-kt ci-kotlin.yml, setup-java).
+- **Support window**: from the declared Kotlin/JVM minimum through the
+  current stable toolchain ("really verified in CI" by construction,
+  five-language-ci-design §1.2).
+- **Bumps**: same discipline as Section 9.3 — minor-only, never in patch,
+  never reinterpreting published contracts.
+- **Verification**: CI runs `./gradlew --no-daemon test` on the declared
+  minimum (ci-kotlin.yml).
+- **Freeze record**: the declared minimum is manifest-embedded and
+  CI-verified; the formal freeze follows Section 9.7.
+
+### 9.6 Supported OS / architectures
 
 The formally supported matrix is CI-verified on every release (full test
 matrix):
@@ -474,7 +537,7 @@ matrix):
   permissions, symlink policy, temp-file permissions) is verified
   per-platform on the supported targets (RFC 0015 §9.6).
 
-### 9.4 Toolchain freeze timing
+### 9.7 Toolchain freeze timing
 
 Per §21.4 (line 1863), concrete toolchain versions are frozen at two
 points, not pre-written in this policy:
@@ -485,10 +548,16 @@ points, not pre-written in this policy:
 - **Go RC (`1.0.0-rc` window)**: pending. The Go minimum version and
   verification toolchain are frozen then, per §21.2, and recorded in the
   corresponding release manifest.
+- **TypeScript/Python/Kotlin**: the declared minimums are
+  manifest-embedded and CI-verified (Sections 9.3-9.5); the five-language
+  package versions are unified at `1.0.0-rc.1` (2026-08-13 decision,
+  five-language-ci-design §10 version policy), and minimum changes between
+  releases follow Sections 9.3-9.5.
 
-Between freezes, all MSRV/Go-minimum changes follow Sections 9.1/9.2.
-Freezing is done at these points to avoid §26.4's premature-commitment
-risk; the freeze records (manifests) are the audit trail.
+Between freezes, all MSRV/declared-minimum changes follow Sections
+9.1-9.5. Freezing is done at these points to avoid §26.4's
+premature-commitment risk; the freeze records (manifests) are the audit
+trail.
 
 ## 10. Deprecation and EOL process
 
@@ -544,9 +613,12 @@ risk; the freeze records (manifests) are the audit trail.
   changes never edit this document in place beyond errata.
 - All policy changes are recorded in the CHANGELOG.
 - Product releases follow the release train (roadmap §11.4): product
-  `1.0.0` = Rust crates 1.0.0 + Go module v1.0.0 + Specification v1
-  release set + Conformance release set 1.0.0; before that, the Go module
-  is v0.x (RFC 0016 §9). Package versions never substitute contract
+  `1.0.0` = Rust crates 1.0.0 + Go module v1.0.0 + TypeScript/Python/
+  Kotlin packages 1.0.0 + Specification v1
+  release set + Conformance release set 1.0.0; before that, the language
+  modules are v0.x (RFC 0016 §9; the five-language package versions are
+  unified at `1.0.0-rc.1` in the rc window — five-language-ci-design §10
+  version policy). Package versions never substitute contract
   versions (§11.4, line 889).
 - The support-policy summary document (`docs/support-policy.md`) is
   updated in the same release as any change to this RFC; the RFC is the
@@ -555,21 +627,21 @@ risk; the freeze records (manifests) are the audit trail.
 ## 13. Conformance integration
 
 - The shared vectors (`conformance/vectors/`) are the authority for
-  language-neutral behavior (roadmap §17); both the Rust and Go
-  implementations run the same vectors through their own runners (RFC
-  0016 §7).
+  language-neutral behavior (roadmap §17); all five implementations
+  (Rust, Go, TypeScript, Python, Kotlin) run the same vectors through
+  their own runners (RFC 0016 §7; five-language-ci-design §2).
 - **Compatibility is enforced by vectors, not by prose**: the Section 4.2
   compatibility boundaries (output order, default loss policy,
   acceptance/recovery) are represented by vectors; any release that
   touches them must add or update vectors in the same release, and any
   breaking change must update old and new behavior vectors together
   (Section 4.4 point 4).
-- When a public behavior change is discovered (including by the Go
+- When a public behavior change is discovered (including by any language
   implementation — roadmap §11.3), the process is: stop the affected
   capability, build the minimal cross-language counterexample, classify
   (implementation / test / spec), fix spec and conformance first, publish
   a new contract ID if public behavior changes, let Rust pass the revised
-  vectors first, then resume Go (RFC 0016 §7).
+  vectors first, then resume the other languages (RFC 0016 §7).
 - The conformance suite itself is part of the release train: the
   conformance release set is versioned with the product (Section 12), so
   consumers can pin the exact vectors a release was verified against.
@@ -614,10 +686,11 @@ risk; the freeze records (manifests) are the audit trail.
 | Document | Relationship |
 |---|---|
 | `docs/support-policy.md` | Public summary of this RFC. Same content, shorter form; maintained in lockstep; this RFC is normative. |
+| `docs/five-language-ci-design.md` | CI toolchain pins for TypeScript/Python/Kotlin ('26.x' / '3.12.x' / Temurin 17) and the version policy; Sections 9.3-9.5 and 9.7 adopt them. |
 | `SECURITY.md` | Operational security document; its disclosure section (SLA, channels, support windows) is restated and made contractual by Section 8. |
 | `README.md` | No support-policy statements of its own beyond capability listings; version-change record points to the CHANGELOG. No conflicts found. |
 | `docs/go-implementation-plan.md` §1.3 | go.mod minimum freeze (`go 1.26` at 0.14.0) is adopted by Section 9.2. |
-| `docs/fc-manifest-0.13.0.json` | `rust_compiler_msrv` freeze (1.85 / 1.97.1) is the Rust-FC freeze record of Section 9.4. |
+| `docs/fc-manifest-0.13.0.json` | `rust_compiler_msrv` freeze (1.85 / 1.97.1) is the Rust-FC freeze record of Section 9.7. |
 | RFC 0015 §5.3 | Exit-code classification frozen; Section 6 adopts it. |
 | RFC 0016 §9 | Go module release-train relationship; Section 12 adopts it. |
 
@@ -638,16 +711,19 @@ This RFC is Accepted when all of the following hold, and remains in force
 through `1.0.0`:
 
 1. All seven §21.4 items are stated (MSRV window — §9.1; Go version
-   window — §9.2; supported OS/arch — §9.3; security fix policy — §8;
+   window — §9.2; TypeScript/Python/Kotlin version windows — §9.3-9.5;
+   supported OS/arch — §9.6; security fix policy — §8;
    previous-minor branch support — §5.1; deprecation notice period — §10;
-   contract/Profile retirement — §11) plus the freeze timing (§9.4).
+   contract/Profile retirement — §11) plus the freeze timing (§9.7).
 2. The §21.3 compatibility boundaries (patch/minor/major, `@N` never
    reinterpreted, output order / default loss policy /
    acceptance-recovery as compatibility) are stated and enforceable via
    conformance (Sections 4, 13).
 3. The content is consistent with `SECURITY.md` (SLA and disclosure),
    RFC 0015 §5.3 (exit classes), RFC 0016 §9 (release train), and the
-   frozen toolchain records (fc-manifest, go.mod).
+   frozen toolchain records (fc-manifest, go.mod, consema-ts
+   package.json engines, consema-py pyproject.toml requires-python,
+   consema-kt build.gradle.kts).
 4. `docs/support-policy.md` carries the same content as its public
    summary (any drift is corrected on its next revision per Section 15).
 5. This RFC's own doc (motivation, non-goals, data model, state machine,

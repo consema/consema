@@ -8,18 +8,18 @@
 
 - **tag 规范**：`vX.Y.Z`（语义化版本；预发布用 `v1.0.0-rc.N`、canary 等
   后缀）。所有仓共用同一 tag 前缀与同一次发布。
-- **五语言版本同步发布**（P1 记录为待 1.0.0 首发的实际决策）：当前
-  rs/kt = `1.0.0-rc.1`、ts/py = `0.14.0` 的差异由各仓 CI
-  `check-version-consistency` 门禁各自守护（manifest 与 README `Version:`
-  行一致）；**1.0.0 首发时**决定最终同步策略（同版本五仓齐发 vs
-  按语言节奏），本次发布流水线接线不预判该决策。
+- **五语言版本同步发布**（2026-08-13 决策，five-language-ci-design.md
+  §10 版本政策）：当前五个语言仓全部为 `1.0.0-rc.1`（ts/py 自 `0.14.0`
+  推进统一）；各仓 CI `check-version-consistency` 门禁各自守护（manifest
+  与 README `Version:` 行一致）；**1.0.0 首发时**按同版本五仓齐发执行。
 - **版本 bump 纪律**：改版本必须同步改本仓 README 的版本行，否则
   `check-version-consistency` 门禁失败——这是有意的护栏。
 
 ## 2. CHANGELOG 策展
 
-- 跨语言/规范变更记录在 `docs/CHANGELOG.md`（策展式：按里程碑组织，
+- 跨语言/规范变更记录在根 `CHANGELOG.md`（策展式：按里程碑组织，
   记录用户可见行为与契约变化，不收录内部重构流水账）。
+  （`docs/CHANGELOG.md` 仅为勘误页，主记录以根 `CHANGELOG.md` 为权威。）
 - 各语言仓的 CHANGELOG（如有）记录该语言实现细节；发布时两者都更新。
 
 ## 3. 发布检查单（每次发布执行）
@@ -28,7 +28,7 @@
        conformance + differential 门禁；fuzz 驱动账本在 consema 仓，
        发布前确认无未处置回归）。
 2. [ ] 版本 bump 完成且各仓 `check-version-consistency` 通过。
-3. [ ] `docs/CHANGELOG.md` 策展完成。
+3. [ ] 根 `CHANGELOG.md` 策展完成。
 4. [ ] 供应链要素就绪：签名/SBOM/checksum/干净重建演练
        （`docs/release-process-0.13.0.md`——Rust 侧 14 个 `.crate` 归档
        的 checksum + 签名 + SBOM；发布记录按该文件执行）。

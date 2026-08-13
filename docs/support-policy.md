@@ -3,7 +3,9 @@
 - 版本：0.1（草案，0.13.0 门禁 M6 交付；`1.0.0` 发布前必须公开，路线图
   §21.4 第 1851 行）
 - 适用范围：Rust SDK（`consema` facade 及全部 backend crates）、Rust CLI、
-  `0.14.0` 起的 Go SDK / Go CLI（§21.2）
+  `0.14.0` 起的 Go SDK / Go CLI（§21.2）、TypeScript（`@consema/consema`）、
+  Python（`consema`）与 Kotlin（`dev.consema:consema-kotlin`）SDK——五语言
+  同等地位（2026-08-11 决策，docs/multi-language-implementation-plan.md）
 - 权威来源：路线图 §12（版本治理）、§21.3（稳定承诺）、§21.4（支持周期）、
   §19.4（发布供应链）、§18.4（缺陷等级）；RFC 0015 §5.3（exit code 冻结）；
   `SECURITY.md`（资源与安全行为）
@@ -14,12 +16,12 @@
 
 现状与门禁事实：
 
-- workspace `rust-version = "1.85"`（`Cargo.toml:33`），edition 2024；
-  `unsafe_code = "forbid"`（`Cargo.toml:37`）。
+- workspace `rust-version = "1.85"`（consema-rs/Cargo.toml:33），edition
+  2024；`unsafe_code = "forbid"`（consema-rs/Cargo.toml:37）。
 - CI 常设 `msrv` job 在 1.85.0 上运行与 stable 相同的全部测试矩阵
-  （`docs/0.13.0-gate-plan.md` M1；.github/workflows/ci.yml）；发布门禁同时
-  在 current stable 与 MSRV 上通过 `--all-targets --all-features` 构建
-  （CHANGELOG.md:33：Rust 1.97.1 与 MSRV 1.85.0 双腿）。
+  （`docs/0.13.0-gate-plan.md` M1；consema-rs/.github/workflows/ci.yml）；
+  发布门禁同时在 current stable 与 MSRV 上通过 `--all-targets --all-features`
+  构建（根 CHANGELOG.md:119：Rust 1.97.1 与 MSRV 1.85.0 双腿）。
 
 政策：
 
@@ -34,7 +36,8 @@
   使用高于 MSRV 语法的代码（如 let-chains）在合入前必须被 msrv job 拦截
   （gate-plan §4 M1 验证记录已实测拦截行为）。
 - **示例**：当前发布基线 = MSRV 1.85（0.8.0 起声明）+ 验证工具链
-  Rust 1.97.1（CHANGELOG.md:30）。
+  Rust 1.97.1（根 CHANGELOG.md:116；冻结记录 fc-manifest-0.13.0.json
+  `rust_compiler_msrv`）。
 
 ## 2. Go version window
 
@@ -49,7 +52,55 @@ RFC 0020 §9.2 的调和表述：声明最低版本在 0.14.0 冻结，最低版
 - 最低版本提升遵循 §12.1 的 minor-only 规则与 §1 的 MSRV 同纪律
   （破坏性变更在 minor，不重解释已发布 contract）。
 
-## 3. 支持环境（OS / 架构）
+## 3. TypeScript / Node version window
+
+TypeScript 实现（`@consema/consema`，consema-ts 仓）随五语言同等地位
+（2026-08-11 决策）纳入本政策。`package.json` 的 `engines` 声明最低
+Node 版本：
+
+- **声明最低版本**：`engines.node >= 26`（consema-ts/typescript/package.json:9-10）；
+  CI 在钉定版本 `'26.x'` 上运行全套件验证（consema-ts ci-typescript.yml，
+  setup-node + npm cache）。
+- **支持窗口**：自声明最低版本起至当时 stable 工具链的所有版本——三语言
+  CI 钉的版本就是最低版本（"really verified in CI" 由构造满足，
+  five-language-ci-design §1.2）。
+- **提升纪律**：最低版本提升遵循 §1/§2 同纪律——只在 minor 发生、永不进入
+  patch、不重解释已发布 contract，CHANGELOG 注明用户可停留的最低版本。
+- **验证**：CI `L-gates` / `L-conformance` / `L-differential` job 在钉定
+  版本上运行（`npm ci` + `npm run check` + `npm test`）。
+
+## 4. Python version window
+
+Python 实现（`consema` 包，consema-py 仓）随五语言同等地位（2026-08-11
+决策）纳入本政策。`pyproject.toml` 的 `requires-python` 声明最低版本：
+
+- **声明最低版本**：`requires-python >= 3.12`（consema-py/python/pyproject.toml:21）；
+  CI 在钉定版本 `'3.12.x'` 上运行全套件验证（consema-py ci-python.yml，
+  setup-python）。
+- **支持窗口**：自声明最低版本起至当时 stable 工具链的所有版本——三语言
+  CI 钉的版本就是最低版本（"really verified in CI" 由构造满足，
+  five-language-ci-design §1.2）。
+- **提升纪律**：同 §3（minor-only、永不进 patch、不重解释已发布 contract）。
+- **验证**：CI 在钉定版本上运行 compileall + pytest 全量套件 + 零依赖断言
+  （ci-python.yml）。
+
+## 5. Kotlin / JVM version window
+
+Kotlin 实现（`dev.consema:consema-kotlin`，consema-kt 仓）随五语言同等
+地位（2026-08-11 决策）纳入本政策。Gradle 构建声明 Kotlin 与 JVM 最低
+版本：
+
+- **声明最低版本**：Kotlin 2.2.0 + JVM 17（consema-kt/kotlin/build.gradle.kts:6-7、
+  24，`jvmToolchain(17)`）；CI 用 Temurin 17 验证（consema-kt
+  ci-kotlin.yml，setup-java）。
+- **支持窗口**：自声明最低版本起至当时 stable 工具链的所有版本——三语言
+  CI 钉的版本就是最低版本（"really verified in CI" 由构造满足，
+  five-language-ci-design §1.2）。
+- **提升纪律**：同 §3（minor-only、永不进 patch、不重解释已发布 contract）。
+- **验证**：CI 在钉定版本上运行 `./gradlew --no-daemon test` 全套件
+  （ci-kotlin.yml）。
+
+## 6. 支持环境（OS / 架构）
 
 正式支持矩阵（CI 常设验证，`docs/0.13.0-gate-plan.md` M1 与 §8
 `supported_targets`）：
@@ -65,10 +116,10 @@ RFC 0020 §9.2 的调和表述：声明最低版本在 0.14.0 冻结，最低版
 - 发布物验证基线记录在 `scripts/verify-package-archives.ps1`（路径安全、
   校验和、解包内容、MSRV 腿）。
 - CLI 平台相关行为（Windows read-only/ACL、POSIX 权限、symlink policy、
-  临时文件权限）在正式目标上逐平台验证（RFC 0015 §9.6 与 CHANGELOG.md:34
-  的跨平台边界；0.13.0 收口 Linux/macOS 全量验证）。
+  临时文件权限）在正式目标上逐平台验证（RFC 0015 §9.6 与根 CHANGELOG.md:46
+  的三平台 CI/跨平台边界记录；0.13.0 收口 Linux/macOS 全量验证）。
 
-## 4. 安全修复政策
+## 7. 安全修复政策
 
 缺陷等级沿用路线图 §18.4：
 
@@ -94,7 +145,7 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
   "安全披露联系方式和支持周期"，本文件为其落点；0.13.0 M7 收口）。披露
   时间表：确认后 90 天内发布修复（critical/high），或公开说明处置状态。
 
-## 5. 版本与分支支持周期
+## 8. 版本与分支支持周期
 
 产品版本规则（§12.1、§21.3）：
 
@@ -107,7 +158,7 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 - **major**（1.0.0 之后）：不可避免的破坏性公共变更。
 
 分支支持周期（`1.0.0` 起生效；0.x 阶段只维护最新 minor，历史 minor 的
-缺陷按 §7 退役规则处理）：
+缺陷按 §10 退役规则处理）：
 
 - 最新 minor 分支：完全支持（bug + security + docs）；
 - **previous minor 分支：支持期 = 自新 minor 发布起 12 个月**，期间只接受
@@ -115,7 +166,7 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 - 超过该窗口的分支：EOL，不再发布修复；CHANGELOG 与 release notes 注明
   各 minor 的 EOL 日期。
 
-## 6. 弃用政策（deprecation）
+## 9. 弃用政策（deprecation）
 
 - **弃用通告期**：任何公共 API、Profile、contract 或 CLI 行为的弃用，先
   在一个 minor 中标记 `deprecated`（CHANGELOG 弃用段 + rustdoc/文档标注），
@@ -125,7 +176,7 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 - 移除时遵守 §12.1 五条（0.x）或 §21.3 major 规则（稳定后），并给出等价
   替代路径（migration guide 体例，`docs/migration-guide.md`）。
 
-## 7. contract / Profile 退役流程
+## 10. contract / Profile 退役流程
 
 - **已发布 `namespace.contract@N` 永不重解释**（§21.3 第 1843 行、
   §12.2）：冻结的 registry 数组与 constructor 精确不变
@@ -135,7 +186,7 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
   旧版本保留为冻结 identity；product 版本可以同时支持多个 contract
   version（§12.2 示例）。
 - **退役（retirement）**：某 contract/Profile 停止在默认能力面发布时：
-  1. 一个 minor 的弃用通告（第 6 节）；
+  1. 一个 minor 的弃用通告（第 9 节）；
   2. 退役记录写明原因、替代 contract ID、最后支持的产品版本；
   3. 退役不删除注册记录与 typed decoder 的解析路径（历史数据可审计）；
   4. `consema capabilities` 输出按退役状态标注，但格式家族与 Profile 的
@@ -147,7 +198,7 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 - 本流程由 0.13.0 Feature-Complete Manifest 收口时登记为首个被执行对象
   （尚无退役案例；本文是政策，不是历史）。
 
-## 8. 工具链冻结时机
+## 11. 工具链冻结时机
 
 §21.4 末段（第 1861 行）：具体工具链版本不在多年路线图中预先写死，而是在
 **Rust Feature-Complete 与 Go RC** 两个时点按当时稳定生态冻结：
@@ -156,13 +207,20 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
   冻结记录进 `docs/fc-manifest-0.13.0.json`（`rust_compiler_msrv` 字段，
   gate-plan §8）。
 - Go：Go RC 冻结最低版本与验证工具链（§21.2），记录进对应发布 manifest。
-- 冻结之间的一切 MSRV/工具链变化按第 1、2 节政策执行。
+- TypeScript / Python / Kotlin：最低版本由各自 manifest 声明（engines /
+  requires-python / build.gradle.kts）并由 CI 在钉定版本上验证（"really
+  verified in CI" 由构造满足，five-language-ci-design §1.2）；五语言包版本
+  统一为 `1.0.0-rc.1`（2026-08-13 决策，five-language-ci-design §10 版本政策）。
+- 冻结之间的一切 MSRV/工具链变化按第 1-5 节政策执行。
 
-## 9. 与既有门禁的对应
+## 12. 与既有门禁的对应
 
 | 本政策条目 | 门禁/证据 |
 |---|---|
-| MSRV 1.85 | Cargo.toml:33；CI msrv job；CHANGELOG.md:33 |
+| MSRV 1.85 | consema-rs/Cargo.toml:33；consema-rs CI msrv job；根 CHANGELOG.md:119 |
+| TS 最低版本 | consema-ts/typescript/package.json:9-10（engines >= 26）；CI 钉 '26.x' |
+| Python 最低版本 | consema-py/python/pyproject.toml:21（requires-python >= 3.12）；CI 钉 '3.12.x' |
+| Kotlin 最低版本 | consema-kt/kotlin/build.gradle.kts:6-7、24（Kotlin 2.2.0 + JVM 17）；CI Temurin 17 |
 | 三平台 | CI 矩阵（gate-plan M1）；BENCHMARKS-0.12.0.md Environment |
 | 缺陷等级 P0-P3 | 路线图 §18.4；SECURITY.md:16 硬化套件 |
 | audit/deny 常设 | SECURITY.md:38；gate-plan P-3/P-4 |
