@@ -31,3 +31,10 @@ __pycache__/
 # Node.js
 typescript/node_modules/
 node_modules/
+
+# Claude Code local state — only .claude/workflows/adversarial-audit.js is tracked
+# (covers settings.local.json / scheduled_tasks.lock; 换机克隆不依赖全局配置)
+.claude/*
+!.claude/workflows/
+.claude/workflows/*
+!.claude/workflows/adversarial-audit.js
