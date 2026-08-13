@@ -2,6 +2,7 @@ export const meta = {
   name: 'adversarial-audit',
   description: '全仓全内容对抗性正反对打：9 镜头穷尽攻击 → 逐条辩护复验 → loop-until-dry 打不穿才停',
   phases: [
+    { title: 'Load', detail: 'stateFile 持久化状态加载（跨轮去重上下文，可选）' },
     { title: 'Attack', detail: '9 镜头并行穷尽渗透（六仓 + 跨仓交叉 + 伪证伪门禁 + 逻辑安全可复现）' },
     { title: 'Verify', detail: '每条 fresh 发现独立辩护复验，打不掉的进确认集' },
   ],
@@ -15,6 +16,12 @@ export const meta = {
 //     dryTarget: 3     // 连续几轮零新确认视为打不穿
 //   }})
 // 返回 { confirmed, seen, rounds }。
+//   —— 跨轮续打（持久化状态，推荐）：args 加 stateFile 指向 loop-state JSON
+//      （含 confirmed/seen 两键）。脚本启动时 spawn 一个 loader agent 读取该文件、
+//      把 confirmed 归并为模式组级 knownFindings（跨轮去重上下文），seen 留空由
+//      运行内自建。args.knownFindings 显式传入时优先于 stateFile。
+//   —— 已知限制：Workflow args 为内联 JSON，大型清单无法直接内联（约 200KB 上限
+//      之下没问题）；超过则走 stateFile。
 //
 // —— 已验证调用方式（2026-08-13 C8 收尾阶段实测）——
 //   (a) 通过 Skill（adversarial-audit）入口调用（本机验证可用）。
@@ -55,6 +62,27 @@ const FINDINGS_SCHEMA = {
   required: ['findings'],
 }
 
+const STATE_SCHEMA = {
+  type: 'object',
+  properties: {
+    groups: {
+      type: 'array',
+      description: '历史确认集的模式组级去重上下文（≤60 组，每组一个根因一行）',
+      items: {
+        type: 'object',
+        properties: {
+          repo: { type: 'string', description: '主要涉及的仓库名（consema/consema-rs/consema-go/consema-ts/consema-py/consema-kt/cross）' },
+          severity: { type: 'string', description: '组内最高 severity' },
+          claim: { type: 'string', description: '根因一句话（含处置状态：已修复/文档化/遗留）' },
+        },
+        required: ['repo', 'claim'],
+      },
+    },
+    notDry: { type: 'boolean', description: '历史波次是否未打穿' },
+  },
+  required: ['groups'],
+}
+
 const VERDICT_SCHEMA = {
   type: 'object',
   properties: {
@@ -81,7 +109,7 @@ function attackPrompt(args, lens) {
 六仓（目标范围）：\n${repoListText(args.repos)}
 
 已确认发现清单（不要重复这些，但可以攻击它们的同类问题在其他位置的实例）：
-${args.knownFindings.map(f => `- [${f.severity}] ${f.repo}:${f.file}:${f.line} ${f.claim}`).join('\n') || '(空)'}
+${args.knownFindings.map(f => `- [${f.severity || '—'}] ${f.repo}${f.file ? ':' + f.file : ''}${f.line ? ':' + f.line : ''} ${f.claim}`).join('\n') || '(空)'}
 
 已见 key 集（与上面清单对应，用于去重；不要产出 key 与之相同的发现）：
 ${args.seen.map(k => `- ${k}`).join('\n') || '(空)'}
@@ -137,11 +165,22 @@ async function run(args) {
   const dryTarget = args.dryTarget || 3
   const maxRounds = 12
 
+  // 历史确认集（跨轮去重上下文）：显式传入优先；否则走 stateFile 加载
+  let known = (args.knownFindings || []).slice()
+  if (!known.length && args.stateFile) {
+    log(`loading persisted state: ${args.stateFile}`)
+    const st = await agent(`你是持久化审计状态的加载 agent。读取状态文件 ${args.stateFile}（JSON，含 confirmed 数组与 seen 数组——confirmed 是上一波已确认并已处置的发现）。任务：把 confirmed 归并成 ≤60 个模式根因组，作为本轮攻击者的「已确认清单」去重上下文。规则：同一根因的多实例并成一组；每组 repo 填主要涉及仓（多仓填 cross）、severity 填组内最高、claim 一句话写明根因+处置状态（已修复/文档化/遗留）。只读文件，禁止修改任何东西。`, {
+      label: 'load:state', phase: 'Load', schema: STATE_SCHEMA, effort: 'low',
+    })
+    if (st && st.groups && st.groups.length) { known = st.groups; log(`state loaded: ${known.length} groups`) }
+    else { log('state load returned nothing — starting without historical context') }
+  }
+
   while (dryStreak < dryTarget && round < maxRounds) {
     round += 1
     log(`round ${round}: ${LENSES.length} 镜头攻击中（已确认 ${confirmed.length}，seen ${seen.size}）`)
 
-    const roundArgs = { ...args, knownFindings: confirmed, seen: [...seen] }
+    const roundArgs = { ...args, knownFindings: known.concat(confirmed), seen: [...seen] }
     const attacked = await parallel(LENSES.map(lens => () =>
       agent(attackPrompt(roundArgs, lens), {
         label: `attack:${lens.key}`,
