@@ -19,12 +19,15 @@ Layout:
 ```json
 {
   "suite": "consema.mutation-corpus@1",
-  "generator": { "tool": "...", "seed": 1759257521, "classes": [...] },
+  "generator": { "tool": "...", "seed": 6840145125992895424, "classes": [...] },
   "fixtures": [ {"id": "...", "format": "...", "profile": "...", "encoding": "...", "path": "...", "bytes": 1234}, ... ],
   "cases": { "<fixture-id>": [ {"c": "<class>", ...op fields...}, ... ] },
   "regressions": [ {"format": "...", "profile": "...", "bytes": "<hex>", "note": "..."} ]
 }
 ```
+
+（示例中的 `seed` 为 `mutation-v1.json` 的真实值，与
+`docs/fc-manifest-0.13.0.json` 的记录一致；其余字段为布局占位示例。）
 
 * **Derived cases** are rebuilt by the replay test from the fixture bytes
   plus one mutation operator. Operator classes (identical to the fuzz

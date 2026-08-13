@@ -34,9 +34,9 @@
 **Go 侧必须镜像的语言无关契约面（只读调研清单）：**
 
 1. **conformance 向量**：`conformance/vectors/` 18 套 suite / 519 cases（本计划逐文件计数复核：2026-08-07 为 508；2026-08-12 P2-B 向量补强 plist +4 / yaml +4 / java-properties +3 后为 519）：v1.json 30、toml-v1 18、protocol-v1 32、source-v1 28、syntax-query-v1 19、protocol-v2 11、operations-v1 35、json-family-v2 33、portable-graph-v1 10、semantic-model-v5 22、yaml-v1 31、semantic-model-v6 25、ini-v1 20、java-properties-v1 25、xml-1-0-safe-v1 34、plist-v1 49、hcl-v1 57、cli-v1 40。聚合 sha256 `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`（fc-manifest 第 38 行；聚合方式见第 40 行；2026-08-12 补强后实测复核可精确复现，2026-08-10 复核的 35bebc8d… 为增补前值——按文件名字节序排序，逐文件 sha256（小写 hex），行格式 `{basename}:{digest}` 以 `\n` 连接（无尾换行）后对 UTF-8 字节再 sha256）。**digest 以规范 checkout（.gitattributes eol=lf，git 存储的 LF 规范态）字节为准**：2026-08-10 修订前记录值 `e3d6578858…` 是 2026-08-07 在 CRLF 工作树（本机 core.autocrlf=true）记录的，已被规范态值取代；CRLF 工作树下逐文件 sha256 不同属预期（本地开发用 `git config core.autocrlf false` 或接受该差异）。
-2. **registry**：semantic-model v7 = 41 条 contract / 187 个 error code（README.md:32；fc-manifest 第 26 行；`crates/consema-protocol/src/registry_manifest.rs` 为序列化源；0.13.0 audit F3 注册 `json.projection.incomplete-document@1`，186 → 187）。
+2. **registry**：semantic-model v7 = 41 条 contract / 187 个 error code（README.md:32；fc-manifest 第 26 行；`consema-rs/consema-protocol/src/registry_manifest.rs` 为序列化源；0.13.0 audit F3 注册 `json.projection.incomplete-document@1`，186 → 187）。
 3. **capability set**：8 families / 16 profiles / 21 query domains / 16 operation registries / 187 codes（fc-manifest 第 31 行；`consema capabilities` 实测）。
-4. **协议 payload**：RFC 0015 v7 记录（`crates/consema-protocol/src/cli.rs`：CliOutputMessage、BatchPlanMessage、BatchResultMessage、CliCommand、Redaction、BatchPlanFileStatus/BatchResultFileStatus；exit 分类 `crates/consema-protocol/src/exit_class.rs:11` 起 Success/Usage/Data/Limit/Precondition/Internal 六类）。
+4. **协议 payload**：RFC 0015 v7 记录（`consema-rs/consema-protocol/src/cli.rs`：CliOutputMessage、BatchPlanMessage、BatchResultMessage、CliCommand、Redaction、BatchPlanFileStatus/BatchResultFileStatus；exit 分类 `consema-rs/consema-protocol/src/exit_class.rs:11` 起 Success/Usage/Data/Limit/Precondition/Internal 六类）。
 5. **值模型**：PortableValue 十五 kind（Null/Boolean/Integer/Decimal/BinaryFloat32/BinaryFloat64/String/Bytes/Date/Time/LocalDateTime/OffsetDateTime/Sequence/Object/EntryMapping，RFC 0016 §4.1 第 123-127 行）；对象有序条目且构造时拒重 key（第 141-143 行，RFC 0002 对象契约）；PVCE/1 与 PGCE/1 为唯一跨语言值字节面（§4.2 第 150-153 行）。
 6. **规范边界事实**：差分 oracle exclusion inventory（HCL D-1..D-9、plist D-1..D-21、YAML 1 项，记录于 `conformance/oracles/hcl-go-v1/manifest.json` 与 `conformance/oracles/plist-macos-v1/manifest.json`）——这些是规范边界的冻结事实，Go 必须复现同样的接受/拒绝语义。
 7. **上游语料**（语言无关输入，Go 按里程碑消费）：toml-test v2.2.0（205+474）、yaml-test-suite data-2022-01-17（402）、JSON5 v2.2.3（83/83）、INI/Properties 五套运行时 oracle 36 项（README.md:34-37；fc-manifest 第 44-49 行）。
@@ -45,7 +45,7 @@
 
 ### 0.2 Go module 拓扑与仓库布局
 
-**单一 module `consema`**（RFC 0016 §3.1 第 91-97 行冻结：单 module 结构冻结，SDK 与未来 Go CLI 共用一个 module，镜像 `crates/consema` facade + `[[bin]]` 结构）。
+**单一 module `consema`**（RFC 0016 §3.1 第 91-97 行冻结：单 module 结构冻结，SDK 与未来 Go CLI 共用一个 module，镜像 `consema-rs/consema` facade + `[[bin]]` 结构）。
 
 - module path 约定：`consema.dev/consema`；最终可发布路径是 0.14.0 的实现事实（RFC 0016 §2.2 第 83-85 行"publishable repository path is an implementation decision of 0.14.0"）。
 - **仓库布局（本计划冻结）：`go/` 目录承载整个 module**（go.mod/go.sum、全部 package、cmd/）。依据：
@@ -61,7 +61,7 @@
 | `protocol` | consema-protocol | language-neutral codecs、contract registry、error registry、Diagnostic、CLI machine protocol records（RFC 0015） |
 | `document` | consema-document | SourceSnapshot、Span、NodeRef、ProfileId、FormationStatus、ParseLimits、MaterializationRequest、SourcePatch |
 | `json`/`toml`/`yaml`/`ini`/`properties`/`xml`/`plist`/`hcl` | 各家族 crate | 每家族 documents、queries、projections、materializations、edits、operation registries |
-| 根包 | crates/consema facade | `Document` union、`Convert*` 组合、`Registry` 面（families/profiles/query domains/operation registries） |
+| 根包 | consema-rs/consema facade | `Document` union、`Convert*` 组合、`Registry` 面（families/profiles/query domains/operation registries） |
 | `conformance` + `cmd/consema-conformance` | consema-conformance | Go conformance runner（§4） |
 
 约束（RFC 0016 §3.2 第 111-117 行）：任何 package 不得 import 兄弟格式 package 的私有内部；跨家族组合（convert）只在根包；`core` 与 `graph` 不依赖模块内任何其他 package（路线图 §16.1 第 1453 行"先证明最底层值、图、编码和协议可以独立实现"）。
@@ -82,7 +82,7 @@
 | 共享件 | 复用方式 | 依据 |
 |---|---|---|
 | `conformance/vectors/*.json`（18 套 / 519 cases） | Go runner 直接消费（§4.3 读取方式）；向量是权威，禁止内嵌期望值进 runner | 路线图 §17.1 第 1565-1573 行；RFC 0016 §7 第 190 行；conformance/README.md 第 3-4 条 |
-| `conformance/fixtures/`（raw 字节夹具） | 按仓库相对路径读取，跨语言相同字节 | 路线图 §17.3 第 1595-1596 行；README"未来 Go 实现必须直接消费相同向量和 fixture" |
+| `conformance/fixtures/`（raw 字节夹具） | 按仓库相对路径读取，跨语言相同字节 | 路线图 §17.3 第 1595-1596 行；conformance/README「Go 实现已直接消费相同向量和 fixture（0.14.0-0.19.0 交付，五语言 CI 全绿）」 |
 | registry 与 error code 数据（v7：41/187） | 冻结清单是数据；Go 的注册表代码自写，内容与 v7 序列化一致 | README.md:32；fc-manifest 第 26 行 |
 | 协议 payload 固定字段与 exit 分类（`core.cli-output@1`/`core.batch-plan@1`/`core.batch-result@1`、`core.query-definition@1`、ProjectionRequest/MaterializationRequest 等） | 字段形状是契约；typed decoder 重验交叉约束照 v6/v7 先例 | RFC 0015；RFC 0016 §5.1/§6；cli-implementation-plan.md:197（Go CLI 同 schema 先例）、:199 |
 | 上游官方 suite 数据（toml-test、yaml-test-suite、JSON5、五套 INI/Properties runtime oracle 记录） | 语言无关输入/事实，按对应里程碑消费 | README.md:34-37；fc-manifest 第 44-49 行；路线图 §17.4 第 1605-1617 行 |
@@ -242,7 +242,7 @@
 
 ### 4.1 双 runner 契约（路线图 §17.1 第 1563-1573 行；RFC 0016 §7 第 190-194 行）
 
-- **同一向量、两个 runner**：Rust runner（`crates/consema-conformance`）与 Go runner（`go/conformance` + `cmd/consema-conformance`）各自独立实现、各自执行全部 18 套共享向量。"Rust 测试通过不能代替 Go 测试，Go 测试通过也不能证明规范没有歧义"（§17.1 第 1573 行）；权威来自规范含义与两实现共同验证。
+- **同一向量、两个 runner**：Rust runner（`consema-rs/consema-conformance`）与 Go runner（`go/conformance` + `cmd/consema-conformance`）各自独立实现、各自执行全部 18 套共享向量。"Rust 测试通过不能代替 Go 测试，Go 测试通过也不能证明规范没有歧义"（§17.1 第 1573 行）；权威来自规范含义与两实现共同验证。
 - 权威组成五元（§17.1 第 1565-1571 行）：normative prose + contract registry + machine-readable vectors + raw fixtures + independent Rust and Go runners。
 - Go runner 直接消费 `conformance/vectors/*.json`（向量文件是权威，RFC 0016 §7 第 190 行）与 `conformance/fixtures/`（raw 字节，§17.3 第 1595 行）。
 
@@ -274,7 +274,7 @@
 
 ### 4.3 Go runner 设计（镜像 `consema-conformance` 体例）
 
-- **布局**：`go/conformance/` 一个 suite 家族一个 runner 文件（protocol_v1.go、portable_graph_v1.go、source_v1.go、…照 `crates/consema-conformance/src/lib.rs:3-25` 的模块清单对偶）；`cmd/consema-conformance` 为 CLI 驱动。
+- **布局**：`go/conformance/` 一个 suite 家族一个 runner 文件（protocol_v1.go、portable_graph_v1.go、source_v1.go、…照 `consema-rs/consema-conformance/src/lib.rs:3-25` 的模块清单对偶）；`cmd/consema-conformance` 为 CLI 驱动。
 - **向量读取（不 embed 副本）**：`go:embed` 无法引用 module 目录树外的 `conformance/vectors/`（路径越界被拒绝）；且副本会造成第二权威源（违反 README 第 3 条"防止把预期值硬编码进 runner"精神）。决策：runner 通过显式路径参数读取仓库向量与 fixtures（`-vectors <repo>/conformance/vectors`、`-fixtures <repo>/conformance/fixtures`），与 RFC 0016 §7 第 190 行"reads conformance/vectors/*.json directly"一致；CI 以仓库路径运行；`go test` 内嵌测试用仓库相对路径解析。
 - **每个 runner 固定校验**（conformance/README.md 第 4 条；lib.rs 自检体例）：suite id 校验、case id 去重、**case 计数断言**（改向量必失败）、按 capability 分派处理器、未知 action 拒绝。
 - **数据驱动**：input/expected 实际驱动执行；禁止把期望值硬编码进 runner。
@@ -345,7 +345,7 @@ Go runner 每次执行校验 `conformance/vectors/` 聚合 sha256 与 fc-manifes
 
 ## 7. START GATE（起始门禁；本计划最高优先级条款）
 
-> **§7 实况注记（2026-08-12 追加；本文档为规划阶段产物，下列条款保留为 0.14.0 时点的历史门禁条款）**：Go 里程碑已按 §6 门禁独立验证交付——0.14.0-0.19.0 G0.1-G5.6 全部 closed（go/README 逐项记录，productVersion 1.0.0-rc.1，runner 508/508）；C-1 已闭环（2026-08-11，GitHub Actions run#5 132/132 steps 全绿，head 437fd35）；C-2 推进中（2026-08-12 10:17 快照 62,432 行 / ≈460 CPU-hours，properties/yaml/ini 三单位已过 72h 门槛）；C-3 partial。
+> **§7 实况注记（2026-08-12 追加；本文档为规划阶段产物，下列条款保留为 0.14.0 时点的历史门禁条款）**：Go 里程碑已按 §6 门禁独立验证交付——0.14.0-0.19.0 G0.1-G5.6 全部 closed（consema-go/README 逐项记录，productVersion 1.0.0-rc.1，runner 519/519（增补后口径，与 :36/fc-manifest 的 519/cfd6e296 一致））；C-1 已闭环（2026-08-11，GitHub Actions run#5 132/132 steps 全绿，head 437fd35）；C-2 推进中（2026-08-12 10:17 快照 62,432 行 / ≈460 CPU-hours，properties/yaml/ini 三单位已过 72h 门槛）；C-3 partial。
 
 > **C-1/C-2/C-3 完成之前，不得发布 0.14.0、不得宣称任何 Go 里程碑关闭；`go/` 内实现按 §6 门禁独立验证。**（2026-08-07 decision record 修订：owner 已书面授权提前启动 go/ 0.14.0 G0.1-G0.3，原"门禁全闭前不创建任何实现文件"条款不再适用于已开工的 G0.1-G0.3。）
 

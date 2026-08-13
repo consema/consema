@@ -65,8 +65,10 @@ TOML、YAML、INI、Java Properties、XML、Property List 与 HCL 八个格式�
    断言）；改动脚本 / conformance 数据后至少本地跑相关脚本（见 README
    「验证」节：`scripts/` 下 toml-test、yaml-test-suite、runtime oracle、
    差分 oracle）。**`conformance/vectors/` 变更是五仓同步事件**：必须同步
-   五个语言仓并更新聚合 digest 与 18/508 计数（见 README「Conformance
-   权威声明」），否则各仓 conformance 门禁与 digest 断言失败。
+   五个语言仓并更新聚合 digest 与 18/519 计数（聚合 digest
+   `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`，见
+   README「Conformance 权威声明」），否则各仓 conformance 门禁与 digest
+   断言失败。
 4. **PR**：标题遵循提交规范；确保 CI 全绿（含 pr-labels.yml 的 kind 标签
    门禁）。
 5. **评审**：至少一位维护者 approve；契约变更需在 PR 中记录 RFC 关联。

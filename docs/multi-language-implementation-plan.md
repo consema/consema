@@ -76,7 +76,7 @@ Go 的测试）。
 | L2 | L1 | 三语言并行 | yaml（1.2/1.1、anchor/alias/graph，↔G2.1）+ ini（三 Profile，↔G2.2）+ properties（Reader/Latin-1，↔G2.3）+ 全操作补齐（↔G2.4） |
 | L3 | L2 | 三语言并行 | xml（1.0 safe Profile，↔G3.1）+ plist（XML/binary，↔G3.2）+ hcl（native/tfvars，不求值，↔G4.1） |
 | L4 | L3 | 三语言并行 | 全格式 materialize 全组合（↔G4.2）+ mandatory structural edit/SourcePatch/batch-plan（↔G4.3）+ examples/文档/capability parity 断言（↔G4.4） |
-| L5 | L4 | 三语言并行 | conformance runner 全 508（↔G5.1）+ 跨语言差分（Rust↔TS/Python/Kotlin，↔G5.2）+ protocol exchange（↔G5.3）+ fuzz/bench/security matrix（↔G5.4）+ CLI beta（↔G5.6） |
+| L5 | L4 | 三语言并行 | conformance runner 全 519（↔G5.1；增补后口径——2026-08-12 P2-B 前为 508，见 fc-manifest-0.13.0.json:37-39）+ 跨语言差分（Rust↔TS/Python/Kotlin，↔G5.2）+ protocol exchange（↔G5.3）+ fuzz/bench/security matrix（↔G5.4）+ CLI beta（↔G5.6） |
 
 每里程碑硬门禁（照 Go 先例）：对应 capability 的共享向量 100% 通过；PVCE/PGCE 字节与 Rust
 一致；不依赖他语言产物；error text 不参与比较；unknown-field/canonicality 规则一致。
@@ -158,4 +158,4 @@ GATE 未过期间的代码统称"盲写产物"，不得进入任何发布证据�
 - 契约：RFC 0016（语言无关契约面）、RFC 0006/0007（graph/PGCE）、RFC 0015（CLI 协议）
 - 注册表：`docs/fc-manifest-0.13.0.json`（41 contract / 187 codes / capability 门禁）
 - 向量：`conformance/vectors/*.json`（18 套 / 519 cases）
-- 字节权威：crates/consema-pvce（PVCE/1）、crates/consema-graph（PGCE/1）
+- 字节权威：consema-rs/consema-pvce（PVCE/1）、consema-rs/consema-graph（PGCE/1）

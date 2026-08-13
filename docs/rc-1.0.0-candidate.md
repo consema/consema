@@ -13,7 +13,7 @@
 |---|---|---|---|
 | C-1：CI 10 job 在 GitHub 干净 checkout 全矩阵全绿 | **closed** | GitHub Actions run #5（2026-08-11，head 437fd35，main push）：132/132 steps 全绿（增补前 10+1 job：lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package/go-1-26，11 定义/17 次执行）在 windows/ubuntu/macos 全矩阵通过；2026-08-12 增补 go-differential 后 ci.yml 为 10+2 job（12 定义；六仓拆分后该定义属 consema-rs 仓，母仓 ci.yml 为 oracles/shared-conformance-digest/check 三 job）；run 历史：run#1 workflow-parse fail（job id go-1.26 含点号）→ run#2 5 根因（symlink_dir 移除、oracles ParserError、coverage Get-CimInstance guard、package 工具链顺序、tags 未推）→ run#3 4 根因（macOS /var→/private/var 临时路径 symlink、oracles 缺 exit 0、semver 嵌套 baseline 歧义、coverage 数组 guard $null）→ run#4 fmt import 顺序 → run#5 全绿；结果已回填 manifest（C-1 → closed） | 已闭环（2026-08-11，run #5 全绿） |
 | C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §3.2.1/§8 快照：258.327 CPU-hours（session 297 时点复算，2026-08-11）；runs.csv 41,939 行（零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈66.8%，完成路径不变）；**2026-08-12 10:17 快照（runs.csv 权威复算）**：62,432 行 / ≈460 CPU-hours，零新 crash（非零退出 = 10 行 session-9 + 16 行 session-448-wave-3 超时分类，均非 fuzz finding）；**properties 85.5h（118.8%）、yaml 75.8h（105.3%）、ini 72.8h（101.1%）三单位已过 72h 门槛**；hcl 55.5h（77.1%）、json 55.1h（76.5%）最接近其余；toml 33.3h、protocol-decode 29.1h、plist 26.7h、xml 19.6h 继续累计；完成路径不变（快照口径：runs.csv 为唯一权威账本，实时数字持续增长） | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
-| C-3：真实发布密钥与 0.13.0 发布执行 | **partial** | 演练密钥 82301612…（隔离 keyring）验证过全流程；**默认 keyring 尚无真实发布密钥**；docs/release 只有 0.8.0 演练产物 | 按 release-process-0.13.0.md §7 十项检查单顺序执行；1.0.0-rc.1 发布执行（版本已推进 0.8.0→0.13.0→1.0.0-rc.1，2209582）；真实密钥+备份+吊销证书；**manifest 必须从干净发布 commit 重新生成**（见 §4 D-1） |
+| C-3：真实发布密钥与 0.13.0 发布执行 | **partial** | 演练密钥 82301612…（隔离 keyring）验证过全流程；**默认 keyring 尚无真实发布密钥**；docs/release 现含 0.8.0 演练产物与 1.0.0-rc.1 PREVIEW 预检产物（2026-08-12 入库：sbom-1.0.0-rc.1.json、cargo-package-1.0.0-rc.1.log、verify-package-archives-1.0.0-rc.1.result.txt、PREVIEW-1.0.0-rc.1.md） | 按 release-process-0.13.0.md §7 十项检查单顺序执行；1.0.0-rc.1 发布执行（版本已推进 0.8.0→0.13.0→1.0.0-rc.1，2209582）；真实密钥+备份+吊销证书；**manifest 必须从干净发布 commit 重新生成**（见 §4 D-1） |
 
 ## 2. §22 门禁核对表（逐行状态，2026-08-10）
 
@@ -294,7 +294,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
    go/pilot/pilot_test.go:157-170 的 12 文件注册一致，接受；
 2. vectors/toml-v1.json 的 toml.corpus.cargo-manifest fixture 路径为裸
    `"Cargo.toml"`（仓库根，非 fixtures 下），Rust runner 用 include_bytes! 解析
-   （crates/consema-conformance/src/toml_v1.rs:27）——Go runner 落地时需继承同一
+   （consema-rs/consema-conformance/src/toml_v1.rs:27）——Go runner 落地时需继承同一
    解析约定；
 3. json5/ 与 toml/ 目录无独立 README（其余 7 家族有）——来源声明由
    conformance/README 与 corpora 元数据承担，体例不一致可接受；

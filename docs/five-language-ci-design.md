@@ -29,7 +29,7 @@
   `go/conformance/differential/` git mv 迁移至共享位置（§3.5 已执行，单一权威）。
 - **三语言 scaffold（盲写产物，工具链后台安装中）**：`typescript/`（package.json:16-19 的
   `check`=tsc --noEmit / `test`=node --test；devDeps 仅 typescript ~5.9.0 + @types/node，package.json:29-32；
-  tsconfig strict，typescript/tsconfig.json:3-15）、`python/`（pyproject.toml:20 requires-python >= 3.12、
+  tsconfig strict，typescript/tsconfig.json:3-15）、`python/`（pyproject.toml:21 requires-python >= 3.12、
   :25 dev extra pytest、:30-32 testpaths=tests）、`kotlin/`（build.gradle.kts:6-7 kotlin 2.2.0、
   :13-15 jvmToolchain(17)、:18-22 kotlin.test + JUnit5、:24-26 useJUnitPlatform）。三语言均**零第三方
   运行时依赖**（测试框架除外，multi-language-implementation-plan.md:30）。
@@ -76,7 +76,7 @@
 | lint（fmt+clippy+rustdoc，3 OS，:25-46） | Rust 专属 | 每语言各自的格式/类型门禁（§1.2 gates job）：TS = `tsc --noEmit` strict（package.json:17）；Python/Kotlin L0 无强制 linter（零依赖政策不引入 ktlint/ruff 等工具依赖，L5 可选文档化） |
 | test（cargo test --workspace，3 OS，:48-61） | Rust 专属 | TS = `npm ci` + `npm test`（node --test）；Python = `pip install -e '.[dev]'` + `pytest`；Kotlin = `./gradlew --no-daemon test` |
 | coverage（cargo-llvm-cov 硬地板 + -Trend，:77-113） | Rust 专属 | 三语言**无覆盖地板**（multi-language-implementation-plan.md §6 验收门禁无覆盖项）；每语言覆盖率趋势为 L5 可选，估计量：非 1.0.0 门禁项 |
-| msrv（Rust 1.85 全门禁，:118-144） | Rust 专属 | 每语言最低版本验证（§1.2）：TS node >= 26（package.json:8 engines；CI 钉 '26.x'）；Python 3.12（pyproject.toml:20；CI 钉 '3.12.x'）；Kotlin 2.2.0 + JVM 17（build.gradle.kts:6-7, 13-15）。注意与 Rust 的差别：Rust 的 stable ≠ msrv 是两套工具链；三语言 CI 钉的版本**就是**最低版本（"really verified in CI" 由构造满足，路线图 §21.2 第 1833 行精神） |
+| msrv（Rust 1.85 全门禁，:118-144） | Rust 专属 | 每语言最低版本验证（§1.2）：TS node >= 26（package.json:9-10 engines；CI 钉 '26.x'）；Python 3.12（pyproject.toml:21；CI 钉 '3.12.x'）；Kotlin 2.2.0 + JVM 17（build.gradle.kts:6-7, 24）。注意与 Rust 的差别：Rust 的 stable ≠ msrv 是两套工具链；三语言 CI 钉的版本**就是**最低版本（"really verified in CI" 由构造满足，路线图 §21.2 第 1833 行精神） |
 | conformance（cargo test -p consema-conformance + suite-count 断言，:145-173） | Rust runner 腿 | 每语言独立 conformance job（§2）：TS/Python/Kotlin 各一，runner 内做 18/519 + digest 断言（不复制 ci.yml:155-173 的内联 PS 脚本——断言进各语言 runner 测试，单一来源） |
 | deny（cargo deny check，:175-184） | Rust 依赖政策 | 每语言零运行时依赖断言 + 开发依赖审计（§1.3）：TS `npm ls --omit=dev` 空 + `npm audit`（L5）；Python `dependencies = []`（pyproject.toml:22）断言 + `pip check`；Kotlin runtimeClasspath 空断言 + gradle 依赖锁定/验证（L5） |
 | audit（cargo audit / RustSec，:186-199） | Rust 供应链 | 同 deny 行。安全面 = 运行时零依赖 → 供应链面只剩 dev 工具（typescript/@types/node、pytest、kotlin.test+junit-jupiter）；L5 收口时逐语言审计并记录（照 SEC-6 体例，fc-manifest-0.13.0.json:510-518） |
@@ -109,7 +109,7 @@
 
 ### 2.1 五 runner 原则
 
-- **同一向量、五个 runner**：Rust（crates/consema-conformance）、Go（go/conformance + cmd/
+- **同一向量、五个 runner**：Rust（consema-rs/consema-conformance）、Go（go/conformance + cmd/
   consema-conformance）、TS、Python、Kotlin 各自独立实现、各自执行全部 18 套共享向量
   （conformance/vectors/，18 文件 / 519 cases，2026-08-12 实测）。权威五元扩展为七元
   （multi-language-implementation-plan.md:6-7：normative prose + contract registry + machine-readable
@@ -143,7 +143,7 @@
 
 | 项 | 设计 |
 |---|---|
-| TS | `typescript/src/conformance/`：node:test 驱动（package.json:17 的 `node --test src/` 即覆盖），每 suite 一个 test 文件（protocol_v1.test.ts…照 crates/consema-conformance/src/lib.rs:3-25 模块清单对偶）；`npm run conformance` 脚本可选（CLI 形式） |
+| TS | `typescript/src/conformance/`：node:test 驱动（package.json:17 的 `node --test src/` 即覆盖），每 suite 一个 test 文件（protocol_v1.test.ts…照 consema-rs/consema-conformance/src/lib.rs:3-25 模块清单对偶）；`npm run conformance` 脚本可选（CLI 形式） |
 | Python | `python/src/consema/conformance/` runner 模块 + `python/tests/conformance/` pytest 套件（pyproject.toml:30-32 testpaths 即覆盖）；可选 `python -m consema.conformance` CLI（照 cmd/consema-conformance 先例） |
 | Kotlin | `kotlin/src/test/kotlin/consema/conformance/` kotlin.test/JUnit5 套件（build.gradle.kts:24-26 useJUnitPlatform 即覆盖） |
 | 固定校验（每 runner 必做） | suite id 前缀 `consema.*` 校验（ci.yml:164-166 体例）；case id 去重；**case 计数断言 18/519**（conformance/README.md:81-82 第 4 条"每个 suite 必须验证 case 数量"）；聚合 digest 断言（§4.2）；未知 action 拒绝 |
@@ -174,7 +174,7 @@
 
 - Rust 侧四个例子**零改动**：`emit_parity_bytes.rs`、`emit_normalized_results.rs`（emit + `--consume`
   双模式）、`emit_protocol_exchange.rs`（emit + `--verify` 双模式）、`emit_conformance_reports.rs`
-  （crates/consema-conformance/examples/，2026-08-11 实测存在）。它们只消费 case 文件与输出目录，
+  （consema-rs/consema-conformance/examples/，2026-08-11 实测存在）。它们只消费 case 文件与输出目录，
   天然支持任意语言侧。
 - 每语言新增 4 个脚本，命名照 `go-verify-*` 惯例：
   `scripts/{ts,python,kotlin}-verify-byte-parity.ps1`、
@@ -331,12 +331,12 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
 |---|---|---|
 | R-1 | **跨平台**：新语言仅 ubuntu（估计） | 三语言均跨平台（无 Windows 专属 API 面）；单 OS 照 go-1-26 先例（ci.yml:321-331）；3-OS 全矩阵属 L5/1.0.0（路线图 §22.4 第 1909 行），按 Go 先例文档化完成路径（go/README.md:814-850）。差分脚本均为 pwsh（ubuntu runner 可用，ci.yml:90 先例） |
 | R-2 | **Kotlin Gradle 依赖下载**（首次构建拉 Gradle 发行版 + Kotlin 插件 + JUnit，估计 2-5 分钟，网络不稳定时更长） | gradle wrapper 入库 + `distributionSha256Sum` 钉版（当前 wrapper 缺失，§0.1 缺口）；gradle/actions/setup-gradle@v4 缓存；gradle.lockfile 依赖锁定；timeout 60 分钟余量 |
-| R-3 | **Python 版本钉**：CI 误用最新版（3.14+）掩盖 3.12 最低版本语义 | setup-python 显式 '3.12.x'；pyproject.toml:20 requires-python >= 3.12 为声明 + CI 钉为验证（"really verified" 由构造满足）；注意与 python-configparser-v1 oracle 的 CPython 3.14.6 pin（conformance/README.md:26）区分——那是第三方行为钉，不是 SDK 工具链 |
-| R-4 | **npm registry 访问 / 供应链** | package-lock.json 必须入库（npm ci 前置，当前缺失 §0.1）；devDeps 仅 2 项（package.json:29-32）；npm audit 于 L5 收口；引擎钉 node '26.x'（package.json:8 engines >= 26） |
+| R-3 | **Python 版本钉**：CI 误用最新版（3.14+）掩盖 3.12 最低版本语义 | setup-python 显式 '3.12.x'；pyproject.toml:21 requires-python >= 3.12 为声明 + CI 钉为验证（"really verified" 由构造满足）；注意与 python-configparser-v1 oracle 的 CPython 3.14.6 pin（conformance/README.md:26）区分——那是第三方行为钉，不是 SDK 工具链 |
+| R-4 | **npm registry 访问 / 供应链** | package-lock.json 必须入库（npm ci 前置，当前缺失 §0.1）；devDeps 仅 2 项（package.json:29-32）；npm audit 于 L5 收口；引擎钉 node '26.x'（package.json:9-10 engines >= 26） |
 | R-5 | **wall-clock 预算** | 现状估计：Rust 全套 ~10-15 分钟（并行 job）；新增 9 job（3 语言 × 3）各估计 5-15 分钟（gates 3-8 / conformance 2-5 / differential 5-10，Rust 例构建由 rust-cache 摊销、cargo build --locked 每次仅增量）；并行下总 wall-clock 估计 +15-35 分钟；timeout 与并发组照 ci.yml:18-20 模式。**估计量**：具体数字待首批 job 实测后回填 |
 | R-6 | **digest / 计数五处漂移** | §4.2 双重复核（manifest 运行期校验 + 五处硬钉常量）+ §4.3 同批纪律；skip 差异由 shared-conformance 对比（-StrictSkips）阻断（§3.6） |
-| R-7 | **JDK 工具链混淆**：Kotlin jvmToolchain(17)（build.gradle.kts:13-15）vs java-properties oracle 的 OpenJDK 25.0.4 pin | 两者是不同对象（SDK 编译工具链 vs 第三方行为钉）；CI 中 setup-java Temurin 17 只服务于 kotlin/ 构建；oracle 仍在 Rust job 内运行 |
-| R-8 | **node 版本漂移**：本地 Node 26.7 vs CI '26.x' | engines >= 26（package.json:8）+ CI 钉 '26.x'；未来 node 27 发布不破坏 engines 约束 |
+| R-7 | **JDK 工具链混淆**：Kotlin jvmToolchain(17)（build.gradle.kts:24）vs java-properties oracle 的 OpenJDK 25.0.4 pin | 两者是不同对象（SDK 编译工具链 vs 第三方行为钉）；CI 中 setup-java Temurin 17 只服务于 kotlin/ 构建；oracle 仍在 Rust job 内运行 |
+| R-8 | **node 版本漂移**：本地 Node 26.7 vs CI '26.x' | engines >= 26（package.json:9-10）+ CI 钉 '26.x'；未来 node 27 发布不破坏 engines 约束 |
 | R-9 | **差分 harness 双向弱化**（新语言只做单方向） | §0.2 不变量 6：每语言 forward+reverse 全跑；脚本内断言 summary 行存在（go-verify-byte-parity.ps1:129-135 体例） |
 | R-10 | **三语言盲写期无 CI 兜底**（语法/类型错误积累，multi-language-implementation-plan.md:106） | L0 门禁先行验证（§5.1）；CI 上线即锁定 |
 
@@ -463,7 +463,7 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
     自 Maven Central（repo1.maven.org）供给至 `kotlin/build/verify/lib/`
     （kotlin-test-junit5 经 typealias 解析 @Test 编译所需，ci-kotlin.yml:227-239/271）；
     Gradle 路径（kotlin-gates，wrapper 驱动）两者均自 Maven Central 解析）；
-    测试 shim `kotlin/verify/TestShim.kt` 入库（单模块编译含 shim，ci-kotlin.yml:96-116）
+    测试 shim `kotlin/verify/TestShim.kt` 已于 2026-08-13 删除（死件，git 历史保留）
 - **仍属未来批次（§5.3/§7.2/§7.3 原计划项，如实记录）**：
   - `scripts/{ts,python,kotlin}-verify-shared-conformance.ps1` 尚未合入（2026-08-12
     复核不存在）；workflow 头注释明示其随 runner-CLI 批次作为第四个 differential
@@ -502,7 +502,8 @@ multi-language-implementation-plan.md:125-131 §7 START GATE：工具链就绪�
   `//go:embed` 改为运行时读取（`CONSEMA_DIFFERENTIAL_CASES_DIR` 环境变量，或从测试包目录向上
   探测 `conformance/differential`——单仓与 consema/consema-go 并排布局均可解析；未设置且探测
   失败时 documented skip）；五个语言 harness（go/typescript/python/kotlin）与 12 个 verify 脚本
-  统一从 `conformance/differential/` 取数；crates/ 下四个 Rust 例子的 doc 注释仍引用旧路径
+  统一从 `conformance/differential/` 取数；consema-rs 的 `consema-conformance/examples/`
+  下四个 Rust 例子的 doc 注释仍引用旧路径
   （其 case 文件路径经 CLI 参数传入，功能不受影响），留待拆分批次随 Rust 文档更新
 - **ci.yml 新增 go-differential job（2026-08-12）**：Go 差分 gate 进 CI——
   `go-differential`（拆分前母仓 ci.yml:344-375；六仓拆分 2d7494f 后归
