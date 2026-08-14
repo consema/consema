@@ -26,16 +26,16 @@ Get-FileHash <repo>\conformance\README.md,<repo>\conformance\oracles\plist-macos
 
 | 仓 | conformance/README.md（sha256） | conformance/oracles/plist-macos-v1/README.md（sha256） |
 |---|---|---|
-| consema（母仓，权威原文） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `fbb6ec6c6bd50f2732e100fe686c97aceb296c42ed3bf29933da66253a7f143b` |
-| consema-rs（变体形态） | `5ce76328aab62b0930fbdcc90c9680ad0b5c046bfe5c3c67c1b551a8b53429fa` | `263c9f92afd08c29507de6cd7b670c91ac8ba3cd5e4af68dd42ef40551dd7b4a` |
-| consema-go（逐字节副本） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `fbb6ec6c6bd50f2732e100fe686c97aceb296c42ed3bf29933da66253a7f143b` |
-| consema-ts（逐字节副本） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `fbb6ec6c6bd50f2732e100fe686c97aceb296c42ed3bf29933da66253a7f143b` |
-| consema-py（逐字节副本） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `fbb6ec6c6bd50f2732e100fe686c97aceb296c42ed3bf29933da66253a7f143b` |
-| consema-kt（逐字节副本） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `fbb6ec6c6bd50f2732e100fe686c97aceb296c42ed3bf29933da66253a7f143b` |
+| consema（母仓，权威原文） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema-rs（变体形态） | `5ce76328aab62b0930fbdcc90c9680ad0b5c046bfe5c3c67c1b551a8b53429fa` | `8c23f8d8a69fb48074bd7b1a1f5ba9a066890d3cef415d78ff5bba8e578ff05e` |
+| consema-go（逐字节副本） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema-ts（逐字节副本） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema-py（逐字节副本） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema-kt（逐字节副本） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
 
-- 母仓行记录权威内容 hash（即本表写入前的内容）：比对命令对母仓以 `git show 1218190:conformance/README.md` 与 `git show ef8d583:conformance/oracles/plist-macos-v1/README.md` 为准；对五仓以当前文件直接比对。
-- go/ts/py/kt 的 `/conformance/` 为 gitignored provisioned 数据（CI 自母仓 checkout provision，见各仓 .gitignore 注释与 py `.github/actions/provision-conformance/action.yml`），re-vendor 更新其本地盘副本，无提交；rs 的 re-vendor 提交为 `804c2e4`。
-- 母仓权威修正提交：`564c1f1`（本文件 (a)/(b)/(c) + 注记）、`ef8d583`（plist README 如实化）、`1218190`（注记中性化，re-vendor 基准）。
+- 母仓行记录权威内容 hash（即本表写入前的内容）：比对命令对母仓以 `git show 1218190:conformance/README.md` 与 `git show 9d096a9:conformance/oracles/plist-macos-v1/README.md` 为准；对五仓以当前文件直接比对。
+- go/ts/py/kt 的 `/conformance/` 为 gitignored provisioned 数据（CI 自母仓 checkout provision，见各仓 .gitignore 注释与 py `.github/actions/provision-conformance/action.yml`），re-vendor 更新其本地盘副本，无提交；rs 的 re-vendor 提交为 `804c2e4`、plist README 复修同步为 `2deb075`。
+- 母仓权威修正提交：`564c1f1`（本文件 (a)/(b)/(c) + 注记）、`ef8d583`（plist README 如实化）、`1218190`（注记中性化，re-vendor 基准）、`9d096a9`（plist README 溯源括注去旧声称字面量）。
 
 本目录保存跨语言可复放的行为契约。向量只使用 strict JSON，二进制位模式、任意精度数字和 wire 结果使用字符串表示，避免宿主语言的数值模型改变预期事实。
 
