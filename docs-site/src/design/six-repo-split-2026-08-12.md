@@ -78,7 +78,7 @@
 - **`conformance/` 为单一语言无关权威**（本仓维护、五仓共享）：`vectors/` 18 套 suite 519 cases（聚合 digest `cfd6e296…`；P2-B 补强 2026-08-12 取代） + `fixtures/`（真实夹具；**`fixtures/toml/Cargo.toml` 于 `943c014` 归位**为 `toml.corpus.cargo-manifest` 的单一权威）+ `oracles/`（固定 runtime oracle：hcl-go-v1、plist-macos-v1 等，manifest 记录 runtime 固定事实与 documented skip_path）+ `corpora/`（mutation 语料）+ `differential/`（跨语言差分 case 集单一权威：`cases.json` byte-parity 68 / `normalized/cases.json` 108 / `protocol-exchange/cases.json` 83，由 `00c850d` 迁入）。
 - **五仓 CI provision 机制（如实）**：consema-rs 以 conformance vendor 快照 + 计数钉为机制（vendored `conformance/` 快照入仓，CI 与本地同源；权威仍在母仓，ci.yml 头注释明示）；go/ts/py/kt 四仓经 `repository: consema/consema` 多仓 checkout 从母仓 `conformance/` 取数（vectors / fixtures / oracles / differential case 集）；差分方向需要时另 checkout `consema/consema-rs`（各仓 ci-*.yml 实测）。
 - **母仓 CI 只跑自有门禁**（`.github/workflows/ci.yml`，`2d7494f` 重建）：三 job——`oracles`（3 OS 矩阵，exit 3 = documented skip = success）+ `shared-conformance-digest`（复算 `conformance/vectors/` 聚合 digest 并断言等于冻结记录 `cfd6e296…`，519 冻结的常设执行者）+ `check`（聚合门禁，`if: always()` + toJSON(needs)，分支保护唯一 required check）。
-- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 必须同步全部五个语言仓并更新聚合 digest 与 18/519 计数（README 声明；未同步仅 consema-go 仓（live HEAD 跟随）会以 conformance gate 与 digest 断言失败——ts/kt/py 三仓 CI 钉定 commit ad667021、consema-rs 为 vendored 快照，均不自动跟随）。
+- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 必须同步全部五个语言仓并更新聚合 digest 与 18/519 计数（README 声明；未同步变更在钉定移动前不会被语言仓 CI 自动捕获——go/ts/kt/py 四仓 CI 钉定 commit 096e5f8（2026-08-14 对抗审计波 2 修复，与旧钉同 cfd6e296 digest）、consema-rs 为 vendored 快照，均不自动跟随）。
 
 ## 7. fuzz 驱动迁移
 

@@ -70,9 +70,10 @@ TOML、YAML、INI、Java Properties、XML、Property List 与 HCL 八个格式�
    变更是五仓同步事件**：必须同步五个语言仓并更新聚合 digest 与 18/519
    计数（聚合 digest
    `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`，见
-   README「Conformance 权威声明」），否则仅 consema-go 仓（live HEAD 跟随）
-   conformance 门禁与 digest 断言失败（consema-ts/consema-kt/consema-py 钉定
-   commit ad667021、consema-rs 为 vendored 快照，均不自动跟随）。
+   README「Conformance 权威声明」），否则在钉定移动前语言仓 CI 不会自动捕获
+   （consema-go/consema-ts/consema-kt/consema-py 四仓钉定 commit 096e5f8
+   （2026-08-14 对抗审计波 2 修复，与旧钉同 cfd6e296 digest）、consema-rs 为
+   vendored 快照，均不自动跟随）。
 4. **PR**：标题遵循提交规范；确保 CI 全绿（含 pr-labels.yml 的 kind 标签
    门禁）。
 5. **评审**：至少一位维护者 approve；契约变更需在 PR 中记录 RFC 关联。
