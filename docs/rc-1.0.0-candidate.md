@@ -62,7 +62,7 @@
   （178.9%）、ini 124.8h（173.3%）、hcl 95.5h（132.7%）、json 95.3h（132.3%）五单位已过 72h
   门槛；toml 57.7h、protocol-decode 50.7h、plist 47.4h、xml 35.0h 继续累计；122,478 文件行含表头）**
   = C-2（其余单位 72h 门槛仍开放，继续累计）；Go fuzz targets clean-run 记录已有
-  （2026-08-10，consema-go/go/README.md:674-727：16 targets 各 30s，零 panic/hang/limit bypass）。⏳
+  （2026-08-10，consema-go/go/README.md targets 各 30s，零 panic/hang/limit bypass）。⏳
 - 无未解决 P0/P1：当前 0。✓
 - 无未接受 critical/high dependency vulnerability：deny/audit 门禁。✓
 - XML/YAML/HCL/binary plist 专项 threat tests：Rust security matrix + Go
@@ -245,7 +245,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 - 双语言 differential corpus 追加运行 → 四 harness 已复跑（P2-7，
   83/83+108/108+68/68；追加 corpus 待 C-2 关账后随收口执行）
 - Go 侧 release-candidate fuzz clean-run 记录 → 已有（2026-08-10，
-  consema-go/go/README.md:674-727，16 targets 30s）
+  consema-go/go/README.md targets 30s）
 - 每格式真实 corpus 抽检巡检 → **已完成**（2026-08-10：钉版 12 文件 digest 12/12
   一致；508 核对一致（增补前——2026-08-12 P2-B 向量补强至 519 后该计数为
   519，fc-manifest-0.13.0.json:37-39）；regressions 空数组符合预期；
@@ -264,7 +264,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
   由 verify 脚本/签名步骤保证）；脚本须从原生 PowerShell 运行（GNU tar 会
   误报 Windows 路径）；与 fuzz 共享 cargo 锁时机械步骤约 40 分钟
 - coverage -Trend 平台差处置 → 入库基线 86.51/82.82/87.91 为 Windows 本机
-  测得（docs/COVERAGE-0.13.0.md:33、68），CI coverage job 在 ubuntu 测，
+  测得（docs/COVERAGE-0.13.0.md），CI coverage job 在 ubuntu 测，
   跨平台差 >1.0pp 时 C-1 首跑可能 -Trend 首红。处置：若红，按脚本政策在
   ubuntu 等效环境刷新入库报告并附处置记录（release 里程碑刷新许可，
   coverage.ps1 的「趋势门禁」政策段，行号可能漂移，以锚为准）；不阻塞 C-1 推入（实测：run #5 coverage job 全绿，未触发
@@ -300,7 +300,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
    consema-go/go/pilot/pilot_test.go:157-170 的 12 文件注册一致，接受；
 2. vectors/toml-v1.json 的 toml.corpus.cargo-manifest fixture 路径为裸
    `"Cargo.toml"`（仓库根，非 fixtures 下），Rust runner 用 include_bytes! 解析
-   （consema-rs/consema-conformance/src/toml_v1.rs:27）——Go runner 落地时需继承同一
+   （consema-rs/consema-conformance/src/toml_v1.rs）——Go runner 落地时需继承同一
    解析约定；
 3. 仅 json5/ 目录无独立 README（其余 8 家族有；toml/ 的 README 自 943c014 起存在）
    ——来源声明由 conformance/README 与 corpora 元数据承担，体例不一致可接受；

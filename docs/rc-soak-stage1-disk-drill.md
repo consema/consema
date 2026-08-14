@@ -16,9 +16,9 @@
 
 - 目标：真实磁盘满（ENOSPC）条件下 `consema apply` 的**失败分类**与**恢复语义**证据。
   - 失败分类：exit 4（precondition 类，RFC 0015 §5.1 表：permission/disk failures
-    列于 precondition；`cli.write.io@1` → 4，`consema-protocol/src/exit_class.rs:254,267`）；
+    列于 precondition；`cli.write.io@1` → 4，`consema-protocol/src/exit_class.rs`）；
     逐文件 failed 条目携带 `failure_code: cli.write.io@1`（诊断注册表 §13.1；
-    `cli_plan_apply.rs` 注入 seam 实测同码，`consema-rs/consema/tests/cli_plan_apply.rs:616-624`）。
+    `cli_plan_apply.rs` 注入 seam 实测同码，`consema-rs/consema/tests/cli_plan_apply.rs`）。
   - 恢复语义：释放空间后**同一 plan manifest** 重跑 apply → exit 0，全部 completed；
     证明批处理可恢复性 = manifest 状态机可重跑（RFC 0015 §10），与演练 4
     （部分权限失败）的结论并列：拒绝/失败是逐文件原子的、批处理无整体原子性，

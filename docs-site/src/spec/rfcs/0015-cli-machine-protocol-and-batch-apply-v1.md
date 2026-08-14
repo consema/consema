@@ -130,20 +130,20 @@ All registered contracts and envelope payloads are fixed-field
 `PortableValue` trees carried by the existing dual transports:
 
 - canonical JSON: `encode_json`/`decode_json`
-  (`consema-rs/consema-protocol/src/value_transport.rs:11-75`), outer envelope
+  (`consema-rs/consema-protocol/src/value_transport.rs`), outer envelope
   fixed as `{"schema":"core.portable-value-json@1","value":...}`; objects
   are ordered `entries` arrays `[{key, value}]`; integers are stringified;
   Bytes are lowercase hex; unknown/missing/reordered fields, non-canonical
   representations, and whitespace are strictly rejected; the decoded value
   must re-encode to the exact input bytes.
-- PVCE/1: `encode_pvce`/`decode_pvce` (`value_transport.rs:77-112`),
+- PVCE/1: `encode_pvce`/`decode_pvce` (`value_transport.rs`),
   rejecting non-canonical varints and integers.
 - The two transports are equivalent within the semantic model: the
   dual-transport bytes of one `PortableValue` are proven by the
   `consema.cli.conformance@1` vectors (Section 16).
 
 The envelope follows the existing envelope discipline
-(`consema-rs/consema-protocol/src/contract.rs:356-460`): the payload object's
+(`consema-rs/consema-protocol/src/contract.rs`): the payload object's
 first field must be `schema` with a value equal to `(id@version)`;
 dispatch keys on the exact `(contract.id, contract.version)` pair and never
 selects a version from field content (RFC 0011 Section 11).
@@ -254,7 +254,7 @@ The `core.cli-output@1` typed decoder revalidates cross-constraints:
 - every `diagnostics` item strictly decodes as `core.diagnostic@1`
   (codes validated under `ErrorCodeRegistry::v7()`);
 - `ProtocolLimits` apply throughout
-  (`consema-rs/consema-protocol/src/limits.rs:5-31`).
+  (`consema-rs/consema-protocol/src/limits.rs`).
 
 ### 4.4 Normative example (canonical JSON bytes)
 
@@ -360,7 +360,7 @@ SIGINT (Ctrl+C) and SIGTERM trigger graceful shutdown:
 | inspect | `cli.inspect@1` | file facts + detection facts + optional parse facts (Section 7) |
 | capabilities | `cli.capabilities@1` | capability inventory (all data derived from facade types; never redeclared) |
 | query | existing query-result record | `core.query-result@1`, or `core.ini-query-result@1`/`core.java-properties-query-result@1`/`core.yaml-query-result@1`/`core.graph-query-result@1` (by domain) |
-| project | `core.projection-result@1` record | its `report`/`provenance` fields already embed the report and provenance (protocol projection.rs:616-634); no wrapper needed |
+| project | `core.projection-result@1` record | its `report`/`provenance` fields already embed the report and provenance (protocol projection.rs); no wrapper needed |
 | materialize | `core.materialization-result@2` record | Complete embeds `core.source-snapshot@2`; Failed carries failure/report/analyzed_input_paths |
 | convert | `cli.convert@1` | `{ schema, report: core.conversion-report@1, target: core.source-snapshot@2 }` |
 | edit | `cli.edit@1` | `{ schema, plan: core.edit-plan@1, change_set: core.change-set@1, committed: Boolean }`; dry-run by default (`committed=false`), `true` under `--write` |
@@ -877,7 +877,7 @@ core.batch-result@1
   for the json Recovered-document gate, so the live v7 registry holds 187
   codes — the frozen Section 13.1 list is unchanged).
 - `RegistryManifest::v7()`; `current()` points to v7 (precedent:
-  registry_manifest.rs:77-78).
+  registry_manifest.rs).
 - Old registries reject every new contract and code (RFC 0011 Section 10);
   the v1-v6 frozen-assertion tests are reused (implementation plan M2
   acceptance gate).

@@ -14,7 +14,7 @@
 | CPU | 13th Gen Intel(R) Core(TM) i9-13900HX（24 physical / 32 logical cores） |
 | OS | Microsoft Windows 11 Pro 10.0.26200 |
 | 工具链 | rustc 1.97.1 (8bab26f4f 2026-07-14) stable-x86_64-pc-windows-msvc；cargo 1.97.1 |
-| clang | 未安装（MSVC-only）——libfuzzer-sys 的 C++ runtime 无法链接，`cargo fuzz run` 在本机不可用（cargo-fuzz 0.13.2 已安装但每个 target 都需要 clang runtime；fuzz.rs:10-13 与 consema-rs 的 `consema-*/fuzz/README.md`（拆分前 `crates/*/fuzz/README.md`）同述） |
+| clang | 未安装（MSVC-only）——libfuzzer-sys 的 C++ runtime 无法链接，`cargo fuzz run` 在本机不可用（cargo-fuzz 0.13.2 已安装但每个 target 都需要 clang runtime；fuzz.rs 与 consema-rs 的 `consema-*/fuzz/README.md`（拆分前 `crates/*/fuzz/README.md`）同述） |
 | 仓库 HEAD | 7e9de3825c74b9ee981bdf2d0a9316cdb1b0fd40（clean：M2 修复与语料已随 0.13.0 落地 commit 094f5d1/7e9de38 入库；会话期代码状态见 §5） |
 
 ## 2. 目标清单与迭代常数
@@ -158,7 +158,7 @@
 
 修复 agent 与本会话并行落地（未提交，工作树状态）：
 
-- **M2-F1（json Recovered gate）**：修复已落地——consema-rs 的 `consema-json/src/projection.rs`（拆分前 `crates/consema-json/src/projection.rs`；`ProjectionFailure::RecoveredDocument`，recovered 文档在 `Document::project` 入口被拒）与 consema-rs 的 `consema-json/src/edit.rs`（拆分前 `crates/consema-json/src/edit.rs`；`EditFailure::RecoveredDocument`，`commit` 入口被拒）；驱动中的计数豁免已移除，恢复严格断言（consema-rs 的 `consema-conformance/tests/operation_fuzz.rs:123` 注释"Finding M2-F1 fixed"）。
+- **M2-F1（json Recovered gate）**：修复已落地——consema-rs 的 `consema-json/src/projection.rs`（拆分前 `crates/consema-json/src/projection.rs`；`ProjectionFailure::RecoveredDocument`，recovered 文档在 `Document::project` 入口被拒）与 consema-rs 的 `consema-json/src/edit.rs`（拆分前 `crates/consema-json/src/edit.rs`；`EditFailure::RecoveredDocument`，`commit` 入口被拒）；驱动中的计数豁免已移除，恢复严格断言（consema-rs 的 `consema-conformance/tests/operation_fuzz.rs` 注释"Finding M2-F1 fixed"）。
 - **M2-F2（yaml 引号 `"~"` 内容丢失）**：修复已落地——consema-rs 的 `consema-yaml/src/native.rs`（拆分前 `crates/consema-yaml/src/native.rs`）`exact_empty_scalar` 仅对 plain 样式重写空占位；`tests/property_graph.rs` 改为 trip-wire（fixed 注释，见第 20-34 行）。
 - 本会话每波构建的二进制因此覆盖了"修复前最后一次旧状态（session 7 部分）→ 严格断言新状态"的多个代码快照；tree-hash 行逐波记录。
 
@@ -166,7 +166,7 @@
 
 | ID | target | 描述 | 分级 | 时钟 | 状态（2026-08-07 会话） |
 |---|---|---|---|---|---|
-| M2-F1 | json project/edit | Recovered 文档被 project/edit 接受（错误完成状态） | P1 | 不清零（已知发现，计数器/断言跟踪） | 修复已落地工作树（projection.rs / edit.rs 的 RecoveredDocument 门）；驱动豁免已移除，严格断言生效（operation_fuzz.rs:123） |
+| M2-F1 | json project/edit | Recovered 文档被 project/edit 接受（错误完成状态） | P1 | 不清零（已知发现，计数器/断言跟踪） | 修复已落地工作树（projection.rs / edit.rs 的 RecoveredDocument 门）；驱动豁免已移除，严格断言生效（operation_fuzz.rs） |
 | M2-F2 | yaml native decode | 引号 `"~"` 解码为空（引号标量静默内容丢失） | P0（§18.4 静默损失） | 不清零（已知发现，trip-wire 跟踪） | 修复已落地工作树（native.rs `exact_empty_scalar` 仅 plain 样式重写）；trip-wire 生效（property_graph.rs） |
 | 本日会话（session 7-11） | 全部 17 target | 无新 crash/panic/hang/limit bypass；3281 行账本中 3271 行 exit 0、10 行 exit=-1（session 9 wave 3 外部终止，已分类非 fuzz finding，见 §3.1） | — | 全部 running（clean） | 账本见 §3.2 |
 

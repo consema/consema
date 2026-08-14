@@ -21,7 +21,7 @@
 - CI 常设 `msrv` job 在 1.85.0 上运行与 stable 相同的全部测试矩阵
   （`docs/0.13.0-gate-plan.md` M1；consema-rs/.github/workflows/ci.yml）；
   发布门禁同时在 current stable 与 MSRV 上通过 `--all-targets --all-features`
-  构建（根 CHANGELOG.md:119：Rust 1.97.1 与 MSRV 1.85.0 双腿）。
+  构建（根 CHANGELOG.md：Rust 1.97.1 与 MSRV 1.85.0 双腿）。
 
 政策：
 
@@ -36,7 +36,7 @@
   使用高于 MSRV 语法的代码（如 let-chains）在合入前必须被 msrv job 拦截
   （gate-plan §4 M1 验证记录已实测拦截行为）。
 - **示例**：当前发布基线 = MSRV 1.85（0.8.0 起声明）+ 验证工具链
-  Rust 1.97.1（根 CHANGELOG.md:116；冻结记录 fc-manifest-0.13.0.json
+  Rust 1.97.1（根 CHANGELOG.md；冻结记录 fc-manifest-0.13.0.json
   `rust_compiler_msrv`）。
 
 ## 2. Go version window
@@ -120,7 +120,7 @@ Kotlin 实现（`dev.consema:consema-kotlin`，consema-kt 仓）随五语言同�
 - 发布物验证基线记录在 `scripts/verify-package-archives.ps1`（路径安全、
   校验和、解包内容、MSRV 腿）。
 - CLI 平台相关行为（Windows read-only/ACL、POSIX 权限、symlink policy、
-  临时文件权限）在正式目标上逐平台验证（RFC 0015 §9.6 与根 CHANGELOG.md:46
+  临时文件权限）在正式目标上逐平台验证（RFC 0015 §9.6 与根 CHANGELOG.md
   的三平台 CI/跨平台边界记录；0.13.0 收口 Linux/macOS 全量验证）。
 
 ## 7. 安全修复政策
@@ -141,8 +141,8 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
   修复进下一个 minor，高危 P2 可经评审进入 patch。
 - **无未接受 critical/high 依赖漏洞**：RustSec `cargo audit`（本地 1,189
   advisory / 0 漏洞，2026-08-07）与 `cargo deny check` 四段为常设门禁
-  （SECURITY.md:38）；上游公告跟踪属于 §19.3 依赖政策。
-- **resource limit 与截断**：任何 limit 失败不伪装成功（SECURITY.md:3-14），
+  （SECURITY.md）；上游公告跟踪属于 §19.3 依赖政策。
+- **resource limit 与截断**：任何 limit 失败不伪装成功（SECURITY.md），
   修复不得引入截断假成功。
 - **披露流程**：安全缺陷先于公开经私有渠道披露；`1.0.0` 前在仓库
   `SECURITY.md` 冻结披露联系邮箱与 PGP key（§19.4 要求
@@ -223,14 +223,14 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 
 | 本政策条目 | 门禁/证据 |
 |---|---|
-| MSRV 1.85 | consema-rs/Cargo.toml:33；consema-rs CI msrv job；根 CHANGELOG.md:119 |
+| MSRV 1.85 | consema-rs/Cargo.toml:33；consema-rs CI msrv job；根 CHANGELOG.md |
 | TS 最低版本 | consema-ts/typescript/package.json 的 `engines` 字段（>= 26）；CI 钉 26.7.0 |
 | Python 最低版本 | consema-py/python/pyproject.toml:21（requires-python >= 3.12）；CI 钉 '3.12.x' |
 | Kotlin 最低版本 | consema-kt/kotlin/build.gradle.kts 的 Kotlin 版本与 `jvmToolchain` 字段（Kotlin 2.2.0 + JVM 17）；CI Temurin 17 |
 | 三平台 | CI 矩阵（gate-plan M1）；BENCHMARKS-0.12.0.md Environment |
-| 缺陷等级 P0-P3 | 路线图 §18.4；SECURITY.md:16 硬化套件 |
-| audit/deny 常设 | SECURITY.md:38；gate-plan P-3/P-4 |
-| contract 冻结 | IMPLEMENTATION.md 第 12 章；README.md:48、56（fc-manifest 与 conformance 清单行） |
+| 缺陷等级 P0-P3 | 路线图 §18.4；SECURITY.md 硬化套件 |
+| audit/deny 常设 | SECURITY.md；gate-plan P-3/P-4 |
+| contract 冻结 | IMPLEMENTATION.md 第 12 章；README.md（fc-manifest 与 conformance 清单行） |
 | exit code 冻结 | RFC 0015 §5.3；cookbook 第 11 节 |
 | 发布供应链（含披露联系方式） | 路线图 §19.4；gate-plan M7 |
 

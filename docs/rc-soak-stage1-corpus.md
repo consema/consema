@@ -3,7 +3,7 @@
 - 依据：`docs/rc-1.0.0-candidate.md` §4 阶段 1（"每格式真实 corpus 抽检巡检
   §22.7"）与 §4.1（2026-08-10 已完成一轮：钉版 12 文件 digest 12/12 一致；
   508 核对一致（增补前——2026-08-12 P2-B 向量补强至 519 后该计数为 519）；regressions 空数组符合预期；9 家族来源与覆盖足够；4 条观察见
-  §4.2）与 §4.2（巡检观察记录体例）；`docs/five-element-review-1.0.0.md:63`
+  §4.2）与 §4.2（巡检观察记录体例）；`docs/five-element-review-1.0.0.md`
   （钉版 corpus 12 文件，digest 登记）；`docs/pilot-go-0.19.0.md` §1（语料登记表）。
 - 目标：RC soak 阶段对真实 corpus 的**抽检巡检**——四类核对（钉版 digest /
   519 计数 / regressions / 家族来源覆盖）+ 观察记录（P2 级，照 rc-candidate §4.2
@@ -17,7 +17,7 @@
 | 1 | 钉版 12 文件 digest 核对（fixtures 层真实语料） | pilot-go-0.19.0.md §1 语料登记表（16 位 sha256 前缀 + 字节数） |
 | 2 | 519 计数核对（18 套向量 + 聚合 digest） | fc-manifest-0.13.0.json `digests.conformance_suite`（suites=18 / cases=519 / aggregate_sha256=`cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`）；conformance/README.md 的 18 套 suite 清单段（合计 519 个 case） |
 | 3 | regressions 检查（fuzz 回归输入数组） | conformance/corpora/mutation-v1.json `regressions`（空数组符合预期；新增条目必须可追溯） |
-| 4 | 9 家族来源与覆盖 | conformance/fixtures/ 九目录 + 各家族 README 来源/许可证声明（conformance/README.md:35-43 夹具清单——hcl/plist/xml 三家已补全） |
+| 4 | 9 家族来源与覆盖 | conformance/fixtures/ 九目录 + 各家族 README 来源/许可证声明（conformance/README.md 夹具清单——hcl/plist/xml 三家已补全） |
 
 ## 2. 命令清单（在母仓检出执行）
 
@@ -101,7 +101,7 @@ $m = Get-Content 'conformance\corpora\mutation-v1.json' -Raw -Encoding UTF8 | Co
 ```powershell
 Get-ChildItem 'conformance\fixtures' -Directory | Select-Object -ExpandProperty Name
 # 各家族 README（hcl/ini/json5/plist/properties/real-world/toml/xml/yaml）
-# 的来源/许可证声明抽查（conformance/README.md:35-43 夹具清单）
+# 的来源/许可证声明抽查（conformance/README.md 夹具清单）
 ```
 
 预期：`real-world json5 toml yaml ini properties xml plist hcl` 九目录齐备。

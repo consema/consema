@@ -143,8 +143,8 @@ CLI 默认脱敏（保守键名模式）：human 视图与 plan 视图的 `passw
   `docs/0.13.0-gate-plan.md` §4 M4。
 
 〔superseded 注记（1.0.0-rc.1 起）：本节的"未接线"陈述已部分被交付推翻——
-java-properties 源的 project/convert 已随 B-6 修复接线（project_cmd.rs:70-73
-族前缀特判）、xml/plist/hcl 便携域查询已随 query_cmd.rs:553-557 分派接线
+java-properties 源的 project/convert 已随 B-6 修复接线（project_cmd.rs
+族前缀特判）、xml/plist/hcl 便携域查询已随 query_cmd.rs 分派接线
 （conformance 0 skipped 全绿）；其余项（provenance map、非 INI edit 词表、
 `edit --write`）仍为 0.12.0-0.13.0 时点边界，随 API 评审 backlog 跟踪。〕
 

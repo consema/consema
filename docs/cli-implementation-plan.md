@@ -18,7 +18,7 @@
 ### 0.1 现状核查（本计划调研结论）
 
 - **仓库中不存在任何 CLI 代码**：`crates/*/src/bin/` 仅有 `crates/consema-conformance/src/bin/` 下两个上游 suite 测试适配器（`consema-toml-test-decoder.rs`、`consema-yaml-test-adapter.rs`），不是产品 CLI；全 workspace 无 `main.rs`、无 `[[bin]]`、无 clap/structopt 等参数解析依赖。
-- `crates/consema` 是 lib-only 可发布 facade crate（`crates/consema/Cargo.toml`），`pub use` 全部 13 个 backend crate 并通过 `Document::parse_*`/`as_*` 与 `convert_*` 提供统一语义入口（`crates/consema/src/lib.rs:12-24`、`conversion.rs:317-560`）。
+- `crates/consema` 是 lib-only 可发布 facade crate（`crates/consema/Cargo.toml`），`pub use` 全部 13 个 backend crate 并通过 `Document::parse_*`/`as_*` 与 `convert_*` 提供统一语义入口（`crates/consema/src/lib.rs`、`conversion.rs`）。
 - 仓库无 `.github/`：CI 是本地门禁（`scripts/verify-package-archives.ps1` 打包验证 + 各 oracle 脚本 + cargo 门禁）。
 - 依赖政策：`deny.toml` 的 `[sources]` 仅 crates.io 钉版、`[bans]` 禁多版本/通配；workspace 只钉版 7 个直接依赖（`Cargo.toml:21-28`）。CLI 计划因此**零新外部依赖**（§5）。
 - `docs/IMPLEMENTATION.md` §13（0.8.0 明确边界，第 451-453 行）明示"文件系统原子替换"未实现——0.12.0 是首次实现文件系统写入的版本，且按路线图 §6（第 497-508 行）只属于 CLI/application 层，不得塞回 Document 核心。
@@ -107,10 +107,10 @@ bin 绝不直接依赖任何 backend crate（硬门禁 1）
 
 | 共享件 | 复用方式 | 备注 |
 |---|---|---|
-| `consema::Document`（facade） | 直接复用 | `parse_*`/`as_*`/`render`/`profile`/`formation_status`/`diagnostics`/`snapshot_identity`（lib.rs:70-355），全部格式的同一语义入口 |
-| `consema::convert_*`（8 个） | 直接复用 | 跨格式转换的组合层（conversion.rs:317-560），CLI convert 命令的整个实现 |
-| `consema::protocol` 全部既有 payload | 直接复用 | QueryResultMessage/ProjectionResultMessage/MaterializationResultMessage/ConversionReportMessage/EditPlanMessage/SourceSnapshotMessage/SourcePatchMessage/Completion/DiagnosticMessage（protocol lib.rs:33-80）——CLI 机器输出直接包装这些消息 |
-| `ProtocolMessage::to_json/to_pvce`、`encode_json/decode_json`、`encode_pvce/decode_pvce` | 直接复用 | canonical JSON 与 PVCE/1 双传输（protocol value_transport.rs:11-95）；机器输出与请求输入的传输层 |
+| `consema::Document`（facade） | 直接复用 | `parse_*`/`as_*`/`render`/`profile`/`formation_status`/`diagnostics`/`snapshot_identity`（lib.rs），全部格式的同一语义入口 |
+| `consema::convert_*`（8 个） | 直接复用 | 跨格式转换的组合层（conversion.rs），CLI convert 命令的整个实现 |
+| `consema::protocol` 全部既有 payload | 直接复用 | QueryResultMessage/ProjectionResultMessage/MaterializationResultMessage/ConversionReportMessage/EditPlanMessage/SourceSnapshotMessage/SourcePatchMessage/Completion/DiagnosticMessage（protocol lib.rs）——CLI 机器输出直接包装这些消息 |
+| `ProtocolMessage::to_json/to_pvce`、`encode_json/decode_json`、`encode_pvce/decode_pvce` | 直接复用 | canonical JSON 与 PVCE/1 双传输（protocol value_transport.rs）；机器输出与请求输入的传输层 |
 | `core.query-definition@1` | 直接复用 | query 命令的请求输入（IMPLEMENTATION.md 第 257 行：固定字段 PortableValue schema + PVCE/1 传输）；`query_definition_message`/`query_definition_from_message`（protocol query.rs） |
 | `ProjectionRequestMessage` / `MaterializationRequestMessage(V2)` | 直接复用 | project/materialize 命令的请求输入（protocol projection.rs、materialization.rs） |
 | `ContractRegistry` / `ErrorCodeRegistry` / `RegistryManifest` / `ProfileDescriptor` / `CapabilityDeclaration` | 直接复用 | capabilities/explain 命令与 registry.rs 的数据源（protocol contract.rs、registry.rs、registry_manifest.rs） |
@@ -126,7 +126,7 @@ bin 绝不直接依赖任何 backend crate（硬门禁 1）
 | `ContractRegistry` | 新增 `v7()`：38 条 v6 记录保持不变，追加 CLI 稳定 payload 契约（候选：`core.cli-output@1`、`core.batch-plan@1`、`core.batch-result@1`，最终名单由 RFC 0015 冻结） |
 | `ErrorCodeRegistry` | 新增 `v7()`：v6 的 166 条冻结不变，追加 `cli.*` 错误族（usage/data/limit/precondition/interrupted 类，命名模式 §2.3） |
 | `RegistryManifest` | `current()` 指向 v7（v6 先例：IMPLEMENTATION.md 第 443-445 行） |
-| `ConversionReport` 的 `protocol_report`/`protocol_materialization_result` | 直接复用（conversion.rs:137-248），CLI 机器输出不需重复实现两阶段报告外部化 |
+| `ConversionReport` 的 `protocol_report`/`protocol_materialization_result` | 直接复用（conversion.rs），CLI 机器输出不需重复实现两阶段报告外部化 |
 | facade public API | 按需小增：若 CLI 需要统一的格式枚举/查询域清单入口而 facade 未暴露，在 facade 补薄层（M4/M10 评审），**不改写既有 API** |
 
 v7 是 additive：v1-v6 的 contract/error arrays、manifest 与 frozen constructors 精确不变（v4/v5/v6 先例，IMPLEMENTATION.md 第 365-377 行）。HCL 计划预留的"`core.hcl-query-result@1` 留给后续 semantic-model 版本"（hcl-implementation-plan.md §1.2）与 v7 不冲突：CLI payload 在 v7 先行，格式级 wire 契约仍按各自 RFC 排期。
@@ -213,7 +213,7 @@ core.cli-output@1（固定字段 PortableValue，双传输）：
 `registry.rs` 是**facade 既有类型的薄枚举**，不是新 registry：
 
 - 格式家族：8 个 `FormatFamilyId`（`consema-core`）；
-- Profile：`consema::document::ProfileId` 的 id 清单（`ini.portable`、`java-properties.reader`、`xml.1.0-safe`、`plist.xml`、`hcl.native` 等，全部来自 facade/backend 既有常量，lib.rs:12-24 再导出）；
+- Profile：`consema::document::ProfileId` 的 id 清单（`ini.portable`、`java-properties.reader`、`xml.1.0-safe`、`plist.xml`、`hcl.native` 等，全部来自 facade/backend 既有常量，lib.rs 再导出）；
 - 查询域：`QueryDomain` 既有构造器清单；
 - 操作：各格式 `format_operation_registry()` 描述符；
 - 错误码：`ErrorCodeRegistry::v7()` 清单 + 各格式本地 code 常量清单。
@@ -298,7 +298,7 @@ files: [{ path, status: completed | failed | pending | skipped-stale,
 
 ### 5.2 机器 JSON 输出：复用 protocol 传输 + 自写缩进渲染（推荐）
 
-- 传输编码复用 `encode_json`/`encode_pvce`（canonical，protocol value_transport.rs:11-95）——**绝不引入 serde_json**（其宽松 JSON 语义与仓库 canonical JSON 纪律冲突）。
+- 传输编码复用 `encode_json`/`encode_pvce`（canonical，protocol value_transport.rs）——**绝不引入 serde_json**（其宽松 JSON 语义与仓库 canonical JSON 纪律冲突）。
 - 人类友好的缩进 JSON（`--json --pretty`）：自写确定性缩进器（~100 行），只对 canonical JSON 字节做纯格式化，不做解析重排——保持字节确定性（canonical 语义不变，仅空白）。
 
 ### 5.3 其余新写点（无复用歧义）

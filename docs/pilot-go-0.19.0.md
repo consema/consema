@@ -103,7 +103,7 @@ secret 与个人信息）：
 
 - `main.tf`：`variable "instance_count"` 的 `default = 2`→`default = 4`
   （SetAttributeValue，BodyPath 含 block/labels/occurrence）。`region = var.region`
-  的表达式作为语法事实原样保留（无求值，SECURITY.md:36）；注释与 provider 块
+  的表达式作为语法事实原样保留（无求值，SECURITY.md）；注释与 provider 块
   untouched。
 
 ### 2.6 W6 — JSON ↔ TOML、JSON ↔ YAML 等可表示组合的 audited conversion

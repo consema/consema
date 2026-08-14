@@ -68,7 +68,7 @@ go test -fuzz='^FuzzParseBinary$'     -fuzztime=30s ./plist/
 go test -fuzz='^FuzzParse$'           -fuzztime=30s ./hcl/
 ```
 
-注意（go/README.md:653）：**锚定正则必须带 `^` `$`**——裸
+注意（go/README.md）：**锚定正则必须带 `^` `$`**——裸
 `-fuzz=FuzzParse` 会匹配所有 `FuzzParse` 前缀 target 并拒绝运行。
 
 ## 4. 预期断言

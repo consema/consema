@@ -74,7 +74,7 @@ cd go
 go test -bench=. -benchtime=1s ./json/ ./toml/ ./yaml/ ./ini/ ./properties/ ./xml/ ./plist/ ./hcl/
 ```
 
-- **无冻结预算**（go/README.md:761："no frozen budget; that is a Rust-side
+- **无冻结预算**（go/README.md："no frozen budget; that is a Rust-side
   discipline"）——Go 侧只有趋势记录，不触发 §8 门禁；**>10% 回退的判定惯例**
   （2026-08-10 首跑先例）：比值 >1.10 标注"疑似回退（负载状态，需空闲复测确认）"，
   无代码回退结论须附依据（同会话其它项更快/无代码改动/GC 争抢特征）。

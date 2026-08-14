@@ -214,20 +214,20 @@ the unchanged budget upper bounds (not re-measured post-fix):
   **127.5 ms post-fix (~40×)**.
 - **S4** (20,000-element XML inspect): pre-fix 56.6 s (frozen, N=1; an
   independent pre-fix sample measured 96.6 s,
-  `consema-rs/consema-document/src/source.rs:1545`) → **0.105 s post-fix
-  (~920×, source.rs:1545)**.
+  `consema-rs/consema-document/src/source.rs`) → **0.105 s post-fix
+  (~920×, source.rs)**.
 - Root cause of both (and of the pilot F-2 conversion finding, 69.4 s → 1.01 s,
   ~69×, `docs/pilot-0.13.0.md` F-2 resolution): every per-piece span/coordinate
   lookup re-validated the whole UTF-8 source (`raw_byte_at` full-buffer
   `from_utf8` pass) — O(source × pieces) formation. Three fixes, each with
   regression nets: xml `raw_offset` UTF-8 identity shortcut
-  (`consema-rs/consema-xml/src/parser.rs:2027-2052`; linearity net
+  (`consema-rs/consema-xml/src/parser.rs`; linearity net
   `many_small_elements_formation_scales_linearly`, :2842-2878);
   `SourceSnapshot` retains the construction-validated text
-  (`consema-rs/consema-document/src/source.rs:466-509`; net
+  (`consema-rs/consema-document/src/source.rs`; net
   `per_call_coordinate_conversion_does_not_rescan_large_utf8_sources`,
   :1538-1589); yaml `RawByteResolver` single-pass offset walk
-  (`consema-rs/consema-yaml/src/offsets.rs:1-80`; pointwise-equality tests
+  (`consema-rs/consema-yaml/src/offsets.rs`; pointwise-equality tests
   :90-156).
 - **Frozen budgets remain valid upper bounds**: the fixes strictly improve
   performance, so no row of §4/§5/§6/§7 exceeds budget and no §8 item-3
