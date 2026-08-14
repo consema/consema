@@ -111,7 +111,11 @@ jobs:
   # (docs/fc-manifest-0.13.0.json "conformance_suite.aggregate_sha256").
   # A vector added, removed or edited without updating the record fails CI —
   # the standing executor for the language-neutral conformance freeze
-  # (18 suites / 519 cases).
+  # (18 suites / 519 cases). Per R15/W3-38 (2026-08-14) the case count is
+  # asserted too (sum of per-file cases must equal 519, mirroring the
+  # consema-rs release.yml G072 gate shape), so a case added or removed
+  # without updating the record fails CI even when the file count and
+  # digest happen to stay aligned.
   shared-conformance-digest:
     name: conformance vectors aggregate digest (18 suites / 519 cases)
     runs-on: ubuntu-latest
@@ -137,11 +141,21 @@ jobs:
             printf '%s:%s\n' "$name" "$d" >> /tmp/digest-input
           done
           count=$(wc -l < /tmp/digest-input)
+          cases=0
+          for f in "$vector_dir"/*.json; do
+            n=$(python3 -c 'import json,sys; print(len(json.load(open(sys.argv[1]))["cases"]))' "$f")
+            cases=$((cases + n))
+          done
           digest=$(head -c -1 /tmp/digest-input | sha256sum | cut -d' ' -f1)
           echo "suites: $count"
+          echo "cases: $cases"
           echo "aggregate sha256: $digest"
           if [ "$count" -ne 18 ]; then
             echo "::error::suite-count mismatch: expected 18 vector files, got $count"
+            exit 1
+          fi
+          if [ "$cases" -ne 519 ]; then
+            echo "::error::case-count mismatch: expected 519 cases, got $cases"
             exit 1
           fi
           if [ "$digest" != "$expected" ]; then
