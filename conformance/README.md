@@ -1,5 +1,27 @@
 # Consema 语言无关 Conformance Suites
 
+## Vendored 同步注记（2026-08-14，波 3 F1 re-vendor 收口）
+
+本文件为六仓 conformance/README.md 的权威版。来源提交 SHA：`096e5f8`（波 3 审计前已实证：该提交 conformance/ 树与母仓 HEAD 零差异）。2026-08-14 波 3 修复（组 W3-01/W3-02）在权威版落地以下内容修正后，五仓副本以修正版为基准 re-vendor：differential 断言口径（go/ts/py/kt 侧各仓测试断言、rs 侧 vendored 快照）、G0.1-G5.6 的 G028 限定、`toml-v1.json:102` 行号引用、`oracles/plist-macos-v1/README.md`「not skipped」如实化。go/ts/py/kt 仓为逐字节 vendored 副本；rs 仓为按「同一批内容修正」同步的变体形态（不逐字节复制）。
+
+同步命令（母仓权威版 → 各仓 vendored 副本，在母仓 checkout 内执行）：
+
+```powershell
+# go/ts/py/kt：逐字节复制（<repo> 为各仓 checkout 路径，四仓逐个执行）：
+Copy-Item conformance\README.md <repo>\conformance\README.md
+Copy-Item conformance\oracles\plist-macos-v1\README.md <repo>\conformance\oracles\plist-macos-v1\README.md
+# rs：按 rs 既有变体形态手工同步同一批内容修正，不逐字节复制
+```
+
+一致性比对命令（六仓同名文件 sha256）：
+
+```powershell
+Get-FileHash <repo>\conformance\README.md,<repo>\conformance\oracles\plist-macos-v1\README.md -Algorithm SHA256
+# 与母仓权威版比对；六仓同名文件 hash 表见母仓本注记末尾（裁决 R11 载体）
+```
+
+六仓同名文件 hash 表为母仓独有记录，位于本注记末尾；注记其余内容为 vendored 内容，五仓副本（go/ts/py/kt 逐字节一致，rs 变体形态）不携带比对表。
+
 本目录保存跨语言可复放的行为契约。向量只使用 strict JSON，二进制位模式、任意精度数字和 wire 结果使用字符串表示，避免宿主语言的数值模型改变预期事实。
 
 当前 suite：
@@ -31,10 +53,10 @@
 - `oracles/plist-macos-v1/`：固定 macOS Foundation/plutil 的 plist 差分行为，共 7 个 case（`skip_path` 文档化）；
 - `corpora/json5-v2.2.3.json`：固定到 JSON5 官方 `v2.2.3`/`c3a7524` 的 43 个接受与 39 个拒绝输入（文件内 82 项；门禁口径 83 = 82 + 1 个完整真实夹具），记录上游来源、Git blob、LF 存储变换和 MIT 许可；
 - `corpora/mutation-v1.json`：mutation 语料（46 fixtures / 174,921 cases + regressions 数组，0.13.0 gate plan M2）：逐 fixture 字节 mutation 全集 + fuzz 回归输入；确定性重放生成（`gen_mutation_corpus --check` 校验与生成器同步——已接线为 consema-rs CI 常设门禁（G155，2026-08-13），四语言仓不执行该检查，如实记录；新增回归条目永久入 corpus，见 `corpora/README.md`）；
-- `differential/`：跨语言差分 case 集单一权威（byte-parity `cases.json` 68 / `normalized/cases.json` 108 / `protocol-exchange/cases.json` 83），2026-08-12 由 `00c850d` 自 `go/conformance/differential/` 迁入；五语言 harness 与 verify 脚本统一从本目录取数，各语言侧测试断言精确计数（68/108/83），任何一侧漂移即红；
+- `differential/`：跨语言差分 case 集单一权威（byte-parity `cases.json` 68 / `normalized/cases.json` 108 / `protocol-exchange/cases.json` 83），2026-08-12 由 `00c850d` 自 `go/conformance/differential/` 迁入；五语言 harness 与 verify 脚本统一从本目录取数，go/ts/py/kt 侧由各仓测试断言（68/108/83），rs 侧为 vendored 快照（随权威同步，无独立计数断言）；
 - `fixtures/json5/package-json5-v2.2.3.json5`：官方完整真实 JSON5 配置夹具；
 - `fixtures/real-world/`：覆盖 package JSON、TypeScript/VS Code JSONC 与服务 JSON5 的非专有典型项目配置；
-- `fixtures/toml/`：由向量按仓库相对路径引用的合法与非法 TOML 真实语料；其中 `toml.corpus.cargo-manifest` 向量（`vectors/toml-v1.json:104`）的裸根引用 `"Cargo.toml"` 按**特判约定**解析为 `fixtures/toml/Cargo.toml`（`943c014` 归位的单一权威，与 consema-rs 根清单逐字节一致；TS runner 显式特判，typescript/src/conformance/suites/toml_v1.ts:33-36）——裸根路径不指向任何仓库根文件，五语言 runner 与 provision 均按此约定解析，不向 workspace 根复制 Cargo.toml；
+- `fixtures/toml/`：由向量按仓库相对路径引用的合法与非法 TOML 真实语料；其中 `toml.corpus.cargo-manifest` 向量（`vectors/toml-v1.json:102`）的裸根引用 `"Cargo.toml"` 按**特判约定**解析为 `fixtures/toml/Cargo.toml`（`943c014` 归位的单一权威，与 consema-rs 根清单逐字节一致；TS runner 显式特判，typescript/src/conformance/suites/toml_v1.ts:33-36）——裸根路径不指向任何仓库根文件，五语言 runner 与 provision 均按此约定解析，不向 workspace 根复制 Cargo.toml；
 - `fixtures/yaml/`：Kubernetes、GitHub Actions、Compose 与 anchor-heavy 自有 MIT 工程夹具，无 secret 或第三方复制内容；
 - `fixtures/ini/`：桌面应用、.NET 风格服务、Python 工具、mixed-newline 与显式 CP1252 自有 MIT 工程夹具；
 - `fixtures/properties/`：logging、localization、build tool、Windows path、continuation、Latin-1 与 Java UTF-16 edge 自有 MIT 工程夹具；
@@ -79,7 +101,7 @@ Rust runner 为：
 
 上述 18 套语言无关向量合计 519 个 case。独立外部 gate 包括 JSON5 83 项（门禁口径 = corpus 43 valid + 39 invalid + 1 个完整真实夹具）、YAML 官方 402 项（307 valid、94 invalid、1 个显式 Profile exclusion）、TOML 官方 679 项，以及 INI/Properties 五套固定运行时 oracle 合计 36 项。每个 runner 固定校验 suite/schema/semantic-model、case ID 唯一性与未知 action 拒绝；向量或 manifest 中的 input/expected 实际驱动执行（如实收窄（2026-08-14 波 2 审计）：18 套中 16 套由向量驱动，protocol-v1 与 toml-v1 两套为硬编码夹具，属已知缺口），不把预期值硬编码进 runner。官方参考 gate 只继承其 manifest 明示的公开行为，不继承第三方 loader 的数值降精度、未声明 duplicate collapse、implicit merge、provider layering 或语言对象构造行为。
 
-Go 实现（0.14.0-0.19.0，G0.1-G5.6 全部交付）与 TypeScript/Python/Kotlin 实现（L0-L5 全部交付）均已直接消费相同向量和 fixture——五语言 conformance runner 全绿（18/519，聚合 digest cfd6e296 共钉；2026-08-12，five-language-ci-design.md §10）。任何实现不得用序列化本地 AST、异常对象或第三方 parser 私有类型来替代向量中的公共字段。
+Go 实现（0.14.0-0.19.0，G0.1-G5.6 全部交付——G5.4 三平台验证 macOS 腿 pending，无 CI job、无实测记录（G028 限定口径，2026-08-14））与 TypeScript/Python/Kotlin 实现（L0-L5 全部交付）均已直接消费相同向量和 fixture——五语言 conformance runner 全绿（18/519，聚合 digest cfd6e296 共钉；2026-08-12，five-language-ci-design.md §10）。任何实现不得用序列化本地 AST、异常对象或第三方 parser 私有类型来替代向量中的公共字段。
 
 新增或修改行为时，必须遵循：
 
