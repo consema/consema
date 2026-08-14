@@ -1,6 +1,6 @@
 # 五要素终审（§28 收口记录，`1.0.0` 前哨）
 
-- 对应门禁：路线图 §28《五要素终审》（第 2257-2333 行），对 §28.1-§28.5 的通过条件逐条核验
+- 对应门禁：路线图 §28《五要素终审》（74e336e 树 :2253-2329 / 现行 :2259-2337；行号可能漂移，以锚为准），对 §28.1-§28.5 的通过条件逐条核验
 - 日期：2026-08-10（本地实测）
 - 计数口径注记（2026-08-13 round-4 补充）：本文件多处「conformance 508/508」为
   2026-08-12 19:41（ad66702，P2-B 向量补强）之前撰写的记录，保留当时口径 508（自洽
@@ -21,26 +21,26 @@
 
 ## 1. 五要素逐条核验
 
-### 1.1 §28.1 哲学统一（第 2259-2269 行）— **PASS**
+### 1.1 §28.1 哲学统一（74e336e 树 :2255-2265 / 现行 :2261-2271；行号可能漂移，以锚为准）— **PASS**
 
 | # | 通过条件（原文引用 §28.1） | 最终状态证据 | 核验结论 |
 |---|---|---|---|
-| 1 | 八个格式都以不可变 Document 为真实状态 | Rust：各家族 RFC 0012-0014 与 README（无损 Document、immutable）；Go：consema-go/go/README.md:460（§21.2 政策 1：Completed objects 逻辑不可变、访问器返回拷贝、唯一变更路径是显式 builder）。CHANGELOG.md:153、173（0.11.0/0.10.0 行"未修改 Document 字节精确往返"） | 通过 |
-| 2 | PortableValue 不吞并 graph、XML tree 或 HCL program | YAML graph 归属 PortableGraph（RFC 0006/0007，CHANGELOG.md:240"PortableValue 未因 YAML 增加引用或 graph 类型"）；XML element-tree、HCL body/expression 各自有 `xml.element-tree@1`/`hcl.projection.body@1`/`hcl.expression@1` 记录（CHANGELOG.md:179、139、148）；IMPLEMENTATION.md:108（"PortableGraph 是与 PortableValue 平行的 immutable portable representation"）；Go 侧同名记录（consema-go/README.md:298-301、402-408） | 通过 |
+| 1 | 八个格式都以不可变 Document 为真实状态 | Rust：各家族 RFC 0012-0014 与 README（无损 Document、immutable）；Go：consema-go/go/README.md 的「SDK usage essentials (roadmap §21.2 / RFC 0016 §6)」节政策 1（Completed objects 逻辑不可变、访问器返回拷贝、唯一变更路径是显式 builder；74e336e 树 :455 / 现行 :477；行号可能漂移，以锚为准）。CHANGELOG.md:153、173（0.11.0/0.10.0 行"未修改 Document 字节精确往返"） | 通过 |
+| 2 | PortableValue 不吞并 graph、XML tree 或 HCL program | YAML graph 归属 PortableGraph（RFC 0006/0007，CHANGELOG.md:240"PortableValue 未因 YAML 增加引用或 graph 类型"）；XML element-tree、HCL body/expression 各自有 `xml.element-tree@1`/`hcl.projection.body@1`/`hcl.expression@1` 记录（CHANGELOG.md:179、139、148）；IMPLEMENTATION.md:108（"PortableGraph 是与 PortableValue 平行的 immutable portable representation"）；Go 侧同名记录（consema-go/go/README.md 各家族记录：xml 族 `xml.element-tree@1` 记录 74e336e 树 :298-301 / 现行 :318-321、hcl 族 `hcl.projection.body@1`/`hcl.expression@1` 记录 74e336e 树 :402-405 / 现行 :422-425；行号可能漂移，以锚为准） | 通过 |
 | 3 | Projection、Materialization 和 Edit 都是显式操作 | RFC 0004（MaterializationRequest/Result、fidelity/report/provenance）；CLI 默认只读/dry-run、写操作显式参数（CHANGELOG.md:102"没有任何命令在无显式参数时写目标文件"）；失败形态原子（B-5，API-REVIEW-0.13.0.md:107"report:null,target:null 是诚实形态"）；Go 侧同样显式（pilot-go-0.19.0.md §2.7 六组原子拒绝） | 通过 |
 | 4 | CLI 便利性不改变核心默认拒绝原则 | RFC 0015（default dry-run、`edit --write` usage 显式拒绝，consema-rs/consema/src/bin/consema/edit_cmd.rs:1020-1023 由测试钉死）；帮助文本已如实化（API-REVIEW-0.13.0.md:110：args.rs:194 "dry-run only"） | 通过 |
-| 5 | Rust 与 Go 共享行为，不强制共享实现结构 | 路线图 §11（双实现原则）；RFC 0016 §1.1 cgo 禁令（consema-go/go/README.md:784）；Go stdlib-only 零第三方依赖（consema-go/go/go.mod 无 require，consema-go/go/README.md:567）；两语言独立 parser（consema-go/go/README.md 各家族"self-written"/"independent tokenizer"） | 通过 |
-| 6 | 生产级范围没有把配置来源、evaluation 和治理平台塞入核心 | `.env` 明确为"后续 source adapter，而不是第九种配置格式 Profile"（CHANGELOG.md:225）；HCL 不求值（SECURITY.md:36、CHANGELOG.md:148）；无 schema/registry/remote-KV 进核心（路线图 §24 非目标清单，CHANGELOG.md:138、148） | 通过 |
+| 5 | Rust 与 Go 共享行为，不强制共享实现结构 | 路线图 §11（双实现原则）；RFC 0016 §1.1 cgo 禁令（consema-go/go/README.md 的 cgo 禁令句，74e336e 树 :771 / 现行 :845；行号可能漂移，以锚为准）；Go stdlib-only 零第三方依赖（consema-go/go/go.mod 无 require；consema-go/go/README.md 的 stdlib-only 句 74e336e 树 :501、go.mod 零第三方依赖句 :554 / 现行 :532；行号可能漂移，以锚为准）；两语言独立 parser（consema-go/go/README.md 各家族"self-written"/"independent tokenizer"） | 通过 |
+| 6 | 生产级范围没有把配置来源、evaluation 和治理平台塞入核心 | `.env` 明确为"后续 source adapter，而不是第九种配置格式 Profile"（CHANGELOG.md 的 `.env` 句，74e336e 树 :190 / 现行 :225；行号可能漂移，以锚为准）；HCL 不求值（SECURITY.md:36、CHANGELOG.md:148）；无 schema/registry/remote-KV 进核心（路线图 §24 非目标清单，CHANGELOG.md:138、148） | 通过 |
 
-### 1.2 §28.2 语义一致（第 2270-2295 行）— **PASS**
+### 1.2 §28.2 语义一致（74e336e 树 :2266-2291 / 现行 :2272-2297；行号可能漂移，以锚为准）— **PASS**
 
 - 通过条件为 18 个概念（SourceSnapshot → Conformance）的清单 + "每个概念只有一个核心职责，不随格式或语言改变含义"。
-- 证据：semantic-model v7 registry（41 contract / 187 error code，fc-manifest-0.13.0.json:26-28）在 Rust 与 Go 两侧逐字节一致（consema-go/go/README.md:35-38 注册表 v1-v7 计数；capability parity 硬门禁，consema-go/go/README.md:817-）；语言无关行为不依赖 Rust 类型名（§15.2，API-REVIEW-0.13.0.md:10）。
+- 证据：semantic-model v7 registry（41 contract / 187 error code，fc-manifest-0.13.0.json:26-28）在 Rust 与 Go 两侧逐字节一致（consema-go/go/README.md 的注册表 v1-v7 计数概述行，74e336e 树 :30-32 / 现行 :47-50；capability parity 硬门禁，consema-go/go/README.md 的「Capability parity」节，74e336e 树 :797 / 现行 :878；行号可能漂移，以锚为准）；语言无关行为不依赖 Rust 类型名（§15.2，API-REVIEW-0.13.0.md:10）。
 - 实测：跨语言 normalized-result 差分 108/108（双向）、protocol exchange 83/83（双向）、byte parity 68/68（2026-08-10 本机重跑，见 §4 实测表）——18 个概念在跨语言面上行为一致。
 - 命名漂移 findings（F2 `core.edit.incomplete-target@1` 双语义、F4 projection 拼写、F11 duplicate-group 词、F15 PascalCase 拼写等）全部**冻结且被 RFC/vector 钉死**，disposition = exempt-with-reason（API-REVIEW-0.13.0.md §1），修复窗口为 semantic-model v8 / 1.0.0 API 冻结；语义含义不随格式/语言漂移，属命名层清理而非语义不一致 → 不违反本条通过条件。
 - 结论：通过（v8/1.0.0 命名清理项不阻塞本要素）。
 
-### 1.3 §28.3 逻辑自洽（第 2296-2307 行）— **PASS**
+### 1.3 §28.3 逻辑自洽（74e336e 树 :2292-2303 / 现行 :2298-2309；行号可能漂移，以锚为准）— **PASS**
 
 | # | 通过条件 | 最终状态证据 | 核验结论 |
 |---|---|---|---|
@@ -48,9 +48,9 @@
 | 2 | materialize/convert 链闭合 | 两阶段 projection→PortableValue→materialization 组合（CHANGELOG.md:233）；canonical 生成字节必先重解析闭包验证（各家族 Correctness 段）；Go `Convert*` 8 入口（consema-go/README.md 的「API 摘要」节）；convert 组合 W6 全 Exact、W7 六组原子拒绝（pilot-go-0.19.0.md §2.6-2.7） | 通过 |
 | 3 | edit/patch/apply 链闭合 | dry-run/commit 等价（EditPlan/SourcePatch/UntouchedByteProof，CHANGELOG.md:209）；plan/apply 双前置条件 + skipped-stale 状态机（pilot-go-0.19.0.md §2.8）；中断恢复 100%（53+47，pilot metric 11） | 通过 |
 | 4 | Document 与 portable representation 之间没有隐藏同步 | 转换/物化全部显式两阶段 + 重解析闭包验证（CHANGELOG.md:151、172"失败不携带 Document/partial output"）；无共享缓存/隐式关联（架构层，IMPLEMENTATION.md 分层） | 通过 |
-| 5 | format-specific edit 不伪装成 universal edit | 16 个 format-local operation registry（按 profile 计；各家族操作数 json 8/toml 7/yaml 8/ini 8/properties 5/xml 8/plist 6/hcl 6 合计 56，fc-manifest-0.13.0.json:213-215；Go 侧同集，consema-go/go/README.md:435-436）；跨家族组合显式经 Document 投影/物化，不假借"通用编辑" | 通过 |
-| 6 | YAML graph、XML tree 和 HCL expression 都有合法归属 | PortableGraph / `xml.element-tree@1` / `hcl.expression@1`（§1.1 第 2 行证据）；Go 侧同名记录实现（consema-go/README.md:183-189、298-301、402-408） | 通过 |
-| 7 | Rust 先行与 Go 反向审计没有权威循环 | PVCE/PGCE 字节权威 = Rust 编码器（consema-go/go/README.md:601"Rust side is the authority for the bytes"）；golden 向量由 Rust 编码器生成、Go 逐字节转录，既有冻结字节零变动（CHANGELOG.md:86）；差分 harness 双向（Go 发射 → Rust consume）构成对 Rust 的独立反审计而非循环依赖；cgo 禁令排除 FFI 作弊（consema-go/go/README.md:784） | 通过 |
+| 5 | format-specific edit 不伪装成 universal edit | 16 个 format-local operation registry（按 profile 计；各家族操作数 json 8/toml 7/yaml 8/ini 8/properties 5/xml 8/plist 6/hcl 6 合计 56，fc-manifest-0.13.0.json:213-215；Go 侧同集（consema-go/go/README.md 的 registry.go 概述行：8 families / 16 profiles / 21 query domains / 16 operation registries（RFC 0015 §6.2），74e336e 树 :430-433 / 现行 :450-452；行号可能漂移，以锚为准））；跨家族组合显式经 Document 投影/物化，不假借"通用编辑" | 通过 |
+| 6 | YAML graph、XML tree 和 HCL expression 都有合法归属 | PortableGraph / `xml.element-tree@1` / `hcl.expression@1`（§1.1 第 2 行证据）；Go 侧同名记录实现（consema-go/go/README.md 各家族记录：yaml 族 MaterializeGraph/MaterializeValue 与 `&gN` anchors 74e336e 树 :183-189 / 现行 :203-208、xml 族 `xml.element-tree@1` 记录 74e336e 树 :298-301 / 现行 :318-321、hcl 族 `hcl.projection.body@1`/`hcl.expression@1` 记录 74e336e 树 :402-405 / 现行 :422-425；行号可能漂移，以锚为准） | 通过 |
+| 7 | Rust 先行与 Go 反向审计没有权威循环 | PVCE/PGCE 字节权威 = Rust 编码器（consema-go/go/README.md 的 "Rust side is the authority for the bytes" 句，74e336e 树 :588 / 现行 :650；行号可能漂移，以锚为准）；golden 向量由 Rust 编码器生成、Go 逐字节转录，既有冻结字节零变动（CHANGELOG.md:86）；差分 harness 双向（Go 发射 → Rust consume）构成对 Rust 的独立反审计而非循环依赖；cgo 禁令排除 FFI 作弊（consema-go/go/README.md 的 cgo 禁令句，74e336e 树 :771 / 现行 :845；行号可能漂移，以锚为准） | 通过 |
 
 **Kotlin ChangeSet 结构差异（终审记录 F-28.3-1，2026-08-12，LOW）**：Kotlin 在 7/8 family 无一等公民 ChangeSet
 （consema-kt/kotlin/src/main/kotlin/consema/json/Edit.kt:245-247 标注 "ChangeSet is a post-1.0.0（冻结前评估项，见五要素终审 F-28.3-1 处置）milestone; this L1 commit carries the ordered edit diagnostics"——class EditCommit 在 :248；consema-kt 0d6dde9 已将 L4 标注 15 处改为 post-1.0.0）；
@@ -58,19 +58,19 @@
 功能闭合不受影响（conformance 508/508）。处置：不重构 Kotlin edit 管线（属 1.0.0 API 冻结决策，留待
 冻结前评估）；建议在 1.0.0 API 冻结前对齐（见 §6.2 收口项）。
 
-### 1.4 §28.4 真实有效（第 2308-2319 行）— **PASS**
+### 1.4 §28.4 真实有效（74e336e 树 :2304-2315 / 现行 :2310-2321；行号可能漂移，以锚为准）— **PASS**
 
 | # | 通过条件 | 最终状态证据 | 核验结论 |
 |---|---|---|---|
-| 1 | 格式范围来自跨生态调查，而不是个人偏好 | 路线图 §4（第 239-357 行）生态调查与范围论证；RFC 0001-0014 逐个冻结 Profile 依据 | 通过 |
-| 2 | `.env`、注册表和远程 KV 被正确归为来源 | CHANGELOG.md:216（`.env` 是后续 source adapter 而非第九种格式 Profile）；路线图 §24 非目标清单（注册表/远程 KV 不在 1.0.0 范围）——正确归类、未混入核心 | 通过 |
+| 1 | 格式范围来自跨生态调查，而不是个人偏好 | 路线图 §4《1.0.0 格式范围》生态调查与范围论证（74e336e 树 :239-357 / 现行 :243-361；行号可能漂移，以锚为准）；RFC 0001-0014 逐个冻结 Profile 依据 | 通过 |
+| 2 | `.env`、注册表和远程 KV 被正确归为来源 | CHANGELOG.md 的 `.env` 句（"`.env` 仍是后续 source adapter，而不是第九种配置格式 Profile"；74e336e 树 :190 / 现行 :225；行号可能漂移，以锚为准）；路线图 §24 非目标清单（注册表/远程 KV 不在 1.0.0 范围）——正确归类、未混入核心 | 通过 |
 | 3 | 八个家族完成真实 corpus 和迁移工作流 | 钉版 corpus 12 文件（pilot-go-0.19.0.md §1，digest 登记）；三类真实批量迁移全部执行（版本/镜像更新、结构插入删除、跨格式转换，pilot-go-0.19.0.md §4.1-4.3）；fixtures 覆盖 9 目录（conformance/fixtures/，2026-08-10 实测） | 通过 |
-| 4 | 每个格式不仅能 parse，还能保真、查询、投影、生成和编辑 | 路线图 §8 Mandatory Capability Matrix（第 613-643 行）；18 套语言无关 suite 508/508（实测 508 passed / 0 skipped / 0 failed，见 §4）；Go 侧 capability parity 全等（实测 PASS）；pilot W1-W5 覆盖全部八家族编辑 | 通过 |
+| 4 | 每个格式不仅能 parse，还能保真、查询、投影、生成和编辑 | 路线图 §8《每个 GA 格式的 Mandatory Capability Matrix》（74e336e 树 :613-646 / 现行 :617-650；行号可能漂移，以锚为准）；18 套语言无关 suite 508/508（实测 508 passed / 0 skipped / 0 failed，见 §4）；Go 侧 capability parity 全等（实测 PASS）；pilot W1-W5 覆盖全部八家族编辑 | 通过 |
 | 5 | 用户可以用 CLI 安全 plan/apply | Rust CLI 与 Go CLI（consema-go/go/cmd/consema；核验提交 74e336e 为拆分前母仓 commit，go 仓不可直接解析，见 §1 核验口径）plan/apply 六步写前重验 + 原子替换 + 读回验证；stale/篡改/只读/中断负例全绿（pilot-go-0.19.0.md §2.8；rc-1.0.0-candidate.md:103-105（stale/中断）、168-191（演练 4 只读负例））；升级演练逐字节兼容（rc-1.0.0-candidate.md §3.2，:136-155） | 通过 |
 | 6 | 性能、安全和供应链有可重放证据 | BENCHMARKS-0.13.0.md（冻结预算 + 复验机制 §12）；三处超线性修复复测（CHANGELOG.md:52）；security matrix（consema-go/go/README.md 的「Security matrix (0.19.0 G5.4)」节：XML/plist 32 行 + HCL 13 行 = 45 行边界 + threat corpora）；供应链流程落地（release-process-0.13.0.md）——**但 0.13.0 真实发布未执行（C-3）且演练发现 D-1/D-2（checksum 不可复现、密钥无备份），见 §2 与 §3** | 通过（发布执行属 §28.5 口径） |
 | 7 | 静默信息损失为零 | pilot metric 3 = 0（pilot-go-0.19.0.md:155）；M2-F2（P0 静默损失）已修复并带 trip-wire（fuzz-evidence-0.13.0.md §5/§6 的 M2-F2 记录）；audited conversion 全部 fidelity=Exact 或原子失败（pilot metric 4/5） | 通过 |
 
-### 1.5 §28.5 完整可靠（第 2320-2333 行）— **PARTIAL**
+### 1.5 §28.5 完整可靠（74e336e 树 :2316-2329 / 现行 :2322-2337；行号可能漂移，以锚为准）— **PARTIAL**
 
 | # | 通过条件 | 最终状态证据 | 核验结论 |
 |---|---|---|---|
@@ -147,7 +147,7 @@
 |---|---|---|---|
 | 1 | `go test -count=1 ./...`（worktree） | 18 包 ok / 1 包 FAIL（`conformance`：**digest 35bebc8d… ≠ 记录 e3d6578858…**，即 F-B）；其余全部 ok，含 cmd/consema e2e（5.439s）、pilot（1.395s）〔修复前实测记录——F-B 已由 2209582 处置（回填 35bebc8d…）并审计验证〕 | consema-go/README "all green" 在**本机 CRLF 工作树**成立；干净 checkout 下 F-B 使 conformance 包红 |
 | 2 | runner 计数探针（worktree 临时测试文件，用后删除） | **TOTAL=508 PASSED=508 SKIPPED=0 FAILED=0**；DIGEST_OK=false | consema-go/go/README.md 的 0.18.0 历史态（「506 passed / 2 documented skips / 0 failed」，见 Capability parity 节；该历史态未标注后续 G5.3 翻转——ada5020 已将 2 个 skip 翻转执行为 508 全执行，consema-go/go/README 已注明演进；本探测 508/0/0 与翻转后口径一致） |
-| 3 | `go test -count=1 -run TestCapabilityParity ./` | PASS（OperationSets + NoRustOnlyMandatoryBehavior） | capability parity 硬门禁（consema-go/go/README.md:817-） |
+| 3 | `go test -count=1 -run TestCapabilityParity ./` | PASS（OperationSets + NoRustOnlyMandatoryBehavior） | capability parity 硬门禁（consema-go/go/README.md 的「Capability parity」节，74e336e 树 :797 / 现行 :878；行号可能漂移，以锚为准） |
 | 4 | `gofmt -l .`、`go vet ./...`、`go build ./...`、`go mod tidy` | 全干净 | §6 门禁（go-implementation-plan.md:323） |
 | 5 | `go test -race -count=1 ./conformance/...` 及其余包 | 全 ok（唯一 FAIL 系核验临时文件删除时序所致，已复跑确认） | race 门禁 |
 | 6 | `cargo test -p consema-conformance --release --locked`（worktree） | exit 0；26 个 test binary 全 ok，179 passed / 0 failed（18 套 suite runner 全部 conformant） | Rust conformance 508/508 + 计数断言 |
@@ -160,7 +160,7 @@
 | 13 | 主树聚合 digest 复算（PowerShell，文档化算法） | 本机 CRLF 工作树 = **e3d6578858…**（与当时记录一致）；干净 LF checkout = **35bebc8d…**〔修复前实测记录——修复后 recorded=35bebc8d…（LF 口径），干净 checkout 通过、本机 CRLF 树差异属文档化行为〕 | fc-manifest 第 35-41 行"值可精确复现"声称在干净 checkout 不成立 |
 | 14 | 主树 `go test -count=1 ./...` | conformance ok（CRLF digest 命中）；**cmd/consema FAIL**（panic：e2e_test.go:442 `first[:len(first)-1]`，first 为空）→ F-A〔修复前实测记录——F-A 已由 2209582 处置并审计验证〕 | 工作树 1.0.0-rc.1 版本推进破坏 envelope |
 
-未重跑、引用最近实测记录（注明日期）：Go 16 fuzz targets 30s clean-run 与 8×2 benchmark（2026-08-10，consema-go/go/README.md:674-727 clean-run、:758- benchmark）；Rust fuzz 账本已续跑至 session 79 在途——runs.csv 13,005 行 / 79.427 CPU-hours（截取自 session 79 期间，2026-08-10；session 78 结束快照 12,937 行 / 78.971 CPU-hours、15:53:39；最接近格式 properties ≈20.6%；fuzz-evidence-0.13.0.md §3.2.1/§8，runs.csv 为唯一权威账本）；mutation corpus 174,921 case replay（2026-08-07，63.10s；原始输出未保留、时长不可复算——见 fuzz-evidence-0.13.0.md §8 证据链说明）；coverage 86.51/82.82/87.91（2026-08-07）；cargo audit 1,189 advisories / 0 漏洞、deny 四段（2026-08-07）；Linux/macOS 矩阵（从未实测，= C-1）；macOS Foundation differential 7 cases / 35 legs（0.17.0 记录）。
+未重跑、引用最近实测记录（注明日期）：Go 16 fuzz targets 30s clean-run 与 8×2 benchmark（2026-08-10，consema-go/go/README.md 的「Release-candidate fuzz clean-run」节，74e336e 树 :661 / 现行 :724；「Benchmark baseline」节，74e336e 树 :745 / 现行 :819；行号可能漂移，以锚为准）；Rust fuzz 账本已续跑至 session 79 在途——runs.csv 13,005 行 / 79.427 CPU-hours（截取自 session 79 期间，2026-08-10；session 78 结束快照 12,937 行 / 78.971 CPU-hours、15:53:39；最接近格式 properties ≈20.6%；fuzz-evidence-0.13.0.md §3.2.1/§8，runs.csv 为唯一权威账本）；mutation corpus 174,921 case replay（2026-08-07，63.10s；原始输出未保留、时长不可复算——见 fuzz-evidence-0.13.0.md §8 证据链说明）；coverage 86.51/82.82/87.91（2026-08-07）；cargo audit 1,189 advisories / 0 漏洞、deny 四段（2026-08-07）；Linux/macOS 矩阵（从未实测，= C-1）；macOS Foundation differential 7 cases / 35 legs（0.17.0 记录）。
 
 ---
 
@@ -373,7 +373,7 @@
 |---|---|
 | consema-rs | cargo test 1,636 passed / 0 failed、fmt --check 干净、digest 复算命中 |
 | consema-go | go test 22 包全绿（20 含测试）、四脚本 68/108/83/519 |
-| consema-ts | npm test 667、三脚本 68/108/108、needs 程序化校验 missing NONE |
+| consema-ts | npm test 667、三脚本 68/108/83、needs 程序化校验 missing NONE |
 | consema-py | pytest 703 passed / 4 skipped、三脚本 68/108/83 |
 | consema-kt | gradle 572 tests 0 fail 0 skip、三脚本 68/108/83、CI digest 步骤复算命中 |
 | 母仓 | fc-manifest JSON 校验、digest 复算 cfd6e296、runs.csv 122,477 数据行 / 780.529 CPU-h 复算一致 |
@@ -423,3 +423,22 @@
 - **遗留**：release-sign.ps1 正则与 rc.1 tag 冲突（发布时处置，C-3 用户动作）；G70 rustc 政策差异已统一；branch protection required checks 同步（G087 job 改名，用户侧）；docs-site Pages 部署（用户侧）。
 
 **§10 结论**：波 2 修复后仍未打穿（重打 12 轮 dryStreak=0）——按常设阶段继续波 3 重打；P0 已清零（波 2 唯一 P0 已修复），P1 全量处置；锚点约定落地后，行号失效矿脉预期大幅收缩。
+
+## 11. 锚点修复处置注记（2026-08-14，波 3 W3-03 F2）
+
+- **本批修复**：本文件全部裸行号锚改为「§标题/语义句 + 快照 SHA 树内行号」体例（波 3 纪律 3），
+  行号括注「行号可能漂移，以锚为准」；含同根因兄弟位置（§1.1 第 2/6 行与 §1.3 第 6 行的
+  consema-go/README.md 仓根幻影区间、§1.1 第 6 行 CHANGELOG .env 句裸锚）。
+- **重核方法**：逐锚先在自钉核验提交 74e336e 上重核证据指向（`git show 74e336e:go/README.md`、
+  `74e336e:CHANGELOG.md`、`74e336e:"Consema 1.0.0 产品路线图与双语言落地设计.md"`），确认语义后再落笔；
+  「现行」行号逐条经现行树实测（母仓 ef8d583 / consema-go c150470）。
+- **74e336e 复核结论**：旧锚在 74e336e 树上即不成立——go/README 政策 1 句实 :455（非 :460）、
+  cgo 禁令实 :771（非 :784）、stdlib-only 实 :501（非 :567）、字节权威实 :588（非 :601）、
+  registry v1-v7 计数实 :30-32（非 :35-38）、Capability parity 节实 :797（非 :817-）、
+  operation registry 概述实 :430-433（非 :435-436）、clean-run 节实 :661（非 :674-727）、
+  Benchmark 节实 :745（非 :758-）；CHANGELOG .env 句实 :190（非 :216；:216/:217 为 YAML 门禁/toml-test 行）；
+  路线图 §28 起实 :2253（非 :2257）、§28.1-§28.5 起实 :2255/:2266/:2292/:2304/:2316（非
+  :2259/:2270/:2296/:2308/:2320）、§4 起实 :239（该锚在 74e336e 上成立）、§8 起实 :613（成立）；
+  仓根 consema-go/README.md 仅 176 行，旧引 :183-189/:298-301/:402-408 为幻影区间，语义实为
+  go/README.md 各家族记录（yaml 族 :183-189、xml 族 :298-301、hcl 族 :402-405）；§9.5 consema-ts
+  三脚本第三数字实为 83（68/108/83）。
