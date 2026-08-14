@@ -63,9 +63,10 @@ Node 版本：
   ci-typescript.yml，setup-node + npm cache；26.7.0 为 2026-08-13 实测钉定值，
   随 Node 补丁发布漂移，见 §12 表）。
 - **支持窗口**：自声明最低版本起至当时 stable 工具链的所有版本。如实注记：
-  三语言 CI 钉的是各自 minor 线的最新补丁（TS 26.7.0、Python '3.12.x'），
+  五语言 CI 钉的是各自 minor 线的最新补丁（TS 26.7.0、Python
+  3.12.x/3.13.x/3.14.x 三 minor 线矩阵——ci-python.yml python-gates job），
   声明的最低版本 26.0/3.12.0 未被按精确版本验证——"really verified in CI"
-  由构造满足只对 Kotlin 2.2.0 精确成立（RFC 0020 §9.2 口径，five-language-ci-design §1.2）。
+  由构造满足只对 Kotlin 2.2.0 精确成立（RFC 0020 §9.3 口径，five-language-ci-design §1.2）。
 - **提升纪律**：最低版本提升遵循 §1/§2 同纪律——只在 minor 发生、永不进入
   patch、不重解释已发布 contract，CHANGELOG 注明用户可停留的最低版本。
 - **验证**：CI 全套 10 job（ts-gates / coverage / ts-compiler-matrix /
@@ -78,12 +79,13 @@ Node 版本：
 Python 实现（`consema` 包，consema-py 仓）随五语言同等地位（2026-08-11
 决策）纳入本政策。`pyproject.toml` 的 `requires-python` 声明最低版本：
 
-- **声明最低版本**：`requires-python >= 3.12`（consema-py/python/pyproject.toml:21）；
-  CI 在钉定版本 `'3.12.x'` 上运行全套件验证（consema-py ci-python.yml，
-  setup-python）。
-- **支持窗口**：自声明最低版本起至当时 stable 工具链的所有版本——CI 钉
-  '3.12.x'（minor 线最新补丁），声明最低版本 3.12.0 未被精确版本验证
-  （"really verified in CI" 由构造满足不成立；RFC 0020 §9.2 口径）。
+- **声明最低版本**：`requires-python >= 3.12`（consema-py/python/pyproject.toml 的
+  requires-python 字段——行号可能漂移，以字段名为锚）；CI 矩阵为
+  3.12.x / 3.13.x / 3.14.x 三 minor 线（consema-py ci-python.yml python-gates job，
+  setup-python；consema-py SECURITY:49 自述同口径）。
+- **支持窗口**：自声明最低版本起至当时 stable 工具链的所有版本——CI 矩阵
+  3.12.x/3.13.x/3.14.x（各自 minor 线最新补丁），声明最低版本 3.12.0 未被精确版本验证
+  （"really verified in CI" 由构造满足不成立；RFC 0020 §9.3 口径）。
 - **提升纪律**：同 §3（minor-only、永不进 patch、不重解释已发布 contract）。
 - **验证**：CI 在钉定版本上运行 compileall + pytest 全量套件 + 零依赖断言
   （ci-python.yml）。
@@ -101,8 +103,8 @@ Kotlin 实现（`dev.consema:consema-kotlin`，consema-kt 仓）随五语言同�
   2.2.0 为精确钉定，是五语言中唯一「CI 钉定版本即声明最低版本」（"really
   verified in CI" 由构造满足）成立者。
 - **提升纪律**：同 §3（minor-only、永不进 patch、不重解释已发布 contract）。
-- **验证**：CI 在钉定版本上运行 `./gradlew --no-daemon test` 全套件
-  （ci-kotlin.yml）。
+- **验证**：CI 在钉定版本上运行 `.\gradlew.bat test koverVerify`（ci-kotlin.yml
+  kotlin-gates job；无 `--no-daemon` 旗标，含 kover 60% 行覆盖门禁）。
 
 ## 6. 支持环境（OS / 架构）
 
@@ -113,7 +115,7 @@ Kotlin 实现（`dev.consema:consema-kotlin`，consema-kt 仓）随五语言同�
 |---|---|---|
 | Windows（Windows 11 Pro 10.0.26200 实测基线） | x86-64 | CI windows-latest 全测试矩阵 |
 | Linux | x86-64 | CI ubuntu-latest 全测试矩阵 |
-| macOS | arm64（macos-latest 自 2024 起为 Apple Silicon；x86-64 macOS 无 CI 载体） | CI macos-latest 全测试矩阵 |
+| macOS | arm64（macos-latest 自 2024 起为 Apple Silicon；x86-64 macOS 无 CI 载体） | CI macos-latest 全测试矩阵——如实注记：仅 consema-rs 有 macOS CI 腿（lint/test 三 OS 矩阵）；consema-go 的 macOS 腿明确 pending（G5.4，无 CI job 无实测）；consema-ts/py/kt 三仓 CI 仅 ubuntu+windows（differential 腿 windows-latest）——四语言仓支持目标以各仓 SECURITY 为准 |
 
 - 其余平台/架构为 best-effort：不阻断发布，但任何已接受的关键修复都会
   在声明支持的三平台上验证。
@@ -145,8 +147,10 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 - **resource limit 与截断**：任何 limit 失败不伪装成功（SECURITY.md），
   修复不得引入截断假成功。
 - **披露流程**：安全缺陷先于公开经私有渠道披露；`1.0.0` 前在仓库
-  `SECURITY.md` 冻结披露联系邮箱与 PGP key（§19.4 要求
-  "安全披露联系方式和支持周期"，本文件为其落点；0.13.0 M7 收口）。披露
+  `SECURITY.md` 冻结披露联系邮箱（§19.4 要求
+  "安全披露联系方式和支持周期"，本文件为其落点；0.13.0 M7 收口；PGP key
+  半项无载体——SECURITY.md 无 PGP 公钥、M7 收口记录未含，如实记录：PGP
+  key 未冻结，为 `1.0.0` 前开放项）。披露
   时间表：确认后 90 天内发布修复（critical/high），或公开说明处置状态。
 
 ## 8. 版本与分支支持周期
@@ -214,8 +218,8 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 - TypeScript / Python / Kotlin：最低版本由各自 manifest 声明（engines /
   requires-python / build.gradle.kts）并由 CI 在钉定版本上验证（如实注记：
   "really verified in CI" 由构造满足只对 Kotlin 精确成立；TS 钉 26.7.0、
-  Python 钉 '3.12.x'（minor 线最新补丁），声明最低版本未被精确验证，RFC 0020
-  §9.2 口径）；五语言包版本统一为 `1.0.0-rc.1`（2026-08-13 决策，
+  Python 钉 3.12.x/3.13.x/3.14.x（各自 minor 线最新补丁），声明最低版本未被精确验证，RFC 0020
+  §9.3 口径）；五语言包版本统一为 `1.0.0-rc.1`（2026-08-13 决策，
   five-language-ci-design §10 版本政策）。
 - 冻结之间的一切 MSRV/工具链变化按第 1-5 节政策执行。
 
