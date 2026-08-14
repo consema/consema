@@ -4,10 +4,12 @@
 - Date: 2026-08-07
 - Scope: the machine-readable protocol of the `consema` CLI (envelope,
   exit-code classification, batch-plan/batch-result manifests, detection
+
+- 引用约定（2026-08-15 追加）：本文件对路线图、SECURITY.md、IMPLEMENTATION.md 的引用一律以节标题/语义句为锚，不再标注行号（行号可能漂移；本文件其余「line N」如指向 append-only 账本 waves.log 除外）。
   facts, secret redaction, fsio write policy, resource limits, error
   algebra) and the semantic-model v7 registration boundary; the machine
   schemas of all 11 official commands are frozen as v1 candidates (roadmap
-  §15.6, line 1422); roadmap §27 R-17 (`0.12.0`)
+  §15.6「API 与产品门禁」); roadmap §27 R-17 (`0.12.0`)
 - Depends on: RFC 0011 (semantic-model v6 registration and error-code
   discipline), RFC 0012/0013/0014 (source-contract and registry-boundary
   precedent), roadmap §10 (product-level CLI), §14.11 (0.12.0 scope and
@@ -48,7 +50,7 @@ Recovered-document gate, in v7 — 187 codes total; the Section 13.1
 as envelope payloads and are **not registered** (Section 6).
 
 The CLI is the product entry point, but not the normative authority and not
-a third implementation (roadmap §1, line 135): the machine protocol is a
+a third implementation (roadmap §2「目标、产品与标准的关系」——「CLI 是产品入口，但不是规范权威，也不是第三个实现」句): the machine protocol is a
 language-neutral semantic-model payload, and the Go CLI (0.19.0, roadmap
 §22.6) implements the same protocol; the Rust CLI binary is only the first
 driver of that contract. All of the CLI's format knowledge comes from the
@@ -71,7 +73,7 @@ facade public API (hard gate 1, Section 2).
   ambiguity, the batch state machine, the write policy, and CLI-layer
   resource limits.
 - Human output (tables/indented text) is not a cross-language contract and
-  does not enter the semantic model (roadmap §11.2, lines 849-861;
+  does not enter the semantic model (roadmap §11.2「Go 不是 Rust 的翻译」;
   implementation plan §11 item 5); but human and machine output must draw
   from the same facade call, differing only in rendering (implementation
   plan §2.4).
@@ -84,7 +86,7 @@ facade public API (hard gate 1, Section 2).
   implementation plan §0.3, §11).
 - No new evaluation, import, network, or environment-read path: the CLI
   never executes programs embedded in configuration during parse/query/
-  project (roadmap §10, line 816). The single exception is the documented
+  project (roadmap §10「产品级 CLI」). The single exception is the documented
   `apply` testing/CI injection seam of Section 5.4
   (`CONSEMA_APPLY_INTERRUPT_AFTER`, `CONSEMA_APPLY_WRITE_FAILURE`): it
   reads exactly those two variables, is scoped to the `apply` command
@@ -94,14 +96,14 @@ facade public API (hard gate 1, Section 2).
   (hard gate 2; Section 7).
 - No invented format-semantic defaults: duplicate/lossy/encoding/
   EntryMapping/RequireObject policies are always given by explicit
-  arguments or request payloads (roadmap §10, line 818).
+  arguments or request payloads (roadmap §10「产品级 CLI」).
 - No cross-filesystem multi-file atomicity claim: fsio promises only
   single-file atomic replacement; the "batch atomicity" of `apply` is the
   recoverability of the manifest state machine, not a filesystem
-  transaction (roadmap §10, line 812; Section 10).
+  transaction (roadmap §10「产品级 CLI」; Section 10).
 - CLI file I/O never returns to the Document core or backend crates:
-  fsio/plan/apply all live in the bin layer (roadmap §6, lines 497-508;
-  §19.2, line 1734).
+  fsio/plan/apply all live in the bin layer (roadmap §6「统一操作链条」;
+  §19.2「无副作用安全边界」).
 - No new external dependencies: argument parsing, pretty JSON, fsio, and
   redaction are all self-written; clap/tempfile/serde_json are rejected
   (Section 17).
@@ -165,7 +167,7 @@ A request that fails strict decode is a data error (exit 2,
 `cli.data.invalid-request@1`), except decode `ResourceLimit`, which is a
 limit error (exit 3). Decoded requests must pass typed-decoder revalidation
 of cross-constraints; the `schema` field alone never bypasses validation
-(RFC 0011 Section 11; SECURITY.md line 18).
+(RFC 0011 Section 11; SECURITY.md——行号可能漂移，以语义句为锚).
 
 ### 3.3 Byte determinism
 
@@ -177,7 +179,7 @@ rules:
   environment values, locale, hostname, path canonicalization (the `path`
   field carries the user-supplied spelling verbatim; no canonicalization,
   no cwd joining), memory addresses, or `SnapshotIdentity` integers (these
-  must be externalized to caller-stable locators; SECURITY.md line 28).
+  must be externalized to caller-stable locators; SECURITY.md——行号可能漂移，以语义句为锚).
 - `product_version` is the release version string (workspace version),
   without git hashes or build metadata.
 
@@ -199,7 +201,7 @@ rules:
   exactly one line of canonical JSON envelope ending in one LF (0x0A) and
   nothing else; without `--json`, stdout carries only command-result data;
   all diagnostics, progress, and redaction notices go to stderr (roadmap
-  §10, line 805).
+  §10「产品级 CLI」).
 - `--json --pretty` performs pure whitespace indentation on canonical JSON
   bytes (self-written deterministic indenter, no parse/reorder); canonical
   semantics are unchanged (implementation plan §5.2).
@@ -319,8 +321,7 @@ vector-testable; the bin only applies the mapping).
   never change in a patch.
 - Scripts must treat any unrecognized exit code as failure and must hold no
   expectations for codes above 5.
-- Changing a frozen meaning breaks the v1-candidate freeze (roadmap §15.6,
-  line 1422).
+- Changing a frozen meaning breaks the v1-candidate freeze (roadmap §15.6「API 与产品门禁」).
 
 ### 5.4 User interruption
 
@@ -448,7 +449,7 @@ redaction settings) is asserted by e2e tests from milestone M5 onward
 
 `consema inspect` outputs a fact inventory (`cli.inspect@1`) for the input
 file, every item deterministically marked; it **never emits a single "this
-is X format" conclusion** (hard gate 2; roadmap §14.11, line 1325;
+is X format" conclusion** (hard gate 2; roadmap §14.11「`0.12.0`：Rust 产品集成」;
 implementation plan §3.2).
 
 ```text
@@ -491,7 +492,7 @@ cli.parse-facts@1 (nested, CLI-local):
 2. Any command that needs parsing requires an explicit `--profile` (or
    `--format`): absence is a usage error (exit 1), never "try and see"; no
    "try every dialect" automatic attempts exist (INI precedent:
-   IMPLEMENTATION.md line 132).
+   IMPLEMENTATION.md——行号可能漂移，以语义句为锚).
 3. On ambiguity, parse-class operations fail (exit 2,
    `cli.detection.ambiguous@1`) and stderr lists the candidates, reasons,
    and usage hints; `consema inspect` itself reports ambiguity
@@ -510,9 +511,8 @@ cli.parse-facts@1 (nested, CLI-local):
 
 `consema plan` is **read-only**: per file, parse → `EditTransaction`
 dry_run → aggregate manifest. The plan manifest is an artifact, not a file
-write authorization (IMPLEMENTATION.md line 322; roadmap §10, line
-809); dry-run and the future commit must produce identical replacements
-and target digest (SECURITY.md line 26). `plan` never writes any target
+write authorization (IMPLEMENTATION.md——行号可能漂移，以语义句为锚; roadmap §10「产品级 CLI」); dry-run and the future commit must produce identical replacements
+and target digest (SECURITY.md——行号可能漂移，以语义句为锚). `plan` never writes any target
 file (the manifest file may be written only via `--output`, and only to
 stdout or that path).
 
@@ -614,7 +614,7 @@ core.batch-plan@1:
 the same engine): it consumes `core.batch-plan@1` and, per file, executes
 "revalidate → atomic write → read-back target-digest verification",
 producing `core.batch-result@1`. `apply` performs no naked operations
-outside the manifest (roadmap §10, line 804).
+outside the manifest (roadmap §10「产品级 CLI」).
 
 ### 9.2 Fixed fields
 
@@ -735,7 +735,7 @@ any other digest                 → skipped-stale (exit 4)
   permissions/ownership (when the OS supports it) are copied to the
   temporary file; Windows read-only attribute and ACL behavior is measured
   during implementation and recorded; full cross-platform verification is
-  the 0.13.0 gate (roadmap §15.4, line 1399), and **0.12.0 must work on
+  the 0.13.0 gate (roadmap §15.4「安全门禁」), and **0.12.0 must work on
   Windows** (R-3).
 - **Symlink policy**: write paths reject symlink/junction targets by
   default (`cli.write.symlink-policy@1`, exit 4); `--follow-symlinks`
@@ -743,7 +743,7 @@ any other digest                 → skipped-stale (exit 4)
 - **Newline and encoding policy**: the CLI never transcodes and never
   rewrites newlines — raw bytes enter the `SourceSnapshot` and the raw
   rendered bytes are written (`Document::render()` is byte-exact,
-  IMPLEMENTATION.md line 73); UTF-16/ISO-8859-1 files pass through
+  IMPLEMENTATION.md——行号可能漂移，以语义句为锚); UTF-16/ISO-8859-1 files pass through
   unchanged per their encoding facts (R-11).
 - **Read-only targets**: replacement rejects read-only targets
   (`cli.write.read-only@1`); a target that is a directory →
@@ -761,8 +761,8 @@ any other digest                 → skipped-stale (exit 4)
 
 ### 11.1 Scope
 
-Redaction is **presentation-only** (roadmap §10, line 814; §19.2;
-SECURITY.md line 22): it affects only stderr diagnostics, human output, and
+Redaction is **presentation-only** (roadmap §10「产品级 CLI」; §19.2「无副作用安全边界」;
+SECURITY.md——行号可能漂移，以语义句为锚): it affects only stderr diagnostics, human output, and
 stdout envelope presentation; it **never removes the byte preconditions
 required to apply a SourcePatch** (hard gate 3). Redaction results are
 reproducible and testable (vectors + hardening).
@@ -914,10 +914,9 @@ core.batch-result@1
 ## 15. Security boundary
 
 - **No side-effect chain**: the CLI adds no evaluation, import, network,
-  or environment-read path (roadmap §10, line 816; §19.2, lines
-  1719-1732); the core's no-filesystem/no-env/no-network invariant is
+  or environment-read path (roadmap §10「产品级 CLI」; §19.2「无副作用安全边界」); the core's no-filesystem/no-env/no-network invariant is
   unaffected by the CLI layer (CLI file I/O is an explicit application
-  operation, §19.2, line 1734). The one exception is the documented
+  operation, §19.2「无副作用安全边界」). The one exception is the documented
   `apply` testing/CI injection seam (`CONSEMA_APPLY_INTERRUPT_AFTER`,
   `CONSEMA_APPLY_WRITE_FAILURE`, Section 5.4): it reads exactly those two
   variables, exists for no other command, and is documented in `--help`;
@@ -1006,7 +1005,7 @@ self-check — no repository fixtures) and outputs `cli.conformance@1`
 the full language-neutral suite stays repository-level
 (`cargo test -p consema-conformance`). Release artifacts do not include
 `conformance/vectors` (precedent: consema-conformance `publish = false`,
-IMPLEMENTATION.md line 65).
+IMPLEMENTATION.md——行号可能漂移，以语义句为锚).
 
 ## 17. Rejected alternatives
 
@@ -1015,7 +1014,7 @@ IMPLEMENTATION.md line 65).
   output schema; only the established path of fixed-field PortableValue +
   canonical JSON/PVCE dual transport + typed-decoder revalidation can be
   proven by language-neutral vectors (precedent: protocol-v1/v2 dual
-  transport equivalence, IMPLEMENTATION.md line 401; implementation plan
+  transport equivalence, IMPLEMENTATION.md——行号可能漂移，以语义句为锚; implementation plan
   §2.3). CLI convenience layers (human output, detection-facts display)
   stay local, and the detection-facts semantics (facts-only, ambiguity as a
   first-class result) remain part of the cross-language contract.
@@ -1035,8 +1034,7 @@ IMPLEMENTATION.md line 65).
 - **Detect then parse automatically ("try every dialect")**: rejected —
   detection returns only confidence facts or ambiguity (hard gate 2);
   parse-class commands require an explicit `--profile`, whose absence is a
-  usage error; nothing is guessed silently (roadmap §3.3, §14.11, line
-  1325).
+  usage error; nothing is guessed silently (roadmap §3.3「默认不猜测」、§14.11「`0.12.0`：Rust 产品集成」).
 - **Redacting the on-disk plan manifest too**: rejected — the manifest is
   `apply`'s input contract and its `original`/`replacement` bytes are
   precondition facts; redaction applies only to the presentation layer
@@ -1045,12 +1043,11 @@ IMPLEMENTATION.md line 65).
   positives (normal values redacted) violate "deterministic and
   explainable"; v1 does conservative key-name matching only (Section 11.2;
   R-6 both directions).
-- **Multi-file filesystem transactions in apply**: rejected — roadmap §10,
-  line 812 explicitly disclaims them; batch atomicity is the manifest state
+- **Multi-file filesystem transactions in apply**: rejected — roadmap §10「产品级 CLI」
+  explicitly disclaims them; batch atomicity is the manifest state
   machine's recoverability (Section 9.4).
 - **JSON-only machine schema transport**: rejected — both request input and
-  machine output require PVCE and strict JSON dual transport (roadmap §10,
-  line 808); a single transport would break Go alignment and vector
+  machine output require PVCE and strict JSON dual transport (roadmap §10「产品级 CLI」); a single transport would break Go alignment and vector
   equivalence proofs.
 - **An envelope for usage errors too**: rejected — usage errors are
   rejected before command execution and have no result to report; an
@@ -1059,7 +1056,7 @@ IMPLEMENTATION.md line 65).
 
 ## 18. Roadmap and plan mapping
 
-- roadmap §10 (lines 783-818): the 11 commands (Sections 2.1, 6.1),
+- roadmap §10「产品级 CLI」: the 11 commands (Sections 2.1, 6.1),
   read-only/dry-run by default with explicit confirmation arguments
   (hard gate 4; Sections 8.1, 9.1, 10), stdout/stderr/exit code (Sections
   3.3, 5), human and machine dual output with versioned schema (Sections
@@ -1072,22 +1069,22 @@ IMPLEMENTATION.md line 65).
   encoding policy (Section 10), no execution of programs embedded in
   configuration (Section 15), convenience choices never become core
   semantic defaults (Section 2.2).
-- roadmap §12.3 item 13 (lines 948-950): the ten-part RFC kit — motivation
+- roadmap §12.3 item 13（RFC-first 范围）: the ten-part RFC kit — motivation
   (Sections 1-2), non-goals (Section 2.2), data model (Sections 4, 6, 8,
   9), state machine (Section 9), error algebra (Sections 5, 13), resource
   limits (Section 12), security (Section 15), versioning (Section 14),
   conformance (Section 16), rejected alternatives (Section 17) — is
   complete.
-- roadmap §14.11 (lines 1304-1327): all-format registry (Section 6.2),
+- roadmap §14.11「`0.12.0`：Rust 产品集成」: all-format registry (Section 6.2),
   auto-detection safety boundary (Section 7), official CLI (Section 1),
   machine-readable CLI protocol (Sections 4-9), per-file atomic write and
   batch manifests (Sections 8-10), secret redaction (Section 11), and the
   five hard gates (Section 2.3 mapping).
-- roadmap §15.6 (lines 1422-1423): exit code, stdout/stderr, and machine
+- roadmap §15.6「API 与产品门禁」: exit code, stdout/stderr, and machine
   schema frozen as v1 candidate (Sections 4, 5); patch/apply covered by
   interruption, conflict, permission, and disk-error tests (Section 16.3;
   implementation plan M8).
-- roadmap §22.6 (lines 1921-1927): dry-run by default with write
+- roadmap §22.6「产品」: dry-run by default with write
   preconditions (hard gate 4; Section 9.3), stable machine-readable output
   schema (Section 4), batch manifests/conflicts/interruption/recovery
   (Sections 8-9).
