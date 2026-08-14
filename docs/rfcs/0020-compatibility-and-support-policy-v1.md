@@ -385,10 +385,10 @@ the disposition is publicly stated.
 - Coordinated disclosure: reports are acknowledged privately before any
   public disclosure; details are never published before a fix is
   available. No bug bounties are offered.
-- Channels: the repository's GitHub Security Advisory (private reporting;
-  enabled when the repository is public) is the primary channel; the
-  direct channel is the maintainer email (franckcl1989
-  <franckcl@icloud.com>). Reports should include affected
+- Channels: GitHub private vulnerability reporting is currently not
+  enabled (gh api measured 2026-08-14: enabled=false); once enabled it
+  will be the primary channel; until then the primary channel is the
+  maintainer email (franckcl1989 <franckcl@icloud.com>). Reports should include affected
   versions, the Profile/contract involved, the triggering capability
   contract (e.g. `core.source-snapshot@1`), a minimal reproduction, and
   observed behavior (§19.4).
