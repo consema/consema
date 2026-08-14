@@ -18,9 +18,9 @@ complements the human-chosen `kind:` label.
 | `kind: docs`    | `0075ca` | Documentation-only change                                          |
 | `kind: chore`   | `5319e7` | Maintenance: tooling, CI, dependencies, refactor without behavior change |
 | `kind: release` | `fbca04` | Release preparation / version bump                                 |
-| `area: core`    | `d93f0b` | Implementation / authoritative content (repo source tree)          |
-| `area: ci`      | `bfd4f2` | CI / tooling: `.github/**`, `scripts/**`                           |
-| `area: docs`    | `c2e0c6` | Documentation: `*.md`, `docs/**`                                   |
+| `area: core`    | `d93f0b` | Implementation / authoritative content (repo source tree: `conformance/**`; root meta files `LICENSE`/`.gitignore`/`.gitattributes`) |
+| `area: ci`      | `bfd4f2` | CI / tooling: `.github/**`, `scripts/**`, `.claude/**`             |
+| `area: docs`    | `c2e0c6` | Documentation: `*.md`, `docs/**`, `docs-site/**`                   |
 | `needs-info`    | `d4c5f9` | Issues awaiting information: the stale workflow (`only-labels: needs-info`) target（2026-08-13 换色：原与 `kind: release` 共用 `fbca04`，标签 UI 不可区分） |
 
 Create the labels in a fresh checkout (or any new repository copy) with:

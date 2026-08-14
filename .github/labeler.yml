@@ -1,9 +1,16 @@
 # Path-based area labels for .github/workflows/labeler.yml (actions/labeler
-# v7 config: label -> list of match objects; rules without an `any`/`all`
-# wrapper are OR-ed; inside a combinator `all-globs-to-all-files` requires
-# every changed file to match every glob, and `!`-prefixed globs are
-# independent negated matchers). Area labels are derived from paths only;
-# `kind:` labels remain the human/PR-template merge gate (pr-labels.yml).
+# v7 config: label -> list of match objects; top-level match objects are
+# OR-ed (a bare `changed-files` entry defaults to `any`), and inside a
+# combinator `any-glob-to-any-file` means "any changed file matching any
+# glob" — a single hit is enough to apply the label. The area rules are
+# independent: a mixed PR gets every area label whose paths it touches (a
+# source + docs PR gets both `area: core` and `area: docs`). Literal root
+# patterns (LICENSE/.gitignore/.gitattributes) match only the repo-root file
+# (minimatch, no matchBase). Language subtrees (crates/, python/,
+# typescript/) were removed in the six-repo split commit 2d7494f and are
+# .gitignore-excluded leftovers — deliberately no rules for them. Area
+# labels are derived from paths only; `kind:` labels remain the
+# human/PR-template merge gate (pr-labels.yml).
 
 'area: core':
   # authoritative conformance layer (vectors / fixtures / oracles / corpora /
@@ -11,15 +18,29 @@
   - changed-files:
       - any-glob-to-any-file:
           - 'conformance/**'
+  # repo-root meta files (literal names, root-only — no subtree matches)
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'LICENSE'
+          - '.gitignore'
+          - '.gitattributes'
 
 'area: ci':
   - changed-files:
       - any-glob-to-any-file:
           - '.github/**'
           - 'scripts/**'
+  # Claude Code workflow tooling (tracked: .claude/workflows/adversarial-audit.js)
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.claude/**'
 
 'area: docs':
   - changed-files:
       - any-glob-to-any-file:
           - '**/*.md'
           - 'docs/**'
+  # mdbook site sources (non-md: book.toml, .gitignore)
+  - changed-files:
+      - any-glob-to-any-file:
+          - 'docs-site/**'
