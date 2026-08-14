@@ -3,7 +3,7 @@
 - 决策：2026-08-11（用户决策：TS/Python/Kotlin 三语言加入 1.0.0 release 标准，与 Rust/Go 同等地位；
   工具链不阻塞——先盲写，工具链后台安装后验证）
 - 体例：照 `docs/go-implementation-plan.md`（里程碑拆分、多 agent 文件域、START GATE、硬门禁）
-- 权威五元（路线图 §17.1 第 1571-1577 行）扩展到七元：normative prose + contract registry +
+- 权威五元（路线图 §17.1「权威组成」——行号可能漂移，以节标题为锚）扩展到七元：normative prose + contract registry +
   machine-readable vectors + raw fixtures + independent runners（Rust / Go / TS / Python / Kotlin）
 
 ## 0. 总体结构
@@ -16,7 +16,7 @@
 - 共享仲裁层：`conformance/vectors/`（18 套 / 519 cases，聚合 digest cfd6e296 五语言共钉；
   508/35bebc8d 为 2026-08-12 P2-B 补强前值，见 §7.1 关账表）、
   `conformance/fixtures/`、`conformance/corpora/`、`conformance/oracles/`；
-  注册表：contract v7（41 条）/ error codes v7（187 码）；RFC 0016（Go 契约）为语言无关规范面。
+  注册表：contract v7（41 条）/ error codes v7（187 码）；RFC 0016 为 Go API mapping v1 宪章（Go 专属契约面，非语言无关——标题即「Go API mapping v1」；TS/Python/Kotlin 实现不作其语言无关权威）。
 - 字节权威 = **Rust 编码器**（PVCE/1、PGCE/1 golden 字节，双语言差分 harness 反向审计）。
 - 工具链状态（2026-08-11）：Node 26.7 / Python 3.12 / Temurin 17 JDK / Kotlin 2.2.0 后台安装中；
   安装完成前允许盲写（本计划 §3 盲写纪律），完成后执行验证门禁（§7）。
@@ -52,7 +52,7 @@ L5=fuzz/bench/security matrix+CLI+release-candidate clean-run（↔G5）。
 
 **数据来源优先级（提取冻结数据时）**：
 1. `conformance/vectors/*.json`（语言无关、机器可读、双语言共钉聚合 digest）——首选；
-2. RFC 0001-0016 + 0020 规范 prose（语言无关权威；0017-0019 不存在）——次选；
+2. RFC 0001-0015 + 0020 规范 prose（语言无关权威；0017-0019 不存在；0016 为 Go 专属宪章，不作语言无关面）——次选；
 3. Rust 实现（第一权威语言：PVCE/PGCE 字节布局、注册表清单的最终仲裁者）——仅在 1/2 不足时；
 4. Go 实现——**仅作交叉参照**（核对"另一实现也这么理解"），不作为提取来源；若 Rust 与 Go
    不一致，以 Rust + 向量为准并记录差异上报（不得自行裁决）。
@@ -133,11 +133,11 @@ JDK 17.0.20 + kotlinc 2.2.0（Kt，直接 JVM 调用 K2JVMCompiler）、cargo 1.
 每个 L 关闭同理（先验证后宣称）。任何 agent 的派发受本 GATE 约束；
 GATE 未过期间的代码统称"盲写产物"，不得进入任何发布证据。
 
-### 7.1 L0-L5 关账状态（2026-08-12 更新：L0-L4 全部关闭；L5 关闭面 = 差分 harness + CI 已交付，fuzz/bench/security matrix 为 Rust/Go 专属，ts/py/kt 的 L5 不含——以 five-language-ci-design.md §10 实况为准）
+### 7.1 L0-L5 关账状态（2026-08-12 更新：L0-L4 全部关闭；L5 关闭面 = 差分 harness + CI 已交付，fuzz/bench/security matrix 为 Rust/Go 专属，ts/py/kt 的 L5 不含——以 five-language-ci-design.md §10 实况为准；L0 的 L-differential 组成腿 shared-conformance 脚本尚未合入（该设计 §1.2/§10），L0 关闭面按其口径收窄）
 
 | 批次 | 载体 commit | 证据 |
 |---|---|---|
-| L0-L4（三语言） | 5cf680b（实现入库；errata 见 CHANGELOG 2026-08-12 勘误） | 每语言 conformance 508/508（增补前——18 套 / digest 35bebc8d 共钉；2026-08-12 P2-B 向量补强至 519 / cfd6e296 后见 fc-manifest-0.13.0.json:39、41）+ capability parity；CHANGELOG 勘误记录 commit message 仅标注 fuzz 账本、实际携带三语言实现 |
+| L0-L4（三语言） | 5cf680b（实现入库；errata 见 CHANGELOG 2026-08-12 勘误） | 每语言 conformance 508/508（增补前——18 套 / digest 35bebc8d 共钉；2026-08-12 P2-B 向量补强至 519 / cfd6e296 后见 fc-manifest-0.13.0.json digests.conformance_suite——以字段名为锚，行号可能漂移）+ capability parity；CHANGELOG 勘误记录 commit message 仅标注 fuzz 账本、实际携带三语言实现 |
 | Python 补充 | a0c318b | .gitignore 排除 node_modules（CHANGELOG 勘误同述） |
 | L5 harnesses + CI | 2f981df | 跨语言差分 harness（normalized/protocol exchange）+ 各语言 CI workflow；差分发现的 wire-codec 缺陷随本 commit 修复（五要素终审 §3.2 关账表） |
 | CI 修复 | dbba9a4 | 五语言 CI 全绿（python fixtures 路径、kotlin jar 供给等首跑缺陷修复；ci.yml run#9 + ci-typescript/ci-python/ci-kotlin 各 run#2，见 rc-1.0.0-candidate.md §4.1） |
@@ -156,7 +156,7 @@ GATE 未过期间的代码统称"盲写产物"，不得进入任何发布证据�
 ## 8. 相关文件
 
 - 体例：`docs/go-implementation-plan.md`（§1-§7 平移）
-- 契约：RFC 0016（语言无关契约面）、RFC 0006/0007（graph/PGCE）、RFC 0015（CLI 协议）
+- 契约：RFC 0016（Go API mapping 宪章——Go 专属契约面，仅 Go 侧消费）、RFC 0006/0007（graph/PGCE）、RFC 0015（CLI 协议）
 - 注册表：`docs/fc-manifest-0.13.0.json`（41 contract / 187 codes / capability 门禁）
 - 向量：`conformance/vectors/*.json`（18 套 / 519 cases）
 - 字节权威：consema-rs/consema-pvce（PVCE/1）、consema-rs/consema-graph（PGCE/1）

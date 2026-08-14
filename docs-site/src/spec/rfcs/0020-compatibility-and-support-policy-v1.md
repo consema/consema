@@ -64,8 +64,10 @@ RFC is the normative statement of all of them, fulfilling roadmap §27 R-20
   numbers* only at the two freeze points already defined by §21.4
   (Rust Feature-Complete — done at 0.13.0 — and Go RC — pending). The
   TypeScript/Python/Kotlin declared minimums are manifest-embedded and
-  CI-verified at pinned versions ("really verified in CI" by construction,
-  five-language-ci-design §1.2); their freeze follows the same
+  CI-verified at pinned versions ("really verified in CI" by construction——
+  如实注记：该措辞只对 Kotlin 2.2.0 精确成立（TS 钉 26.7.0、Python 钉
+  3.12.x 为各自 minor 线最新补丁，声明最低版本 26.0/3.12.0 未被精确验证），
+  见 §9.3 诚实注记；five-language-ci-design §1.2); their freeze follows the same
   release-train discipline (Section 9.7).
 
 ### 1.2 Normative standing
@@ -413,8 +415,9 @@ the disposition is publicly stated.
 
 - Standing gates: `Cargo.lock` and exact-lockfile discipline, RustSec
   `cargo audit` (0 known advisories at the 0.13.0 gate), `cargo deny
-  check` (unknown registries/Git sources, wildcards, duplicates, and
-  license inventory rejected), and the locked license allowlist
+  check` (unknown registries/Git sources, wildcards, and license
+  inventory rejected; duplicates 按 bans 图口径——排除 dev/lockfile-only 后
+  现存 3 组 justified duplicates getrandom/syn/r-efi 放行，见 SECURITY.md), and the locked license allowlist
   (SECURITY.md, line 38; §19.3).
 - Go: dependency audit is part of the release checklist (§19.4); the Go
   module is stdlib-only (go-implementation-plan §1.3), so the third-party
@@ -451,8 +454,7 @@ the disposition is publicly stated.
 
 - **Declared minimum**: `go.mod` declares the minimum Go version; the
   value is `go 1.26`, frozen at 0.14.0 (go-implementation-plan §1.3, per
-  §21.2 lines 1825/1831: minimum version follows the public support
-  policy and is CI-verified).
+  §21.2「Go API」的「Go 最低版本遵循公开支持政策并在 CI 验证」句——行号可能漂移，以节标题为锚).
 - **Support window**: each Go minor release supports the latest two Go
   minor versions at its time of release (the §21.4 placeholder promise,
   now concrete: with `go.mod` at 1.26, releases support Go 1.26 and 1.27
@@ -480,8 +482,8 @@ the disposition is publicly stated.
   the current stable toolchain. Honest note: the three L5 languages pin
   the latest patch of their minor line (TS 26.7.0, Python '3.12.x'), so
   "really verified in CI" by construction holds only for Kotlin 2.2.0 —
-  the declared minima 26.0/3.12.0 are not precisely verified (Section 9.2
-  wording, five-language-ci-design §1.2).
+  the declared minima 26.0/3.12.0 are not precisely verified (Section 9.3
+  wording——原「Section 9.2 wording」误引已纠正；five-language-ci-design §1.2 同口径).
 - **Bumps**: minimum-version increases follow the same discipline as the
   Rust MSRV — minor-only, never in patch, never reinterpreting published
   contracts, with the CHANGELOG noting the lowest stayable version.
@@ -498,7 +500,9 @@ the disposition is publicly stated.
   setup-python).
 - **Support window**: all Python versions from the declared minimum
   through the current stable toolchain ("really verified in CI" by
-  construction, five-language-ci-design §1.2).
+  construction——如实注记：该措辞只对 Kotlin 2.2.0 精确成立，见 §9.3；
+  Python CI 矩阵实为 3.12.x/3.13.x/3.14.x 三 minor 线（ci-python.yml
+  python-gates job），3.12.0 未被精确版本验证).
 - **Bumps**: same discipline as Section 9.3 — minor-only, never in patch,
   never reinterpreting published contracts.
 - **Verification**: CI runs compileall + the full pytest suite plus the
@@ -517,8 +521,9 @@ the disposition is publicly stated.
   five-language-ci-design §1.2).
 - **Bumps**: same discipline as Section 9.3 — minor-only, never in patch,
   never reinterpreting published contracts.
-- **Verification**: CI runs `./gradlew --no-daemon test` on the declared
-  minimum (ci-kotlin.yml).
+- **Verification**: CI runs the full suite plus the 60% kover line-coverage
+  gate on the declared minimum (ci-kotlin.yml kotlin-gates job:
+  `.\gradlew.bat test koverVerify`——无 `--no-daemon` 旗标).
 - **Freeze record**: the declared minimum is manifest-embedded and
   CI-verified; the formal freeze follows Section 9.7.
 
@@ -531,7 +536,7 @@ matrix):
 |---|---|---|
 | Windows (Windows 11 Pro baseline) | x86-64 | windows-latest full matrix |
 | Linux | x86-64 | ubuntu-latest full matrix |
-| macOS | arm64 (macos-latest is Apple Silicon since 2024; x86-64 macOS has no CI carrier) | macos-latest full matrix |
+| macOS | arm64 (macos-latest is Apple Silicon since 2024; x86-64 macOS has no CI carrier) | macos-latest full matrix——如实注记：仅 consema-rs 有 macOS CI 腿（lint/test 三 OS 矩阵）；consema-go 的 macOS 腿明确 pending（G5.4，无 CI job 无实测）；consema-ts/py/kt 三仓 CI 仅 ubuntu+windows——四语言仓支持目标以各仓 SECURITY 为准 |
 
 - All other platforms/architectures are best-effort: they do not block
   releases, and accepted critical fixes are verified on the three

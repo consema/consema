@@ -10,7 +10,7 @@
 ## 门禁与证据
 
 - [fc-manifest-0.13.0.json](https://github.com/consema/consema/blob/main/docs/fc-manifest-0.13.0.json)：0.13.0 Feature-Complete Gate 记录（含 conformance 聚合 digest 与各门禁条目证据）
-- [fuzz-evidence-0.13.0.md](https://github.com/consema/consema/blob/main/docs/fuzz-evidence-0.13.0.md) 与 `docs/fuzz-evidence-0.13.0-logs/`：fuzz 证据（含原始日志；fuzz 账本禁改）
+- [fuzz-evidence-0.13.0.md](https://github.com/consema/consema/blob/main/docs/fuzz-evidence-0.13.0.md) 与 `docs/fuzz-evidence-0.13.0-logs/`：fuzz 证据（含原始日志；runs.csv 为追加式账本（只 append 从不改写）——账本目录副本为拆分时点快照 + 2026-08-13 追加变更（8f1ffa2，CONSEMA_GIT_EXE override，+13 行），非冻结原版；驱动已暂停（2026-08-13 11:19 后未重启））
 - [0.13.0-gate-plan.md](https://github.com/consema/consema/blob/main/docs/0.13.0-gate-plan.md)、[API-REVIEW-0.13.0.md](https://github.com/consema/consema/blob/main/docs/API-REVIEW-0.13.0.md)、[COVERAGE-0.13.0.md](https://github.com/consema/consema/blob/main/docs/COVERAGE-0.13.0.md)
 - 基准：BENCHMARKS-0.6.0 … 0.13.0（[docs/ 目录](https://github.com/consema/consema/tree/main/docs)）
 - RC soak 五本：rc-soak-stage1-benchmarks / corpus / differential / disk-drill / go-fuzz（[docs/ 目录](https://github.com/consema/consema/tree/main/docs)）

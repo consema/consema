@@ -34,7 +34,7 @@
 
 ## 0.1 已确认的起点
 
-Rust `0.1.0` 于 2026-07 完成（历史快照，下文数字为当时状态）：
+Rust `0.1.0` 于 2026-08-04 完成（历史快照，下文数字为当时状态；git 实证：首提交 4d07c24 与 `v0.1.0` tag 均为 2026-08-04 10:05:59）：
 
 * PortableValue v1 全类型与 strict equality/hash；
 * PVCE/1 canonical encode/strict decode；
@@ -102,6 +102,8 @@ Rust `0.3.0` 已完成跨格式 contract/protocol 闭合：冻结 RFC 0002、Sem
 ```
 
 缺少其中任何一个，都不能发布 `1.0.0`。
+
+> **superseded by 2026-08-11 决策（五语言同等地位）**：本节以双语言（Rust/Go）口径定义 `1.0.0`——TypeScript/Python/Kotlin 与 Rust/Go 同等地位、全部纳入 `1.0.0` release 标准与产品承诺（见 `docs/multi-language-implementation-plan.md` 与 `docs/five-language-ci-design.md`）；「实现完成」按五个独立实现均实现全部 mandatory 1.0 能力核验。本节双语言口径保留为 2026-08-11 前历史记录。
 
 ---
 
@@ -839,6 +841,8 @@ Rust 全部功能实现
 
 Go 开发不得提前与 Rust 格式实现并行，以免在语义尚未稳定时复制返工。
 
+> **2026-08-07 决策注记（偏差 D-1）**：本节顺序块「→ 才开始 Go 正式实现」「Go 开发不得提前与 Rust 格式实现并行」已被 2026-08-07 owner decision（fc-manifest decisions[0] D-1）修订——owner 决定在 C-1/C-2/C-3 完成前启动 Go 实现，Go 0.14.0-0.19.0 已提前授权启动并全部独立验证交付（见 §13 决策注记与 §14.12 修订条款）。本节双语言口径另被 2026-08-11 五语言同等地位决策 superseded（TS/Python/Kotlin 同等地位，见 §1 注记）。保留为历史规划态。
+
 ## 11.2 Go 不是 Rust 的翻译
 
 Go 实现必须：
@@ -998,7 +1002,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
   ↓
 0.12.0 Rust SDK + CLI 产品集成                           Rust 已完成
   ↓
-0.13.0 Rust 生产加固与 Feature-Complete Gate      Rust 门禁推进中（C-1 已闭环 2026-08-11；C-2 partial，5/9 单位过 72h——2026-08-13 复算 122,477 数据行 / 780.529 CPU-hours，properties/yaml/ini/hcl/json 已过门槛；C-3 partial；五语言各 L0-L5 已交付）
+0.13.0 Rust 生产加固与 Feature-Complete Gate      Rust 门禁推进中（C-1 已闭环 2026-08-11；C-2 partial，5/9 单位过 72h——2026-08-13 复算 122,477 数据行 / 780.529 CPU-hours，properties/yaml/ini/hcl/json 已过门槛，驱动已暂停（2026-08-13 11:19 后未重启），四单位未过门槛如实记录为遗留；C-3 partial；五语言各 L0-L5 已交付——L0 差分腿 shared-conformance 脚本尚未合入（five-language-ci-design §1.2/§10），L0-L5 关闭面以该文档为准）
   ↓
 0.14.0 Go core / PVCE / PGCE / protocol                  已交付（G0.1-G0.5，2026-08-07 D-1 授权启动）
   ↓
@@ -1019,7 +1023,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 
 > **决策注记（2026-08-07）**：owner 决定在 C-1/C-2/C-3 完成前启动 `0.14.0` 的 Go 实现（G0.1-G0.3：core/graph/protocol），这是经记录的路线图偏差，按 §0 冲突解决层级处理——修改路线图、不静默缩小 1.0.0 承诺；`0.13.0` 门禁判定以 docs/fc-manifest-0.13.0.json 为准（gate_open/not_closed，C-1/C-2/C-3 开放，decision record 见该 manifest）。
 >
-> **状态更新（2026-08-12；2026-08-13 更新 C-2 数字）**：C-1 已闭环——2026-08-11 GitHub Actions run#5（head 437fd35）132/132 steps 全绿；C-2 推进中——2026-08-13 复算 122,477 数据行 / 780.529 CPU-hours（runs.csv 权威），properties/yaml/ini/hcl/json 五单位已过 72h 门槛；C-3 partial；Go 全里程碑（0.14.0-0.19.0 G0.1-G5.6）已交付；五语言实现各 L0-L5 已交付（TS/Python/Kotlin 与 Rust/Go 同等地位，见 docs/multi-language-implementation-plan.md 与 docs/five-language-ci-design.md）。
+> **状态更新（2026-08-12；2026-08-13 更新 C-2 数字）**：C-1 已闭环——2026-08-11 GitHub Actions run#5（head 437fd35）132/132 steps 全绿；C-2 推进中——2026-08-13 复算 122,477 数据行 / 780.529 CPU-hours（runs.csv 权威），properties/yaml/ini/hcl/json 五单位已过 72h 门槛（驱动已暂停 2026-08-13 11:19 后未重启，四单位未过门槛如实记录为遗留）；C-3 partial；Go 全里程碑（0.14.0-0.19.0 G0.1-G5.6）已交付；五语言实现各 L0-L5 已交付（TS/Python/Kotlin 与 Rust/Go 同等地位，见 docs/multi-language-implementation-plan.md 与 docs/five-language-ci-design.md；L0 的 shared-conformance 差分腿尚未合入，见该设计 §10）。
 
 版本数量可以在实际执行中增加，但不得压缩语义门禁。若某个阶段过大，可以拆成更多 minor 版本；不能为了保持编号漂亮而把未完成能力滚入下一阶段。
 
@@ -1872,6 +1876,8 @@ Go 官方把 `v1` 定义为稳定承诺，并建议将破坏性 major update 作
 
 # 22. `1.0.0` 最终发布门槛
 
+> **superseded by 2026-08-11 决策（五语言同等地位）**：本节发布门槛以双语言（Rust/Go）口径撰写——TypeScript/Python/Kotlin 与 Rust/Go 同等地位、全部纳入 `1.0.0` release 标准与产品承诺（§22.2 双语言实现、§22.4 双语言全测试矩阵、§22.6 双 SDK/CLI 正式发布、§22.7 双语言 SDK pilot 相应按五语言面核验，见 `docs/multi-language-implementation-plan.md` 与 `docs/five-language-ci-design.md`）；本节双语言口径保留为 2026-08-11 前历史记录，发布门槛以五语言文档为准。
+
 ## 22.1 标准与格式
 
 * 八个格式家族全部 GA；
@@ -2206,7 +2212,7 @@ Lossless structure、provenance 和 graph 必然增加成本。控制：
 
 1. 通过正式 RFC；
 2. 证明属于主流静态配置格式；
-3. 说明对当前排期和双语言成本的影响；
+3. 说明对当前排期和双语言成本的影响（**superseded by 2026-08-11 决策（五语言同等地位）**：五语言同等地位后成本面为五语言——TS/Python/Kotlin 与 Rust/Go 同等地位、全部纳入 `1.0.0` release 标准）；
 4. 用户明确接受路线图变更；
 5. 不降低任何既有家族门槛。
 
@@ -2347,4 +2353,4 @@ Consema `1.0.0` 的最终定义是：
 
 > **不以版本号推进代替完成，不以格式数量代替真实支持，不以共同 map 代替语义统一，不以单一实现通过代替跨语言标准成立。**
 
-Go 只在 Rust 全部门禁通过后开始；`1.0.0` 只在 Rust、Go、规范、CLI 和生产保障全部完成后发布。
+Go 只在 Rust 全部门禁通过后开始（**2026-08-07 决策注记（偏差 D-1）**：该时序已被 owner decision 修订——Go 0.14.0-0.19.0 在 C-1/C-2/C-3 完成前提前授权启动并全部独立验证交付，见 §13 决策注记与 §14.12 修订条款）；`1.0.0` 只在 Rust、Go、规范、CLI 和生产保障全部完成后发布（**superseded by 2026-08-11 决策（五语言同等地位）**：TS/Python/Kotlin 同等地位、全部纳入 `1.0.0` release 标准，见 §1 注记）。
