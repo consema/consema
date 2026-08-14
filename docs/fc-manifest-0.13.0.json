@@ -15,7 +15,7 @@
   "digests": {
     "product_version": {
       "value": "1.0.0-rc.1",
-      "evidence": "consema-rs/Cargo.toml:31（[workspace.package] version，51fa86d 提交推进 0.13.0→1.0.0-rc.1——consema-rs 投影 SHA，母仓对应提交为 2209582，同 message「Land 1.0.0-rc.1: RFC 0020, five-element review, SemVer envelope, canonical digest」）；consema-go/go/cmd/consema/version.go:15（Go CLI productVersion 同步）",
+      "evidence": "consema-rs/Cargo.toml 的 [workspace.package] version 字段（51fa86d 提交推进 0.13.0→1.0.0-rc.1——consema-rs 投影 SHA，母仓对应提交为 2209582，同 message「Land 1.0.0-rc.1: RFC 0020, five-element review, SemVer envelope, canonical digest」；行号可能漂移，以字段名为锚）；consema-go/go/cmd/consema/version.go 的 productVersion 字段（行号可能漂移，以字段名为锚）",
       "note": "workspace 版本已推进 0.8.0→0.13.0→1.0.0-rc.1（consema-rs 投影 51fa86d / 母仓 2209582，15 crate version.workspace = true + Go CLI productVersion 同步）；真实发布执行（checksum/SBOM/签名/tag/恢复演练复跑，docs/release-process-0.13.0.md §7 检查单）仍属门禁收口的开放项（见 feature_complete_judgment.open_items C-3）。"
     },
     "spec_revision": {
@@ -314,7 +314,7 @@
           "status": "complete",
           "evidence": [
             "docs/rfcs/0016-go-api-mapping-v1.md（Accepted，§4.1 15-kind 值映射冻结）",
-            "consema-go/go/：0.14.0 G0.1-G0.5 起步（core 15-kind+PVCE、graph+PGCE、protocol v1-v7 41/187+CLI 记录、consema-go/go/conformance 18-suite runner、6 fuzz target、differential 字节 harness），0.15.0-0.19.0（G1.1-G5.6）完成八格式家族全 surface 与 CLI consema-go/go/cmd/consema（11 命令 + plan/apply，exit 0-5 矩阵）；go build/vet/test/race/gofmt/tidy 全绿，22 包全绿（20 含测试，quickstart/sdk_chain 两示例包无测试；含 race）；productVersion 1.0.0-rc.1（consema-go/go/cmd/consema/version.go:15）",
+            "consema-go/go/：0.14.0 G0.1-G0.5 起步（core 15-kind+PVCE、graph+PGCE、protocol v1-v7 41/187+CLI 记录、consema-go/go/conformance 18-suite runner、6 fuzz target、differential 字节 harness），0.15.0-0.19.0（G1.1-G5.6）完成八格式家族全 surface 与 CLI consema-go/go/cmd/consema（11 命令 + plan/apply，exit 0-5 矩阵）；go build/vet/test/race/gofmt/tidy 全绿，22 包全绿（20 含测试，quickstart/sdk_chain 两示例包无测试；含 race）；productVersion 1.0.0-rc.1（consema-go/go/cmd/consema/version.go 的 productVersion 字段——行号可能漂移，以字段名为锚）",
             "conformance runner 实测：0.14.0 时点适用 case 149/149 通过、359 documented skip（历史）；现为 519/519 零 skip，聚合 digest cfd6e296... 精确一致（规范 checkout 实测；2026-08-07 CRLF 工作树记录 e3d6578858... 已被规范态值取代）",
             "跨语言字节 parity 实测：68/68（51 PVCE + 17 PGCE）双向相等（consema-go/scripts/go-verify-byte-parity.ps1）；normalized 差分 108/108 双向、协议交换 83/83（2026-08-10）",
             "docs/go-implementation-plan.md（§6 验收门禁表）、§7 修订条款（D-1 决策记录）；consema-go/README.md 逐里程碑交付记录（G0.1-G5.6 全 closed）"

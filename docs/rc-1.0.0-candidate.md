@@ -298,7 +298,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
 ### 4.2 巡检 4 条观察记录（P2 级）
 
 1. pilot-go-0.19.0.md §1 标题"12 个文件"而表含 13 行（logback.xml 为"—"）——与
-   consema-go/go/pilot/pilot_test.go:157-170 的 12 文件注册一致，接受；
+   consema-go/go/pilot/pilot_test.go（行号可能漂移，以符号名为锚）的 12 文件注册一致，接受；
 2. vectors/toml-v1.json 的 toml.corpus.cargo-manifest fixture 路径为裸
    `"Cargo.toml"`（仓库根，非 fixtures 下），Rust runner 用 include_bytes! 解析
    （consema-rs/consema-conformance/src/toml_v1.rs）——Go runner 落地时需继承同一
