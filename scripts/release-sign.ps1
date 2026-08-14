@@ -324,8 +324,12 @@ function Invoke-GpgVerify {
 # --- Tag signing -------------------------------------------------------------
 
 if ($mode -eq 'tag') {
-    if ($SignTag -notmatch '^v[0-9]+\.[0-9]+\.[0-9]+$') {
-        Write-Output "error: -SignTag must look like 'v0.13.0' (got '$SignTag')."
+    # Line-anchored (G105): a prefix match let 'v0.13.0evil' through and
+    # triggered a doomed release run; the whole string must be a version.
+    # Wave 3 (2026-08-14, R2): a SemVer prerelease suffix is now allowed
+    # (v1.0.0-rc.1 passes); the anchors still reject any other suffix.
+    if ($SignTag -notmatch '^v[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.-]+)?$') {
+        Write-Output "error: -SignTag must look like 'vX.Y.Z' or 'vX.Y.Z-<prerelease>' (got '$SignTag')."
         exit 2
     }
     $existing = Invoke-NativeCapture 'git' @('-C', $RepoRoot, 'tag', '-l', $SignTag)
