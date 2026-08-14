@@ -2,7 +2,7 @@
 
 ## Vendored 同步注记（2026-08-14，波 3 F1 re-vendor 收口）
 
-六仓 conformance/README.md 以母仓 consema 为权威：母仓持有权威原文，go/ts/py/kt 仓持有逐字节 vendored 副本，rs 仓持有按「同一批内容修正」同步的变体形态（不逐字节复制）。本注记（除文末 hash 比对表外）为 vendored 内容，在六仓文件中一致。re-vendor 基准提交 SHA：`1218190`（注记中性化，re-vendor 基准）——**勘误（2026-08-15 波 4）**：原「来源提交 SHA：`096e5f8`（波 3 审计前已实证：该提交 conformance/ 树与母仓 HEAD 零差异）」不成立——git 实测 096e5f8→HEAD 的 conformance/ 树有 4 文件、52 增 11 删差异（conformance/README.md 自身、corpora/README.md、oracles/plist-macos-v1/README.md 与 manifest.json），096e5f8 的 conformance/README.md sha256（e36dce34…）与 HEAD（f8708d44…）不同；「来源 096e5f8、零差异」表述作废。2026-08-14 波 3 修复（组 W3-01/W3-02）在权威版落地以下内容修正后，五仓副本以修正版（1218190 基线）为基准 re-vendor：differential 断言口径（go/ts/py/kt 侧各仓测试断言、rs 侧 vendored 快照）、G0.1-G5.6 的 G028 限定、`toml-v1.json` 的 toml.corpus.cargo-manifest 向量引用、`oracles/plist-macos-v1/README.md`「not skipped」如实化。2026-08-15 波 4（R4/R17）再落地本注记勘误与 runner 校验口径修正，go/ts/py/kt 本地盘副本需以波 4 修正版再 re-vendor（hash 表见下）。
+六仓 conformance/README.md 以母仓 consema 为权威：母仓持有权威原文，go/ts/py/kt 仓持有逐字节 vendored 副本，rs 仓持有按「同一批内容修正」同步的变体形态（不逐字节复制）。本注记（除文末 hash 比对表外）为 vendored 内容，在六仓文件中一致。re-vendor 基准提交 SHA：`1218190`（注记中性化，re-vendor 基准）——**勘误（2026-08-15 波 4）**：原「来源提交 SHA：`096e5f8`（波 3 审计前已实证：该提交 conformance/ 树与母仓 HEAD 零差异）」不成立——git 实测 096e5f8→HEAD 的 conformance/ 树有 4 文件、52 增 11 删差异（conformance/README.md 自身、corpora/README.md、oracles/plist-macos-v1/README.md 与 manifest.json），096e5f8 的 conformance/README.md sha256（e36dce34…）与 HEAD（f8708d44…）不同；「来源 096e5f8、零差异」表述作废。2026-08-14 波 3 修复（组 W3-01/W3-02）在权威版落地以下内容修正后，五仓副本以修正版（1218190 基线）为基准 re-vendor：differential 断言口径（go/ts/py/kt 侧各仓测试断言、rs 侧 vendored 快照）、G0.1-G5.6 的 G028 限定、`toml-v1.json` 的 toml.corpus.cargo-manifest 向量引用、`oracles/plist-macos-v1/README.md`「not skipped」如实化。2026-08-15 波 4（R4/R17）再落地本注记勘误与 runner 校验口径修正；go/ts/py/kt 本地盘副本已以波 4 修正版再 re-vendor（来源提交 SHA：`7cb9f9d`，母仓 2026-08-15 HEAD；hash 表见下）。
 
 同步命令（母仓权威版 → 各仓 vendored 副本，在母仓 checkout 内执行）：
 
@@ -22,20 +22,20 @@ Get-FileHash <repo>\conformance\README.md,<repo>\conformance\oracles\plist-macos
 
 六仓同名文件 hash 比对表为母仓独有记录，位于本注记末尾（裁决 R11 载体）；五仓副本不携带比对表。
 
-### 六仓同名文件 hash 比对表（2026-08-14 波 3 F1 re-vendor 收口实测，裁决 R11）
+### 六仓同名文件 hash 比对表（2026-08-14 波 3 F1 re-vendor 收口实测，裁决 R11；2026-08-15 波 4 re-vendor 后实测更新）
 
 | 仓 | conformance/README.md（sha256） | conformance/oracles/plist-macos-v1/README.md（sha256） |
 |---|---|---|
-| consema（母仓，权威原文） | `4f68cfcf120aa6e872f9e9544f5ce8b602858ef8700d9c19abfcf0b5dc7a9694`（波 4 修正后现行） | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
-| consema-rs（变体形态） | `5ce76328aab62b0930fbdcc90c9680ad0b5c046bfe5c3c67c1b551a8b53429fa` | `8c23f8d8a69fb48074bd7b1a1f5ba9a066890d3cef415d78ff5bba8e578ff05e` |
-| consema-go（逐字节副本） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
-| consema-ts（逐字节副本） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
-| consema-py（逐字节副本） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
-| consema-kt（逐字节副本） | `6a7d6345e07da55a1e91e23b505dcce4d97e5420a4c5a664576ad7f17d47a0e5` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema（母仓，权威原文） | `deda03160fb4d35b682d243973fe43376d160b4dc476fc3e70351316a68dcacd`（波 4 re-vendor 后 vendored 内容实测） | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema-rs（变体形态） | `abb9b616f75e28f2fc02c8422bcf023b31c7ae83c954f32b46040a246bcf03d1` | `8c23f8d8a69fb48074bd7b1a1f5ba9a066890d3cef415d78ff5bba8e578ff05e` |
+| consema-go（逐字节副本） | `deda03160fb4d35b682d243973fe43376d160b4dc476fc3e70351316a68dcacd` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema-ts（逐字节副本） | `deda03160fb4d35b682d243973fe43376d160b4dc476fc3e70351316a68dcacd` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema-py（逐字节副本） | `deda03160fb4d35b682d243973fe43376d160b4dc476fc3e70351316a68dcacd` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema-kt（逐字节副本） | `deda03160fb4d35b682d243973fe43376d160b4dc476fc3e70351316a68dcacd` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
 
-- 母仓行记录权威内容 hash（即本表写入前的内容）：比对命令对母仓以 `git show HEAD:conformance/README.md` 与 `git show HEAD:conformance/oracles/plist-macos-v1/README.md` 为准（波 4 修正后 HEAD 为 4f68cfcf…；plist README 未变）；对五仓以当前文件直接比对。
-- **波 4 re-vendor 状态（2026-08-15）**：go/ts/py/kt 本地盘副本现仍为 1218190 基线内容（README `6a7d6345…`），与本表母仓现行 hash 不一致——波 4 修正（本注记勘误 + runner 校验口径）后需以修正版再 re-vendor 并更新本表；rs 变体按 rs 侧 re-vendor 流程同步。
-- go/ts/py/kt 的 `/conformance/` 为 gitignored provisioned 数据（CI 自母仓 checkout provision，见各仓 .gitignore 注释与 py `.github/actions/provision-conformance/action.yml`），re-vendor 更新其本地盘副本，无提交；rs 的 re-vendor 提交为 `804c2e4`、plist README 复修同步为 `2deb075`。
+- 母仓行记录 vendored 内容 hash（hash 比对表节不计入，即五仓副本的比对面）：比对命令对母仓以 `git show HEAD:conformance/README.md` 删除「### 六仓同名文件 hash 比对表」标题至「- 母仓权威修正提交」条目（含两者及紧邻空行）后的内容为准（波 4 re-vendor 后为 deda0316…；plist README 未变）；对五仓以当前文件直接比对。
+- **波 4 re-vendor 完成（2026-08-15）**：go/ts/py/kt 本地盘副本已以波 4 修正版（来源提交 SHA `7cb9f9d`）re-vendor，与母仓 vendored 内容逐字节一致（实测见上表）；rs 变体已手工同步同一批内容修正（rs 提交 `4b8f9bd`）。
+- go/ts/py/kt 的 `/conformance/` 为 gitignored provisioned 数据（CI 自母仓 checkout provision，见各仓 .gitignore 注释与 py `.github/actions/provision-conformance/action.yml`），re-vendor 更新其本地盘副本，无提交；rs 的 re-vendor 提交为 `804c2e4`、plist README 复修同步为 `2deb075`、波 4 内容修正同步提交为 `4b8f9bd`。
 - 母仓权威修正提交：`564c1f1`（本文件 (a)/(b)/(c) + 注记）、`ef8d583`（plist README 如实化）、`1218190`（注记中性化，re-vendor 基准）、`9d096a9`（plist README 溯源括注去旧声称字面量）。
 
 本目录保存跨语言可复放的行为契约。向量只使用 strict JSON，二进制位模式、任意精度数字和 wire 结果使用字符串表示，避免宿主语言的数值模型改变预期事实。
