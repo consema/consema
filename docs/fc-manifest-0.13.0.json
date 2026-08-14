@@ -37,7 +37,7 @@
       "suites": 18,
       "cases": 519,
       "aggregate_sha256": "cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a",
-      "evidence": "conformance/vectors/*.json（18 文件，2026-08-12 实测 18 suites / 519 cases：plist +4 binary limit、yaml +4 recovery/depth/alias-budget、java-properties +3 family-parse/encoding）；consema-rs/.github/workflows/ci.yml 的 conformance job（suite-count 断言步骤与断言 throw 步骤；7e9de38 树内 :93-121/:103-121/:119，行号可能漂移，以 job/step 名为锚）；README.md",
+      "evidence": "conformance/vectors/*.json（18 文件，2026-08-12 实测 18 suites / 519 cases：plist +4 binary limit、yaml +4 recovery/depth/alias-budget、java-properties +3 family-parse/encoding）；consema-rs/.github/workflows/ci.yml 的 conformance job（suite-count 断言步骤与断言 throw 步骤——以 job/step 名为锚，行号可能漂移；7e9de38 为拆分前母仓提交，其树内断言为 18 suites / 508 cases（P2-B 前口径），不再作为行号引用源）；README.md",
       "note": "聚合方式（2026-08-10 复核，2026-08-07 初记）：按文件名字节序排序，逐文件 sha256（小写 hex），每行格式 '{basename}:{digest}'，各行以 '\\n' 连接（无尾换行），聚合 sha256 即对该 UTF-8 字节串再 sha256。2026-08-12 P2-B 向量补强（plist +4 limit、yaml +4 recovery/depth/alias、java-properties +3 parse/encoding）后 18 文件实测聚合 = cfd6e296…（go runner VerifyVectorsDigest 同值交叉验证）。digest 以规范 checkout（.gitattributes eol=lf，git 存储的 LF 规范态）字节为准；2026-08-10 修订前记录值 e3d6578858… 是在 2026-08-07 的 CRLF 工作树（本机 core.autocrlf=true）上记录，已被规范态值取代（本机 CRLF 工作树下逐文件 sha256 不同属预期，本地开发用 git config core.autocrlf false 或接受该差异）。（与 M1 的 suite-count 断言同源，gate plan §8。）"
     },
     "corpus_test_suite_revisions": {
@@ -53,7 +53,7 @@
     },
     "benchmark_baseline_revision": {
       "value": "docs/BENCHMARKS-0.13.0.md（2026-08-07 测量；测量构建 HEAD b505ada，会话内 0.12.0 落为 9c1ede2）",
-      "evidence": "docs/BENCHMARKS-0.13.0.md（§1 Environment）、:90-138（§4 冻结预算行）、:184-204（§7 场景行）",
+      "evidence": "docs/BENCHMARKS-0.13.0.md（§1 Environment；行号可能漂移，以节标题为锚）、:90-138（§4 冻结预算行）、:184-204（§7 场景行）",
       "note": "后修复复测：S3 10k-duplicate properties 4.97 s→127.5 ms（p50），S4 20k-element XML 56.6 s→0.105 s（另一次测量 96.6 s，source.rs）——修复只改善性能，冻结预算仍为有效上界（BENCHMARKS §7 修正注）。"
     },
     "rust_compiler_msrv": {
@@ -181,7 +181,7 @@
           "evidence": [
             "conformance/vectors/*.json 18 suites / 519 cases（2026-08-12 实测）",
             "README.md",
-            "consema-rs/.github/workflows/ci.yml:181-213（conformance job 的 suite-count 断言）"
+            "consema-rs/.github/workflows/ci.yml 的 conformance job（suite-count 断言步骤；以 job/step 名为锚，行号可能漂移）"
           ],
           "source_of_truth": "语言无关 conformance vectors（语义权威顺序第 3 级）"
         },
@@ -411,7 +411,7 @@
             "docs/fuzz-evidence-0.13.0-logs/waves.log"
           ],
           "source_of_truth": "路线图 §15.3（任何新 crash 清零该 target 计时）",
-          "completion_path": "首选：Linux + nightly + clang 主机对 17 个 cargo-fuzz target 运行 cargo +nightly fuzz run（corpus 进化，fuzz/corpus/<target>/ 种子已提交）；备选：本机 in-process 协议续跑（仅代码变化后的波次提供新探索）。按 fuzz-evidence §4 协议把每格式家族（parse+ops 汇总，protocol 单独）真实 CPU 时长追加进 runs.csv；每格式达到 72 CPU-hours 且零未解释问题即关闭（§7.3）。截至 2026-08-13 复算（runs.csv 122,477 数据行，权威）：properties 145.4h（201.9%）、yaml 128.8h（178.9%）、ini 124.8h（173.3%）、hcl 95.5h（132.7%）、json 95.3h（132.3%）五单位已过 72h 门槛；toml 57.7h（80.2%）、protocol-decode 50.7h（70.4%）、plist 47.4h（65.8%）、xml 35.0h（48.6%）继续累计，剩余部分以此路径累计。",
+          "completion_path": "首选：Linux + nightly + clang 主机对 17 个 cargo-fuzz target 运行 cargo +nightly fuzz run（corpus 进化，fuzz/corpus/<target>/ 种子已提交）；备选：本机 in-process 协议续跑（仅代码变化后的波次提供新探索）。按 fuzz-evidence §4 协议把每格式家族（parse+ops 汇总，protocol 单独）真实 CPU 时长追加进 runs.csv；每格式达到 72 CPU-hours 且零未解释问题即关闭（§7.3）。截至 2026-08-13 复算（runs.csv 122,477 数据行，权威）：properties 145.4h（201.9%）、yaml 128.8h（178.9%）、ini 124.8h（173.3%）、hcl 95.5h（132.7%）、json 95.3h（132.3%）五单位已过 72h 门槛；toml 57.7h（80.2%）、protocol-decode 50.7h（70.4%）、plist 47.4h（65.8%）、xml 35.0h（48.6%）低于门槛；驱动已暂停（2026-08-13 11:19 后未重启），剩余部分以此路径累计（重启时恢复）。",
           "owner": "fuzz 证据账本（agent H 延续）+ 0.13.0 gatekeeper"
         },
         {
@@ -460,7 +460,7 @@
           "name": "Rust workspace 保持 unsafe_code = \"forbid\"",
           "status": "complete",
           "evidence": [
-            "consema-rs/Cargo.toml:37",
+            "consema-rs/Cargo.toml 的 workspace lints（missing_docs = \"warn\" 等；以字段名为锚，行号可能漂移）",
             "docs/0.13.0-gate-plan.md P-9"
           ],
           "source_of_truth": "workspace manifest（lint 常设）"
@@ -481,7 +481,7 @@
           "name": "XML external entity、YAML tag constructor、HCL evaluation 默认关闭且不可被错误路径绕过",
           "status": "complete",
           "evidence": [
-            "SECURITY.md（XML entity deny-by-default）、:36（HCL 不求值）",
+            "SECURITY.md（XML entity deny-by-default；HCL 不求值句——以语义句为锚，行号可能漂移）",
             "YAML tag 构造器不执行：母仓 SECURITY.md 无 YAML 专属安全段（逐家族段落结构缺 YAML——缺口如实记录），事实见 CHANGELOG.md（custom tag 不执行语言构造器/merge/include/import/网络或文件访问）与 RFC 0007（YAML 家族安全边界）",
             "CHANGELOG.md（0.9.0 XML entity deny-by-default 记录）"
           ],
@@ -513,8 +513,8 @@
           "name": "依赖不存在未接受的 critical/high 漏洞",
           "status": "complete",
           "evidence": [
-            "cargo audit --no-fetch 本地实测：1,189 advisories / 76 deps / 0 漏洞（2026-08-07，gate plan P-4；Cargo.lock 实测 76 个 [[package]]；cargo audit 口径随版本变化，以当前扫描结果为准）",
-            "consema-rs/.github/workflows/ci.yml:230（audit job）"
+            "cargo audit --no-fetch 本地实测：1,189 advisories / 76 deps / 0 漏洞（2026-08-07 单仓快照，gate plan P-4；当时 Cargo.lock 实测 76 个 [[package]]；六仓拆分后 consema-rs Cargo.lock 实测 83 个 [[package]]（2026-08-14），consema-rs audit.yml 头注同口径；cargo audit 口径随版本变化，以当前扫描结果为准）",
+            "consema-rs/.github/workflows/ci.yml 的 audit job（以 job 名为锚，行号可能漂移）"
           ],
           "source_of_truth": "RustSec DB + CI audit job"
         },
@@ -525,7 +525,7 @@
           "evidence": [
             "cargo deny check advisories bans licenses sources 实测全绿（gate plan P-3）",
             "deny.toml",
-            "consema-rs/.github/workflows/ci.yml:215（deny job）"
+            "consema-rs/.github/workflows/ci.yml 的 deny job（以 job 名为锚，行号可能漂移）"
           ],
           "source_of_truth": "deny.toml（政策）+ CI deny job"
         },
@@ -536,7 +536,7 @@
           "evidence": [
             "SECURITY.md（threat model 载体：攻击面/无副作用链/资源限制/硬化门禁）",
             "SECURITY.md（披露渠道 + 分级 SLA + 支持窗口）",
-            "docs/support-policy.md §4（P0-P3 修复政策）"
+            "docs/support-policy.md §7（安全修复政策，P0-P3 修复政策）"
           ],
           "source_of_truth": "路线图 §15.4、§19.4；SECURITY.md"
         },
@@ -545,7 +545,7 @@
           "name": "CLI secret redaction 和临时文件权限完成跨平台验证",
           "status": "closed",
           "evidence": [
-            "Windows 实测全量：CHANGELOG.md（redaction）、:120（CLI 进程级硬化）",
+            "Windows 实测全量：CHANGELOG.md（redaction；CLI 进程级硬化句——以语义句为锚，行号可能漂移）",
             "docs/support-policy.md（三平台验证归 0.13.0 收口）",
             "GitHub Actions run #5（2026-08-11，head 437fd35）：132/132 steps 全绿，三 OS 全矩阵（cli 测试矩阵含 redaction 与临时文件/权限测试）"
           ],
@@ -597,8 +597,8 @@
           "status": "complete",
           "evidence": [
             "docs/BENCHMARKS-0.13.0.md（§1 环境 pin）",
-            ":66-89（§3 corpus + SHA-256 pin）",
-            ":304-348（§8 版本化回归政策）"
+            ":66-89（§3 corpus + SHA-256 pin；行号可能漂移，以节标题为锚）",
+            ":304-348（§8 版本化回归政策；行号可能漂移，以节标题为锚）"
           ],
           "source_of_truth": "BENCHMARKS-0.13.0.md"
         },
@@ -608,9 +608,9 @@
           "status": "complete",
           "evidence": [
             "docs/BENCHMARKS-0.13.0.md（§4 SDK 预算行）",
-            ":140-162（§5 CLI 预算行）",
-            ":164-182（§6 materialize 预算行）",
-            ":184-204（§7 场景预算行）"
+            ":140-162（§5 CLI 预算行；行号可能漂移，以节标题为锚）",
+            ":164-182（§6 materialize 预算行；行号可能漂移，以节标题为锚）",
+            ":184-204（§7 场景预算行；行号可能漂移，以节标题为锚）"
           ],
           "source_of_truth": "BENCHMARKS-0.13.0.md（自 0.13.0 起为 release budget，非趋势记录）"
         },
@@ -620,7 +620,7 @@
           "status": "complete",
           "evidence": [
             "docs/BENCHMARKS-0.13.0.md（§8 冻结政策文本）",
-            ":349-356（§9 批准记录模板）",
+            ":349-356（§9 批准记录模板；行号可能漂移，以节标题为锚）",
             "至 2026-08-07 无触发：后修复只改善性能（冻结预算仍为有效上界）"
           ],
           "source_of_truth": "路线图 §20.3；BENCHMARKS §8"
@@ -666,7 +666,7 @@
           "name": "backend AST 和第三方错误类型不泄漏",
           "status": "complete",
           "evidence": [
-            "docs/API-REVIEW-0.13.0.md §6（15 个 crate 中 7 个声明第三方依赖：encoding_rs/sha2/toml_edit/saphyr-parser/unicode-id-start/unicode-ident/xmlparser；facade Document 用私有 DocumentInner 包装）"
+            "docs/API-REVIEW-0.13.0.md §6（10 个 crate 声明第三方依赖：consema/ctrlc、consema-document/encoding_rs+sha2、consema-ini/properties/encoding_rs、consema-json/unicode-id-start、consema-hcl/unicode-ident、consema-plist/xml/xmlparser、consema-toml/toml_edit、consema-yaml/saphyr-parser——外部依赖名 8 个（7 个 workspace 钉 + ctrlc）；facade Document 用私有 DocumentInner 包装）"
           ],
           "source_of_truth": "API-REVIEW §6 + Cargo.toml 依赖面"
         },
@@ -686,7 +686,7 @@
           "status": "closed",
           "evidence": [
             "声明：consema-rs/Cargo.toml:33（rust-version = \"1.85\"）",
-            "CI job 已交付：consema-rs/.github/workflows/ci.yml:150（msrv job，1.85.0 全门禁）",
+            "CI job 已交付：consema-rs/.github/workflows/ci.yml 的 msrv job（1.85.0 全门禁；以 job 名为锚，行号可能漂移）",
             "本地验证记录：gate plan §4 M1（干净 worktree 全流程 exit 0，MSRV 腿实测拦截 let-chains）",
             "GitHub Actions run #5（2026-08-11，head 437fd35）：132/132 steps 全绿（msrv job 在干净 checkout 上真跑）"
           ],
@@ -733,7 +733,7 @@
           "evidence": [
             "consema-rs/consema/tests/cli_m*.rs（stale/篡改 original/只读/目录/symlink/权限/磁盘/中断注入）",
             "docs/pilot-0.13.0.md（W8：stale conflict、中断恢复实测）",
-            "CHANGELOG.md（batch 状态机与中断恢复）、:120（进程级 e2e hardening：权限/磁盘/中断注入）"
+            "CHANGELOG.md（batch 状态机与中断恢复；进程级 e2e hardening：权限/磁盘/中断注入句——以语义句为锚，行号可能漂移）"
           ],
           "source_of_truth": "RFC 0015 §6.2（batch 状态机）"
         },
@@ -744,7 +744,7 @@
           "evidence": [
             "scripts/verify-package-archives.ps1（-AllowDirty + MSRV 腿 + tar 路径安全 + 校验和）",
             "本地实测：干净 HEAD worktree 全流程 exit 0（14 个 .crate + MSRV 1.85 腿，gate plan §4 M1 验证记录）",
-            "CI package job 已交付：consema-rs/.github/workflows/ci.yml:384-410",
+            "CI package job 已交付：consema-rs/.github/workflows/ci.yml 的 package job（以 job 名为锚，行号可能漂移）",
             "docs/release-process-0.13.0.md（干净重建步骤 + CI 常设载体）",
             "GitHub Actions run #5（2026-08-11，head 437fd35）：132/132 steps 全绿（package job 在干净 checkout 上真跑）"
           ],
@@ -757,7 +757,7 @@
           "name": "changelog、migration、compatibility 和 support policy 完成",
           "status": "complete",
           "evidence": [
-            "CHANGELOG.md（0.1.0-0.12.0 + 0.13.0 Unreleased 条目）",
+            "CHANGELOG.md（0.1.0-0.12.0 版本条目 + 0.13.0 条目——0.9.0-0.12.0 为「## Unreleased — 0.x.0」体例、0.13.0 为带日期正式条目「## 0.13.0 — 2026-08-07」）",
             "docs/migration-guide.md（0.8.0 API → 0.12.0 facade + CLI、v6→v7）",
             "docs/support-policy.md（§21.4 七个必公开项 + 工具链冻结时机）"
           ],
@@ -810,7 +810,7 @@
         ],
         "evidence": [
           "docs/fuzz-evidence-0.13.0.md §7（完成路径）",
-          "docs/fuzz-evidence-0.13.0.md §3.2.1/§8（2026-08-13 复算快照：122,477 数据行（122,478 文件行含表头）/ 780.529 CPU-hours、零新 crash；properties 145.4h（201.9%）、yaml 128.8h（178.9%）、ini 124.8h（173.3%）、hcl 95.5h（132.7%）、json 95.3h（132.3%）五单位已过 72h 门槛；toml 57.7h / protocol-decode 50.7h / plist 47.4h / xml 35.0h 继续累计；快照口径，runs.csv 为唯一权威账本）"
+          "docs/fuzz-evidence-0.13.0.md §3.2.1/§8（2026-08-13 复算快照：122,477 数据行（122,478 文件行含表头）/ 780.529 CPU-hours、零新 crash；properties 145.4h（201.9%）、yaml 128.8h（178.9%）、ini 124.8h（173.3%）、hcl 95.5h（132.7%）、json 95.3h（132.3%）五单位已过 72h 门槛；toml 57.7h / protocol-decode 50.7h / plist 47.4h / xml 35.0h 低于门槛；快照口径，runs.csv 为唯一权威账本；驱动已暂停（2026-08-13 11:19 session 916 无记录终止后未重启），累计冻结于 122,478 文件行——四单位未过门槛如实记录为遗留）"
         ],
         "completion_path": "见 quality.Q-7.completion_path（clang 主机 cargo-fuzz 为主，本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时）。",
         "owner": "fuzz 证据账本（agent H 延续）+ 0.13.0 gatekeeper"
