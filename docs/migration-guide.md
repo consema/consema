@@ -12,7 +12,9 @@
 `parse_ini`/`parse_properties`、`convert_json`/`convert_toml`/
 `convert_yaml`/`convert_ini`/`convert_properties`、`consema::protocol`
 导出）在 0.12.0 原样可用，语义未变。README 中 0.8.0 时代的示例代码
-（JSON5→JSON、INI、Properties、协议、物化、原子编辑等）不需要修改。
+（JSON5→JSON、INI、Properties、协议、物化、原子编辑等）不需要修改（如实注记：
+六仓拆分 2026-08-12 后母仓 README 重建为六仓导航、示例随语言目录迁出——
+所指示例现位于各语言仓 README 与示例文件，迁移语义不变量不变）。
 
 0.9.0–0.11.0 是纯增量：
 

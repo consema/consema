@@ -40,8 +40,9 @@ TOML、YAML、INI、Java Properties、XML、Property List 与 HCL 八个格式�
 - **环境信息**：`conformance/vectors/` 聚合 digest（见
   `docs/fc-manifest-0.13.0.json`）、本仓版本 / git rev / tag、OS 与平台。
 - **安全漏洞不要公开提交 issue**：走 `SECURITY.md` 的披露渠道（GitHub
-  Security Advisory 与维护者邮箱；见该文件），发现 panic、无界分配或规范
-  绕过时同样走该渠道。
+  Security Advisory 当前未启用（2026-08-14 gh api 实测 false），启用后为
+  首选渠道；启用前首选维护者邮箱 franckcl1989 &lt;franckcl@icloud.com&gt;；
+  见 SECURITY.md），发现 panic、无界分配或规范绕过时同样走该渠道。
 
 ## 如何提 Feature
 

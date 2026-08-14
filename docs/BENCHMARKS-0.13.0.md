@@ -332,7 +332,9 @@ acceptance gate ("任何超预算或 10% 回退有批准记录").
    performs the root-cause analysis — "environment drift" and
    "not yet located, re-check plan" are allowed conclusions, both documented;
    (iii) fill one record per regression using the §9 template and append it
-   to `docs/APPROVALS-0.13.0.md` (sequential ids APPR-0001..); (iv) the
+   to `docs/APPROVALS-0.13.0.md` (sequential ids APPR-0001..)——如实注记
+   （2026-08-15 波 4）：该载体文件尚未创建（六仓全仓 grep 无此文件），为
+   待建文件；任何回归在载体建立前不得「无记录放行」，gate 保持开放； (iv) the
    decision is 批准 (release with the regression), 拒绝 (fix and re-measure),
    or 延后 (carry to the next version); (v) the record is public: it must be
    referenced from the release CHANGELOG entry. A regression without an
@@ -351,7 +353,7 @@ acceptance gate ("任何超预算或 10% 回退有批准记录").
 One record per regression in `docs/APPROVALS-0.13.0.md`, following the
 release-record 体例 of `docs/RELEASE-0.8.0.md` (dated, evidence-bound,
 explicit decision). Records live in that file (owned by the gatekeeper, not
-by this document); the template is frozen here:
+by this document); the template is frozen here（载体文件尚未创建——见 §8.4 如实注记）:
 
 ```markdown
 ## APPR-0001 — <one-line summary>
@@ -580,7 +582,11 @@ Bash the shell expands `settings-*.ini`, in PowerShell expand via
 
 The M5 acceptance gate "CI 或定期复核可执行" is served by a -Check job (the
 CI workflow file is owned by the M1/M3 milestones; this section is the
-contract the job implements). The job re-runs the §10.1/§10.2 commands —
+contract the job implements)——如实注记（2026-08-15 波 4）：六仓
+.github/workflows/ 中不存在任何 benchmark/-Check job（全仓 grep
+benchmark 零命中），本节描述的常设复核 job 尚未落地（幻影载体）；M5
+门禁当前形态为本机执行路径（§10.1/§10.2），-Check job 落地为 1.0.0
+前待办。The job re-runs the §10.1/§10.2 commands —
 SDK rows at 15 samples, CLI rows at N=200 (scenario rows S3 at N=30 and S4
 at N=1 per §12, convert rows C1-C5 at N=30), plan at N=50, apply at N=20
 with corpus regeneration — on
@@ -593,7 +599,7 @@ the pinned environment, computes the same percentiles, and compares against
   document for 0.14.0).
 - **Fail**: any violated row; the job emits a diff report (row, frozen,
   measured, delta %) and the release gate stays open until an approval
-  record (§9) exists in `docs/APPROVALS-0.13.0.md`.
+  record (§9) exists in `docs/APPROVALS-0.13.0.md`（载体未建前 gate 保持开放，见上）。
 - One-shot example (single row spot check):
 
 ```text

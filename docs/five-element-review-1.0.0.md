@@ -183,7 +183,7 @@
     expected MAJOR.MINOR.PATCH without leading zeros`。
   - 根因：工作树把 `consema-rs/Cargo.toml`（workspace version）与 `consema-go/go/cmd/consema/version.go`（productVersion）从
     `0.13.0`/`0.19.0` 推进到 `1.0.0-rc.1`；而当时 Rust `is_semantic_version`（cli.rs）与 Go
-    `isSemanticVersion`（cli.go:1013-1032）都是严格 `MAJOR.MINOR.PATCH`（无 pre-release 后缀），RFC 0015 §3.3
+    `isSemanticVersion`（cli.go——行号可能漂移，以符号名为锚）都是严格 `MAJOR.MINOR.PATCH`（无 pre-release 后缀），RFC 0015 §3.3
     与 RFC 0020（当时为未跟踪文件）均未修订该格式。提交态（0.19.0）对应测试当时全绿（实测 #1）。
   - 影响（当时）：若按当时工作树构建 RC-1，Rust 与 Go CLI 的每个信封命令都会 exit 5（错误完成状态，
     §18.4 P1 级）；Go CLI e2e 套件崩溃。C-3 阶段 0 与任何 RC 构建前必须处置。
