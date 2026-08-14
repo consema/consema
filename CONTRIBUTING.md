@@ -48,7 +48,7 @@ TOML、YAML、INI、Java Properties、XML、Property List 与 HCL 八个格式�
 - 新能力 / 行为变更建议：用 feature 模板开 issue
   （`.github/ISSUE_TEMPLATE/feature_request.yml`），描述问题、动机、方案与备选。
 - **契约变更必须走 RFC**：涉及 contract / Profile / 语义 / 兼容性 / 已冻结
-  registry（v1-v6）的行为变更，按 `docs/rfcs/` 流程起草 RFC（编号接续现行
+  registry（v1-v7）的行为变更，按 `docs/rfcs/` 流程起草 RFC（编号接续现行
   0020），并遵守 [RFC 0020 兼容与支持政策](docs/rfcs/0020-compatibility-and-support-policy-v1.md)；
   未走 RFC 的契约变更不会直接以 PR 形式进入规范文档。
 - 纯实现 / 工具 / 文档改进不需要 RFC，直接走 PR。

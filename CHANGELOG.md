@@ -30,7 +30,7 @@ Consema 遵循 Semantic Versioning。尚未完成的路线项目不记为已发�
 
 ### 落地记录（2026-08-11/2026-08-12 补录：C-1 闭环与五语言时间线）
 
-- **2026-08-12 · a0c318b**：Python 实现 L0-L4 入库（core/graph/protocol/document + 8 格式家族 + root facade + conformance runner）；a0c318b 同时补充 .gitignore 排除 node_modules；
+- **2026-08-12 · 5cf680b**：Python 实现 L0-L4 入库（core/graph/protocol/document + 8 格式家族 + root facade + conformance runner）；a0c318b 为 .gitignore 排除 node_modules 的提交（5cf680b 实际同时携带 TS/Python/Kotlin 三语言 L0-L4 实现，勘误见 :34 与 docs/CHANGELOG.md）；
 - **2026-08-12 · 5cf680b + cd26af3 勘误**：TS/Python/Kotlin 三语言 L0-L4 实现实际由 5cf680b 携带（commit message 仅标注 fuzz 账本）；每语言 conformance 508/508（18 套 / digest 35bebc8d 共钉）+ capability parity；cd26af3 为勘误归因记录（5cf680b 树计数 533/475/18,467 含构建产物，5a040be purge 后真实 tracked 数 255/243/229，历史事实不变）；
 - **2026-08-12 · 2f981df**：L5 差分 harness（TS/Python/Kotlin 跨语言 byte-parity/normalized/protocol-exchange）+ 五语言 CI workflow（ci-typescript/ci-python/ci-kotlin 各 3 job）；差分发现的 wire-codec 缺陷随本 commit 修复（ValuePath schema-less wire 与 AssociationLocation 位置面、materialization-request version:0 拒绝语义、yaml tag/provenance 面）；
 - **2026-08-12 · dbba9a4**：五语言 CI 首跑缺陷修复（python 测试夹具路径仓库相对化、kotlin jar 供给 + TestShim.kt 入库）；四 workflow 全绿（ci.yml run#9 + 三语言各 run#2）；

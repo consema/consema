@@ -14,7 +14,7 @@
 
 Both inputs are repository-authored production-shaped fixtures under
 `conformance/fixtures/hcl/`, pinned byte-for-byte by the fixture gate
-(`crates/consema-conformance/tests/hcl_fixtures.rs`):
+(`consema-rs/consema-conformance/tests/hcl_fixtures.rs`；拆分前布局为 `crates/consema-conformance/tests/hcl_fixtures.rs`):
 
 - `tf/main.tf` (1,139 bytes), SHA-256
   `1c9a57fc4f6b7358d22aac8c2f13c7b9ab421194007eac7d6673e7b5558e2436`:
@@ -39,7 +39,7 @@ Operations measured per iteration:
 
 Recovery and adversarial-size behavior (expression depth, template/heredoc
 size, number digits, body nesting, item counts) are covered by the hardening
-suite (`crates/consema-conformance/tests/hcl_hardening.rs`), not by this
+suite (`consema-rs/consema-conformance/tests/hcl_hardening.rs`；拆分前布局为 `crates/consema-conformance/tests/hcl_hardening.rs`), not by this
 wall-clock baseline.
 
 ## Results (5,000 iterations, 3 samples)

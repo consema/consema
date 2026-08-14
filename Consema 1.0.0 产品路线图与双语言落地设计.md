@@ -34,7 +34,7 @@
 
 ## 0.1 已确认的起点
 
-Rust `0.1.0` 于 2026-07 完成（历史快照，下文数字为当时状态）：
+Rust `0.1.0` 于 2026-08-04 完成（历史快照，下文数字为当时状态；git 实证：首提交 4d07c24 与 `v0.1.0` tag 均为 2026-08-04 10:05:59）：
 
 * PortableValue v1 全类型与 strict equality/hash；
 * PVCE/1 canonical encode/strict decode；

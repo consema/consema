@@ -3,8 +3,8 @@
 - 依据：`docs/rc-1.0.0-candidate.md` §4 阶段 1（"每格式真实 corpus 抽检巡检
   §22.7"）与 §4.1（2026-08-10 已完成一轮：钉版 12 文件 digest 12/12 一致；
   508 核对一致（增补前——2026-08-12 P2-B 向量补强至 519 后该计数为 519）；regressions 空数组符合预期；9 家族来源与覆盖足够；4 条观察见
-  §4.2）与 §4.2（巡检观察记录体例）；`docs/five-element-review-1.0.0.md`
-  （钉版 corpus 12 文件，digest 登记）；`docs/pilot-go-0.19.0.md` §1（语料登记表）。
+  §4.2）与 §4.2（巡检观察记录体例）；`docs/five-element-review-1.0.0.md` §1.4
+  「真实有效」表格行 3（钉版 corpus 12 文件，digest 登记——以节锚为准）；`docs/pilot-go-0.19.0.md` §1（语料登记表）。
 - 目标：RC soak 阶段对真实 corpus 的**抽检巡检**——四类核对（钉版 digest /
   519 计数 / regressions / 家族来源覆盖）+ 观察记录（P2 级，照 rc-candidate §4.2
   的 4 条观察体例：编号、出处、判定）。

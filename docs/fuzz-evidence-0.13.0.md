@@ -149,7 +149,7 @@
 ## 4. 累计协议（后来的运行如何追加）
 
 1. 六仓拆分后从 consema-rs 根运行：`powershell -NoProfile -ExecutionPolicy Bypass -File run_waves.ps1 -Waves <N> -Copies <C>`（运行副本；`-LedgerDir` 默认指向母仓 `docs\fuzz-evidence-0.13.0-logs` 绝对路径；原版脚本保留于账本目录作冻结协议证据；脚本是 §3.3 协议的机器可执行形式；每波自动 tree-hash → 重建 → 并发运行 → 逐进程真实 CPU/墙钟/退出码 → 追加 runs.csv 与 waves.log）。
-2. 任何 FAIL 行（exit ≠ 0）都是事件：立即停止追加，按 §6 分类；**新 crash 清零该 target 的 release-candidate clean 计时**（§15.3 第 1393 行），并把最小输入按 `conformance/corpora/README.md` 的 regressions 工作流永久加入 `conformance/corpora/mutation-v1.json` 的 `regressions` 数组（replay 测试从此永久覆盖）。
+2. 任何 FAIL 行（exit ≠ 0）都是事件：立即停止追加，按 §6 分类；**新 crash 清零该 target 的 release-candidate clean 计时**（路线图 §15.3「质量门禁」"72 CPU-hours 是发布候选最低证据，不是'超过时间即证明安全'。任何新 crash 都会清零该 target 的 release-candidate clean run"句），并把最小输入按 `conformance/corpora/README.md` 的 regressions 工作流永久加入 `conformance/corpora/mutation-v1.json` 的 `regressions` 数组（replay 测试从此永久覆盖）。
 3. 追加永不改写既有行（只 append）；汇总从 runs.csv 重算。
 4. 会话结束更新本文档 §3.2 与 §8 的累计数字。
 5. 已知发现（M2-F1/M2-F2）不计入新 crash，不清零时钟；其状态在 §6 跟踪。

@@ -35,7 +35,7 @@ Operations measured per iteration:
    verification, returning no Document on any mismatch.
 
 Recovery and adversarial-size behavior are covered by the hardening suites
-(`crates/consema-conformance/tests/plist_hardening.rs`), not by this
+(`consema-rs/consema-conformance/tests/plist_hardening.rs`；拆分前布局为 `crates/consema-conformance/tests/plist_hardening.rs`), not by this
 wall-clock baseline.
 
 ## Results (5,000 iterations, 3 samples)

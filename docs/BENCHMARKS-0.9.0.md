@@ -47,7 +47,7 @@ optimization claim.
 cargo run --locked --offline --release -p consema-conformance --example xml_baseline -- 5000
 ```
 
-The fixture gate (`crates/consema-conformance/tests/xml_fixtures.rs`)
+The fixture gate (`consema-rs/consema-conformance/tests/xml_fixtures.rs`；拆分前布局为 `crates/consema-conformance/tests/xml_fixtures.rs`)
 independently requires byte-exact unmodified rendering, exhaustive lossless
 coverage, exact projection, and the projection→materialization→reparse→
 projection fixed point for every pinned fixture; the baseline never runs on

@@ -74,8 +74,8 @@ cd go
 go test -bench=. -benchtime=1s ./json/ ./toml/ ./yaml/ ./ini/ ./properties/ ./xml/ ./plist/ ./hcl/
 ```
 
-- **无冻结预算**（go/README.md："no frozen budget; that is a Rust-side
-  discipline"）——Go 侧只有趋势记录，不触发 §8 门禁；**>10% 回退的判定惯例**
+- **无冻结预算**（go/README.md「Benchmark baseline (0.19.0 G5.4)」节"no
+  frozen budget; that is a Rust-side discipline"句）——Go 侧只有趋势记录，不触发 §8 门禁；**>10% 回退的判定惯例**
   （2026-08-10 首跑先例）：比值 >1.10 标注"疑似回退（负载状态，需空闲复测确认）"，
   无代码回退结论须附依据（同会话其它项更快/无代码改动/GC 争抢特征）。
 - 记录：8 家族 × {BenchmarkParse, BenchmarkRender}（µs/op + MB/s）。
@@ -117,5 +117,5 @@ go test -bench=. -benchtime=1s ./json/ ./toml/ ./yaml/ ./ini/ ./properties/ ./xm
 
 - `docs/BENCHMARKS-0.13.0.md`（冻结预算、§8-§12 机制；本手册的唯一数字来源）
 - `docs/rc-1.0.0-candidate.md` §4/§4.1（soak 计划、Go 首跑记录、fuzz 关账建议）
-- `consema-go/go/README.md` :758-816（Go 基准命令与 2026-08-10 记录）
+- `consema-go/go/README.md`「Benchmark baseline (0.19.0 G5.4)」节（Go 基准命令与 2026-08-10 记录）
 - `docs/APPROVALS-0.13.0.md`（触发时创建，§9 模板）

@@ -2,11 +2,10 @@
 
 - 依据：`docs/rc-1.0.0-candidate.md` §4 阶段 1（"Go 侧 release-candidate fuzz
   clean-run 记录 §22.4"）与 §4.1（"已有（2026-08-10，consema-go/go/README.md
-  的「Fuzz targets」节，
-  16 targets 各 30s，零 panic/hang/limit bypass）"——六仓拆分后该记录位于
-  `consema-go/go/README.md` "## Fuzz targets" 节（clean-run 记录）
-  在 :674-727）；
-  路线图 §22.4 第 1909 行（release-candidate fuzz clean-run）。
+  「Fuzz targets」节的 clean-run 记录：16 targets 各 30s，零 panic/hang/limit
+  bypass）"——六仓拆分后该记录位于 `consema-go/go/README.md`「Fuzz targets」
+  节与「Release-candidate fuzz clean-run (0.19.0 G5.4)」子节）；
+  路线图 §22.4「release-candidate fuzz clean-run 达标」条。
 - 目标：RC soak 阶段对 Go 16 个 fuzz target 各 30s 的 clean-run **重跑**并记录
   （对照 2026-08-10 基线：execs/30s 与 PASS），验证候选代码状态下零
   panic / hang / limit bypass。
@@ -68,7 +67,8 @@ go test -fuzz='^FuzzParseBinary$'     -fuzztime=30s ./plist/
 go test -fuzz='^FuzzParse$'           -fuzztime=30s ./hcl/
 ```
 
-注意（go/README.md）：**锚定正则必须带 `^` `$`**——裸
+注意（go/README.md「Fuzz targets」节的 anchored-regex 注记："the anchored
+regex is required"）：**锚定正则必须带 `^` `$`**——裸
 `-fuzz=FuzzParse` 会匹配所有 `FuzzParse` 前缀 target 并拒绝运行。
 
 ## 4. 预期断言
@@ -82,8 +82,9 @@ go test -fuzz='^FuzzParse$'           -fuzztime=30s ./hcl/
 
 ## 5. 发现处置（新 crash 协议）
 
-首个 clean-run 曾发现 4 缺陷并全部修复，失败输入已钉为回归种子（go/README.md:
-674-727 clean-run 记录；回归种子实况：③ yaml plain-block 挂起钉入
+首个 clean-run 曾发现 4 缺陷并全部修复，失败输入已钉为回归种子（go/README.md
+「Release-candidate fuzz clean-run (0.19.0 G5.4)」节的 clean-run 记录与回归
+种子注记；回归种子实况：③ yaml plain-block 挂起钉入
 yaml/testdata/fuzz/FuzzParse、④ plist.xml 恢复循环钉入 plist/testdata/fuzz/
 FuzzParseXML 两个目录；① plist.binary trailer limit 伪 Complete 与 ②
 json.strict.trailing-comma 分类为 fuzz target 内 f.Add 种子，无 testdata
@@ -120,8 +121,8 @@ json.strict.trailing-comma 分类为 fuzz target 内 f.Add 种子，无 testdata
 
 ## 7. 相关文件
 
-- `consema-go/go/README.md` :604-727（target 表、命令、2026-08-10 基线记录、
-  4 缺陷与回归种子）
+- `consema-go/go/README.md`「Fuzz targets」节与「Full-family fuzz targets
+  (0.19.0 G5.4)」节（target 表、命令、2026-08-10 基线记录、4 缺陷与回归种子）
 - `docs/rc-1.0.0-candidate.md` §4/§4.1（soak 计划与 Go 侧现状）
 - `docs/fuzz-evidence-0.13.0.md` §2（Rust fuzz 契约与 limit-failure-is-pass 的
   对应口径）
