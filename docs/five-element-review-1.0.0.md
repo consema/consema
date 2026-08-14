@@ -158,7 +158,7 @@
 | 11 | `scripts/go-verify-protocol-exchange.ps1` | **40/40 accept + 43/43 reject（双向），exit 0** | §22.2 protocol cross-encode/decode 100% |
 | 12 | `scripts/go-verify-shared-conformance.ps1` | **步骤 [1/6] digest 校验失败**（35bebc8d… ≠ e3d6578858…）→ F-B〔修复前实测记录——修复后 recorded=35bebc8d…（LF 口径），干净 checkout 通过、本机 CRLF 树差异属文档化行为〕 | G5.1 "independent aggregate digest check" 仅在本机 CRLF 工作树成立 |
 | 13 | 主树聚合 digest 复算（PowerShell，文档化算法） | 本机 CRLF 工作树 = **e3d6578858…**（与当时记录一致）；干净 LF checkout = **35bebc8d…**〔修复前实测记录——修复后 recorded=35bebc8d…（LF 口径），干净 checkout 通过、本机 CRLF 树差异属文档化行为〕 | fc-manifest 第 35-41 行"值可精确复现"声称在干净 checkout 不成立 |
-| 14 | 主树 `go test -count=1 ./...` | conformance ok（CRLF digest 命中）；**cmd/consema FAIL**（panic：e2e_test.go:442 `first[:len(first)-1]`，first 为空）→ F-A〔修复前实测记录——F-A 已由 2209582 处置并审计验证〕 | 工作树 1.0.0-rc.1 版本推进破坏 envelope |
+| 14 | 主树 `go test -count=1 ./...` | conformance ok（CRLF digest 命中）；**cmd/consema FAIL**（panic：e2e_test.go:442 `first[:len(first)-1]`，first 为空）→ F-A〔修复前实测记录——F-A 已由 2209582 处置并审计验证；历史记录，锚以处置注记为准〕 | 工作树 1.0.0-rc.1 版本推进破坏 envelope |
 
 未重跑、引用最近实测记录（注明日期）：Go 16 fuzz targets 30s clean-run 与 8×2 benchmark（2026-08-10，consema-go/go/README.md 的「Release-candidate fuzz clean-run」节，74e336e 树 :661 / 现行 :724；「Benchmark baseline」节，74e336e 树 :745 / 现行 :819；行号可能漂移，以锚为准）；Rust fuzz 账本已续跑至 session 79 在途——runs.csv 13,005 行 / 79.427 CPU-hours（截取自 session 79 期间，2026-08-10；session 78 结束快照 12,937 行 / 78.971 CPU-hours、15:53:39；最接近格式 properties ≈20.6%；fuzz-evidence-0.13.0.md §3.2.1/§8，runs.csv 为唯一权威账本）；mutation corpus 174,921 case replay（2026-08-07，63.10s；原始输出未保留、时长不可复算——见 fuzz-evidence-0.13.0.md §8 证据链说明）；coverage 86.51/82.82/87.91（2026-08-07）；cargo audit 1,189 advisories / 0 漏洞、deny 四段（2026-08-07）；Linux/macOS 矩阵（从未实测，= C-1）；macOS Foundation differential 7 cases / 35 legs（0.17.0 记录）。
 
@@ -178,7 +178,7 @@
   （cli.rs / cli.go——行号可能漂移，以符号名为锚）。`1.0.0-rc.1` 已提交（consema-rs/Cargo.toml 的 workspace version / consema-go/go/cmd/consema/version.go——行号可能漂移，以字段名为锚）。
   审计验证：cargo test -p consema-protocol 100 passed；go test ./cmd/consema 108 passed。
 - **修复前状态（历史记录）**：
-  - 现象：主树 `go test -count=1 ./...` → `cmd/consema` 包 panic（e2e_test.go:442 空 stdout 切片越界）；
+  - 现象：主树 `go test -count=1 ./...` → `cmd/consema` 包 panic（e2e_test.go:442 空 stdout 切片越界〔历史记录，锚以处置注记为准〕）；
     手动 `consema inspect --json` → exit 5 `core.protocol.invalid-value@1 at $.product_version:
     expected MAJOR.MINOR.PATCH without leading zeros`。
   - 根因：工作树把 `consema-rs/Cargo.toml`（workspace version）与 `consema-go/go/cmd/consema/version.go`（productVersion）从
