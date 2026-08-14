@@ -442,3 +442,32 @@
   仓根 consema-go/README.md 仅 176 行，旧引 :183-189/:298-301/:402-408 为幻影区间，语义实为
   go/README.md 各家族记录（yaml 族 :183-189、xml 族 :298-301、hcl 族 :402-405）；§9.5 consema-ts
   三脚本第三数字实为 83（68/108/83）。
+
+## 12. 第四轮对抗性审计第三波（2026-08-14，修复后重打与收口）
+
+### 12.1 审计与归并
+
+- 触发：波 2 修复落地后按常设阶段重打（stateFile 带波 1+2 确认集与组级去重上下文）
+- 结果：**120 条确认**（P0×2 / P1×5 / P2×113）；含 2 个新 P0（rs `cargo package --workspace` 发布门禁确定性失败、py `python -m build` 发布路径确定性失败——「发布路径从未真实演练」复发机制实证）
+- 归并：六分片 1:1 归并为 **45 根因组**（`loop-state/disposition-2026-08-14-wave3.md`），**16 项总指挥当波裁决**（判断型组零跨波悬挂：披露渠道如实化 R1、release-sign 正则放宽 SemVer 预发布 R2、RFC 0016 误归因统一契约家族 R3、fc-manifest 副本保留+同步+SHA 注记 R12 等）
+
+### 12.2 修复执行
+
+- 阶段一 8 agent（跨仓家族/高优先）：conformance 六仓 re-vendor、五要素终审锚点 P1、fc-manifest 四仓副本同步、docs-site 构建 P1、SECURITY 六仓家族、release-sign、RFC/跨仓引用族 sweep（812 文件 ~12,500 处）、verify 脚本族（13 脚本 nonce + 双探测）
+- 阶段二 6 agent（按仓并行）：45 组全部落地；六仓各仓多次 commit + push 全程即时提交
+- 全程纪律执行：发布路径改动全部本地实测预演（cargo package 14/14 exit 0、python -m build + 端用户 pip install、npm pack + 干净目录消费、release-sign 完整签名路径 5 例全过、mdbook build exit 0）
+
+### 12.3 收口验证（六仓全绿）
+
+- rs 1,636 tests + cargo doc；go 22 包 build/test/vet/gofmt 全过；ts 668（663+5 skip）；py 703；kt 573（含 W3-45c 新增 TestFixturesTest 守卫测试）；母仓 JSON/YAML/runs.csv 复验
+- 16/17 同根因零命中 grep 复验通过；唯一残留（docs-site §7.1 job 计数镜像未随权威更新）已修复并推送
+- 10 组抽查「处置记录 vs 文件实况」全部一致；vendored 副本 hash 表六仓实测吻合（R11 载体落地）
+- 审计自身数字修正 1 处：波 3 记录的 trivia 272B 实测为 256B（A6 落笔以实测为准）
+
+### 12.4 遗留（波 4 输入）
+
+- F7 枚举模式外三类：裸 `(:NNN)` 省略行号、跨仓 `.py/.go/.ts` file:line 引用、散文「lines NNN-NNN」（冻结 RFC 正文内形态需裁决）
+- docs-site 全量 G03 重随建议（发布视图副本与权威逐文件 diff）
+- 按常设阶段继续波 4 重打（stateFile 含波 2+3 累积 571 条确认）。
+
+**§12 结论**：波 3 修复后六仓全绿、实况比对一致；行号失效矿脉大幅收缩（裸 `RFC §x:y`、路线图 `§x:y`、`G114 印章` 六仓零命中）——锚点约定全面落地。继续波 4 重打验证。
