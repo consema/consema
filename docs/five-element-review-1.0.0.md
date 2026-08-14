@@ -457,9 +457,10 @@
 - 阶段二 6 agent（按仓并行）：45 组全部落地；六仓各仓多次 commit + push 全程即时提交
 - 全程纪律执行：发布路径改动全部本地实测预演（cargo package 14/14 exit 0、python -m build + 端用户 pip install、npm pack + 干净目录消费、release-sign 完整签名路径 5 例全过、mdbook build exit 0）
 
-### 12.3 收口验证（六仓全绿）
+### 12.3 收口验证（本机验证口径；CI 绿口径见波 4 勘误）
 
-- rs 1,636 tests + cargo doc；go 22 包 build/test/vet/gofmt 全过；ts 668（663+5 skip）；py 703；kt 573（含 W3-45c 新增 TestFixturesTest 守卫测试）；母仓 JSON/YAML/runs.csv 复验
+- **勘误（2026-08-15 波 4 P1 实证）**：本节原标题「六仓全绿」不成立——波 4 审计实测 consema-kt main CI 自 2026-08-14 10:53 起持续红（run 31797956126 / 31798354016 均 failure，后者在本记录写入前 12 分钟），根因为波 3 W3-29 引入的「verify cached gradle distribution」步骤硬编码 `$env:USERPROFILE\.gradle\wrapper\dists` 而 hosted runner 的 GRADLE_USER_HOME=D:\a\.gradle（波 4 P1，ci-kotlin.yml:183/:947）；consema-ts main CI 亦红于波 2 G33 引入的 clean-install smoke 步骤 PowerShell 转义缺陷（波 4 P0，ci-typescript.yml:609）。本节全部计数为本机验证结果（kt 573 未经 CI 执行，门禁在测试步骤前失败），**不是** CI 绿声明。
+- rs 1,636 tests + cargo doc；go 22 包 build/test/vet/gofmt 全过；ts 668（663+5 skip）；py 703；kt 573（含 W3-45c 新增 TestFixturesTest 守卫测试）；母仓 JSON/YAML/runs.csv 复验（均为本机口径）
 - 16/17 同根因零命中 grep 复验通过；唯一残留（docs-site §7.1 job 计数镜像未随权威更新）已修复并推送
 - 10 组抽查「处置记录 vs 文件实况」全部一致；vendored 副本 hash 表六仓实测吻合（R11 载体落地）
 - 审计自身数字修正 1 处：波 3 记录的 trivia 272B 实测为 256B（A6 落笔以实测为准）
@@ -470,4 +471,4 @@
 - docs-site 全量 G03 重随建议（发布视图副本与权威逐文件 diff）
 - 按常设阶段继续波 4 重打（stateFile 含波 2+3 累积 571 条确认）。
 
-**§12 结论**：波 3 修复后六仓全绿、实况比对一致；行号失效矿脉大幅收缩（裸 `RFC §x:y`、路线图 `§x:y`、`G114 印章` 六仓零命中）——锚点约定全面落地。继续波 4 重打验证。
+**§12 结论**：波 3 修复后本机验证全绿、实况比对一致（CI 绿口径见 §12.3 勘误——kt/ts CI 由波 4 修复）；行号失效矿脉大幅收缩（裸 `RFC §x:y`、路线图 `§x:y`、`G114 印章` 六仓零命中）——锚点约定全面落地。继续波 4 重打验证。
