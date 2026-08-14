@@ -4,6 +4,10 @@
 #
 # The site is a PUBLISH VIEW of the authoritative documents in this
 # repository (docs/ and repo root); the source lives in docs-site/.
+# docs-site/src is a hand-maintained mirror: drift from docs/ is NOT
+# detected (no diff CI gate — post-1.0.0 backlog). Authority always
+# lives in the repository docs/; re-sync per the G03 re-sync flow
+# (wave-2 disposition record 2026-08-14).
 # No repository secrets are required (deployment uses the OIDC id-token).
 #
 # Pins: every action pinned to a commit SHA with a `# vX.Y.Z` comment

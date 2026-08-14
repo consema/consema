@@ -19,7 +19,6 @@
     - [RFC 0012：XML 1.0 safe Profile v1](spec/rfcs/0012-xml-1.0-safe-profile-v1.md)
     - [RFC 0013：Property List family profiles v1](spec/rfcs/0013-plist-family-profiles-v1.md)
     - [RFC 0014：HCL family profiles v1](spec/rfcs/0014-hcl-family-profiles-v1.md)
-    - [RFC 0015：CLI 机器协议与 batch apply v1](spec/rfcs/0015-cli-machine-protocol-and-batch-apply-v1.md)
     - [RFC 0016：Go API mapping v1](spec/rfcs/0016-go-api-mapping-v1.md)
 - [概念](concepts/index.md)
   - [配置内容统一处理标准（语义基线）](concepts/content-standard.md)
