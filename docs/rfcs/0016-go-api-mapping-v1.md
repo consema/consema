@@ -15,13 +15,12 @@
   registration and error-code discipline), RFC 0015 (CLI machine protocol;
   the Go CLI reuses the same protocol in 0.19.0), roadmap §11 (Rust/Go dual
   implementation principles), §15.2 (this RFC is the §15.2 "Go API mapping
-  RFC 已通过" gate), §15.7 (Feature-Complete Manifest as the Go starting
-  point, line 1445), §16 (Go phase plans), §17 (language-neutral conformance
+  RFC 已通过" gate), §15.7「Feature-Complete Manifest」(Feature-Complete Manifest as the Go starting point——行号可能漂移，以节标题为锚), §16 (Go phase plans), §17 (language-neutral conformance
   architecture), `docs/API-REVIEW-0.13.0.md` (M4 API review; the naming
   dispositions this RFC pins)
 - External behavior references: none; the only external contracts are the
   shared language-neutral conformance vectors (`conformance/vectors/`, 18
-  suites, 508 cases at 0.13.0) and the semantic-model contract registry
+  suites, 508 cases at 0.13.0——0.13.0 历史快照，2026-08-12 P2-B 向量补强后为 519 cases / digest cfd6e296，现行以 fc-manifest digests.conformance_suite 为准) and the semantic-model contract registry
 
 ## 1. Decision
 
@@ -41,7 +40,7 @@ conflict results, resource-limit completion semantics).
 
 The Rust Feature-Complete Manifest (`docs/fc-manifest-0.13.0.json`, M9) is
 the Go starting point — never an accidental local workspace state (roadmap
-§15.7, line 1445).
+§15.7「Feature-Complete Manifest」——行号可能漂移，以节标题为锚).
 
 ### 1.1 Non-negotiable constraints
 
@@ -181,7 +180,7 @@ mapping covers all fifteen kinds:
 
 ### 5.2 Projection and materialization (frozen)
 
-- Projection: per-family `ProjectionRequest` structs (target contract id/version, default policy, rules, limits) and `ProjectionResult` sealed outcomes: `Complete{Value, Fidelity, Report, Provenance}` or `Failed{Diagnostics, Report}` — same shape as the facade's per-format results; the conservative default policy is `core.projection.exact-or-reject@1` (never invented, roadmap §10 line 818).
+- Projection: per-family `ProjectionRequest` structs (target contract id/version, default policy, rules, limits) and `ProjectionResult` sealed outcomes: `Complete{Value, Fidelity, Report, Provenance}` or `Failed{Diagnostics, Report}` — same shape as the facade's per-format results; the conservative default policy is `core.projection.exact-or-reject@1` (never invented, roadmap §10「产品级 CLI」——行号可能漂移，以节标题为锚).
 - Materialization: `MaterializationRequest` (target profile, style, encoding, newline, mapping policy, representability, limits) → `MaterializationResult` `Complete{Snapshot, Fidelity, Report, Provenance}` or `Failed{...}`; record-format gates (the versioned internal record consumed only by its owning family's materializer) are identical in Go.
 - Provenance and reports are externalized per the RFC 0015 record shapes when crossing the protocol layer; inside the SDK they are the family's typed values.
 
@@ -200,12 +199,12 @@ mapping covers all fifteen kinds:
 - One `Diagnostic` type in `consema/protocol` carrying `Code`, `Category`, `Severity`, `Arguments`, `Notes`, `Occurrence` — the `core.diagnostic@1` record shape; construction validates against the frozen `ErrorCodeRegistry` (unknown code or category contradiction is an error, RFC 0011).
 - SDK operations return typed errors implementing `interface { Code() string }`; the stable code is always the registered code (format-local code families pass through unchanged per RFC 0015 §5.2).
 - The CLI exit-class mapping (`classify_error_code`, RFC 0015 §5.1/§5.2) is a protocol-layer function implemented once in Go (`protocol.ClassifyErrorCode(code string) ExitClass`) and used by the Go CLI in 0.19.0; the SDK itself never classifies.
-- Resource-limit semantics: limit failures are `ResourceLimit` errors with the frozen codes; no truncation-then-success (SECURITY.md line 14).
+- Resource-limit semantics: limit failures are `ResourceLimit` errors with the frozen codes; no truncation-then-success (SECURITY.md——行号可能漂移，以语义句为锚).
 - Go error text is human presentation only and never participates in conformance comparison (roadmap §16.1).
 
 ## 7. Conformance integration contract (frozen)
 
-- **Both implementations run the same vectors**: the Go conformance runner reads `conformance/vectors/*.json` directly (the shared vector files are the authority, roadmap §17); the 18-suite / 508-case inventory at 0.13.0 is the starting inventory, revisioned per the FC manifest digest.
+- **Both implementations run the same vectors**: the Go conformance runner reads `conformance/vectors/*.json` directly (the shared vector files are the authority, roadmap §17); the 18-suite / 508-case inventory at 0.13.0 is the starting inventory, revisioned per the FC manifest digest（0.13.0 历史快照——2026-08-12 P2-B 向量补强后为 519 cases / cfd6e296，现行以 fc-manifest digests.conformance_suite 为准）;
 - The Go runner mirrors `consema-conformance`'s suite organization: one runner module per suite family with the same skip_path discipline as the differential oracles (documented skip = success, never silent).
 - **Differential runs**: bidirectional Rust/Go differential harness for normalized results (roadmap §16.2/§16.6); cross-language PVCE/PGCE byte equality is a hard gate at 0.14.0.
 - **Go discovers spec problems**: roadmap §11.3 process applies — stop the Go capability, build the minimal cross-language counterexample, classify (implementation/test/spec), fix spec and conformance first, publish a new contract ID if public behavior changes, Rust passes the revised vectors first, then Go resumes. The Rust Feature-Complete Baseline is not a "Rust is always right" claim (roadmap §11.3).

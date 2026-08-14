@@ -1,7 +1,7 @@
 # Consema 0.13.0 performance and memory budget freeze
 
 This document freezes the formal p50/p95 time and peak-memory budgets required
-by roadmap §15.5 (第 1407-1408 行) and the §20.3 regression policy, closing gap
+by roadmap §15.5「性能门禁」（P-5「p50/p95 时间与峰值内存有正式预算」句——行号可能漂移，以节标题为锚）and the §20.3 regression policy, closing gap
 G-6 of `docs/0.13.0-gate-plan.md` (milestone M5, agent E). From 0.13.0 on, the
 numbers in this document ARE release budgets: any over-budget or >10%
 regression requires an approval record (§6). `BENCHMARKS-0.6.0.md` through

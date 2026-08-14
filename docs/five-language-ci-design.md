@@ -18,8 +18,8 @@
   msrv/conformance/deny/audit/semver/oracles/package，拆分前母仓 ci.yml:25-307，现行 job 名见
   consema-rs ci.yml）+ `go-1-26`（拆分前母仓 ci.yml:321-331，现行归 consema-go 仓）。
   C-1 记录此 10 job 需在 GitHub 干净 checkout 全矩阵全绿（fc-manifest-0.13.0.json open_items 字典 C-1 项；C-1 status 已 closed——2026-08-11 run #5 132/132 steps 全绿并回填 closure）。〔注：本节为 2026-08-11 调研快照，已由 §10 实况取代——拆分前母仓 ci.yml 为 10+2 job（go-1-26、go-differential 两个 job）；六仓拆分 2d7494f 后 go-differential 归 consema-go 仓（ci-go.yml 的 go-differential job），母仓 ci.yml 现为 oracles / shared-conformance-digest / check 三 job〕
-- **差分 harness 现状（关键事实）**：`scripts/go-verify-byte-parity.ps1`、`go-verify-normalized-
-  differential.ps1`、`go-verify-protocol-exchange.ps1`、`go-verify-shared-conformance.ps1` 目前**未接入
+- **差分 harness 现状（关键事实）**〔注：本节为 2026-08-11 调研快照——「go-verify 未接入 CI」已被 §10 实况取代：Go 差分已由本地执行 + 文档化完成路径变为 CI 常设 gate（consema-go ci-go.yml 的 go-differential job，以 job 名为锚）〕：`scripts/go-verify-byte-parity.ps1`、`go-verify-normalized-
+  differential.ps1`、`go-verify-protocol-exchange.ps1`、`go-verify-shared-conformance.ps1` 当时**未接入
   CI**（.github 全域检索 `go-verify` 零命中）；按拆分前的既定分工，.github 是 Rust
   门禁域（拆分后 consema-go 仓 .github 已是 Go 门禁域，consema-go/go/README.md「Three-platform
   verification (0.19.0 G5.4)」节注记），Go 的验证以本地执行 + 文档化完成路径为准。差分证据链：byte parity 68/68（51 PVCE + 17
@@ -81,7 +81,7 @@
 | lint（fmt+clippy+rustdoc，3 OS，拆分前母仓 ci.yml:25-46） | Rust 专属 | 每语言各自的格式/类型门禁（§1.2 gates job）：TS = `tsc --noEmit` strict（consema-ts typescript/package.json 的 scripts.check 字段）；Python/Kotlin L0 无强制 linter（零依赖政策不引入 ktlint/ruff 等工具依赖，L5 可选文档化） |
 | test（cargo test --workspace，3 OS，拆分前母仓 ci.yml:48-61） | Rust 专属 | TS = `npm ci` + `npm test`（node --test）；Python = `pip install -e '.[dev]'` + `pytest`；Kotlin = `./gradlew --no-daemon test` |
 | coverage（cargo-llvm-cov 硬地板 + -Trend，拆分前母仓 ci.yml:77-113） | Rust 专属 | ts/py/kt 各有 60% coverage 硬地板（2026-08-13 实况：TS node 内建行覆盖 ≥60%、Python pytest-cov 总量 ≥60%、Kotlin kover 行覆盖 ≥60%，见各仓 coverage job；multi-language-implementation-plan.md §6 验收门禁原无覆盖项，已由各仓 coverage 门禁补充）；覆盖率趋势为 L5 可选，估计量：非 1.0.0 门禁项 |
-| msrv（Rust 1.85 全门禁，拆分前母仓 ci.yml:118-144） | Rust 专属 | 每语言最低版本验证（§1.2）：TS node >= 26（consema-ts typescript/package.json 的 engines 字段；CI 钉 26.7.0）；Python 3.12（consema-py python/pyproject.toml 的 requires-python 字段；CI 钉 '3.12.x'）；Kotlin 2.2.0 + JVM 17（consema-kt kotlin/build.gradle.kts 的 kotlin 版本与 jvmToolchain 字段）。注意与 Rust 的差别：Rust 的 stable ≠ msrv 是两套工具链；三语言 CI 钉的版本**就是**最低版本（"really verified in CI" 由构造满足，路线图 §21.2 精神——如实注记：TS/Python 钉的是各自 minor 线最新补丁，见 support-policy 与 RFC 0020 口径） |
+| msrv（Rust 1.85 全门禁，拆分前母仓 ci.yml:118-144） | Rust 专属 | 每语言最低版本验证（§1.2）：TS node >= 26（consema-ts typescript/package.json 的 engines 字段；CI 钉 26.7.0）；Python 3.12（consema-py python/pyproject.toml 的 requires-python 字段；CI 钉 '3.12.x'）；Kotlin 2.2.0 + JVM 17（consema-kt kotlin/build.gradle.kts 的 kotlin 版本与 jvmToolchain 字段）。注意与 Rust 的差别：Rust 的 stable ≠ msrv 是两套工具链；三语言 CI 钉的版本**就是**最低版本（"really verified in CI" 由构造满足——**如实注记：只对 Kotlin 2.2.0 精确成立；TS 钉 26.7.0、Python 钉 3.12.x 为各自 minor 线最新补丁，声明最低版本 26.0/3.12.0 未被精确验证**；路线图 §21.2 精神，support-policy 与 RFC 0020 §9.3 同口径） |
 | conformance（cargo test -p consema-conformance + suite-count 断言，拆分前母仓 ci.yml:145-173） | Rust runner 腿 | 每语言独立 conformance job（§2）：TS/Python/Kotlin 各一，runner 内做 18/519 + digest 断言（不复制拆分前 ci.yml conformance job 的内联 PS 脚本——断言进各语言 runner 测试，单一来源；现行 suite-count 断言在 consema-rs ci.yml conformance job） |
 | deny（cargo deny check，拆分前母仓 ci.yml:175-184） | Rust 依赖政策 | 每语言零运行时依赖断言 + 开发依赖审计（§1.3）：TS `npm ls --omit=dev` 空 + `npm audit`（L5，现行 ci-typescript.yml npm-audit job）；Python `dependencies = []`（consema-py python/pyproject.toml 的 dependencies 字段）断言 + `pip check`；Kotlin runtimeClasspath 空断言 + gradle 依赖锁定/验证（L5，现行 ci-kotlin.yml runtime-classpath-audit job） |
 | audit（cargo audit / RustSec，拆分前母仓 ci.yml:186-199） | Rust 供应链 | 同 deny 行。安全面 = 运行时零依赖 → 供应链面只剩 dev 工具（typescript/@types/node、pytest、kotlin.test+junit-jupiter）；L5 收口时逐语言审计并记录（照 fc-manifest-0.13.0.json gates 字典 SEC-6 项体例） |
@@ -105,7 +105,7 @@
 
 - **TS**：`npm ls --omit=dev` 必须空输出（consema-ts typescript/package.json 的 devDependencies 字段即满足，零运行时依赖）；package-lock.json 必须入库（npm ci 前置）。
 - **Python**：consema-py python/pyproject.toml 的 dependencies 字段（`dependencies = []`）由 CI 断言（脚本读取 pyproject 校验）+ `pip check` 干净。
-- **Kotlin**：Gradle `configurations.runtimeClasspath` 为空断言（consema-kt kotlin/build.gradle.kts 的依赖块，全部在 testImplementation/testRuntimeOnly）；gradle 依赖锁定（gradle.lockfile）与 wrapper `distributionSha256Sum` 钉版（§6 R-4）。
+- **Kotlin**：Gradle runtimeClasspath 审计（ci-kotlin.yml 的 runtime-classpath-audit job，W3-26 2026-08-14 收窄口径）：断言 runtimeClasspath 恰好解析为 org.jetbrains.kotlin:kotlin-stdlib + org.jetbrains:annotations（Kotlin Gradle plugin 默认注入 kotlin-stdlib，结构上永不为空——「为空」断言从未成立）；gradle 依赖锁定（gradle.lockfile）未落地（六仓实测无此文件），工具链钉为 wrapper `distributionSha256Sum`（§6 R-4）。
 - 该断言放 gates job 末步；违反即红（等价于 deny job 的角色）。
 
 ---
@@ -153,14 +153,14 @@
 | Kotlin | `kotlin/src/test/kotlin/consema/conformance/` kotlin.test/JUnit5 套件（build.gradle.kts 的 useJUnitPlatform 配置即覆盖） |
 | 固定校验（每 runner 必做） | suite id 前缀 `consema.*` 校验（拆分前母仓 ci.yml conformance job 的 suite-id 校验体例，现行见 consema-rs ci.yml conformance job）；case id 去重；**case 计数断言 18/519**（conformance/README.md 规则 4"每个 suite 必须验证 case 数量"）；聚合 digest 断言（§4.2）；未知 action 拒绝 |
 | 数据驱动 | input/expected 实际驱动执行；禁止把期望值硬编码进 runner（conformance/README.md 第 3 条"runner 只是执行器"） |
-| skip 纪律 | 未实现 capability 的 case 进 documented skip（带 capability + 原因，绝不静默；RFC 0016 §7 第 191 行，go-implementation-plan.md）；L5 起零 skip |
+| skip 纪律 | 未实现 capability 的 case 进 documented skip（带 capability + 原因，绝不静默；RFC 0016 §7「Conformance integration contract (frozen)」的 documented skip = success 纪律——行号可能漂移，以节标题为锚）；L5 起零 skip |
 | 报告形态 | 与 Rust/Go 同构的共享报告（§2.3）：suite file、case id、passed/skipped/failed 计数、skip 原因；机器可读输出照 RFC 0015 信封语义（go-implementation-plan.md） |
 
 ### 2.3 共享报告契约（五 runner 对比的公共语言）
 
-- 既有事实：Rust 侧由 `emit_conformance_reports.rs` 产出 `shared-conformance.json`（
-  go-verify-shared-conformance.ps1:157-167）；Go 侧由 runner CLI 产出同形报告、`go/conformance/
-  shared.go` 转成共享契约后逐 case 对比（go-verify-shared-conformance.ps1:203-248）。
+- 既有事实：Rust 侧由 `emit_conformance_reports.rs` 产出 `shared-conformance.json`（consema-go 的
+  go-verify-shared-conformance.ps1——行号可能漂移，以语义段为锚）；Go 侧由 runner CLI 产出同形报告、`go/conformance/
+  shared.go` 转成共享契约后逐 case 对比（go-verify-shared-conformance.ps1 的共享契约对比段——行号可能漂移，以语义为锚）。
 - 设计：**共享报告契约 v1**（JSON：每 suite 的 file 名、case id、verdict passed/skipped/failed、
   skip 的 capability+reason；无 error text）——三新语言 runner 各自产出同形报告，语言侧对比测试
   复刻 `shared_run_test.go` 的逐 case 对比语义（same verdict both sides；skip 必须两侧同 skip，
@@ -340,9 +340,9 @@ multi-language-implementation-plan.md §7 START GATE：工具链就绪后先验�
 | # | 风险 | 缓解 |
 |---|---|---|
 | R-1 | **跨平台**：新语言仅 ubuntu（估计） | 三语言均跨平台（无 Windows 专属 API 面）；单 OS 照 go-1-26 job 先例（拆分前母仓 ci.yml:321-331；现行归 consema-go 仓）；3-OS 全矩阵属 L5/1.0.0（路线图 §22.4），按 Go 先例文档化完成路径（consema-go/go/README.md「Three-platform verification (0.19.0 G5.4)」节）。差分脚本均为 pwsh（ubuntu runner 可用，拆分前母仓 ci.yml 的 pwsh 步骤先例） |
-| R-2 | **Kotlin Gradle 依赖下载**（首次构建拉 Gradle 发行版 + Kotlin 插件 + JUnit，估计 2-5 分钟，网络不稳定时更长） | gradle wrapper 入库 + `distributionSha256Sum` 钉版（当前 wrapper 缺失，§0.1 缺口）；gradle/actions/setup-gradle@v4 缓存；gradle.lockfile 依赖锁定；timeout 60 分钟余量 |
+| R-2 | **Kotlin Gradle 依赖下载**（首次构建拉 Gradle 发行版 + Kotlin 插件 + JUnit，估计 2-5 分钟，网络不稳定时更长） | gradle wrapper 已入库（c60d31a，gradle 8.14——§10 实况，§0.1「wrapper 缺失」缺口已闭合）+ `distributionSha256Sum` 钉版；gradle/actions/setup-gradle@v4 缓存；gradle.lockfile 依赖锁定（未落地——六仓实测无此文件，如实记录）；timeout 60 分钟余量 |
 | R-3 | **Python 版本钉**：CI 误用最新版（3.14+）掩盖 3.12 最低版本语义 | setup-python 显式 '3.12.x'；consema-py python/pyproject.toml 的 requires-python 字段（>= 3.12）为声明 + CI 钉为验证（"really verified" 由构造满足）；注意与 python-configparser-v1 oracle 的 CPython 3.14.6 pin（conformance/README.md oracles 清单段）区分——那是第三方行为钉，不是 SDK 工具链 |
-| R-4 | **npm registry 访问 / 供应链** | package-lock.json 必须入库（npm ci 前置，当前缺失 §0.1）；devDeps 仅 2 项（package.json 的 devDependencies）；npm audit 于 L5 收口；引擎钉 node 26.7.0（package.json 的 engines 字段 >= 26） |
+| R-4 | **npm registry 访问 / 供应链** | package-lock.json 已入库（2026-08-13，consema-ts commit 66ec3fd——§10 实况，§0.1「无 package-lock.json」缺口已闭合）；devDeps 仅 2 项（package.json 的 devDependencies）；npm audit 于 L5 收口；引擎钉 node 26.7.0（package.json 的 engines 字段 >= 26） |
 | R-5 | **wall-clock 预算** | 现状估计：Rust 全套 ~10-15 分钟（并行 job）；新增 9 job（3 语言 × 3）各估计 5-15 分钟（gates 3-8 / conformance 2-5 / differential 5-10，Rust 例构建由 rust-cache 摊销、cargo build --locked 每次仅增量）；并行下总 wall-clock 估计 +15-35 分钟；timeout 与并发组照拆分前母仓 ci.yml 的头部 concurrency 模式（现行见各仓 ci.yml/ci-*.yml）。**估计量**：具体数字待首批 job 实测后回填 |
 | R-6 | **digest / 计数五处漂移** | §4.2 双重复核（manifest 运行期校验 + 五处硬钉常量）+ §4.3 同批纪律；skip 差异由 shared-conformance 对比（-StrictSkips）阻断（§3.6） |
 | R-7 | **JDK 工具链混淆**：Kotlin jvmToolchain(17)（build.gradle.kts 的 jvmToolchain 字段）vs java-properties oracle 的 OpenJDK 25.0.4 pin | 两者是不同对象（SDK 编译工具链 vs 第三方行为钉）；CI 中 setup-java Temurin 17 只服务于 kotlin/ 构建；oracle 仍在 Rust job 内运行 |
@@ -438,7 +438,7 @@ multi-language-implementation-plan.md §7 START GATE：工具链就绪后先验�
 - 现状 CI：`.github/workflows/ci.yml`（10+2 job：10 Rust + go-1-26 + go-differential；**六仓拆分 2d7494f 后此句为拆分前快照——10 Rust 门禁归 consema-rs 仓、go-1-26 / go-differential 归 consema-go 仓，母仓 ci.yml 重建为 oracles / shared-conformance-digest / check 三 job**）
 - 差分现状：`scripts/go-verify-*.ps1` 四个脚本（consema-go 仓）、consema-go/go/README.md「Cross-language byte parity」节
 - 向量权威：`conformance/README.md`、`conformance/vectors/`（18 套 / 519 cases）
-- 记录：`docs/fc-manifest-0.13.0.json`（digest 第 35-41 行、C-1 第 786-802 行）
+- 记录：`docs/fc-manifest-0.13.0.json`（digests.conformance_suite 键、open_items 字典 C-1 项——以字段名为锚，行号可能漂移）
 - 验证证据：`docs/five-element-review-1.0.0.md`（108/108、83/83、68/68 实测）
 - 三语言 scaffold：`typescript/package.json`、`python/pyproject.toml`、`kotlin/build.gradle.kts`
 
@@ -491,13 +491,13 @@ multi-language-implementation-plan.md §7 START GATE：工具链就绪后先验�
     gradle 8.14，kotlin-gates 走 wrapper 驱动（ci-kotlin.yml 的 kotlin-gates job））
 - **L5 批次落地（2026-08-12）**：
   - **`L-package` job × 3 上线**（§1.1 package 行 / §7.1 规划行 L5 项）：`ts-package`
-    = npm pack --dry-run（tarball 必须含 files: src，ci-typescript.yml）、
+    = npm pack --dry-run（tarball 必须含 dist/index.js + dist/index.d.ts + LICENSE、零 *.test./test_helpers/test_decode 文件——G33 2026-08-14「1.0 前发布编译产物」决策，ci-typescript.yml 的 ts-package job，以 job 名为锚）、
     `python-package` = pip wheel --no-deps .（hatchling 后端，wheel 必须含
     consema/ 包，ci-python.yml）、`kotlin-package` = bash gradlew jar（gradle 8.14
     wrapper，jar 必须产出至 kotlin/build/libs/，ci-kotlin.yml）；三 job 均
     ubuntu-latest、均入各仓 `check (all gates green)` needs、permissions:
     contents: read、无 secrets、不依赖 conformance 数据（打包与数据无关）；
-    本机实测通过（ts 261 文件含 src/、py consema-0.14.0-py3-none-any.whl 含
+    本机实测通过（ts tarball 含 dist 产物、py 1.0.0-rc.1 版 wheel（2026-08-13 版本 bump，c6663b4）含
     consema/__init__.py、kt consema-kotlin-1.0.0-rc.1.jar 含 consema/ 类）
   - **3-OS 矩阵处置 = 文档化完成路径（§5.3 L5 行"二选一"决策）**：ts/py/kt
     保持单 OS 主跑面 + windows/ubuntu 双 OS 差分面——ts/py 的 gates/conformance

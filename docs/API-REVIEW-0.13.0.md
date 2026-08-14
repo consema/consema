@@ -12,7 +12,7 @@
 - **cargo-semver-checks**：本地实测 11 个基线 crate（vs v0.8.0 tag f79dd99，baseline worktree 建于仓库外）；8 个全绿，3 个仅"新家族枚举变体新增"（已按 0.x 治理批准，RFC 级决定见 §3）。
 - **rustdoc**：workspace 除 consema-conformance 外 0 个 missing-docs；consema-conformance 的 12 个 missing-docs 曾全部位于 M2 并行轨的 `consema-rs/consema-conformance/src/fuzz.rs`，该文件已随 0.13.0 落地（094f5d1/7e9de38 提交，已入库）并补齐全部 missing-docs（见 §4），门禁全绿。
 - **facade/feature**：facade 依赖 13 个 backend crate、无 `[features]`，与 CHANGELOG 声称一致；`capabilities` 清单由 facade 类型派生（`lib.rs` registry 模块）。
-- **泄漏复查**：15 个 crate 中 7 个声明第三方依赖（encoding_rs/sha2/toml_edit/saphyr-parser/unicode-id-start/unicode-ident/xmlparser，全部以锁定版本钉入 Cargo.lock；依赖面修正记录：2026-08-14 波 2 审计，原「15 个 crate 零第三方依赖」声称与 Cargo.lock 事实不符，安全结论随之修正——第三方依赖不进入公共签名，见 §6）；第三方错误类型泄漏在构造上不可能；格式 crate 公共 API 只携带语言无关契约类型（ProfileId/Diagnostic/PortableValue/NodeRef/Span/…），backend AST 内部类型（syntax kind、native 树节点数据）保持在 crate 内私有。无泄漏。
+- **泄漏复查**：15 个 crate 中 10 个声明第三方依赖（consema/ctrlc、consema-document/encoding_rs+sha2、consema-ini/properties/encoding_rs、consema-json/unicode-id-start、consema-hcl/unicode-ident、consema-xml/plist/xmlparser、consema-toml/toml_edit、consema-yaml/saphyr-parser——外部依赖名 8 个：7 个 workspace 钉 + ctrlc；2026-08-15 波 4 复核：原「7 个」漏计 consema/ctrlc、consema-properties/encoding_rs、consema-xml/xmlparser，全部以锁定版本钉入 Cargo.lock；依赖面修正记录：2026-08-14 波 2 审计，原「15 个 crate 零第三方依赖」声称与 Cargo.lock 事实不符，安全结论随之修正——第三方依赖不进入公共签名，见 §6）；第三方错误类型泄漏在构造上不可能；格式 crate 公共 API 只携带语言无关契约类型（ProfileId/Diagnostic/PortableValue/NodeRef/Span/…），backend AST 内部类型（syntax kind、native 树节点数据）保持在 crate 内私有。无泄漏。
 
 ---
 
@@ -161,7 +161,7 @@
 ## 3. cargo-semver-checks 基线解读（M4 视角）
 
 - **基线锚点**：`git tag v0.8.0` 存在（f79dd99，annotated 未签名），与 plan P-11 一致；baseline worktree 建于仓库外（`C:\Users\franck\Documents\consema-baseline-v0.8.0`，semver-checks 要求 baseline 不在当前 workspace 内）。
-- **CI semver job（M1 交付，`.github/workflows/ci.yml:207-245`）**：`obi1kenobi/cargo-semver-checks-action@v2`，`baseline-root: baseline`（v0.8.0 checkout），package 列表 = v0.8.0 时代已存在的 11 个可发布 crate（consema、consema-core、consema-document、consema-graph、consema-ini、consema-json、consema-properties、consema-protocol、consema-pvce、consema-toml、consema-yaml）；v0.8.0 基线树（fbe98b5c）另有 consema-conformance crate 目录——repository-only 不可发布，从 semver 基线排除（理由如实记录）；consema-xml/plist/hcl 无基线，排除（R-4 覆盖边界显式记录）。
+- **CI semver job（M1 交付，consema-rs ci.yml 的 semver job——以 job 名为锚，行号可能漂移）**：`obi1kenobi/cargo-semver-checks-action@v2`，`baseline-root: baseline`（v0.8.0 checkout），package 列表 = v0.8.0 时代已存在的 11 个可发布 crate（consema、consema-core、consema-document、consema-graph、consema-ini、consema-json、consema-properties、consema-protocol、consema-pvce、consema-toml、consema-yaml）；v0.8.0 基线树（fbe98b5c）另有 consema-conformance crate 目录——repository-only 不可发布，从 semver 基线排除（理由如实记录）；consema-xml/plist/hcl 无基线，排除（R-4 覆盖边界显式记录）。
 - **本地实测（2026-08-07，`cargo install cargo-semver-checks --locked` 后逐包 `check-release --baseline-root`，与 CI job 等价）**：
 
 | crate | 结果 |
@@ -189,7 +189,7 @@
 
 ## 6. backend AST 与第三方错误类型泄漏复查（§15.6）
 
-- **第三方错误类型**：15 个 crate 中 7 个声明第三方依赖（encoding_rs/sha2/toml_edit/saphyr-parser/unicode-id-start/unicode-ident/xmlparser，全部以锁定版本钉入 Cargo.lock）；逐一核对公共签名，第三方类型不进入公共 API——第三方错误类型进入公共签名在构造上不可能。公共错误面全部是 crate 自有的 `StableFailure` 实现与 consema-protocol 的注册 code。（依赖面修正记录：2026-08-14 波 2 审计，原「15 个 crate 零第三方依赖」声称与 Cargo.lock 事实不符。）
+- **第三方错误类型**：15 个 crate 中 10 个声明第三方依赖（consema/ctrlc、consema-document/encoding_rs+sha2、consema-ini/properties/encoding_rs、consema-json/unicode-id-start、consema-hcl/unicode-ident、consema-xml/plist/xmlparser、consema-toml/toml_edit、consema-yaml/saphyr-parser——外部依赖名 8 个：7 个 workspace 钉 + ctrlc；2026-08-15 波 4 复核：原「7 个」漏计 consema/ctrlc、consema-properties/encoding_rs、consema-xml/xmlparser，全部以锁定版本钉入 Cargo.lock）；逐一核对公共签名，第三方类型不进入公共 API——第三方错误类型进入公共签名在构造上不可能。公共错误面全部是 crate 自有的 `StableFailure` 实现与 consema-protocol 的注册 code。（依赖面修正记录：2026-08-14 波 2 审计，原「15 个 crate 零第三方依赖」声称与 Cargo.lock 事实不符。）
 - **backend AST 泄漏**：格式 crate 的 AST 内部类型保持 crate 私有——`JsonSyntaxKind`/`JsonValueKind`/`JsonArrayElement`（json）、`XmlSyntaxKind`/`XmlElementData`（xml）、`HclSyntaxKind`/`HclAttribute`（hcl）等均为本 crate 公共但**不外泄到其他 crate 的签名**；facade `Document` 用私有 `DocumentInner` 枚举包装各格式 Document（`lib.rs`），跨 crate 公共签名只携带语言无关契约类型（`ProfileId`、`Diagnostic`、`PortableValue`、`NodeRef`、`Span`、`SourceSnapshot`、`ParseLimits`、`FormatFamilyId` 等，RFC 0002/0008/0011 契约面）。consema-core/consema-document 类型出现在格式 crate 公共签名中的全部是契约类型，非实现内部。
 - **判定**：无泄漏。`cli-implementation-plan.md` 的"bin 只走 public API"结构约束继续成立（本次修复未触碰）。
 

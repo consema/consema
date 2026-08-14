@@ -451,8 +451,7 @@ the disposition is publicly stated.
 
 - **Declared minimum**: `go.mod` declares the minimum Go version; the
   value is `go 1.26`, frozen at 0.14.0 (go-implementation-plan §1.3, per
-  §21.2 lines 1825/1831: minimum version follows the public support
-  policy and is CI-verified).
+  §21.2「Go API」的「Go 最低版本遵循公开支持政策并在 CI 验证」句——行号可能漂移，以节标题为锚).
 - **Support window**: each Go minor release supports the latest two Go
   minor versions at its time of release (the §21.4 placeholder promise,
   now concrete: with `go.mod` at 1.26, releases support Go 1.26 and 1.27

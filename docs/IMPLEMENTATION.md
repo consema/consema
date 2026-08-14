@@ -446,7 +446,7 @@ RFC 0015 的 `ContractRegistry::v7()` 增至 41 条记录：v6 的 38 条精确�
 
 `ErrorCodeRegistry::v7()` 在 v6 的 166 条上增加 20 条 `cli.*` code，共 186 条：usage 7（unknown-command/unknown-argument/invalid-argument/invalid-format/missing-required/missing-plan/redaction-pattern）、data 2（io/invalid-request）、detection 1（ambiguous）、limit 3（file-size/batch-count/manifest-size）、write 5（io/permission/read-only/symlink-policy/target-is-directory）、interrupted 1（signal）与 internal 1（unclassified）；0.13.0 另注册 `json.projection.incomplete-document@1`（audit F3，`consema-rs/consema-json/src/projection.rs` 的 json Recovered 门禁 code），v7 现共 187 条。exit-code 分类是纯函数（`classify_error_code`，RFC 0015 §5.2）：usage→1、data/detection→2、limit→3、write/interrupted→4、internal→5、其余成功 0；CLI 二进制只映射该分类，绝不手选码。
 
-`RegistryManifest::current()` 在 0.12.0 指向 v7；v1-v6 的 contract/error arrays、manifest 与 frozen constructor 精确不变。v7 的 CLI payload 是语言无关语义模型契约：Go CLI（路线图 §22.6）实现同一 machine schema，payload 内不出现 Rust 类型名或 process-local 身份（RFC 0015 §15.2）。
+`RegistryManifest::current()` 在 0.12.0 指向 v7；v1-v6 的 contract/error arrays、manifest 与 frozen constructor 精确不变。v7 的 CLI payload 是语言无关语义模型契约：Go CLI（路线图 §22.6）实现同一 machine schema，payload 内不出现 Rust 类型名或 process-local 身份（RFC 0015 §1「Decision」——payload 为语言中立语义模型契约；RFC 0015 无 §15.2 小节，其 §15 为 Security boundary）。
 
 ## 13. 0.8.0 明确边界
 
