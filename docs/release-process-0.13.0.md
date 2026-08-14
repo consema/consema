@@ -88,6 +88,12 @@ MSRV build leg: rustc 1.85.0 for all 14 crates
 - 校验：`powershell -File scripts/release-sign.ps1 -VerifyArtifacts -ManifestPath
   docs/release/SHA256SUMS-<version>.txt` —— 逐条重算对比，任何 mismatch 或缺失
   归档都以 exit 1 列明；然后 `gpg --verify` `.asc`/`.sig`。
+- **历史签名失效注记（2026-08-15 追加）**：`docs/release/SHA256SUMS-0.8.0.txt`
+  （及其 `.asc`/`.sig`）的签名对已被 2026-08-13 的内容编辑静默失效——签名生成于
+  编辑前，对现行文件 `gpg --verify` 必然报 bad signature，消费者无法区分
+  「被篡改」与「被注记编辑」；该文件保留为历史存档（仅供存档，不做验证载体），
+  1.0.0-rc.1 发布时按本流程从干净发布 commit 重新生成 checksum 清单并签名
+  （§7 检查单第 5 项）。
 - 发布时同时入库三个文件：`SHA256SUMS-<version>.txt`（纯文本）、`.asc`（clearsign，
   含文本+签名，适合直接分发）、`.sig`（detached ASCII 签名）。
 
