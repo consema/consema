@@ -6,7 +6,7 @@
   module layout, the core value-model mapping (PortableValue/PortableGraph to
   Go types), the formation/projection/materialization/edit API shapes, the
   error classification contract, and the conformance integration contract,
-  mapped against the Rust facade (`crates/consema`) and the language-neutral
+  mapped against the Rust facade (`consema-rs/consema`) and the language-neutral
   contracts. It does **not** specify implementation details; the Go
   implementation plans land with 0.14.0+ (roadmap §16.1-§16.5)
 - Depends on: RFC 0002 (cross-format protocol v1), RFC 0003 (source, syntax
@@ -93,8 +93,12 @@ the Go starting point — never an accidental local workspace state (roadmap
 One module named `consema` (module path convention: `consema.dev/consema`
 or the publish-resolved path recorded at 0.14.0; the path is an
 implementation fact, the single-module structure is frozen). The SDK and the
-future Go CLI share one module (mirroring `crates/consema`'s facade +
+future Go CLI share one module (mirroring `consema-rs/consema`'s facade +
 `[[bin]]` structure, RFC 0015 §1 precedent).
+〔如实注记（2026-08-13）：`consema.dev` 域名 DNS NXD，且模块位于
+consema-go 仓 `go/` 子目录（无路径后缀）——Go proxy 目前无法按该路径拾取；
+发布机制以 GitHub Release 建档为准，proxy 收录待域名与模块路径就绪
+（与 RELEASING.md §1/§4 同述）。〕
 
 ### 3.2 Package topology (frozen)
 
@@ -105,7 +109,7 @@ future Go CLI share one module (mirroring `crates/consema`'s facade +
 | `consema/protocol` | `consema-protocol` | language-neutral codecs, contract registry, error registry, CLI machine protocol records (RFC 0015) |
 | `consema/document` | `consema-document` | SourceSnapshot, Span, NodeRef, ProfileId, FormationStatus, ParseLimits, MaterializationRequest, SourcePatch |
 | `consema/json`, `consema/toml`, `consema/yaml`, `consema/ini`, `consema/properties`, `consema/xml`, `consema/plist`, `consema/hcl` | one crate each | per-family documents, queries, projections, materializations, edits, operation registries |
-| `consema` (root) | `crates/consema` facade | `Document` union type, `Convert*` composition, `Registry` surface (families/profiles/query domains/operation registries) |
+| `consema` (root) | `consema-rs/consema` facade | `Document` union type, `Convert*` composition, `Registry` surface (families/profiles/query domains/operation registries) |
 | `consema/conformance` + `cmd/consema-conformance` | `consema-conformance` | the Go conformance runner over the shared vectors (Section 7) |
 
 Constraints:
@@ -122,7 +126,7 @@ Constraints:
 
 The language-neutral PortableValue contract is the closed fifteen-kind
 registry of 配置内容统一处理标准与 Rust 参考实现.md §10 and
-`crates/consema-core/src/value.rs` (PortableValueKind): Null, Boolean,
+`consema-rs/consema-core/src/value.rs` (PortableValueKind): Null, Boolean,
 Integer, Decimal, BinaryFloat32, BinaryFloat64, String, Bytes, Date, Time,
 LocalDateTime, OffsetDateTime, Sequence, Object, EntryMapping. The Go
 mapping covers all fifteen kinds:
@@ -226,6 +230,7 @@ change applied to Rust and Go together via the §11.3 process.
 - The Go module version follows the product release train (roadmap §11.4): `Consema Product 1.0.0` = Rust crates 1.0.0 + Go module v1.0.0 + Specification v1 release set + Conformance release set 1.0.0; before 1.0.0 the Go module is v0.x.
 - Package versions never substitute contract versions: `core.pvce.full@1`'s `@1` and the module version are different dimensions (roadmap §11.4).
 - Go starts from the 0.13.0 Feature-Complete Manifest (M9 deliverable) and re-checks it at each Go milestone.
+- **调和注记（2026-08-13）**："before 1.0.0 the Go module is v0.x" 指稳定发布轨（0.x.0 里程碑）；RC 预发布按组织发布纪律（RELEASING.md §1：预发布用 `v1.0.0-rc.N` tag）走 v1 预发布轨——1.0.0-rc.1 先于 1.0.0 以 `v1.0.0-rc.1` 发布属 v1.0.0 的 prerelease 轨道，不构成对 v0.x 条款的违反（语义版本预发布后缀见 RFC 0015 §3.3）。
 
 ## 10. Rejected alternatives
 

@@ -1452,5 +1452,6 @@
       "spdxElementId": "SPDXRef-DOCUMENT"
     }
   ],
-  "spdxVersion": "SPDX-2.3"
+  "spdxVersion": "SPDX-2.3",
+  "comment": "披露注记（2026-08-14 波 2 审计）：本 SBOM 于 2026-08-07 由 cargo-sbom 0.10.0 在 0.13.0 门禁工作树（commit 9c1ede20fab56829cfaeca6924ee115ff01cd5d2，workspace version 当时仍为 0.8.0）生成，文件名按 workspace 版本自动命名——其内容描述 0.13.0 门禁工作树的 15 crate 全 workspace（含 0.9.0-0.11.0 新增 crate），不是 0.8.0 发布树；0.8.0 发布时无 SBOM 产物。1.0.0-rc.1 发布 SBOM 必须按 docs/release-process-0.13.0.md §7 从干净发布 commit 重新生成。"
 }

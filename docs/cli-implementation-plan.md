@@ -1,8 +1,12 @@
 # Consema 0.12.0 CLI 实现计划（Rust SDK + CLI 产品集成）
 
+> **拆分后路径注记（2026-08-14 波 2）**：本文为 2026-08 拆仓前撰写的 0.12.0 规划记录，
+> 文中 `crates/consema*` 为拆分前单仓布局路径，六仓拆分后对应物为
+> `consema-rs/consema*`；按 G76 处置约定，历史规划文档以本节注记统一标注。
+
 - 对应规范：路线图《Consema 1.0.0 产品路线图与双语言落地设计》§10（产品级 CLI）、§14.11（0.12.0 范围与硬门禁）、§12.3 第 13 项（CLI machine protocol 与 batch apply 须 RFC-first）、§15（Feature-Complete Gate 中与 CLI 相关的门禁）、§1（CLI 不是第三个实现）；RFC 0015（本计划 M1 产出，CLI machine protocol 与 batch apply，规划编号对应路线图 §27 R-17）
 - 目标版本：0.12.0（对齐路线图 §14.11）
-- 先例：`docs/hcl-implementation-plan.md`（0.11.0）与 `docs/plist-implementation-plan.md`（0.10.0）的多 agent 文件域计划体例；`crates/consema/`（facade，0.8.0，lib-only 602 行 + conversion.rs 2147 行）；`crates/consema-protocol/`（semantic-model v1-v6、canonical JSON/PVCE 双传输、typed payload decoders）
+- 先例：`docs/hcl-implementation-plan.md`（0.11.0）与 `docs/plist-implementation-plan.md`（0.10.0）的多 agent 文件域计划体例；consema-rs 的 `consema/`（拆分前 `crates/consema/`；facade，0.8.0，lib-only 602 行 + conversion.rs 2147 行）；consema-rs 的 `consema-protocol/`（拆分前 `crates/consema-protocol/`；semantic-model v1-v6、canonical JSON/PVCE 双传输、typed payload decoders）
 - 语义权威顺序（沿用 `docs/IMPLEMENTATION.md`）：永久不变量 → 已接受 RFC → 语言无关 conformance vectors → 本实现计划与 Rust API → 第三方行为仅为实现细节
 
 本文是只读调研产出的执行计划；除本文外本次不修改任何仓库文件。所有行数估计为 Rust 源码（含该模块内测试）规模级，参考 consema-xml 各模块实际行数（parser 2649、edit 2490）与 hcl/plist 计划的估计惯例。
@@ -35,14 +39,14 @@ consema conformance     内嵌 CLI 自检子集；完整语言无关 suite 保�
 consema explain         诊断码/契约/Profile/能力的权威解释（人类 + 机器）
 ```
 
-0.12.0 交付（§14.11 第 1308-1319 行）列出的 inspect/query/project/materialize/convert/plan/apply/explain 是核心八命令；capabilities、edit、conformance 亦属 §10"至少提供"清单，全部 11 个在 0.12.0 完成（§15.1 第 1361 行"CLI 全部正式命令完成"是 0.13.0 门禁的前提输入）。
+0.12.0 交付（§14.11）列出的 inspect/query/project/materialize/convert/plan/apply/explain 是核心八命令；capabilities、edit、conformance 亦属 §10"至少提供"清单，全部 11 个在 0.12.0 完成（§15.1"CLI 全部正式命令完成"是 0.13.0 门禁的前提输入）。
 
 ### 0.3 模块拓扑
 
 关键决策：**CLI 二进制作为 `crates/consema`（facade crate）的 `[[bin]]` 目标**，bin 代码全部位于 `src/bin/consema/`（目录式 bin，私有模块树），只允许依赖同包 lib 的 public API。两个理由：
 
 1. 路线图 §1（第 131-135 行）把正式 `consema` CLI 列为产品交付物，facade crate 就是"产品"crate；bin 内置于其中保持可发布归档数不变（14 个，`scripts/verify-package-archives.ps1` 覆盖面不变），`cargo install consema` 同时获得 SDK 与 CLI。
-2. **同包 bin 无法访问 lib 的私有项**——"CLI 与 SDK 使用同一语义入口"（§14.11 硬门禁第 1324 行）由此在编译期强制执行：CLI 需要什么语义入口，就必须走 facade 的 public API；facade 缺什么就补什么公共 API（M10 评审），绝不绕道 backend crate（硬门禁第 1323 行）。
+2. **同包 bin 无法访问 lib 的私有项**——"CLI 与 SDK 使用同一语义入口"（§14.11 硬门禁）由此在编译期强制执行：CLI 需要什么语义入口，就必须走 facade 的 public API；facade 缺什么就补什么公共 API（M10 评审），绝不绕道 backend crate（硬门禁）。
 
 ```text
 crates/consema/
@@ -161,13 +165,13 @@ path = "src/bin/consema/main.rs"
 
 全局规则（§10 第 803-816 行逐条落实）：
 
-- **默认只读或 dry-run**：没有任何命令在无显式参数时写目标文件（第 803 行、§22.6 第 1922 行"CLI 默认 dry-run，写操作有 precondition"）。
+- **默认只读或 dry-run**：没有任何命令在无显式参数时写目标文件（§22.6"CLI 默认 dry-run，写操作有 precondition"）。
 - **写入必须显式确认参数**：统一 `--write`/`--apply`/`--output` 三档；`--apply` 只能消费先前 `plan` 产生的 batch-plan manifest，不接受裸操作（第 804 行）。
 - **stdout 输出数据，stderr 输出诊断**（第 805 行）：所有 human 诊断、progress、redaction 提示走 stderr；stdout 在 `--json` 下只有一行规范 JSON（信封），非 `--json` 下只有命令结果数据。
 - **CLI 的便利选择不能成为核心语义默认值**（第 818 行）：duplicate policy、lossy 授权、编码选择等全部由显式参数或请求 payload 给定，CLI 只要求用户选择、绝不替用户静默选择（§3.3 强制路径）。
 - **不在 parse/query/project 中执行配置里的程序**（第 816 行、§19.2 第 1719-1732 行）：CLI 不新增任何求值、import、网络或环境读取路径。
 
-### 2.2 exit code 分类（v1 candidate，RFC 0015 冻结；§15.6 第 1422 行"冻结为 v1 candidate"）
+### 2.2 exit code 分类（v1 candidate，RFC 0015 冻结；§15.6"冻结为 v1 candidate"）
 
 | 分类 | 码 | 触发（稳定映射，禁止自由发挥） |
 |---|---|---|
@@ -194,7 +198,7 @@ core.cli-output@1（固定字段 PortableValue，双传输）：
   redaction（{redacted: bool, count: int}，§4.4）
 ```
 
-- **CLI 机器 schema 必须是语言无关的语义模型 payload**：Go CLI（0.19.0）要产出同一 machine-readable output schema（§22.6 第 1929 行），双语言一致性清单覆盖 projection/materialization report（§11.2 第 853-863 行）——只有走固定字段 PortableValue + canonical JSON/PVCE 双传输 + typed decoder 重验的老路，才能被语言无关向量证明（protocol-v1/v2 双传输等价 32 个 case 先例，IMPLEMENTATION.md 第 337 行）。
+- **CLI 机器 schema 必须是语言无关的语义模型 payload**：Go CLI（0.19.0）要产出同一 machine-readable output schema（§22.6），双语言一致性清单覆盖 projection/materialization report（§11.2）——只有走固定字段 PortableValue + canonical JSON/PVCE 双传输 + typed decoder 重验的老路，才能被语言无关向量证明（protocol-v1/v2 双传输等价 32 个 case 先例，IMPLEMENTATION.md 第 337 行）。
 - 错误分类：CLI 层错误码进 `ErrorCodeRegistry::v7()`（`cli.usage.*`、`cli.detection.*`、`cli.write.*`、`cli.interrupted.*` 等，命名模式照 `hcl.parse.*@1` 先例）；格式层诊断继续使用既有 166 条 + 各格式本地 code 常量，CLI 只传递不改写。
 - 每个 v7 payload 的 decoder 重新验证交叉约束（照 v6 先例：不能仅凭 schema discriminator 绕过，IMPLEMENTATION.md 第 443-445 行）。
 
@@ -204,7 +208,7 @@ core.cli-output@1（固定字段 PortableValue，双传输）：
 
 ## 3. registry 与 auto-detection 安全边界
 
-### 3.1 全格式 registry（§14.11 第 1312 行）
+### 3.1 全格式 registry（§14.11）
 
 `registry.rs` 是**facade 既有类型的薄枚举**，不是新 registry：
 
@@ -216,7 +220,7 @@ core.cli-output@1（固定字段 PortableValue，双传输）：
 
 `consema capabilities` 输出该清单（含每个 Profile 的 capability 声明与 conformance 证据指向）；`consema explain` 输出单项权威解释（契约定义、错误码含义、Profile 结构规则）。数据全部派生自 SDK 自身类型——**CLI 对格式的任何知识都来自 facade，不重复声明**（§11 兼容性说明）。
 
-### 3.2 auto-detection 只返回置信事实或歧义（§14.11 硬门禁第 1325 行）
+### 3.2 auto-detection 只返回置信事实或歧义（§14.11 硬门禁）
 
 `detect.rs` 对输入文件输出**事实清单**，每项带确定性标记：
 
@@ -247,7 +251,7 @@ core.cli-output@1（固定字段 PortableValue，双传输）：
 ### 4.1 fsio.rs：同目录临时文件 + 原子替换（第 811-812 行）
 
 - 写流程：目标同目录创建唯一临时文件（`{name}.consema-{pid}-{nonce}.tmp`）→ 写入渲染字节 → flush → 按 OS 语义原子替换（POSIX `rename`；Windows `std::fs::rename` 的 REPLACE_EXISTING 语义）→ 读回验证 target digest。
-- **权限/所有者政策**（第 815 行）：临时文件创建为受限权限（POSIX 0600）；替换前把目标文件既有权限/所有者（OS 支持时）复制到临时文件；Windows 只读属性与 ACL 行为在实现期实测并在 RFC 记录（跨平台验证是 0.13.0 门禁，§15.4 第 1399 行）。
+- **权限/所有者政策**：临时文件创建为受限权限（POSIX 0600）；替换前把目标文件既有权限/所有者（OS 支持时）复制到临时文件；Windows 只读属性与 ACL 行为在实现期实测并在 RFC 记录（跨平台验证是 0.13.0 门禁，§15.4）。
 - **symlink 政策**（第 815 行）：写入路径默认拒绝 symlink/junction 目标（报告 `cli.write.symlink-policy@1`），`--follow-symlinks` 显式授权；inspect 报告 symlink 事实。
 - **换行与编码政策**（第 815 行）：CLI 不转码、不改换行——读原始字节进 `SourceSnapshot`，写渲染后的原始字节（`Document::render()` 字节精确，IMPLEMENTATION.md 第 73 行）；UTF-16/ISO-8859-1 文件全程按 encoding 事实直通。
 - **不声称跨文件系统多文件原子性**（第 812 行）：fsio 只承诺单文件原子替换；多文件事务不存在，`apply` 的"批量原子性"是 manifest 状态机的可恢复性，不是文件系统事务。
@@ -320,7 +324,7 @@ files: [{ path, status: completed | failed | pending | skipped-stale,
 | M5 | query/project/materialize/convert 命令 + `--json` + protocol 请求输入 | M2、M3 | ‖ 与 M4/M6 并行 | 1600-2200 | `query_cmd.rs`、`project_cmd.rs`、`materialize_cmd.rs`、`convert_cmd.rs`、机器输出接线 |
 | M6 | redact + fsio 原子写引擎 | M3 | ‖ 与 M4/M5 并行 | 900-1300 | `redact.rs`、`fsio.rs`（含失败注入单元测试） |
 | M7 | edit + plan：batch-plan v1 生成 | M2、M5 | 串行 | 1200-1700 | `edit_cmd.rs`（dry-run）、`plan.rs`、`manifest.rs`（plan 侧）、human 视图 redaction |
-| M8 | apply：batch-result、中断恢复、e2e | M6、M7 | 串行 | 1400-2000 | `apply.rs`、`manifest.rs`（result 侧）、`tests/cli_plan_apply.rs`（stale/冲突/权限/磁盘/中断注入，§15.6 第 1423 行） |
+| M8 | apply：batch-result、中断恢复、e2e | M6、M7 | 串行 | 1400-2000 | `apply.rs`、`manifest.rs`（result 侧）、`tests/cli_plan_apply.rs`（stale/冲突/权限/磁盘/中断注入，§15.6） |
 | M9 | conformance 命令 + cli-v1.json 向量 + runner + hardening | M2、M8 | ‖ M10 | 2000-2800 | `conformance_cmd.rs`、`conformance/vectors/cli-v1.json`、`crates/consema-conformance/src/cli_v1.rs`、`tests/cli_hardening.rs`、`tests/cli_e2e.rs` |
 | M10 | 文档 + 发布门禁 | M2-M8 公共 API | ‖ M9 | 1500-2500（文档） | CHANGELOG 0.12.0、IMPLEMENTATION.md 更新（crate 边界表 + v7 章节）、cookbook/migration guide、全格式工作流示例、`docs/BENCHMARKS-0.12.0.md`、verify-package-archives 全量 |
 
@@ -383,7 +387,7 @@ files: [{ path, status: completed | failed | pending | skipped-stale,
 
 范围：`apply.rs`（读 plan → 逐文件：重读/重验 digest → original-bytes 前置条件（委托 `SourcePatch` 验证）→ fsio 写 → 读回验 target digest → 落 result manifest）；`manifest.rs` result 侧（completed/failed/pending/skipped-stale 状态机 + 中断恢复）；`tests/cli_plan_apply.rs` e2e：stale digest（plan 后改文件）、original-bytes 不匹配、编辑冲突、权限拒绝、目标只读、磁盘失败注入、**中断恢复**（apply 中途 kill 子进程 → 重跑 → completed 跳过/pending 重做）、symlink 政策；`edit_cmd.rs` 的 `--write` 复用同一引擎。
 
-验收门禁（§15.6 第 1423 行"patch/apply 具备中断、冲突、权限和磁盘错误测试"、§16.x 第 1648 行 e2e）：上述注入矩阵全绿；中断恢复状态机断言（manifest 顺序：pending 落盘先于写入）；跨文件互不影响断言；exit code 4 分类矩阵。
+验收门禁（§15.6"patch/apply 具备中断、冲突、权限和磁盘错误测试"、§16.x e2e）：上述注入矩阵全绿；中断恢复状态机断言（manifest 顺序：pending 落盘先于写入）；跨文件互不影响断言；exit code 4 分类矩阵。
 
 ### M9 — conformance 命令 + 向量 + runner + hardening（‖ M10）
 
@@ -457,7 +461,7 @@ files: [{ path, status: completed | failed | pending | skipped-stale,
 |---|---|---|---|
 | R-1 | 零新依赖约束 | args/pretty-JSON/fsio 全部自写；若实现中发现需要 tempfile 类功能，一律自写（§5）；RFC 0015 记录该决策与 rejected alternative | M3、M6 |
 | R-2 | exit code 与 Recovered/歧义的关系 | "报告即成功"与"操作失败"两义要严格分开（§2.2）；分类函数穷尽矩阵防漂移 | M2、M8 |
-| R-3 | Windows 原子替换与权限 | `std::fs::rename` REPLACE_EXISTING 语义 + 目标只读属性/ACL 行为需实测；只读属性处理写入 fsio 政策；跨平台完整验证是 0.13.0 门禁（§15.4 第 1399 行），0.12.0 必须在 Windows 上可用 | M6、M8、M10 |
+| R-3 | Windows 原子替换与权限 | `std::fs::rename` REPLACE_EXISTING 语义 + 目标只读属性/ACL 行为需实测；只读属性处理写入 fsio 政策；跨平台完整验证是 0.13.0 门禁（§15.4），0.12.0 必须在 Windows 上可用 | M6、M8、M10 |
 | R-4 | symlink/junction 政策跨平台 | Windows junction/reparse point 的读取与写入语义不同；inspect 报告事实、写入默认拒绝 | M4、M6 |
 | R-5 | 中断恢复的 manifest 写入顺序 | 必须"先落 pending 再执行、后落 completed"；若先写文件后落 manifest，崩溃会造成 completed 漏记（重跑将重写）或 pending 误标；顺序以测试定格 | M8 |
 | R-6 | redaction 边界 | 误报（正常值被脱敏）与漏报（secret 泄露）双方向：v1 只做键名保守匹配 + 占位符 + `redacted` 事实；绝不触碰 patch 前置条件（SECURITY.md 第 22 行） | M6、M9 |
@@ -467,7 +471,7 @@ files: [{ path, status: completed | failed | pending | skipped-stale,
 | R-10 | 并发 apply 竞态 | 两个 apply 同时写同一文件：digest 前置条件重验是唯一防线；文档明示"无跨进程文件锁"（§4.1 不声称跨文件系统原子性） | M8 |
 | R-11 | 编码处理 | UTF-16/ISO-8859-1 文件 raw bytes 直通 `SourceSnapshot`；CLI 层禁止任何转码/换行改写；inspect 的编码事实来自 encoding resolution 而非猜测 | M4、M5 |
 | R-12 | v7 与冻结注册表 | additive 增补，v1-v6 冻结断言复用；`current()` 指向 v7 后旧 conformance 显式绑定旧 registry 的既有测试必须保持全绿 | M2 |
-| R-13 | Go CLI 一致性 | machine schema 内不得出现 Rust 类型名或 process-local 身份（§15.2 第 1369 行）；payload 全部走语义模型路径，CLI 二进制只是驱动 | M2、M10 |
+| R-13 | Go CLI 一致性 | machine schema 内不得出现 Rust 类型名或 process-local 身份（§15.2）；payload 全部走语义模型路径，CLI 二进制只是驱动 | M2、M10 |
 | R-14 | conformance 命令职责边界 | 内嵌子集与仓库级 suite 的分工写入 RFC；发布物不引用仓库 fixtures；`consema conformance` 的 suite 报告格式同样走 v7 信封 | M9 |
 
 ## 10. 验收门禁总表（对照仓库既有体例）
@@ -480,13 +484,13 @@ files: [{ path, status: completed | failed | pending | skipped-stale,
 | 新 payload 双传输等价（canonical JSON ↔ PVCE）+ decoder 篡改拒绝 | protocol-v1/v2 向量体例 | M2、M9 |
 | 机器输出字节相等（CLI `--json` == SDK protocol encode） | §11 兼容性说明的自动载体 | M5 起每里程碑 |
 | 检测事实/歧义矩阵数据驱动 | 向量数据驱动体例（改期望必失败） | M4、M9 |
-| plan/apply 失败注入：stale digest、original bytes、冲突、权限、磁盘、只读、symlink、中断恢复 | §15.6 第 1423 行、§16.x 第 1648 行、§22.7 第 1936 行 | M8 |
+| plan/apply 失败注入：stale digest、original bytes、冲突、权限、磁盘、只读、symlink、中断恢复 | §15.6、§16.x、§22.7 | M8 |
 | e2e：exit code 矩阵 + stdout/stderr 分流 + 全命令冒烟 | `env!("CARGO_BIN_EXE_consema")` | M3 起每里程碑 |
 | hardening 不 panic + 覆盖闭包 | tests/plist_hardening.rs 体例 | M9 |
 | 全套 suite 计数（0.12.0：18 套全绿） | CHANGELOG/RELEASE 记录体例 | M10 |
 | 打包/解包验证（14 个可发布 crate，consema 含 bin） | scripts/verify-package-archives.ps1 | M10 |
 | 性能基线文档 BENCHMARKS-0.12.0.md（CLI 冷启动/批量 plan-apply） | docs/BENCHMARKS-0.9.0.md 等 | M10 |
-| 临时文件权限与 redaction 跨平台验证 | §15.4 第 1399 行——**0.12.0 实现并 Windows 验证；Linux/macOS 全量验证归 0.13.0** | M6、M8（0.12）/0.13 门 |
+| 临时文件权限与 redaction 跨平台验证 | §15.4——**0.12.0 实现并 Windows 验证；Linux/macOS 全量验证归 0.13.0** | M6、M8（0.12）/0.13 门 |
 | M5/M7/M8 边界 API 评审（M10 移交 8 项：native 域 locator、provenance 空 map、project 报告 json/toml 限定、格式 code fallback、失败记录形态、java-properties 族前缀 bug、edit 词表 INI 限定、`edit --write` 未接线） | 逐项 disposition 已记录于 `docs/0.13.0-gate-plan.md` §4 M4（B-1..B-8）；修复项 B-6/B-8 为 0.13.0 优先 | M10（评审）+ 0.13.0 M4 |
 
 ## 11. 兼容性说明：CLI 不是第三个实现
@@ -494,8 +498,8 @@ files: [{ path, status: completed | failed | pending | skipped-stale,
 路线图 §1（第 135 行）："CLI 是产品入口，但不是规范权威，也不是第三个实现。"本计划的强制执行机制：
 
 1. **编译期强制**：bin 与 lib 同包，bin 只能访问 lib 的 public API（§0.3）。CLI 对格式的全部知识来自 facade 的 `Document`/`convert_*`/再导出类型——`src/bin/consema/` 中不存在任何 parse/query/project/materialize/edit/convert 的实现代码；每命令是"参数 → facade 调用 → 渲染"的薄驱动。
-2. **语义入口测试**：机器输出字节相等门禁（CLI `--json` == 同操作 SDK protocol encode）证明 CLI 与 SDK 输出同一语义（§14.11 硬门禁第 1324 行"CLI 与 SDK 使用同一语义入口"）。
+2. **语义入口测试**：机器输出字节相等门禁（CLI `--json` == 同操作 SDK protocol encode）证明 CLI 与 SDK 输出同一语义（§14.11 硬门禁"CLI 与 SDK 使用同一语义入口"）。
 3. **registry 单一来源**：`registry.rs` 的清单派生自 SDK 类型（§3.1），CLI 不重复声明格式知识；capabilities 与 facade 类型逐一相等断言防漂移。
 4. **便利性不改变核心语义**（§10 第 818 行）：duplicate/lossy/encoding 等政策一律由用户显式选择或请求 payload 给定，CLI 不发明默认策略（§3.3）。
 5. **面向 Go 的契约**：CLI machine schema 是 semantic-model v7 语言无关 payload（§2.3），Go CLI（0.19.0，§22.6）实现的是同一协议——schema 是契约，Rust CLI 二进制只是该契约的第一个驱动。CLI 便利层（人类输出、脱敏展示、检测事实）不属于跨语言契约，不进入语义模型。
-6. **CLI 文件 I/O 是 application operation**（§19.2 第 1734 行、§24 第 2013 行"CLI 文件读写不等于配置来源合并系统"）：fsio/plan/apply 全部在 bin 层，Document 核心与 backend crate 的"无副作用"不变量不受影响（§19.2 第 1719-1732 行）。
+6. **CLI 文件 I/O 是 application operation**（§19.2、§24"CLI 文件读写不等于配置来源合并系统"）：fsio/plan/apply 全部在 bin 层，Document 核心与 backend crate 的"无副作用"不变量不受影响（§19.2）。

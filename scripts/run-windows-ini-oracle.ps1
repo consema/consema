@@ -33,7 +33,12 @@ if ($manifest.suite -ne 'consema.ini.windows-wide-api-differential@1') {
 }
 $windowsBuild = [Environment]::OSVersion.Version.ToString()
 if ($windowsBuild -cne $manifest.authority.windows_build) {
-    throw "Windows build mismatch: expected $($manifest.authority.windows_build), got $windowsBuild"
+    # Allowed skip path (2026-08-14 波 2，对照 run-hcl-go-oracle.ps1 体例)：
+    # build 不匹配（hosted runner 10.0.26100 vs pinned 10.0.26200.0）此前无条件
+    # throw，使该 oracle 在任何 hosted runner 上不可执行；现按 documented skip
+    # （exit 3，记录于 oracle manifest）处理。
+    Write-Output "Windows INI oracle: SKIPPED (Windows build mismatch: expected $($manifest.authority.windows_build), got $windowsBuild; documented skip recorded in the oracle manifest)"
+    exit 3
 }
 $kernelPath = Join-Path ([Environment]::SystemDirectory) 'kernel32.dll'
 $kernelVersion = [Diagnostics.FileVersionInfo]::GetVersionInfo($kernelPath).FileVersion

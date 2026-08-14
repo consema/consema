@@ -35,7 +35,7 @@ combinatorial corpus；每份记录在 plan manifest 中）。
 ### 2.1 W1 — JSONC/JSON5/TOML/YAML 中更新依赖或镜像版本，保持注释与 style
 
 **结论：CLI 上不可执行（发现 F-1）。** 本版本 edit/plan 操作词表只接线
-INI family（CHANGELOG.md:42、cookbook §10 边界 7）。对 JSONC 源发出
+INI family（CHANGELOG.md 的 0.13.0 节 INI edit 词表条目、cookbook §10 边界 7）。对 JSONC 源发出
 `json.edit.replace-scalar-semantic@1` 请求得到显式拒绝（exit 2）：
 
 ```text
@@ -243,7 +243,7 @@ yaml/、xml/、plist/、hcl/）的钉版文件。
 证据：6 个家族（json/toml/yaml/xml/plist/hcl）的 edit 请求全部显式拒绝
 （exit 2，`cli.data.invalid-request@1`，消息 "the <family> edit surface is
 not wired in this milestone: the request vocabulary maps the ini family
-only"）；CHANGELOG.md:42 与 cookbook §10 边界 7 同文。影响：真实 JSON
+only"）；CHANGELOG.md 的 0.13.0 节 INI edit 词表条目与 cookbook §10 边界 7 同文。影响：真实 JSON
 项目（本 pilot）无法经 CLI 完成"保持注释与 style 的依赖版本更新"，只能
 SDK 编辑或等待 0.13.0 API 评审 backlog B-7 的每格式操作请求映射。这不是
 静默缺口——拒绝是显式且信息完整的。

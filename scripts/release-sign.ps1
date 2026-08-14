@@ -2,13 +2,16 @@
 # §19.4 "signed tag 与 release artifact"). Covers the two signing paths of
 # the release supply chain:
 #
-# 注（2026-08-13）：六仓拆分后本脚本的 cargo metadata 从启动 cwd 解析
-# workspace——母仓根已无 Cargo.toml，必须在 consema-rs 检出内执行
-# （-RepoRoot 默认值是本脚本父目录，与实际 cargo 解析根是两个互不相关的根；
-# 发布检查单命令见 docs/release-process-0.13.0.md §7，均按 consema-rs 执行）。
+# 注（2026-08-13，2026-08-14 波 2 修订）：六仓拆分后本脚本的 cargo metadata
+# 从启动 cwd 解析 workspace——母仓根已无 Cargo.toml，可执行路径在
+# consema-rs 仓（consema-rs/scripts/release-sign.ps1，发布检查单命令见
+# docs/release-process-0.13.0.md §7，均按 consema-rs 执行）；母仓 scripts/ 副本
+# 为记录载体。若在本副本执行，必须显式传 -RepoRoot <consema-rs 检出>——默认值
+# 是本脚本父目录（母仓根），与实际 cargo 解析根互不相关，按默认执行会把
+# tag 操作打到错误仓库。
 #
-#   -SignTag v0.13.0
-#       GPG-sign the release tag: git tag -s -a v0.13.0 -m "Consema 0.13.0"
+#   -SignTag v1.0.0-rc.1
+#       GPG-sign the release tag: git tag -s -a v1.0.0-rc.1 -m "Consema 1.0.0-rc.1"
 #       and immediately verify it with git tag -v. A tag that already
 #       exists is never re-signed (tags are content-addressed; a re-sign
 #       would mint a new tag object and orphan the old one).
@@ -321,7 +324,7 @@ function Invoke-GpgVerify {
 # --- Tag signing -------------------------------------------------------------
 
 if ($mode -eq 'tag') {
-    if ($SignTag -notmatch '^v[0-9]+\.[0-9]+\.[0-9]+') {
+    if ($SignTag -notmatch '^v[0-9]+\.[0-9]+\.[0-9]+$') {
         Write-Output "error: -SignTag must look like 'v0.13.0' (got '$SignTag')."
         exit 2
     }
@@ -457,6 +460,7 @@ if ($mode -eq 'verify') {
         exit 1
     }
 
+    $verifiedSignatureCount = 0
     foreach ($signaturePath in @("$ManifestPath.asc", "$ManifestPath.sig")) {
         if (Test-Path -LiteralPath $signaturePath -PathType Leaf) {
             $verifyArguments = @($signaturePath)
@@ -464,12 +468,19 @@ if ($mode -eq 'verify') {
                 $verifyArguments += $ManifestPath
             }
             Invoke-GpgVerify $verifyArguments ([IO.Path]::GetFileName($signaturePath))
+            $verifiedSignatureCount++
         } else {
             Write-Output "note: no signature file present: $([IO.Path]::GetFileName($signaturePath))"
         }
     }
 
-    Write-Output "verified $($entries.Count) archive checksums and manifest signatures"
+    if ($verifiedSignatureCount -eq 0) {
+        Write-Output "FAIL: no signature files present for $([IO.Path]::GetFileName($ManifestPath))"
+        Write-Output '  (both .asc and .sig missing); nothing was signature-verified.'
+        exit 1
+    }
+
+    Write-Output "verified $($entries.Count) archive checksums and $verifiedSignatureCount manifest signature(s)"
     exit 0
 }
 

@@ -75,7 +75,8 @@ foreach ($fact in $manifest.runtime.PSObject.Properties) {
 }
 $windowsBuild = [Environment]::OSVersion.Version.ToString()
 if ($windowsBuild -cne $manifest.runtime.windows_build) {
-    throw "Windows build mismatch: expected $($manifest.runtime.windows_build), got $windowsBuild"
+    Write-Output ".NET INI oracle: SKIPPED (Windows build mismatch: expected $($manifest.runtime.windows_build), got $windowsBuild; documented skip path, 2026-08-14 波 2 对照 run-hcl-go-oracle.ps1 体例)"
+    exit 3
 }
 
 $seen = @{}

@@ -103,8 +103,9 @@ Copy-Item -LiteralPath "$spec\docs\fc-manifest-0.13.0.json" `
 
 每个脚本的内部流水线（照各脚本头部注释与 CI job 语义）：
 
-1. 布局 sanity → case 集校验（manifest id + 计数 ≥40 下限；精确计数 68/108/83
-   由语言侧完整性测试断言）→ `cargo build --locked -p consema-conformance --example …`
+1. 布局 sanity → case 集校验（manifest id + 精确计数 68/108/83 由语言侧完整性
+   测试断言；「≥40 下限」仅存于个别语言侧脚本的保守兜底，非全 harness 统一
+   形态——2026-08-14 波 2 修正口径）→ `cargo build --locked -p consema-conformance --example …`
    （在 consema-rs 内，swatinem/rust-cache 等价于本地增量）→ Rust 例子 emit →
    语言侧测试/运行器在 golden 环境变量就位时执行（缺变量 documented skip）→
    reverse 方向闭合（normalized `--consume`、exchange `--verify`）→ summary 行解析。

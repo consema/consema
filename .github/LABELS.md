@@ -34,7 +34,7 @@ gh label create "kind: release" --color fbca04
 gh label create "area: core" --color d93f0b
 gh label create "area: ci" --color bfd4f2
 gh label create "area: docs" --color c2e0c6
-gh label create "needs-info" --color fbca04 --description "等待更多信息"
+gh label create "needs-info" --color d4c5f9 --description "等待更多信息"
 ```
 
 The default GitHub issue labels (bug, enhancement, documentation, ...) stay

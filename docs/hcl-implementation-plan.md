@@ -1,8 +1,13 @@
 # Consema 0.11.0 HCL family 实现计划
 
+> **拆分后路径注记（2026-08-14 波 2）**：本文为 2026-08 拆仓前撰写的 0.11.0 规划记录，
+> 文中 `crates/consema-*` 为拆分前单仓布局路径，六仓拆分后对应物为
+> `consema-rs/consema-*`（如 `crates/consema-plist/` → consema-rs 的
+> `consema-plist/`）；按 G76 处置约定，历史规划文档以本节注记统一标注。
+
 - 对应规范：`docs/rfcs/0014-hcl-family-profiles-v1.md`（16 节，`hcl.native@1` 与 `hcl.tfvars@1` 双 profile）
 - 目标版本：0.11.0（对齐路线图 §14.10）
-- 先例实现：`crates/consema-plist/`（0.10.0，9 模块，共享 value model + 双 parser + operation registry 模式）、`crates/consema-xml/`（0.9.0，9 模块约 13k 行，parser 2649、edit 2490、projection 1945、materialization 1825、query 1735、document 884）
+- 先例实现：consema-rs 的 `consema-plist/`（拆分前 `crates/consema-plist/`；0.10.0，9 模块，共享 value model + 双 parser + operation registry 模式）、consema-rs 的 `consema-xml/`（拆分前 `crates/consema-xml/`；0.9.0，9 模块约 13k 行，parser 2649、edit 2490、projection 1945、materialization 1825、query 1735、document 884）
 - 语义权威顺序（沿用 `docs/IMPLEMENTATION.md`）：永久不变量 → 已接受 RFC → 语言无关 conformance vectors → 本实现计划与 Rust API → 第三方行为仅为 differential oracle，非契约
 
 本文是只读调研产出的执行计划；除本文外本次不修改任何仓库文件。所有行数估计为 Rust 源码（含该模块内测试）规模级，参考 consema-xml 与 consema-plist 各模块实际行数。

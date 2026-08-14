@@ -13,11 +13,9 @@
   推进统一）；各仓 CI `check-version-consistency` 门禁各自守护（manifest
   与 README `Version:` 行一致）；**1.0.0 首发时**按同版本五仓齐发执行。
 - **版本 bump 纪律**：改版本必须同步改本仓 README 的版本行，否则
-  `check-version-consistency` 门禁失败——这是有意的护栏（如实注记：五语言仓
-  门禁以 `grep -qF "Version: $version" README.md` 子串匹配——rc→GA 方向
-  （1.0.0-rc.1 → 1.0.0）新串是旧串前缀必然命中，忘改 README 不被拦截；
-  反向 bump 会被正确拦截，行为不对称；精确匹配（行锚定）修正在六仓门禁侧
-  跟踪）。
+  `check-version-consistency` 门禁失败——这是有意的护栏（五语言仓门禁已于
+  2026-08-13 波 1 改为行锚定精确匹配：rc→GA 方向（1.0.0-rc.1 → 1.0.0）
+  新串是旧串前缀时同样失败，必须同步改 README 版本行）。
 
 ## 2. CHANGELOG 策展
 

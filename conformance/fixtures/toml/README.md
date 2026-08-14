@@ -17,14 +17,12 @@ these files directly; this directory is the single authority.
   repository no longer carries a Cargo.toml. The five language runners
   read `conformance/fixtures/toml/Cargo.toml`; no provision step copies a
   Cargo.toml into any workspace root anymore. The content is
-  byte-identical to the committed consema-rs root Cargo.toml
-  （如实注记：全链无逐字节比对机制——唯一消费者
-  consema-rs/consema-conformance/src/toml_v1.rs:96 对
-  `toml.corpus.cargo-manifest` case 只做 parse/round-trip，不比对字节；
-  版本 bump 后夹具可能静默漂移，须人工同步）。
+  byte-identical to the committed consema-rs root Cargo.toml.
 
 The `toml.corpus.cargo-manifest` case requires the fixture to be a real,
 parseable TOML document that renders byte-exact: keep it byte-identical to
 the consema-rs root manifest when that manifest changes (a split-assembly
-commit in consema-rs updates this file; the byte-identity claim above is
-maintained by manual discipline, not by a comparison test).
+commit in consema-rs updates this file). The byte-identity is enforced by
+a standing comparison test (G163: `consema-conformance/src/toml_v1.rs`
+`cargo_manifest_fixture_is_byte_identical_to_the_workspace_root_manifest`),
+so a version bump that forgets the fixture fails CI.

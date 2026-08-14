@@ -1,5 +1,9 @@
 # Consema 0.10.0 Property List 家族实现计划
 
+> **拆分后路径注记（2026-08-14 波 2）**：本文为 2026-08 拆仓前撰写的 0.10.0 规划记录，
+> 文中 `crates/consema-*` 为拆分前单仓布局路径，六仓拆分后对应物为
+> `consema-rs/consema-*`；按 G76 处置约定，历史规划文档以本节注记统一标注。
+
 - 对应规范：`docs/rfcs/0013-plist-family-profiles-v1.md`（16 节，`plist.xml@1` 与 `plist.binary@1`）
 - 目标版本：0.10.0（对齐路线图 §14.9）
 - 先例实现：`crates/consema-xml/`（0.9.0，9 模块约 13k 行）、`crates/consema-ini/`（lib.rs 导出组织）、`crates/consema-properties/`（Java UTF-16 字符串类型）
@@ -377,7 +381,7 @@ RFC §4.7 文法 `[-]YYYY-MM-DDTHH:MM:SSZ`（整秒、无小数、无偏移）+ 
 范围：
 - `scripts/oracles/PropertyListOracle.swift`：钉版 Swift 驱动，调用 Foundation `PropertyListSerialization.data(from:format:)` 与 `propertyList(from:)` 双向（§13）。
 - `scripts/run-plist-macos-oracle.ps1`：照 run-python-configparser-oracle.ps1 模式——pin macOS 版本/工具链版本与 digest/plutil 调用旗标/输入 digest/期望输出/排除清单；运行 `plutil -lint`、`plutil -convert xml1|binary1`（每个 fixture 双向）、`plutil -p` 值比较 + Swift 驱动；manifest 校验（suite `consema.plist.macos-differential@1`）。macOS runner 专属（CI 上标记非 Windows 可跳过）。
-- `scripts/run-plistlib-oracle.ps1`：次要对齐（钉版 CPython plistlib，非 Apple CI 可跑；libplist 可选），明确"非语义权威"（§13）。
+- `scripts/run-plistlib-oracle.ps1`：次要对齐（钉版 CPython plistlib；如实注记（2026-08-14 波 2）：仅 Windows 10.0.26200.0 精确 build 可执行——Linux/macOS 无法运行 windows-amd64 embeddable zip，hosted Windows 10.0.26100 亦不匹配，现按 documented skip exit 3 处理；libplist 可选），明确"非语义权威"（§13）。
 - `conformance/oracles/plist-macos-v1/manifest.json`：§13 的排除清单逐条落表（UTF-32 BOM 与未知声明编码、重复 key 保留 vs last-wins、严格 base64 与 version 属性、严格 DOCTYPE、尾随内容拒绝、日历校验、64 位整数范围、bplist01 拒绝、16 字节整数与 null marker 拒绝、非有限日期拒绝、ASCII 高位置位字节拒绝、非 string 二进制 dict key、含 CR 字符串、更严偏移表项界、Apple writer key 排序）。
 - facade（`crates/consema/src/`）：`pub use consema_plist as plist`；`DocumentInner::Plist(Box<plist::Document>)` + `parse_plist`/`as_plist`；`FormatMismatch::Plist`；conversion.rs 增加 `convert_plist`（跨格式经 projection/materialization 组合，照 convert_ini 体例）。facade 测试照既有体例（parse_plist 两 profile、render、as_* 误用拒绝）。
 - 文档：CHANGELOG 0.10.0 条目、`docs/IMPLEMENTATION.md` 新增 plist 章节（crate 边界表更新）、路线图 §14.9 落实状态更新、`docs/BENCHMARKS-0.10.0.md`。

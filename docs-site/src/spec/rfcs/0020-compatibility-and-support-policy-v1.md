@@ -17,7 +17,7 @@
 - Depends on: roadmap §12 (版本治理；§12.1 破坏性变更五条、§12.2 契约与产品
   版本正交、§12.3 RFC-first 字段）、§11.4（发布版本关系）、§15（Feature-
   Complete Gate，MSRV 冻结时点）、§16.6/§18.4（缺陷等级）、§19.4（发布
-  供应链）、§21.1（Rust API，第 1820 行 MSRV 不进入 patch）、§21.2（Go API）、
+  供应链）、§21.1（Rust API，MSRV 不进入 patch）、§21.2（Go API）、
   §21.3（稳定承诺）、§21.4（支持周期七必公开项）、§26.4（过早冻结风险）、
   §27（R-20）；RFC 0015 §5.3（exit code 分类冻结）；RFC 0016 §9（Go
   module 与产品 release train 关系）；`SECURITY.md`（资源与安全行为、
@@ -39,7 +39,7 @@ that takes effect at `1.0.0`. Roadmap §21.4 requires seven items to be
 public before `1.0.0` — Rust MSRV window, Go version window, supported
 OS/architectures, security fix policy, previous-minor branch support
 period, deprecation notice period, and the contract/Profile retirement
-process — plus the toolchain freeze timing (§21.4, line 1863). Per the
+process — plus the toolchain freeze timing (§21.4). Per the
 2026-08-11 five-language equal-status decision
 (docs/multi-language-implementation-plan.md), the TypeScript, Python, and
 Kotlin version windows join the same commitment (Sections 9.3-9.5). This
@@ -161,16 +161,16 @@ Class rules:
 - **Published contract**: immutable identity; change means a new `@N`
   (Section 11).
 - **Diagnostic message text**: explicitly improvable in any release;
-  stable `code`/`category`/`fields` do not change casually (§21.3,
-  line 1846; RFC 0011 registry validation).
+  stable `code`/`category`/`fields` do not change casually (§21.3;
+  RFC 0011 registry validation).
 
 > **2026-08-11 revision (yaml dry-run surface boundary recorded)**: on the
 > Go public API surface, the yaml family intentionally has no dry-run
 > entry point in this window — `PlanEdit` explicitly rejects yaml
 > transactions with the registered `core.edit.operation-unsupported@1`
-> (RFC 0004 §17; `crates/consema-protocol/src/error_registry.rs:502`).
+> (RFC 0004 §17; `consema-rs/consema-protocol/src/error_registry.rs:502`).
 > The Rust yaml family publishes `dry_run`
-> (`crates/consema-yaml/src/edit.rs:554`); the Go-side boundary is a
+> (`consema-rs/consema-yaml/src/edit.rs:554`); the Go-side boundary is a
 > deliberate, documented API shape (go-implementation-plan §2.6 G5.5;
 > go/edits.go). Adding a Go yaml dry-run surface is a feature for the
 > post-1.0.0 window, not a blocker — recorded per the 2026-08-10 P2-2
@@ -190,7 +190,7 @@ bug or security fixes only. A patch release must not:
 - change output order, default loss policy, or format
   acceptance/recovery boundaries;
 - raise the Rust MSRV or any declared minimum version — Go,
-  TypeScript, Python, or Kotlin (§21.1, line 1820; Section 9).
+  TypeScript, Python, or Kotlin (§21.1; Section 9).
 
 ### 4.2 minor (`1.x.0`)
 
@@ -200,13 +200,13 @@ the following are explicitly **compatibility** and therefore cannot be
 changed:
 
 - **output order** of any public result (query matches, object entries,
-  diagnostics, reports, batch manifests) (§21.3, line 1847);
+  diagnostics, reports, batch manifests) (§21.3);
 - **default loss policy** of any projection/materialization/query
-  operation (§21.3, line 1848);
+  operation (§21.3);
 - **format acceptance/recovery boundaries** of any published Profile
-  (§21.3, line 1849) — including recovered-document capabilities;
+  (§21.3) — including recovered-document capabilities;
 - stable diagnostic `code`/`category`/`fields` (message text may improve,
-  §21.3, line 1846).
+  §21.3).
 
 ### 4.3 major (`2.0.0` and later)
 
@@ -387,11 +387,11 @@ the disposition is publicly stated.
   available. No bug bounties are offered.
 - Channels: the repository's GitHub Security Advisory (private reporting;
   enabled when the repository is public) is the primary channel; the
-  direct channel is the maintainer identity recorded in release tags
-  (franckcl1989 <franckcl@icloud.com>). Reports should include affected
+  direct channel is the maintainer email (franckcl1989
+  <franckcl@icloud.com>). Reports should include affected
   versions, the Profile/contract involved, the triggering capability
   contract (e.g. `core.source-snapshot@1`), a minimal reproduction, and
-  observed behavior (§19.4, line 1764).
+  observed behavior (§19.4).
 - Supply-chain findings (dependencies, SBOM, signatures, CI) use the same
   channel.
 - Fixes must not relax resource-limit or completion-status semantics
@@ -400,9 +400,11 @@ the disposition is publicly stated.
 ### 8.4 Security fix support windows
 
 - Before `1.0.0`: security fixes are promised only for the latest stable
-  version and its previous minor (current release tag and its
-  predecessor); older versions are not promised fixes unless the impact
-  analysis justifies a backport (SECURITY.md, line 48).
+  version and its previous minor (the support window is benchmarked on
+  `1.0.0-rc.1`; before GA this means the current rc version and its
+  predecessor rc — no GA release tags exist yet); older versions are not
+  promised fixes unless the impact analysis justifies a backport
+  (SECURITY.md, line 48).
 - From `1.0.0`: the Section 5.1 branch lifecycle applies — security fixes
   for the latest and previous minor, advisories only for the
   security-announcements-only window.
@@ -433,7 +435,7 @@ the disposition is publicly stated.
 - **Support window**: all Rust versions from the MSRV through the current
   stable.
 - **Bumps**: MSRV increases happen only in minor releases — never in
-  patch (`§21.1`, line 1820) — and follow the manifest change record
+  patch (§21.1) — and follow the manifest change record
   (§12); the CHANGELOG states the lowest version users can stay on.
 - **Verification**: the CI `msrv` job (runs the full test matrix on the
   declared MSRV) is the sole authority; local `cargo +<msrv>` is
@@ -458,9 +460,9 @@ the disposition is publicly stated.
 - **Bumps**: minimum-version increases follow the same discipline as the
   Rust MSRV — minor-only, never in patch, never reinterpreting published
   contracts, with the CHANGELOG noting the lowest stayable version.
-- **Verification**: CI runs the module on the declared minimum and on
-  current stable (go vet, static analysis, race detector, fuzz per
-  §21.2).
+- **Verification**: CI runs the module on the declared minimum (the
+  go-matrix job's exact `1.26.0` leg) and on current stable (`1.26.5`)
+  (go vet, static analysis, race detector, fuzz per §21.2).
 - **Freeze record**: the minimum and the verification toolchain are
   formally frozen at the Go RC freeze point (Section 9.7) and recorded in
   the corresponding release manifest. (Current environment fact: go1.26.5
@@ -471,13 +473,15 @@ the disposition is publicly stated.
 ### 9.3 TypeScript / Node version window
 
 - **Declared minimum**: `engines.node` declares the minimum Node version;
-  the value is `>= 26` (consema-ts/typescript/package.json:9-10),
-  CI-verified at the pinned '26.x' (consema-ts ci-typescript.yml,
+  the value is `>= 26` (consema-ts/typescript/package.json, `engines`
+  field), CI-verified at the pinned 26.7.0 (consema-ts ci-typescript.yml,
   setup-node).
 - **Support window**: all Node versions from the declared minimum through
-  the current stable toolchain. For the three L5 languages the CI-pinned
-  version *is* the declared minimum ("really verified in CI" by
-  construction, five-language-ci-design §1.2).
+  the current stable toolchain. Honest note: the three L5 languages pin
+  the latest patch of their minor line (TS 26.7.0, Python '3.12.x'), so
+  "really verified in CI" by construction holds only for Kotlin 2.2.0 —
+  the declared minima 26.0/3.12.0 are not precisely verified (Section 9.2
+  wording, five-language-ci-design §1.2).
 - **Bumps**: minimum-version increases follow the same discipline as the
   Rust MSRV — minor-only, never in patch, never reinterpreting published
   contracts, with the CHANGELOG noting the lowest stayable version.
@@ -505,8 +509,9 @@ the disposition is publicly stated.
 ### 9.5 Kotlin / JVM version window
 
 - **Declared minimum**: the Gradle build declares Kotlin `2.2.0` on JVM 17
-  (consema-kt/kotlin/build.gradle.kts:6-7, 24, `jvmToolchain(17)`),
-  CI-verified with Temurin 17 (consema-kt ci-kotlin.yml, setup-java).
+  (consema-kt/kotlin/build.gradle.kts, Kotlin version and
+  `jvmToolchain(17)` fields), CI-verified with Temurin 17 (consema-kt
+  ci-kotlin.yml, setup-java).
 - **Support window**: from the declared Kotlin/JVM minimum through the
   current stable toolchain ("really verified in CI" by construction,
   five-language-ci-design §1.2).
@@ -526,7 +531,7 @@ matrix):
 |---|---|---|
 | Windows (Windows 11 Pro baseline) | x86-64 | windows-latest full matrix |
 | Linux | x86-64 | ubuntu-latest full matrix |
-| macOS | x86-64 / arm64 | macos-latest full matrix |
+| macOS | arm64 (macos-latest is Apple Silicon since 2024; x86-64 macOS has no CI carrier) | macos-latest full matrix |
 
 - All other platforms/architectures are best-effort: they do not block
   releases, and accepted critical fixes are verified on the three
@@ -539,7 +544,7 @@ matrix):
 
 ### 9.7 Toolchain freeze timing
 
-Per §21.4 (line 1863), concrete toolchain versions are frozen at two
+Per §21.4, concrete toolchain versions are frozen at two
 points, not pre-written in this policy:
 
 - **Rust Feature-Complete (0.13.0)**: done. MSRV 1.85 and the measured
@@ -579,8 +584,8 @@ trail.
 
 ## 11. Contract version governance
 
-- **Published `namespace.contract@N` is never reinterpreted** (§21.3,
-  line 1845; §12.2). The frozen registry arrays and constructors remain
+- **Published `namespace.contract@N` is never reinterpreted** (§21.3;
+  §12.2). The frozen registry arrays and constructors remain
   byte-exact: v1-v6 are frozen and v7 is an additive superset
   (IMPLEMENTATION.md ch. 12); a published record's identity, payload
   schema, and decoder behavior do not change.
@@ -619,7 +624,7 @@ trail.
   modules are v0.x (RFC 0016 §9; the five-language package versions are
   unified at `1.0.0-rc.1` in the rc window — five-language-ci-design §10
   version policy). Package versions never substitute contract
-  versions (§11.4, line 889).
+  versions (§11.4).
 - The support-policy summary document (`docs/support-policy.md`) is
   updated in the same release as any change to this RFC; the RFC is the
   normative source (Section 1.2).
@@ -653,13 +658,13 @@ trail.
   `1.0.0`-onward previous-minor window with a security-only tail is the
   chosen trade-off between maintenance load and upgrade safety.
 - **No MSRV policy (track whatever rustc ships)**: rejected — MSRV
-  stability is part of the production promise (§21.1, line 1820; §21.4);
+  stability is part of the production promise (§21.1; §21.4);
   a declared, CI-enforced MSRV is the only way users can plan upgrades.
 - **Allowing MSRV/Go-minimum bumps in patch releases**: rejected —
-  §21.1 line 1820 is a hard rule; a patch must never force a toolchain
+  §21.1 is a hard rule; a patch must never force a toolchain
   upgrade.
 - **Pre-writing concrete toolchain versions for years in this policy**:
-  rejected — §21.4 (line 1863) and §26.4 require freezing at the
+  rejected — §21.4 and §26.4 require freezing at the
   Rust-Feature-Complete and Go RC points, where the stable ecosystem is
   known; a fixed multi-year number would be an unverifiable promise.
 - **Deleting registry records or decoder paths on retirement**: rejected
@@ -669,7 +674,7 @@ trail.
   one-full-minor notice period (Section 10) is the minimum window users
   need to migrate.
 - **Reinterpreting `@N` instead of publishing `@N+1`**: rejected —
-  §21.3 line 1845 and §12.2 make published contracts immutable; any
+  §21.3 and §12.2 make published contracts immutable; any
   reinterpretation would silently break stored data and pinned consumers.
 - **Keeping only `docs/support-policy.md` without an RFC**: rejected —
   §12.3 requires RFC-first governance for public commitments and §21.4

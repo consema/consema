@@ -182,8 +182,17 @@ try {
     $fillStream = [System.IO.File]::Open($fill, [System.IO.FileMode]::Create, [System.IO.FileAccess]::Write)
     try {
         $chunk = New-Object byte[] (4KB)
-        while ((& $freeOf) -gt ($LeaveFreeKiB * 1KB)) {
-            $fillStream.Write($chunk, 0, $chunk.Length)
+        $fillExhausted = $false
+        while ((-not $fillExhausted) -and ((& $freeOf) -gt ($LeaveFreeKiB * 1KB))) {
+            try {
+                $fillStream.Write($chunk, 0, $chunk.Length)
+            } catch [System.IO.IOException] {
+                # ENOSPC：演练设计目的即制造该条件。此前未捕获的 IOException 在
+                # EAP=Stop 下为终止性异常，演练在该失败路径中止且不留记录；
+                # 现按预期 ENOSPC 捕获并继续演练流程（2026-08-14 波 2 修复）。
+                Write-Host "fill: write hit IOException (expected ENOSPC); continuing drill"
+                $fillExhausted = $true
+            }
         }
     }
     finally {

@@ -3,7 +3,7 @@
 - 决策：2026-08-11（用户决策：TS/Python/Kotlin 三语言加入 1.0.0 release 标准，与 Rust/Go 同等地位；
   工具链不阻塞——先盲写，工具链后台安装后验证）
 - 体例：照 `docs/go-implementation-plan.md`（里程碑拆分、多 agent 文件域、START GATE、硬门禁）
-- 权威五元（路线图 §17.1 第 1565-1571 行）扩展到七元：normative prose + contract registry +
+- 权威五元（路线图 §17.1 第 1571-1577 行）扩展到七元：normative prose + contract registry +
   machine-readable vectors + raw fixtures + independent runners（Rust / Go / TS / Python / Kotlin）
 
 ## 0. 总体结构
@@ -76,7 +76,7 @@ Go 的测试）。
 | L2 | L1 | 三语言并行 | yaml（1.2/1.1、anchor/alias/graph，↔G2.1）+ ini（三 Profile，↔G2.2）+ properties（Reader/Latin-1，↔G2.3）+ 全操作补齐（↔G2.4） |
 | L3 | L2 | 三语言并行 | xml（1.0 safe Profile，↔G3.1）+ plist（XML/binary，↔G3.2）+ hcl（native/tfvars，不求值，↔G4.1） |
 | L4 | L3 | 三语言并行 | 全格式 materialize 全组合（↔G4.2）+ mandatory structural edit/SourcePatch/batch-plan（↔G4.3）+ examples/文档/capability parity 断言（↔G4.4） |
-| L5 | L4 | 三语言并行 | conformance runner 全 519（↔G5.1；增补后口径——2026-08-12 P2-B 前为 508，见 fc-manifest-0.13.0.json:37-39）+ 跨语言差分（Rust↔TS/Python/Kotlin，↔G5.2）+ protocol exchange（↔G5.3）+ fuzz/bench/security matrix（↔G5.4）+ CLI beta（↔G5.6） |
+| L5 | L4 | 三语言并行 | conformance runner 全 519（↔G5.1；增补后口径——2026-08-12 P2-B 前为 508，见 fc-manifest-0.13.0.json:39、41）+ 跨语言差分（Rust↔TS/Python/Kotlin，↔G5.2）+ protocol exchange（↔G5.3）+ fuzz/bench/security matrix（↔G5.4）+ CLI beta（↔G5.6） |
 
 每里程碑硬门禁（照 Go 先例）：对应 capability 的共享向量 100% 通过；PVCE/PGCE 字节与 Rust
 一致；不依赖他语言产物；error text 不参与比较；unknown-field/canonicality 规则一致。
@@ -111,7 +111,8 @@ JDK 17.0.20 + kotlinc 2.2.0（Kt，直接 JVM 调用 K2JVMCompiler）、cargo 1.
 - 各语言惯用差异（TS 结构性类型、Python 动态类型、Kotlin sealed class）可能导致语义面实现分歧：
   以 vectors 为准，差分 harness 兜底。
 - 1.0.0 release 标准扩展：三语言加入后，§22 门禁/五要素审计/fc-manifest 范围同步扩展；
-  C-2 fuzz 账本按语言分列（每语言 release-candidate clean-run，照 Go G5.4 先例）。
+  C-2 fuzz 账本为 Rust/Go 专属、不按语言分列（ts/py/kt 的 L5 不含 fuzz/bench/security
+  ——与 §7.1 关账表一致，2026-08-14 波 2 修正此前「按语言分列」的矛盾口径）。
 
 ## 6. 验收门禁总表（照 go-implementation-plan §6）
 
@@ -136,13 +137,13 @@ GATE 未过期间的代码统称"盲写产物"，不得进入任何发布证据�
 
 | 批次 | 载体 commit | 证据 |
 |---|---|---|
-| L0-L4（三语言） | 5cf680b（实现入库；errata 见 CHANGELOG 2026-08-12 勘误） | 每语言 conformance 508/508（增补前——18 套 / digest 35bebc8d 共钉；2026-08-12 P2-B 向量补强至 519 / cfd6e296 后见 fc-manifest-0.13.0.json:37-39）+ capability parity；CHANGELOG 勘误记录 commit message 仅标注 fuzz 账本、实际携带三语言实现 |
+| L0-L4（三语言） | 5cf680b（实现入库；errata 见 CHANGELOG 2026-08-12 勘误） | 每语言 conformance 508/508（增补前——18 套 / digest 35bebc8d 共钉；2026-08-12 P2-B 向量补强至 519 / cfd6e296 后见 fc-manifest-0.13.0.json:39、41）+ capability parity；CHANGELOG 勘误记录 commit message 仅标注 fuzz 账本、实际携带三语言实现 |
 | Python 补充 | a0c318b | .gitignore 排除 node_modules（CHANGELOG 勘误同述） |
 | L5 harnesses + CI | 2f981df | 跨语言差分 harness（normalized/protocol exchange）+ 各语言 CI workflow；差分发现的 wire-codec 缺陷随本 commit 修复（五要素终审 §3.2 关账表） |
 | CI 修复 | dbba9a4 | 五语言 CI 全绿（python fixtures 路径、kotlin jar 供给等首跑缺陷修复；ci.yml run#9 + ci-typescript/ci-python/ci-kotlin 各 run#2，见 rc-1.0.0-candidate.md §4.1） |
 
 - 每语言 conformance 519/519（增补后；digest cfd6e296da5b… 五 runner 共钉，
-  fc-manifest-0.13.0.json:37-38 为权威）+ capability parity + 差分（68/108/83）
+  fc-manifest-0.13.0.json:39 为权威）+ capability parity + 差分（68/108/83）
   全绿；五语言 CI 在 dbba9a4 全绿。
 - **L5 关闭面如实界定**：ts/py/kt 的 L5 关闭面 = 差分 harness + 各语言 CI
   （含零 documented skip 断言与 `L-package` job，2026-08-12 上线）；

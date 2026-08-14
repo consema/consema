@@ -18,6 +18,12 @@ Thumbs.db
 /python/
 /typescript/
 
+# Scratch working notes (2026-08-14: prep2b.txt / _tmp_note.txt / _tmp_targets.txt
+# 为临时工作笔记，已删除；兜底忽略，避免再入仓)
+prep2b.txt
+_tmp_note.txt
+_tmp_targets.txt
+
 # Kotlin / Gradle build output
 kotlin/build/
 *.class

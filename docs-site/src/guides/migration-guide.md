@@ -86,8 +86,10 @@ match 1: $.version (key version) = "1.0.0"
 
 ### 3.3 场景：跨格式转换
 
-旧做法（自写 parser + writer）。新做法——两阶段显式组合，目标字节默认
-stdout、`--output` 显式落盘（cookbook 第 5 节 `convert-request.json`）：
+旧做法（自写 parser + writer）。新做法——两阶段显式组合，目标字节只到
+stdout（`--output` 是 plan/apply 专属的 manifest/结果写目标，convert 收到即
+usage 错误 exit 1——G089 处置口径，2026-08-14；cookbook 第 5 节
+`convert-request.json`）：
 
 ```text
 $ consema convert package.json --profile json.strict --request-file convert-request.json

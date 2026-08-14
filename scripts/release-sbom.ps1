@@ -14,8 +14,8 @@
 #   $env:CONSEMA_CARGO convention of the other scripts; it reads the
 #   committed Cargo.lock via cargo metadata and emits SPDX 2.3 JSON
 #   (default) or CycloneDX 1.4/1.6 JSON, so the license inventory the
-#   dependency gate (§19.3, deny.toml: MIT/Apache-2.0/Unicode-3.0) audits
-#   is attested in SPDX license expressions. cyclonedx-bom is CycloneDX-
+#   dependency gate (§19.3, deny.toml: MIT/Apache-2.0/Unicode-3.0/BSD-3-Clause)
+#   audits is attested in SPDX license expressions. cyclonedx-bom is CycloneDX-
 #   only, carries a heavier dependency tree, and adds nothing that
 #   cargo-sbom does not provide, since CycloneDX output is available as
 #   --output-format cyclone_dx_json_1_6 when a consumer requires it.
@@ -125,7 +125,10 @@ if ($LASTEXITCODE -ne 0) {
     exit 2
 }
 $sbomVersion = ($sbomVersionOutput | Select-Object -First 1).Trim()
-if ($sbomVersion -notmatch [regex]::Escape($pinnedSbomVersion)) {
+# 精确版本比较（2026-08-14 波 2 修复）：子串匹配会让 '0.10.01'/'0.10.0-evil'
+# 等错误版本通过门禁；对齐 consema-rs 副本体例，按完整 token 锚定。
+$sbomVersionToken = ($sbomVersion -split ' ')[-1].Trim()
+if ($sbomVersionToken -ne $pinnedSbomVersion) {
     Write-Output "error: cargo-sbom version mismatch: found '$sbomVersion',"
     Write-Output "  expected '$pinnedSbomVersion' (the pinned release-tooling version)."
     Write-Output "  Install the pinned version with:"

@@ -16,9 +16,9 @@
 #      covers the workspace libs, the consema facade binary, examples, and
 #      every test target -- including the consema-conformance tests, whose
 #      vectors/fixtures corpora are embedded at compile time
-#      (include_str!/include_bytes!, see crates/consema-conformance/src/*_v1.rs
-#      and tests/*_fixtures.rs), so the corpus is exercised with no extra
-#      wiring.
+#      (include_str!/include_bytes!, see consema-rs/consema-conformance/src/*_v1.rs
+#      and tests/*_fixtures.rs -- 拆分前 crates/consema-conformance/…), so the
+#      corpus is exercised with no extra wiring.
 #   3. Exports llvm-cov's own per-file summary (--json --summary-only), groups
 #      files by crate, and regenerates the report file (docs/COVERAGE-0.13.0.md
 #      by default) with the real measured numbers, the methodology, and the
@@ -158,7 +158,13 @@ $rustcVersion = (& rustc --version).Trim()
 $cargoVersion = (& $cargo --version).Trim()
 $llvmCovVersion = (& cargo llvm-cov --version).Trim()
 $hostName = $env:COMPUTERNAME
-$osInfo = @(if ($IsWindows) { Get-CimInstance Win32_OperatingSystem -ErrorAction SilentlyContinue })
+# $IsWindows is a PowerShell Core 6+ automatic variable; the script header
+# promises Windows PowerShell 5.1 (`powershell -File scripts/coverage.ps1`),
+# which has no such variable and would throw under Set-StrictMode. $env:OS
+# is set on every Windows host (5.1 and Core alike) and unset on non-Windows,
+# so this expression keeps the Core behavior and works on 5.1 too.
+# (对齐 consema-rs 副本，2026-08-14 波 2)
+$osInfo = @(if ($env:OS -eq 'Windows_NT') { Get-CimInstance Win32_OperatingSystem -ErrorAction SilentlyContinue })
 $osCaption = if ($osInfo.Count -gt 0) {
     $osInfo[0].Caption
 } else {
@@ -245,8 +251,13 @@ $totals = @{
 foreach ($fileEntry in $fileEntries) {
     $filePath = [string]$fileEntry.filename
     $summaryBlock = $fileEntry.summary
+    # 显式成员清单正则（2026-08-14 波 2 对齐 consema-rs 副本）：拆仓后
+    # crates/ 布局不存在；通配 `consema[^\\/]*` 又会把仓库根目录本身
+    # （consema-rs）折叠成假 crate 行。以下为显式成员清单——facade crate
+    # `consema` 加 14 个 `consema-*` 成员——后接路径分隔符。
     $crateMarker = [regex]::Match(
-        $filePath, '(?:^|[\\/])crates[\\/]([^\\/]+)[\\/]'
+        $filePath,
+        '(?:^|[\\/])(consema(?:-(?:conformance|core|document|graph|hcl|ini|json|plist|properties|protocol|pvce|toml|xml|yaml))?)[\\/]'
     )
     $crateName = $null
     if ($crateMarker.Success) { $crateName = $crateMarker.Groups[1].Value }
@@ -322,7 +333,13 @@ if ($Trend) {
     $relativeReportPath = $ReportPath.Replace('\', '/')
     $previous = Get-CommittedReport $relativeReportPath
     if ($null -eq $previous) {
-        Write-Output "note: no previous report at HEAD:$relativeReportPath; -Trend has no baseline to compare against (first baseline run)"
+        # 2026-08-14 波 2 修复：-Trend 请求下基线缺失此前静默放行（首跑即绿，
+        # 趋势门禁空转）；现改为硬失败——趋势门禁只在有已入库基线时才有意义，
+        # 首次建立基线请先不带 -Trend 运行并提交报告。
+        Write-Output "error: -Trend requested but no previous report at HEAD:$relativeReportPath"
+        Write-Output '  (-Trend has no baseline to compare against; run once without -Trend,'
+        Write-Output '   commit the report, then re-run with -Trend.)'
+        exit 1
     } else {
         $previousTotal = [regex]::Match(
             $previous, '(?m)^coverage\.total regions=([0-9.]+) functions=([0-9.]+) lines=([0-9.]+)\s*$'
@@ -452,7 +469,7 @@ $report = @"
 - 报告体例：由 ``scripts/coverage.ps1`` 整体生成（政策文本也在脚本内；禁止手改数字块）。
   本文件是 0.13.0 门禁 M3 的“报告数值入库”载体（gate plan §4 M3、§7 验收表：
   “coverage 可复现报告”）。
-- 取代一次性数字：CHANGELOG.md:133 与 RELEASE-0.8.0.md:98 的 84.65% regions /
+- 取代一次性数字：CHANGELOG.md:219 与 RELEASE-0.8.0.md:98 的 84.65% regions /
   82.73% functions / 86.59% lines 是单次辅助报告，无脚本、无工件、不可复现；自本
   报告起 coverage 由常设脚本在固定 commit 上产出，任何数字变化都来自脚本运行。
 

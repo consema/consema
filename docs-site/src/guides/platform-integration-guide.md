@@ -171,7 +171,7 @@ Consema 只做单文件内容处理：平台负责"文件集合"这个维度（�
 ## 6. CLI 编辑限制与跨格式修改路径
 
 - **CLI 编辑词表仅 INI family**（0.13.0）：`consema edit` 只接受
-  `ini.edit.*` 操作；其余 6 个家族的 edit 请求显式拒绝（exit 2，
+  `ini.edit.*` 操作；其余 7 个家族的 edit 请求显式拒绝（exit 2，
   `cli.data.invalid-request@1`，消息自明，绝不静默）；`edit --write`
   未接线（dry-run only，`--write` 是 usage 错误 exit 1）；**批量写一律经
   `plan` + `apply`**（cookbook §10 边界 7、§6；pilot-0.13.0 F-1；

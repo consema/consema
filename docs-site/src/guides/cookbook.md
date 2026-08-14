@@ -2,11 +2,8 @@
 
 本文是任务导向的 `consema` CLI 配方集。每条配方的命令都在 0.12.0 开发工作区
 （Windows 11 Pro 10.0.26200，`target/release/consema.exe`）上实际执行过，
-输出按原样粘贴。注：机器输出示例的 `product_version` 字段为 0.8.0——0.12.0
-CLI 里程碑的 workspace 产品版本（Consema 版本治理下 CLI 里程碑 0.12.0 携带
-workspace 版本 0.8.0）；现行 PRODUCT_VERSION 为 1.0.0-rc.1。命令与输出中的
-路径以你的实际环境为准；请求文件内容（RFC 0015 §3.2 严格解码的 canonical
-tagged JSON）逐字节给出，复制即用。
+输出按原样粘贴。命令与输出中的路径以你的实际环境为准；请求文件内容（RFC
+0015 §3.2 严格解码的 canonical tagged JSON）逐字节给出，复制即用。
 
 机器可读输出、exit code 语义与命令边界的权威定义见
 `docs/rfcs/0015-cli-machine-protocol-and-batch-apply-v1.md`、
@@ -144,9 +141,7 @@ match 7: $.devDependencies (key devDependencies) = {typescript: "5.6.3"}
 syntax 查询域对 Recovered 可查询已证明部分（IMPLEMENTATION §4.3/§4.5/
 §4.6 的 INI/HCL/XML 恢复语义）。native 查询域（如
 `json.native-semantic-query@1`）与本版本的 xml/plist/hcl 源在 query 上未
-接线，显式拒绝而非不完整结果（0.13.0 API 评审项，见第 10 节）。〔superseded
-注记：xml/plist/hcl 便携域查询已随 1.0.0-rc.1 接线（query_cmd.rs:553-557
-分派、0 skipped 全绿），本节为 0.12.0 时点记录〕
+接线，显式拒绝而非不完整结果（0.13.0 API 评审项，见第 10 节）。
 
 机器模式：`--json` 时 stdout 只有一行 `core.cli-output@1` 信封：
 
@@ -896,7 +891,7 @@ JSON 材料化 → 跨格式转换到 TOML——在五个语言实现中各有�
 | Go | [go/examples/sdk_chain/main.go](https://github.com/consema/consema-go/blob/main/go/examples/sdk_chain/main.go) | `cd go && go run ./examples/sdk_chain` |
 | TypeScript | [typescript/examples/sdk_chain.ts](https://github.com/consema/consema-ts/blob/main/typescript/examples/sdk_chain.ts) | `cd typescript && node examples/sdk_chain.ts`（node 26 原生运行 `.ts`，无构建步骤） |
 | Python | [python/examples/sdk_chain.py](https://github.com/consema/consema-py/blob/main/python/examples/sdk_chain.py) | `cd python && PYTHONPATH=src python examples/sdk_chain.py` |
-| Kotlin | [kotlin/examples/SdkChain.kt](https://github.com/consema/consema-kt/blob/main/kotlin/examples/SdkChain.kt) | `kotlinc -jvm-target 17 -d out src/main/kotlin examples/SdkChain.kt`，再 `java -cp "out;<kotlinc>\lib\kotlin-stdlib.jar" consema.examples.SdkChainKt` |
+| Kotlin | [kotlin/examples/SdkChain.kt](https://github.com/consema/consema-kt/blob/main/kotlin/examples/SdkChain.kt) | `kotlinc -J-Xmx2g -jvm-target 17 -d out src/main/kotlin examples/SdkChain.kt`（`-J-Xmx2g`：默认 512MiB 堆对大项目编译会 OOM，2026-08-14 波 2 对齐 kt 仓体例），再 `java -cp "out;<kotlinc>\lib\kotlin-stdlib.jar" consema.examples.SdkChainKt` |
 
 运行命令均取自各示例文件头注释（实测命令）；每个示例文件头部都链接了本
 cookbook 与五语言设计文档，各仓 README 提供完整的 SDK 文档（Rust /

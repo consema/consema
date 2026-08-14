@@ -15,6 +15,7 @@ on:
     branches: [main]
     paths:
       - 'docs-site/**'
+      - 'docs/**'
       - '.github/workflows/docs-site.yml'
   workflow_dispatch:
 

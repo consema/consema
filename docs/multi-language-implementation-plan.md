@@ -111,7 +111,8 @@ JDK 17.0.20 + kotlinc 2.2.0（Kt，直接 JVM 调用 K2JVMCompiler）、cargo 1.
 - 各语言惯用差异（TS 结构性类型、Python 动态类型、Kotlin sealed class）可能导致语义面实现分歧：
   以 vectors 为准，差分 harness 兜底。
 - 1.0.0 release 标准扩展：三语言加入后，§22 门禁/五要素审计/fc-manifest 范围同步扩展；
-  C-2 fuzz 账本按语言分列（每语言 release-candidate clean-run，照 Go G5.4 先例）。
+  C-2 fuzz 账本为 Rust/Go 专属、不按语言分列（ts/py/kt 的 L5 不含 fuzz/bench/security
+  ——与 §7.1 关账表一致，2026-08-14 波 2 修正此前「按语言分列」的矛盾口径）。
 
 ## 6. 验收门禁总表（照 go-implementation-plan §6）
 

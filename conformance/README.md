@@ -30,7 +30,7 @@
 - `oracles/hcl-go-v1/`：固定 hashicorp/hcl v2.21.0 + go-cty v1.13.0 Go module 的 HCL accept/reject 差分行为，共 29 个 case（`skip_path` 文档化）；
 - `oracles/plist-macos-v1/`：固定 macOS Foundation/plutil 的 plist 差分行为，共 7 个 case（`skip_path` 文档化）；
 - `corpora/json5-v2.2.3.json`：固定到 JSON5 官方 `v2.2.3`/`c3a7524` 的 43 个接受与 39 个拒绝输入（文件内 82 项；门禁口径 83 = 82 + 1 个完整真实夹具），记录上游来源、Git blob、LF 存储变换和 MIT 许可；
-- `corpora/mutation-v1.json`：mutation 语料（46 fixtures / 174,921 cases + regressions 数组，0.13.0 gate plan M2）：逐 fixture 字节 mutation 全集 + fuzz 回归输入；确定性重放生成（`gen_mutation_corpus --check` 可人工校验与生成器同步——非常设门禁：母仓与 consema-rs 的 CI/测试均未调用该检查，如实记录；新增回归条目永久入 corpus，见 `corpora/README.md`）；
+- `corpora/mutation-v1.json`：mutation 语料（46 fixtures / 174,921 cases + regressions 数组，0.13.0 gate plan M2）：逐 fixture 字节 mutation 全集 + fuzz 回归输入；确定性重放生成（`gen_mutation_corpus --check` 校验与生成器同步——已接线为 consema-rs CI 常设门禁（G155，2026-08-13），四语言仓不执行该检查，如实记录；新增回归条目永久入 corpus，见 `corpora/README.md`）；
 - `differential/`：跨语言差分 case 集单一权威（byte-parity `cases.json` 68 / `normalized/cases.json` 108 / `protocol-exchange/cases.json` 83），2026-08-12 由 `00c850d` 自 `go/conformance/differential/` 迁入；五语言 harness 与 verify 脚本统一从本目录取数，各语言侧测试断言精确计数（68/108/83），任何一侧漂移即红；
 - `fixtures/json5/package-json5-v2.2.3.json5`：官方完整真实 JSON5 配置夹具；
 - `fixtures/real-world/`：覆盖 package JSON、TypeScript/VS Code JSONC 与服务 JSON5 的非专有典型项目配置；
@@ -77,7 +77,7 @@ Rust runner 为：
 - `consema_conformance::run_ini_windows_oracle()`；
 - `consema_conformance::run_ini_qt_oracle()`。
 
-上述 18 套语言无关向量合计 519 个 case。独立外部 gate 包括 JSON5 83 项（门禁口径 = corpus 43 valid + 39 invalid + 1 个完整真实夹具）、YAML 官方 402 项（307 valid、94 invalid、1 个显式 Profile exclusion）、TOML 官方 679 项，以及 INI/Properties 五套固定运行时 oracle 合计 36 项。每个 runner 固定校验 suite/schema/semantic-model、case ID 唯一性与未知 action 拒绝；向量或 manifest 中的 input/expected 会实际驱动执行，防止把预期值硬编码进 runner。官方参考 gate 只继承其 manifest 明示的公开行为，不继承第三方 loader 的数值降精度、未声明 duplicate collapse、implicit merge、provider layering 或语言对象构造行为。
+上述 18 套语言无关向量合计 519 个 case。独立外部 gate 包括 JSON5 83 项（门禁口径 = corpus 43 valid + 39 invalid + 1 个完整真实夹具）、YAML 官方 402 项（307 valid、94 invalid、1 个显式 Profile exclusion）、TOML 官方 679 项，以及 INI/Properties 五套固定运行时 oracle 合计 36 项。每个 runner 固定校验 suite/schema/semantic-model、case ID 唯一性与未知 action 拒绝；向量或 manifest 中的 input/expected 实际驱动执行（如实收窄（2026-08-14 波 2 审计）：18 套中 16 套由向量驱动，protocol-v1 与 toml-v1 两套为硬编码夹具，属已知缺口），不把预期值硬编码进 runner。官方参考 gate 只继承其 manifest 明示的公开行为，不继承第三方 loader 的数值降精度、未声明 duplicate collapse、implicit merge、provider layering 或语言对象构造行为。
 
 Go 实现（0.14.0-0.19.0，G0.1-G5.6 全部交付）与 TypeScript/Python/Kotlin 实现（L0-L5 全部交付）均已直接消费相同向量和 fixture——五语言 conformance runner 全绿（18/519，聚合 digest cfd6e296 共钉；2026-08-12，five-language-ci-design.md §10）。任何实现不得用序列化本地 AST、异常对象或第三方 parser 私有类型来替代向量中的公共字段。
 

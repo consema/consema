@@ -138,6 +138,8 @@ CLI 是产品入口，但不是规范权威，也不是第三个实现。Go 与 
 
 `1.0.0` 不提供 Java、TypeScript、Python 或其他语言 SDK。语言无关协议仍应允许未来实现加入，但首个稳定版本只对 Rust 和 Go 作出产品承诺。
 
+> **superseded by 2026-08-11 决策（五语言同等地位）**：TypeScript/Python/Kotlin 与 Rust/Go 同等地位、全部纳入 `1.0.0` release 标准与产品承诺（见 `docs/multi-language-implementation-plan.md` 与 `docs/five-language-ci-design.md`）；本节双语言口径保留为 2026-08-11 前历史记录。Java 仍为非目标。
+
 ---
 
 # 3. 不可改变的统一哲学
@@ -990,25 +992,25 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
   ↓
 0.9.0  XML（实现与证据完成，待发布归档）               Rust 已完成
   ↓
-0.10.0 plist XML/binary                                  Rust
+0.10.0 plist XML/binary                                  Rust 已完成
   ↓
-0.11.0 HCL native/tfvars                                 Rust
+0.11.0 HCL native/tfvars                                 Rust 已完成
   ↓
-0.12.0 Rust SDK + CLI 产品集成                           Rust
+0.12.0 Rust SDK + CLI 产品集成                           Rust 已完成
   ↓
-0.13.0 Rust 生产加固与 Feature-Complete Gate      Rust 门禁推进中（C-1 已闭环 2026-08-11；C-2 partial，5/9 单位过 72h——2026-08-13 复算 122,478 行 / 780.529 CPU-hours，properties/yaml/ini/hcl/json 已过门槛；C-3 partial；五语言各 L0-L5 已交付）
+0.13.0 Rust 生产加固与 Feature-Complete Gate      Rust 门禁推进中（C-1 已闭环 2026-08-11；C-2 partial，5/9 单位过 72h——2026-08-13 复算 122,477 数据行 / 780.529 CPU-hours，properties/yaml/ini/hcl/json 已过门槛；C-3 partial；五语言各 L0-L5 已交付）
   ↓
-0.14.0 Go core / PVCE / PGCE / protocol                  Go 开始
+0.14.0 Go core / PVCE / PGCE / protocol                  已交付（G0.1-G0.5，2026-08-07 D-1 授权启动）
   ↓
-0.15.0 Go Source/Document + JSON family + TOML            Go
+0.15.0 Go Source/Document + JSON family + TOML            已交付（G0.1-G5.6 全里程碑，逐项记录见 consema-go/go/README.md）
   ↓
-0.16.0 Go YAML + INI + Properties                        Go
+0.16.0 Go YAML + INI + Properties                         已交付（G0.1-G5.6 全里程碑，逐项记录见 consema-go/go/README.md）
   ↓
-0.17.0 Go XML + plist                                    Go
+0.17.0 Go XML + plist                                    已交付（G0.1-G5.6 全里程碑，逐项记录见 consema-go/go/README.md）
   ↓
-0.18.0 Go HCL + Materialization/Edit parity              Go
+0.18.0 Go HCL + Materialization/Edit parity               已交付（G0.1-G5.6 全里程碑，逐项记录见 consema-go/go/README.md）
   ↓
-0.19.0 双语言一致性、产品 Beta 与真实项目验证            Rust + Go
+0.19.0 双语言一致性、产品 Beta 与真实项目验证            已交付（G0.1-G5.6；五语言扩展见 2026-08-11 决策）
   ↓
 1.0.0-rc.n  稳定候选
   ↓
@@ -1017,7 +1019,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 
 > **决策注记（2026-08-07）**：owner 决定在 C-1/C-2/C-3 完成前启动 `0.14.0` 的 Go 实现（G0.1-G0.3：core/graph/protocol），这是经记录的路线图偏差，按 §0 冲突解决层级处理——修改路线图、不静默缩小 1.0.0 承诺；`0.13.0` 门禁判定以 docs/fc-manifest-0.13.0.json 为准（gate_open/not_closed，C-1/C-2/C-3 开放，decision record 见该 manifest）。
 >
-> **状态更新（2026-08-12；2026-08-13 更新 C-2 数字）**：C-1 已闭环——2026-08-11 GitHub Actions run#5（head 437fd35）132/132 steps 全绿；C-2 推进中——2026-08-13 复算 122,478 行 / 780.529 CPU-hours（runs.csv 权威），properties/yaml/ini/hcl/json 五单位已过 72h 门槛；C-3 partial；Go 全里程碑（0.14.0-0.19.0 G0.1-G5.6）已交付；五语言实现各 L0-L5 已交付（TS/Python/Kotlin 与 Rust/Go 同等地位，见 docs/multi-language-implementation-plan.md 与 docs/five-language-ci-design.md）。
+> **状态更新（2026-08-12；2026-08-13 更新 C-2 数字）**：C-1 已闭环——2026-08-11 GitHub Actions run#5（head 437fd35）132/132 steps 全绿；C-2 推进中——2026-08-13 复算 122,477 数据行 / 780.529 CPU-hours（runs.csv 权威），properties/yaml/ini/hcl/json 五单位已过 72h 门槛；C-3 partial；Go 全里程碑（0.14.0-0.19.0 G0.1-G5.6）已交付；五语言实现各 L0-L5 已交付（TS/Python/Kotlin 与 Rust/Go 同等地位，见 docs/multi-language-implementation-plan.md 与 docs/five-language-ci-design.md）。
 
 版本数量可以在实际执行中增加，但不得压缩语义门禁。若某个阶段过大，可以拆成更多 minor 版本；不能为了保持编号漂亮而把未完成能力滚入下一阶段。
 
@@ -1200,7 +1202,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 
 落实状态：已完成（2026-08-04）。规范见 `docs/rfcs/0006-portable-graph-and-pgce-v1.md`、`docs/rfcs/0007-yaml-family-profiles-and-safety-v1.md` 与 `docs/rfcs/0008-semantic-model-v5.md`，实现见 `consema-graph` 与 `consema-yaml`，语言无关证据见 `conformance/vectors/portable-graph-v1.json`、`semantic-model-v5.json` 与 `yaml-v1.json`，上游证据见 `docs/UPSTREAM-YAML-TEST-SUITE.md`，性能基线见 `docs/BENCHMARKS-0.7.0.md`。
 
-完成证据：RFC 0006/0007/0008 已接受并落地；PortableGraph、semantic-model v5、YAML 三套新增语言无关 suite 分别为 10/10、22/22、27/27，使 11 套 suite 合计达到 265/265。官方 `yaml/yaml-test-suite data-2022-01-17` 的 402 项全部核算：307 valid byte-exact、94 invalid atomic rejection、1 个未来 `%YAML 1.3` 的明确 Profile-contract exclusion。Kubernetes、GitHub Actions、Compose 与 anchor-heavy 四类工程夹具完成 source/graph/PGCE/materialization closure；mutation/resource corpus 覆盖 Unicode、truncation、alias bomb、depth、cycle、custom tag 和 PGCE canonicality。Rust 1.97 与 MSRV 1.85 均通过 312 项 workspace 全 target/all features tests 和 strict Clippy；rustfmt、doctest、rustdoc、RustSec、cargo-deny、固定 YAML 性能基线及既有 JSON5/TOML 上游门禁均通过。semantic-model v5 发布 30 条 contract 与 132 个 error code，v1-v4 精确冻结。
+完成证据：RFC 0006/0007/0008 已接受并落地；PortableGraph、semantic-model v5、YAML 三套新增语言无关 suite 分别为 10/10、22/22、27/27，使 11 套 suite 合计达到 265/265（2026-08-12 P2-B 向量补强后 yaml-v1.json +4 recovery/depth/alias-budget case 为 31，11 套合计 269/269）。官方 `yaml/yaml-test-suite data-2022-01-17` 的 402 项全部核算：307 valid byte-exact、94 invalid atomic rejection、1 个未来 `%YAML 1.3` 的明确 Profile-contract exclusion。Kubernetes、GitHub Actions、Compose 与 anchor-heavy 四类工程夹具完成 source/graph/PGCE/materialization closure；mutation/resource corpus 覆盖 Unicode、truncation、alias bomb、depth、cycle、custom tag 和 PGCE canonicality。Rust 1.97 与 MSRV 1.85 均通过 312 项 workspace 全 target/all features tests 和 strict Clippy；rustfmt、doctest、rustdoc、RustSec、cargo-deny、固定 YAML 性能基线及既有 JSON5/TOML 上游门禁均通过。semantic-model v5 发布 30 条 contract 与 132 个 error code，v1-v4 精确冻结。
 
 ## 14.7 `0.8.0`：INI family 与 Properties family
 
@@ -1255,11 +1257,11 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * XML-to-Object 不存在默认映射；
 * UTF-8/UTF-16 未修改字节精确往返。
 
-落实状态：实现与证据已完成（待 0.9.0 发布归档）。规范已冻结（`docs/rfcs/0012-xml-1.0-safe-profile-v1.md`）；实现覆盖 formation（UTF-8/UTF-16 显式 source contract、safe internal DTD、六维实体膨胀限制、恢复与诊断）、namespace-aware 原生树、37 种细粒度 lossless syntax kinds、native/syntax query、element-tree/text-content/entry-mapping projection、`xml.safe-canonical-document@1` materialization（重解析闭包验证）与 8 个版本化结构编辑操作。语言无关证据见 `conformance/vectors/xml-1-0-safe-v1.json`（34 case）；对抗门禁见 `crates/consema-conformance/tests/xml_hardening.rs`（mutation/truncation/nesting/namespace/entity-amplification/count/long-value）；生产夹具见 `conformance/fixtures/xml/`（Maven/Spring/logging/app-server/namespaced，含投影→物化→重解析不动点门禁）；性能基线见 `docs/BENCHMARKS-0.9.0.md`；`.crate` 打包与解包验证门禁已对 12 个可发布 crate 全量通过。剩余发布动作：W3C XML/Namespaces suite 核算、encoding corpus 归档与 0.9.0 发布记录。
+落实状态：实现与证据已完成（待 0.9.0 发布归档）。规范已冻结（`docs/rfcs/0012-xml-1.0-safe-profile-v1.md`）；实现覆盖 formation（UTF-8/UTF-16 显式 source contract、safe internal DTD、六维实体膨胀限制、恢复与诊断）、namespace-aware 原生树、37 种细粒度 lossless syntax kinds、native/syntax query、element-tree/text-content/entry-mapping projection、`xml.safe-canonical-document@1` materialization（重解析闭包验证）与 8 个版本化结构编辑操作。语言无关证据见 `conformance/vectors/xml-1-0-safe-v1.json`（34 case）；对抗门禁见 `consema-rs/consema-conformance/tests/xml_hardening.rs`（mutation/truncation/nesting/namespace/entity-amplification/count/long-value）；生产夹具见 `conformance/fixtures/xml/`（Maven/Spring/logging/app-server/namespaced，含投影→物化→重解析不动点门禁）；性能基线见 `docs/BENCHMARKS-0.9.0.md`；`.crate` 打包与解包验证门禁已对 12 个可发布 crate 全量通过。剩余发布动作：W3C XML/Namespaces suite 核算、encoding corpus 归档与 0.9.0 发布记录。
 
 ## 14.9 `0.10.0`：Property List
 
-落实状态：实现完成（M1-M10 全里程碑交付），待 0.10.0 发布归档。规范已冻结（`docs/rfcs/0013-plist-family-profiles-v1.md`，16 节，格式事实经 Apple 官方源码/DTD 与 CPython plistlib/libplist 五源交叉核实）；实现覆盖 `plist.xml@1`/`plist.binary@1` 双表示 formation（UTF-8/UTF-16 显式 source contract 与 binary object/offset/ref/trailer facts）、共享原生值模型（有序 dict/array/data/date/UID 等全部值类型）、双表示 round-trip 转换（representation change 报告）、native/syntax/binary query、`plist.value-tree@1` projection、canonical materialization（重解析闭包验证）与 6 个版本化编辑操作；facade 导出 `consema::plist` 与 `Document::parse_plist`/`as_plist`，conversion 支持 plist 目标。语言无关证据见 `conformance/vectors/plist-v1.json`（45 case）；性能基线见 `docs/BENCHMARKS-0.10.0.md`。剩余发布动作：0.10.0 发布记录与发布证据归档。
+落实状态：实现完成（M1-M10 全里程碑交付），待 0.10.0 发布归档。规范已冻结（`docs/rfcs/0013-plist-family-profiles-v1.md`，16 节，格式事实经 Apple 官方源码/DTD 与 CPython plistlib/libplist 五源交叉核实）；实现覆盖 `plist.xml@1`/`plist.binary@1` 双表示 formation（UTF-8/UTF-16 显式 source contract 与 binary object/offset/ref/trailer facts）、共享原生值模型（有序 dict/array/data/date/UID 等全部值类型）、双表示 round-trip 转换（representation change 报告）、native/syntax/binary query、`plist.value-tree@1` projection、canonical materialization（重解析闭包验证）与 6 个版本化编辑操作；facade 导出 `consema::plist` 与 `Document::parse_plist`/`as_plist`，conversion 支持 plist 目标。语言无关证据见 `conformance/vectors/plist-v1.json`（45 case；2026-08-12 P2-B 向量补强 +4 binary limit 后为 49 case）；性能基线见 `docs/BENCHMARKS-0.10.0.md`。剩余发布动作：0.10.0 发布记录与发布证据归档。
 
 目标：覆盖 Apple 平台常用配置，并验证 text/binary 两种 representation 共享值语义但不共享虚假语法树。
 
@@ -1284,7 +1286,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 
 ## 14.10 `0.11.0`：HCL family
 
-落实状态：实现完成（M1-M10 全里程碑交付），待 0.11.0 发布归档。规范已冻结（`docs/rfcs/0014-hcl-family-profiles-v1.md`，16 节，文法经 HashiCorp hclsyntax spec 与 Go 参考实现源码双源核实，一元/二元复合等 9 类 spec-vs-implementation 分歧已冻结定案）；实现覆盖 `hcl.native@1`/`hcl.tfvars@1` 双 profile formation（UTF-8 显式 source contract、BOM/lone CR/invalid UTF-8/duplicate attribute 恢复与诊断）、自研 lexer + parser（UAX #31 标识符、引号模板/heredoc/插值/指令文法、30 种 lossless syntax kind 穷尽覆盖）、body/expression AST 原生模型（AST 与精确 span 双保留）、native/syntax 双查询域、`hcl.projection.body@1` 精确投影与 `hcl.expression@1` 授权 ExtendedValue（显式 ProjectExpression 策略）、`hcl.canonical-document@1` materialization（重解析闭包验证）与 6 个版本化编辑操作（tfvars 只发布 4 个 attribute 操作）；facade 导出 `consema::hcl` 与 `Document::parse_hcl`/`as_hcl`，conversion 支持 HCL 目标（derived 表达式按默认精确目标原子失败）。语言无关证据见 `conformance/vectors/hcl-v1.json`（57 case）；对抗门禁见 `crates/consema-conformance/tests/hcl_hardening.rs`；生产夹具见 `conformance/fixtures/hcl/`（tf/ 与 tfvars/）；性能基线见 `docs/BENCHMARKS-0.11.0.md`。剩余发布动作：0.11.0 发布记录与发布证据归档。
+落实状态：实现完成（M1-M10 全里程碑交付），待 0.11.0 发布归档。规范已冻结（`docs/rfcs/0014-hcl-family-profiles-v1.md`，16 节，文法经 HashiCorp hclsyntax spec 与 Go 参考实现源码双源核实，一元/二元复合等 9 类 spec-vs-implementation 分歧已冻结定案）；实现覆盖 `hcl.native@1`/`hcl.tfvars@1` 双 profile formation（UTF-8 显式 source contract、BOM/lone CR/invalid UTF-8/duplicate attribute 恢复与诊断）、自研 lexer + parser（UAX #31 标识符、引号模板/heredoc/插值/指令文法、30 种 lossless syntax kind 穷尽覆盖）、body/expression AST 原生模型（AST 与精确 span 双保留）、native/syntax 双查询域、`hcl.projection.body@1` 精确投影与 `hcl.expression@1` 授权 ExtendedValue（显式 ProjectExpression 策略）、`hcl.canonical-document@1` materialization（重解析闭包验证）与 6 个版本化编辑操作（tfvars 只发布 4 个 attribute 操作）；facade 导出 `consema::hcl` 与 `Document::parse_hcl`/`as_hcl`，conversion 支持 HCL 目标（derived 表达式按默认精确目标原子失败）。语言无关证据见 `conformance/vectors/hcl-v1.json`（57 case）；对抗门禁见 `consema-rs/consema-conformance/tests/hcl_hardening.rs`；生产夹具见 `conformance/fixtures/hcl/`（tf/ 与 tfvars/）；性能基线见 `docs/BENCHMARKS-0.11.0.md`。剩余发布动作：0.11.0 发布记录与发布证据归档。
 
 目标：覆盖基础设施配置，同时严格守住 Document 与 Evaluation 的边界。
 
@@ -1348,7 +1350,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * 文档、示例和真实项目 pilot；
 * release process、SBOM、签名和恢复演练。
 
-只有第 15 节 Rust Feature-Complete Gate 全部通过，才允许开始 `0.14.0` 的 Go 实现。
+只有第 15 节 Rust Feature-Complete Gate 全部通过，才允许开始 `0.14.0` 的 Go 实现。（注：该条款已按 2026-08-07 owner decision（fc-manifest decisions[0] D-1）修订——Go 0.14.0-0.19.0 已提前授权启动并全部独立验证交付（G0.1-G5.6），见 §13 里程碑表与 docs/go-implementation-plan.md §7。）
 
 ---
 
@@ -2013,7 +2015,7 @@ Rust/Go observable mismatch count
 * secret manager；
 * IDE/GUI；
 * 稳定远程 plugin process protocol；
-* Java/TypeScript/Python SDK；
+* Java/TypeScript/Python SDK（superseded by 2026-08-11 决策：TypeScript/Python/Kotlin 已纳入 1.0.0 同等地位与产品承诺，Java 仍为非目标）；
 * 企业治理平台本身。
 
 Materialization 的 canonical style 不等于 formatter；SourcePatch 不等于通用 semantic patch；CLI 文件读写不等于配置来源合并系统；HCL Document 支持不等于 HCL/Terraform evaluation。
@@ -2329,6 +2331,8 @@ Conformance          跨实现证据
 * failure、recovery、cancellation、limits 和 conflict 都有正式语义；
 * 没有通过 experimental 标签隐藏未完成的 1.0 承诺。
 
+> **2026-08-11 决策注记（superseded by five-language decision）**：本节通过条件以双语言（Rust/Go）口径撰写；五语言同等地位后，§28 五要素按五语言面核验执行（见 docs/five-element-review-1.0.0.md §7 五语言扩展审计；「两语言 observable mismatch」按「任意两语言实现 observable mismatch」执行）。
+
 ---
 
 # 29. 最终确认
@@ -2336,6 +2340,8 @@ Conformance          跨实现证据
 Consema `1.0.0` 的最终定义是：
 
 > **一套完整生产级配置内容处理产品：覆盖 JSON、YAML、TOML、INI、XML、Properties、Property List 与 HCL 八个主流格式家族；由 Rust 和 Go 两个独立实现共同证明；能够无损保存内容事实、表达格式原生语义、执行确定查询、进行显式且可审计的投影与生成、完成快照绑定的原子编辑，并以 Capability、协议、Conformance、安全、性能和稳定发布政策保证长期可靠使用。**
+
+> **2026-08-11 决策注记（superseded by five-language decision）**：「由 Rust 和 Go 两个独立实现共同证明」已扩展为五个独立实现（Rust/Go/TypeScript/Python/Kotlin 同等地位，见 docs/multi-language-implementation-plan.md 与 docs/five-language-ci-design.md）；最终确认的核验载体为五要素终审（docs/five-element-review-1.0.0.md，§7 五语言扩展审计）。
 
 路线图的最高推进原则是：
 

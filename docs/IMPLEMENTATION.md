@@ -354,10 +354,10 @@ TOML exact literal 必须恰好是一个 scalar span：前后 trivia、comment�
 | `consema.json-family.conformance@2` | 33/33 |
 | `consema.portable-graph.conformance@1` | 10/10 |
 | `consema.semantic-model-v5.conformance@1` | 22/22 |
-| `consema.yaml.conformance@1` | 27/27 |
+| `consema.yaml.conformance@1` | 31/31（P2-B 补强 +4 recovery/depth/alias-budget） |
 | `consema.semantic-model-v6.conformance@1` | 25/25 |
 | `consema.ini.conformance@1` | 20/20 |
-| `consema.java-properties.conformance@1` | 22/22 |
+| `consema.java-properties.conformance@1` | 25/25（P2-B 补强 +3 family-parse/encoding） |
 | JSON5 v2.2.3 reference valid/invalid | 43/43 + 39/39 |
 | JSON5 v2.2.3 complete `package.json5` fixture | 1/1 |
 | `toml-lang/toml-test v2.2.0`, TOML 1.0 valid | 205/205 |
@@ -366,7 +366,7 @@ TOML exact literal 必须恰好是一个 scalar span：前后 trivia、comment�
 | `yaml/yaml-test-suite data-2022-01-17`, invalid atomic rejection | 94/94 |
 | YAML profile-contract exclusions | 1/1（`%YAML 1.3`） |
 | `consema.xml-1-0-safe.conformance@1` | 34/34 |
-| `consema.plist.conformance@1` | 45/45 |
+| `consema.plist.conformance@1` | 49/49（P2-B 补强 +4 binary limit） |
 | `consema.hcl.conformance@1` | 57/57 |
 | OpenJDK 25.0.4 Properties oracle | 11/11 |
 | CPython 3.14.6 ConfigParser oracle | 9/9 |
@@ -459,7 +459,7 @@ RFC 0015 的 `ContractRegistry::v7()` 增至 41 条记录：v6 的 38 条精确�
 0.12.0 发布正式 `consema` CLI（RFC 0015），作为 facade crate 的 `[[bin]]` 目标内置（`src/bin/consema/`，std-only，零新外部依赖）。11 个命令：`inspect`、`capabilities`、`query`、`project`、`materialize`、`convert`、`edit`、`plan`、`apply`、`conformance`、`explain`。命令面、机器 schema、exit-code 分类、batch 状态机与 redaction 政策由 RFC 0015 冻结为 v1 candidate；CLI 的机器输出是 `core.cli-output@1` 信封 payload（第 12 章 semantic-model v7），Go CLI 实现同一契约。
 
 - **stdout/stderr 分流**（RFC 0015 §3.3）：`--json` 下 stdout 只有一行规范 JSON 信封（`--pretty` 时确定性缩进渲染，仅空白变化、字节语义不变）；非 `--json` 下 stdout 只有命令结果数据。全部诊断、进度、redaction 提示走 stderr。
-- **默认只读/dry-run**：没有命令在无显式参数时写目标文件；写入必须显式 `--write`（edit）、`--apply`（apply 只消费先前 `plan` 的 manifest）或 `--output`（materialize/convert 目标、plan/apply manifest）。materialize/convert 默认把目标字节写到 stdout。
+- **默认只读/dry-run**：没有命令在无显式参数时写目标文件；写入必须显式 `--write`（edit）、`--apply`（apply 只消费先前 `plan` 的 manifest）；`--output` 是 plan/apply 的 manifest/结果写目标（其余命令收到即 usage 错误 exit 1——G089 处置已落地，Rust 参考实现 args.rs 帮助文本与校验一致）。materialize/convert 目标字节只到 stdout。
 - **facts-only auto-detection**（RFC 0015 §7，硬门禁 2）：`inspect` 只报告字节事实（大小/SHA-256）、编码事实（BOM）、结构 marker 事实、候选 Profile（每个附理由）与歧义（一等结果，exit 0）；永不输出“这是 X 格式”的单一结论。parse 类命令必须显式 `--profile`，歧义不可解析时是 data 类失败（exit 2）。
 - **批量工作流**（RFC 0015 §8-§9）：`plan` 逐文件 parse + edit dry-run 产出 `core.batch-plan@1` manifest（只读；单文件失败作为 manifest 内容记录，exit 0）；`apply` 逐文件重读重验 base digest 与 original-bytes 双前置条件，同目录临时文件 + 原子替换 + 读回验证 target digest，产出 `core.batch-result@1`。任何 Failed/SkippedStale 文件 → exit 4（precondition）；全部 completed → 0。中断恢复：每文件写入前先落 pending 标记、完成后落 completed，重跑 completed 跳过、pending 重做；中断后 stdout 不再输出字节，pending manifest 留在磁盘。
 - **redaction**（RFC 0015 §4.4，presentation-only）：human 视图与 plan 视图默认按保守键名模式脱敏（`$REDACTED$` 占位 + stderr 提示 + 机器 `redaction` 事实）；`--show-secrets` 是唯一取消通道。plan manifest 记录本身（apply 的原始字节前置条件）永不脱敏（硬门禁 3）。

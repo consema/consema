@@ -15,7 +15,7 @@
 | 项 | 内容 | 对照权威 |
 |---|---|---|
 | 1 | 钉版 12 文件 digest 核对（fixtures 层真实语料） | pilot-go-0.19.0.md §1 语料登记表（16 位 sha256 前缀 + 字节数） |
-| 2 | 519 计数核对（18 套向量 + 聚合 digest） | fc-manifest-0.13.0.json `digests.conformance_suite`（suites=18 / cases=519 / aggregate_sha256=`cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`）；conformance/README.md:75 |
+| 2 | 519 计数核对（18 套向量 + 聚合 digest） | fc-manifest-0.13.0.json `digests.conformance_suite`（suites=18 / cases=519 / aggregate_sha256=`cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`）；conformance/README.md 的 18 套 suite 清单段（合计 519 个 case） |
 | 3 | regressions 检查（fuzz 回归输入数组） | conformance/corpora/mutation-v1.json `regressions`（空数组符合预期；新增条目必须可追溯） |
 | 4 | 9 家族来源与覆盖 | conformance/fixtures/ 九目录 + 各家族 README 来源/许可证声明（conformance/README.md:35-43 夹具清单——hcl/plist/xml 三家已补全） |
 
@@ -82,7 +82,8 @@ $agg = [System.BitConverter]::ToString(
 
 预期：`suites=18 cases=519 aggregate=cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`
 （注意 CRLF 工作树会使逐文件 digest 不同——须在规范 checkout（`git config
-core.autocrlf false` / LF）下核对，照 go-verify-shared-conformance.ps1:91-96 注记）。
+core.autocrlf false` / LF）下核对，照 consema-go/scripts/go-verify-shared-conformance.ps1
+的 CRLF 注记段（行号可能漂移，以注记语义为锚））。
 
 ### 2.3 regressions 检查
 

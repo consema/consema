@@ -17,6 +17,12 @@ invalid tests: 474 passed, 0 failed
 
 `consema-toml-test-decoder` reads TOML from standard input and produces the suite's tagged JSON exclusively through Consema's public `TomlItem`, `TomlEntry` and `TomlArrayElement` APIs. It does not expose or serialize `toml_edit` types.
 
+> **记录载体注记（2026-08-14 波 2）**：六仓拆分后母仓根无 Cargo.toml/workspace，
+> 本脚本只存在于母仓 `scripts/`（consema-rs 无副本），在母仓原位第一步
+> `cargo build` 必然失败（exit 101），目前作为记录载体保留、无 CI job 执行；
+> 可执行入口的迁移/重建待总指挥决策。下述运行说明为拆分前的可执行体例（保留
+> 为历史记录）。
+
 Run on Windows PowerShell:
 
 ```powershell

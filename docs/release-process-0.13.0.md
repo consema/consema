@@ -65,7 +65,7 @@ MSRV build leg: rustc 1.85.0 for all 14 crates
   consema-conformance 的 15 个归档；发布时归档集合以 verify 脚本/签名步骤
   计算为准（14 个），裸打包多出的 repository-only crate 不写进 SHA256SUMS。
 
-### 2.2 CI package job（常设载体，六仓拆分后位于 consema-rs/.github/workflows/ci.yml:384-410）
+### 2.2 CI package job（常设载体，六仓拆分后位于 consema-rs/.github/workflows/ci.yml 的 package job）
 
 - `package` job：`ubuntu-latest`、`timeout-minutes: 60`；steps：
   `actions/checkout@v4` → `dtolnay/rust-toolchain@stable` → `dtolnay/rust-toolchain@1.85.0`
@@ -105,11 +105,12 @@ MSRV build leg: rustc 1.85.0 for all 14 crates
 ### 4.2 签名 tag
 
 ```text
-powershell -File scripts/release-sign.ps1 -SignTag v0.13.0 [-KeyId <fingerprint>]
+powershell -File scripts/release-sign.ps1 -SignTag v1.0.0-rc.1 [-KeyId <fingerprint>]
 ```
 
-- 执行 `git tag -s -a v0.13.0 -u <fingerprint> -m "Consema 0.13.0"`，随后
-  `git tag -v` 自检（Good signature）才 exit 0。
+- 执行 `git tag -s -a v1.0.0-rc.1 -u <fingerprint> -m "Consema 1.0.0-rc.1"`，随后
+  `git tag -v` 自检（Good signature）才 exit 0。（注（2026-08-14 波 2）：示例由
+  v0.13.0 改写——0.13.0 从未发布，照 §7 检查单第 6 项以 v1.0.0-rc.1 执行。）
 - `-u` 总是钉死脚本检测到的密钥指纹：不带 `-u` 时 git 会从 user.name/user.email
   推导签名密钥，可能静默换键（2026-08-07 实测确认）。建议同时配置
   `git config user.signingkey <fingerprint>` 让非脚本工具用同一把键。
@@ -158,7 +159,7 @@ powershell -File scripts/release-sign.ps1 -SignArtifacts
      cargo install 子命令），并可用 `$env:CONSEMA_CARGO` 约定覆盖。
   2. cargo-sbom 直接读 Cargo.lock（经 cargo metadata），输出 SPDX 2.3 JSON
      （默认）或 CycloneDX 1.4/1.6 JSON；§19.3 依赖门禁审计的 license inventory
-     （deny.toml：MIT/Apache-2.0/Unicode-3.0）以 SPDX license expression 直接背书。
+     （deny.toml：MIT/Apache-2.0/Unicode-3.0/BSD-3-Clause）以 SPDX license expression 直接背书。
   3. cyclonedx-bom 只有 CycloneDX 输出、依赖树更重，且 cargo-sbom 已能产出
      CycloneDX（`--output-format cyclone_dx_json_1_6`），需要 CycloneDX 消费者时
      无需换工具。
@@ -181,6 +182,11 @@ powershell -File scripts/release-sbom.ps1
   Apache-2.0: 20, MIT: 16, Apache-2.0 OR MIT: 2, (Apache-2.0 OR MIT) AND
   BSD-3-Clause: 1}`，与 deny.toml 政策一致；生成 commit
   `9c1ede20fab56829cfaeca6924ee115ff01cd5d2`。
+- **披露注记（2026-08-14 波 2 审计）**：该产物文件名按 workspace 版本自动命名
+  （当时为 0.8.0），其内容描述 0.13.0 门禁工作树的 15 crate 全 workspace——
+  含 0.9.0-0.11.0 新增 crate，**不是 0.8.0 发布树**（0.8.0 发布时无 SBOM 产物；
+  与 SHA256SUMS-0.8.0 同病，注记已写入产物 `comment` 字段）。1.0.0-rc.1 发布
+  SBOM 必须按 §7 从干净发布 commit 重新生成 `sbom-1.0.0-rc.1.json`。
 - 可复现性说明：重新生成时 `creationInfo.created` 时间戳与 `documentNamespace`
   必然变化（SPDX 规范如此），package/dependency/checksum 事实不变；发布记录须
   在同一 commit + 同一 lockfile 上重跑后入库。
@@ -278,7 +284,7 @@ verify exit=0
 
 ### 6.4 演练边界（诚实记录）
 
-- 演练密钥（82301612…）与 scratch 仓库均不进入任何发布记录；0.13.0 正式签名用
+- 演练密钥（82301612…）与 scratch 仓库均不进入任何发布记录；1.0.0-rc.1 正式签名用
   真实密钥按 §4.1 执行。
 - 未演练：gpg 私钥丢失的恢复（不可恢复——这正是备份与吊销证书存在的原因，
   §4.4）；远程篡改场景（不在 §19.4 恢复演练范围）。

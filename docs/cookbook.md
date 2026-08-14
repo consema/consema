@@ -891,7 +891,7 @@ JSON 材料化 → 跨格式转换到 TOML——在五个语言实现中各有�
 | Go | [go/examples/sdk_chain/main.go](https://github.com/consema/consema-go/blob/main/go/examples/sdk_chain/main.go) | `cd go && go run ./examples/sdk_chain` |
 | TypeScript | [typescript/examples/sdk_chain.ts](https://github.com/consema/consema-ts/blob/main/typescript/examples/sdk_chain.ts) | `cd typescript && node examples/sdk_chain.ts`（node 26 原生运行 `.ts`，无构建步骤） |
 | Python | [python/examples/sdk_chain.py](https://github.com/consema/consema-py/blob/main/python/examples/sdk_chain.py) | `cd python && PYTHONPATH=src python examples/sdk_chain.py` |
-| Kotlin | [kotlin/examples/SdkChain.kt](https://github.com/consema/consema-kt/blob/main/kotlin/examples/SdkChain.kt) | `kotlinc -jvm-target 17 -d out src/main/kotlin examples/SdkChain.kt`，再 `java -cp "out;<kotlinc>\lib\kotlin-stdlib.jar" consema.examples.SdkChainKt` |
+| Kotlin | [kotlin/examples/SdkChain.kt](https://github.com/consema/consema-kt/blob/main/kotlin/examples/SdkChain.kt) | `kotlinc -J-Xmx2g -jvm-target 17 -d out src/main/kotlin examples/SdkChain.kt`（`-J-Xmx2g`：默认 512MiB 堆对大项目编译会 OOM，2026-08-14 波 2 对齐 kt 仓体例），再 `java -cp "out;<kotlinc>\lib\kotlin-stdlib.jar" consema.examples.SdkChainKt` |
 
 运行命令均取自各示例文件头注释（实测命令）；每个示例文件头部都链接了本
 cookbook 与五语言设计文档，各仓 README 提供完整的 SDK 文档（Rust /

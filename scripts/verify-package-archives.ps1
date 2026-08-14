@@ -8,7 +8,11 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$workspaceRoot = Split-Path -Parent $PSScriptRoot
+# workspaceRoot 从启动 cwd 推导（2026-08-14 波 2 修复）：本脚本位于母仓根时
+# 按自身位置解析会让干净树门禁与 target/ 目录落在母仓、与 cargo 解析的
+# consema-rs 工作区错位；cargo metadata/package 按启动 cwd 解析，故工作区根
+# 必须与之一致。
+$workspaceRoot = (Get-Location).Path
 # git-bash GNU tar misparses Windows drive paths when it wins the PATH lookup
 # (`/usr/bin/tar: Cannot connect to C: resolve failed`), so on Windows resolve
 # the system bsdtar explicitly and keep the PATH lookup elsewhere (CI ubuntu

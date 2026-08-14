@@ -64,9 +64,9 @@ cargo run --locked --offline --release -p consema-conformance --example hcl_base
   (v) 记录公开（引用进 CHANGELOG）。
 - **禁止 benchmark gaming**（§8 item 6）：关闭诊断/无损覆盖/limits 的配置本身即违例。
 
-## 3. Go 侧基准趋势记录（go/README.md:758-816）
+## 3. Go 侧基准趋势记录（consema-go/go/README.md 的「Benchmark baseline (0.19.0 G5.4)」节）
 
-- 定位：`consema-go/go/README.md` "## Benchmark baseline (0.19.0 G5.4)"（:758 起）。
+- 定位：`consema-go/go/README.md` "## Benchmark baseline (0.19.0 G5.4)"。
 - 命令（在 `consema-go` 检出）：
 
 ```text

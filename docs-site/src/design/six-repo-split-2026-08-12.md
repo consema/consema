@@ -31,7 +31,7 @@
 
 | 步骤 | 关键 commit（母仓） | 要点 |
 | --- | --- | --- |
-| 1. 全仓库对齐 | `aca77f6`（13 files，110+/94-） | 版本陈旧 3P1+24P2、路径引用 33P2 全部修复；Go 里程碑 0.14.0-0.19.0 交付、C-2 最新快照（3/9 units past 72h、62,432 行）、fc-manifest A-4/A-9/SEC-9 backfill、路线图五语言扩展注记、session-448 wave-3 超时事件记录、40+ 引用漂移修复（CHANGELOG / rc-candidate / ci.yml 行引用）。该 commit 在 go / py 的 split 历史中各有同名投影（go `7a03a15`、py `c1dfb4d`，同一变更在各 split 分支中保留）；rs / ts / kt 分支未带（对齐未触及其特有文件） |
+| 1. 全仓库对齐 | `aca77f6`（13 files，110+/94-） | 版本陈旧 3P1+24P2、路径引用 33P2 全部修复；Go 里程碑 0.14.0-0.19.0 交付、C-2 当时快照（3/9 units past 72h、62,432 行——aca77f6 提交时点值，后续复算见 fuzz-evidence §3.2.1/§8）、fc-manifest A-4/A-9/SEC-9 backfill、路线图五语言扩展注记、session-448 wave-3 超时事件记录、40+ 引用漂移修复（CHANGELOG / rc-candidate / ci.yml 行引用）。该 commit 在 go / py 的 split 历史中各有同名投影（go `7a03a15`、py `c1dfb4d`，同一变更在各 split 分支中保留）；rs / ts / kt 分支未带（对齐未触及其特有文件） |
 | 2. cases.json 差分集迁移 | `00c850d`（34 files，273+/84-） | 共享差分 case 集迁至 `conformance/differential/` 单一权威（five-language-ci-design §3.5 落地）：go embed → 运行时加载（`CONSEMA_DIFFERENTIAL_CASES_DIR` + upward probe），12 个 verify 脚本 + TS/Python/Kotlin harness 路径更新 |
 | 3. git subtree split 五分支 | （无新 commit，历史保留） | 五语言分支 commit 数实测：rs 179 / go 26 / ts 5 / py 7 / kt 7（`git rev-list --count <assembly>^`），历史完整保留 |
 | 4. 五仓组装 | rs `6bcb068`（201 files，193,987+/187-）、go `cb0aedc`（371 files）、ts `1faa03f`、py `00d9054`（260 files）+ py `1a15969`（de-nest 修正：assembly move 与 leftover worktree dirs 冲突）、kt `613ae2f` | Cargo.toml members 重写（15 crates 至仓库根，无 crates/ 目录）；include 路径 172 处 `../../../` → `../../`；conformance vendor 快照入仓（consema-rs 以此快照 + 计数钉为 CI 机制，见 §6；go/ts/py/kt 四仓 CI 经 `repository:` 多仓 checkout 从母仓 provision） |
@@ -78,12 +78,12 @@
 - **`conformance/` 为单一语言无关权威**（本仓维护、五仓共享）：`vectors/` 18 套 suite 519 cases（聚合 digest `cfd6e296…`；P2-B 补强 2026-08-12 取代） + `fixtures/`（真实夹具；**`fixtures/toml/Cargo.toml` 于 `943c014` 归位**为 `toml.corpus.cargo-manifest` 的单一权威）+ `oracles/`（固定 runtime oracle：hcl-go-v1、plist-macos-v1 等，manifest 记录 runtime 固定事实与 documented skip_path）+ `corpora/`（mutation 语料）+ `differential/`（跨语言差分 case 集单一权威：`cases.json` byte-parity 68 / `normalized/cases.json` 108 / `protocol-exchange/cases.json` 83，由 `00c850d` 迁入）。
 - **五仓 CI provision 机制（如实）**：consema-rs 以 conformance vendor 快照 + 计数钉为机制（vendored `conformance/` 快照入仓，CI 与本地同源；权威仍在母仓，ci.yml 头注释明示）；go/ts/py/kt 四仓经 `repository: consema/consema` 多仓 checkout 从母仓 `conformance/` 取数（vectors / fixtures / oracles / differential case 集）；差分方向需要时另 checkout `consema/consema-rs`（各仓 ci-*.yml 实测）。
 - **母仓 CI 只跑自有门禁**（`.github/workflows/ci.yml`，`2d7494f` 重建）：三 job——`oracles`（3 OS 矩阵，exit 3 = documented skip = success）+ `shared-conformance-digest`（复算 `conformance/vectors/` 聚合 digest 并断言等于冻结记录 `cfd6e296…`，519 冻结的常设执行者）+ `check`（聚合门禁，`if: always()` + toJSON(needs)，分支保护唯一 required check）。
-- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 必须同步全部五个语言仓并更新聚合 digest 与 18/519 计数（README 声明；未同步会让各仓 conformance gate 与 digest 断言失败）。
+- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 必须同步全部五个语言仓并更新聚合 digest 与 18/519 计数（README 声明；未同步仅 consema-go 仓（live HEAD 跟随）会以 conformance gate 与 digest 断言失败——ts/kt/py 三仓 CI 钉定 commit ad667021、consema-rs 为 vendored 快照，均不自动跟随）。
 
 ## 7. fuzz 驱动迁移
 
-- **驱动位置**：`run_waves.ps1` 现从 consema-rs checkout 根目录运行（本地副本，未跟踪）；原脚本作为冻结协议证据保留在母仓账本目录 `docs/fuzz-evidence-0.13.0-logs/run_waves.ps1`（`git ls-files` 实测）。
-- **账本仍在母仓**：`-LedgerDir` 默认指向 `C:\Users\franck\Documents\consema\docs\fuzz-evidence-0.13.0-logs`（runs.csv、waves.log 与 per-process `.out.log`/`.err.log`，均为 fc-manifest 引用的权威副本）。
+- **驱动位置**：`run_waves.ps1` 现从 consema-rs checkout 根目录运行（2026-08-13 起已入库跟踪——consema-rs commit d97a038，commit message「fuzz driver committed」；记录时点为本地未跟踪副本）；原脚本作为冻结协议证据保留在母仓账本目录 `docs/fuzz-evidence-0.13.0-logs/run_waves.ps1`（`git ls-files` 实测）。
+- **账本仍在母仓**：`-LedgerDir` 默认指向 `C:\Users\franck\Documents\consema\docs\fuzz-evidence-0.13.0-logs`（runs.csv 与 waves.log 为 fc-manifest 引用的权威账本；per-process `.out.log`/`.err.log` 为驱动诊断日志，fc-manifest 不引用）。
 - **C-2 恢复累计**：session 455 起恢复（runs.csv 只读抽查：session 455 行存在，记录时点已推进至 471）。
 - **账本为后台驱动的活文件**：记录时点后台驱动仍在写 wave 输出（母仓工作树有未提交的 runs.csv / waves.log 改动）——本记录不触碰、不纳入提交。
 
@@ -94,7 +94,7 @@
 3. **consema-rs semver baseline** 使用 `fbe98b5c` 等价 commit（split 历史中树与 monorepo v0.8.0 `crates/` 树一致的 commit；v0.8.0 tag 在 split 历史中不存在），baseline 在 CI 中经 `git archive` + 11-member workspace 清单重建。
 4. **五仓 CI 每次向量变更需五仓同步**（见 §6；README 已声明）。
 5. **fixture 维护协议**：`conformance/fixtures/toml/Cargo.toml` 须与 consema-rs 根 manifest 保持逐字节一致（fixture README 记载；consema-rs 组装类改动须同步更新）。
-6. **run_waves.ps1 副本未跟踪**：consema-rs 根的副本为本地文件，不进入任一仓提交；协议权威以母仓账本内的原脚本为准。
+6. **run_waves.ps1 已入库**：consema-rs 根的驱动已随 d97a038（2026-08-13）入库跟踪（commit message「fuzz driver committed」）；协议权威 = consema-rs 根入库副本，母仓账本内的原脚本为冻结历史。
 
 ## 9. 六仓 CI 状态表（截至记录时点 2026-08-12）
 

@@ -1,9 +1,10 @@
 # RC soak 阶段 1 — Go RC fuzz clean-run 重跑流程
 
 - 依据：`docs/rc-1.0.0-candidate.md` §4 阶段 1（"Go 侧 release-candidate fuzz
-  clean-run 记录 §22.4"）与 §4.1（"已有（2026-08-10，go/README.md:674-727，
+  clean-run 记录 §22.4"）与 §4.1（"已有（2026-08-10，consema-go/go/README.md
+  的「Fuzz targets」节，
   16 targets 各 30s，零 panic/hang/limit bypass）"——六仓拆分后该记录位于
-  `consema-go/go/README.md` "## Fuzz targets" 节，:604-727，clean-run 记录
+  `consema-go/go/README.md` "## Fuzz targets" 节（clean-run 记录）
   在 :674-727）；
   路线图 §22.4 第 1909 行（release-candidate fuzz clean-run）。
 - 目标：RC soak 阶段对 Go 16 个 fuzz target 各 30s 的 clean-run **重跑**并记录
@@ -11,7 +12,7 @@
   panic / hang / limit bypass。
 - **本手册只含命令清单与记录模板；执行本身不在本准备批次内。**
 
-## 1. 目标清单（16 targets，go/README.md:617-651 两个 target 表）
+## 1. 目标清单（16 targets，consema-go/go/README.md 的「Fuzz targets」节两个 target 表）
 
 | Target | 包 | 断言属性 |
 |---|---|---|
@@ -34,18 +35,18 @@
 
 资源上限全部固定为生产默认（`core.DefaultDecodeLimits` /
 `graph.DefaultPGCELimits` / `protocol.DefaultProtocolLimits`）；**limit 失败是
-pass 不是 crash**（与 Rust fuzz 契约同构，go/README.md:611）。
+pass 不是 crash**（与 Rust fuzz 契约同构，consema-go/go/README.md 的「Fuzz targets」节）。
 
 ## 2. 前置条件
 
 | 项 | 要求 |
 |---|---|
 | 检出 | `consema-go` 检出（模块在 `go/` 下），工作树干净 |
-| 工具链 | go 1.26.5（基线同款；go.mod 声明最低 1.24——2026-08-12 下调，CI 三版本矩阵验证；基线记录用 go 1.26.5） |
+| 工具链 | go 1.26.5（基线同款；go.mod 声明最低 1.26（0.14.0 冻结，RFC 0020 §9.2）——2026-08-12 曾临时下调 1.24 为实验状态，2026-08-13 已回正；CI go-matrix 腿为精确 1.26.0 + 1.26.5；基线记录用 go 1.26.5） |
 | 环境 | 空闲或与 fuzz 驱动错峰（Go 本机 fuzz 用满核数；记录负载状态） |
 | 时长 | 16 × 30s + 首次构建 ≈ 10-15 分钟 |
 
-## 3. 命令清单（consema-go 检出，照 go/README.md:653-672）
+## 3. 命令清单（consema-go 检出，照 consema-go/go/README.md 的「Fuzz targets」节命令）
 
 ```text
 cd go

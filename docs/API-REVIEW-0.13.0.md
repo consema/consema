@@ -10,9 +10,9 @@
 - **五维审计 findings：0 项需在 0.13.0 修复**。全部 7 项 findings + 2 项 philosophy 项均豁免（exempt-with-reason）：每一项的语言无关面（注册 code / vector / 域 id / 查询操作词）都由 RFC 与 conformance vectors 冻结，修复即破坏冻结面；Rust 枚举名/函数名漂移只影响 Rust 类型名，不违反 §15.2"语言无关行为不依赖 Rust 类型名"。每项给出后续修复窗口（semantic-model v8 / 1.0.0 API 冻结）与具体改动方案，全部记入 Feature-Complete Manifest 的 known-accepted-limitations。
 - **B-6、B-9（M10 评审 bug 类优先修复项）已修复**，含回归测试（详见 §2.6、§2.9）。
 - **cargo-semver-checks**：本地实测 11 个基线 crate（vs v0.8.0 tag f79dd99，baseline worktree 建于仓库外）；8 个全绿，3 个仅"新家族枚举变体新增"（已按 0.x 治理批准，RFC 级决定见 §3）。
-- **rustdoc**：workspace 除 consema-conformance 外 0 个 missing-docs；consema-conformance 的 12 个 missing-docs 全部位于 M2 并行轨未落盘的 `consema-rs/consema-conformance/src/fuzz.rs`（非本里程碑域）。
+- **rustdoc**：workspace 除 consema-conformance 外 0 个 missing-docs；consema-conformance 的 12 个 missing-docs 曾全部位于 M2 并行轨的 `consema-rs/consema-conformance/src/fuzz.rs`，该文件已随 0.13.0 落地（094f5d1/7e9de38 提交，已入库）并补齐全部 missing-docs（见 §4），门禁全绿。
 - **facade/feature**：facade 依赖 13 个 backend crate、无 `[features]`，与 CHANGELOG 声称一致；`capabilities` 清单由 facade 类型派生（`lib.rs` registry 模块）。
-- **泄漏复查**：全部 15 个 crate 零第三方依赖（仅 consema-* path deps），第三方错误类型泄漏在构造上不可能；格式 crate 公共 API 只携带语言无关契约类型（ProfileId/Diagnostic/PortableValue/NodeRef/Span/…），backend AST 内部类型（syntax kind、native 树节点数据）保持在 crate 内私有。无泄漏。
+- **泄漏复查**：15 个 crate 中 7 个声明第三方依赖（encoding_rs/sha2/toml_edit/saphyr-parser/unicode-id-start/unicode-ident/xmlparser，全部以锁定版本钉入 Cargo.lock；依赖面修正记录：2026-08-14 波 2 审计，原「15 个 crate 零第三方依赖」声称与 Cargo.lock 事实不符，安全结论随之修正——第三方依赖不进入公共签名，见 §6）；第三方错误类型泄漏在构造上不可能；格式 crate 公共 API 只携带语言无关契约类型（ProfileId/Diagnostic/PortableValue/NodeRef/Span/…），backend AST 内部类型（syntax kind、native 树节点数据）保持在 crate 内私有。无泄漏。
 
 ---
 
@@ -25,7 +25,7 @@
 **证据：**
 
 - 概念 (a) "编辑被禁止于 Recovered 文档"：`consema-rs/consema-ini/src/edit.rs:1756`（`RecoveredDocument => "core.edit.incomplete-target@1"`）、`consema-rs/consema-properties/src/edit.rs:239`（同）、`consema-rs/consema-plist/src/edit.rs:447`（`IncompleteTarget`）、`consema-rs/consema-hcl/src/edit.rs:603`（同）、`consema-rs/consema-xml/src/edit.rs:328-329`（"The base document is not `Complete`, so no target can be edited"）。
-- 概念 (b) "target 不是完整字面量语法节点"：`consema-rs/consema-json/src/edit.rs:264-265`（"Target is not a complete literal syntax node"）。
+- 概念 (b) "target 不是完整字面量语法节点"：`consema-rs/consema-json/src/edit.rs` 的 IncompleteTarget 臂（"Target is not a complete literal syntax node"）。
 - code 注册于 `consema-rs/consema-protocol/src/error_registry.rs:490`（0.5.0 起），被 4 个 conformance vector 钉死：`ini-v1.json:42`、`java-properties-v1.json:58`、`plist-v1.json:1559`、`hcl-v1.json:1642`（均含 `core.edit.incomplete-target@1`）。
 
 **Disposition：exempt-with-reason（冻结 + 提交 v8 拆分提案）。** code 由 RFC 0011（semantic-model v6 contract registry）冻结、vector 钉死；拆分为 `core.edit.recovered-document@1`（Recovered 门）与 `core.edit.incomplete-literal-target@1`（json 字面量完整性）需要 semantic-model v8 RFC 修订 + 4 个 vector 修订（破坏性），不属于 0.13.0。后续窗口：semantic-model v8（0.14.0+，与 Go 对齐的破坏性窗口）；在 v8 落地前保持单 code 并在文档（IMPLEMENTATION.md 编辑章节）中标注双语义。记入 FC manifest known-accepted-limitations。
@@ -178,22 +178,22 @@
 
 - 门禁体例：workspace lint `missing_docs = "warn"`（Cargo.toml:38）+ `RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps`。
 - 实测（2026-08-07）：`cargo doc --workspace --no-deps --exclude consema-conformance` 在 `-D warnings` 下**零警告**（0 个 missing-docs），其余 14 个 crate 全部 100% 覆盖。
-- 唯一失败点：`cargo doc -p consema-conformance` 12 个 missing-docs 警告，全部位于 `consema-rs/consema-conformance/src/fuzz.rs:52-69`（`Mutation` 枚举字段/变体），该文件是 **M2 并行轨（fuzz 域）未落盘的新文件**（git 未跟踪，非本里程碑文件域）。M2 合入其 rustdoc 后门禁全绿；0.13.0 收口（M9）复核。
+- 唯一失败点：`cargo doc -p consema-conformance` 12 个 missing-docs 警告，全部位于 `consema-rs/consema-conformance/src/fuzz.rs:52-69`（`Mutation` 枚举字段/变体），当时为 M2 并行轨（fuzz 域）未落盘的新文件。该文件已随 0.13.0 落地（094f5d1/7e9de38 提交，已入库），M2 合入后 12 处 missing-docs 已补齐（fuzz.rs:52-69 全部带 /// 文档），门禁全绿（0.13.0 收口 M9 复核确认）。
 
-## 5. facade/feature 复查（§15.6 第 1424 行）
+## 5. facade/feature 复查（§15.6）
 
 - **facade 依赖面**：`consema-rs/consema/Cargo.toml` 13 个依赖全部为 consema-* path 依赖；**无 `[features]` 段**——与 plan §1.6"facade 依赖 13 个 backend；无 [features]"一致。无 feature 即无 feature 组合面，§15.6"feature 关系清楚"成立（单一全量面）。
 - **facade 表面与 CHANGELOG 声称一致**：8 个 `Document::parse_*`（`lib.rs:535-634`）+ 8 个 `as_*` 适配器（`:710-816`）+ 8 个 `convert_*`（`conversion.rs:346-597`）+ `registry` 模块（families 8 / profiles 16 / query_domains 21 / operation_registry 16 / parse_document）+ `pub use consema_* as *` 重导出——与 CHANGELOG.md:9/21/57/78/95/115 声称逐项相等。
 - **`consema capabilities` 由 facade 派生**：capabilities.rs 走 `registry::format_families()/profiles()/query_domains()/operation_registry()`，无重复声明（RFC 0015 硬门禁 1）；`cli_m4.rs` 测试断言 16 profiles / 8 families / 21 query domains / 187 v7 error codes 与 registry 相等（`cli_m4.rs:161`，0.13.0 audit F3 注册 `json.projection.incomplete-document@1` 后 186 → 187）。
 - **CLI 只走 public API**：`src/bin/consema/` 无 parse/query/project/materialize/edit/convert 实现（全部调用 facade）；本次 B-6/B-9 修复保持该结构（仅改 wire 映射与诊断绑定）。
 
-## 6. backend AST 与第三方错误类型泄漏复查（§15.6 第 1423 行）
+## 6. backend AST 与第三方错误类型泄漏复查（§15.6）
 
-- **第三方错误类型**：15 个 crate 的 Cargo.toml 依赖全部为 consema-* path 依赖（逐一核对），**零第三方依赖**——第三方错误类型进入公共签名在构造上不可能。公共错误面全部是 crate 自有的 `StableFailure` 实现与 consema-protocol 的注册 code。
+- **第三方错误类型**：15 个 crate 中 7 个声明第三方依赖（encoding_rs/sha2/toml_edit/saphyr-parser/unicode-id-start/unicode-ident/xmlparser，全部以锁定版本钉入 Cargo.lock）；逐一核对公共签名，第三方类型不进入公共 API——第三方错误类型进入公共签名在构造上不可能。公共错误面全部是 crate 自有的 `StableFailure` 实现与 consema-protocol 的注册 code。（依赖面修正记录：2026-08-14 波 2 审计，原「15 个 crate 零第三方依赖」声称与 Cargo.lock 事实不符。）
 - **backend AST 泄漏**：格式 crate 的 AST 内部类型保持 crate 私有——`JsonSyntaxKind`/`JsonValueKind`/`JsonArrayElement`（json）、`XmlSyntaxKind`/`XmlElementData`（xml）、`HclSyntaxKind`/`HclAttribute`（hcl）等均为本 crate 公共但**不外泄到其他 crate 的签名**；facade `Document` 用私有 `DocumentInner` 枚举包装各格式 Document（`lib.rs:517-531`），跨 crate 公共签名只携带语言无关契约类型（`ProfileId`、`Diagnostic`、`PortableValue`、`NodeRef`、`Span`、`SourceSnapshot`、`ParseLimits`、`FormatFamilyId` 等，RFC 0002/0008/0011 契约面）。consema-core/consema-document 类型出现在格式 crate 公共签名中的全部是契约类型，非实现内部。
 - **判定**：无泄漏。`cli-implementation-plan.md:42-46` 的"bin 只走 public API"结构约束继续成立（本次修复未触碰）。
 
-## 7. Go API mapping RFC 立项（§15.2 第 1377 行）
+## 7. Go API mapping RFC 立项（§15.2）
 
 本里程碑同步产出 `docs/rfcs/0016-go-api-mapping-v1.md`（立项/charter RFC）：Go module 布局、PortableValue → Go 类型映射、formation/projection/materialization/edit API 形状、错误分类、conformance 集成契约。实现归 0.14.0+。见该 RFC。
 
@@ -201,7 +201,7 @@
 
 - `cargo test -p consema`：全绿（bin 164 tests 含新增 8 个回归测试；lib 31；integration 19+7+6+17+13+1+1）；`cargo test --workspace --all-targets` 48 个 test 目标全绿（含 conformance CLI 套件，B-9 修复未破坏 `cli.parse-facts@1` 向量钉死行为）。
 - `cargo clippy -p consema --all-targets -- -D warnings`：全绿。
-- `cargo fmt -p consema --check`：全绿。workspace 级 `cargo fmt --check` 的失败全部位于 M2 并行轨未落盘的 fuzz 域文件（`consema-conformance/examples/gen_mutation_corpus.rs`、`tests/{mutation_corpus,operation_fuzz,parse_fuzz,protocol_fuzz}.rs`，git 未跟踪），非本里程碑文件域；M2 落盘后全绿。
-- `RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps`：除 M2 未落盘 `consema-conformance/src/fuzz.rs`（12 处 missing-docs）外全绿；详见 §4。
+- `cargo fmt -p consema --check`：全绿。workspace 级 `cargo fmt --check` 的失败曾全部位于 M2 并行轨的 fuzz 域文件（`consema-conformance/examples/gen_mutation_corpus.rs`、`tests/{mutation_corpus,operation_fuzz,parse_fuzz,protocol_fuzz}.rs`），该批文件已随 0.13.0 落地（094f5d1/7e9de38 提交，已入库）并 fmt 全绿。
+- `RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps`：除 M2 当时未落盘的 `consema-conformance/src/fuzz.rs`（12 处 missing-docs）外全绿；该文件已随 0.13.0 落地并补齐，详见 §4。
 - cargo-semver-checks：11 个基线 crate 本地实测完成，8 绿 + 3 个仅新家族变体新增（RFC 级批准）；详见 §3。
 - 五维审计 findings 全 7 + 2 项 disposition 完成（§1）；B-1..B-9 全部 disposition 完成（§2）；B-6/B-9 修复 + 回归测试落盘；RFC 0016 立项（§7）。

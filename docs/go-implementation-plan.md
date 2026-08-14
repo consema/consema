@@ -1,6 +1,6 @@
 # Consema 0.14.0–0.19.0 Go 实现计划（规划阶段文档；发布与里程碑关闭被 §7 START GATE 门禁；实现启动经 2026-08-07 decision record 授权）
 
-- 对应规范：路线图《Consema 1.0.0 产品路线图与双语言落地设计》§11（双实现原则）、§14.12（第 1351 行：只有第 15 节门禁全部通过才允许开始 0.14.0 Go 实现）、§15.7（Feature-Complete Manifest 为 Go 起点，第 1451 行）、§16（Go 阶段详细计划 §16.1-§16.6）、§17（语言无关 Conformance 架构）、§21.2（Go API 政策）、§22/§23（1.0.0 门槛与真实项目验证）；RFC 0016（Go API mapping charter，模块拓扑/值映射/API 形状/错误分类/conformance 集成契约/§8 冻结拼写/rejected alternatives 全部冻结）；docs/0.13.0-gate-plan.md（§4 M4/M9 与 §1.7：C-1/C-2/C-3 开放项）；docs/fc-manifest-0.13.0.json（当前门禁状态：gate_open / not_closed）
+- 对应规范：路线图《Consema 1.0.0 产品路线图与双语言落地设计》§11（双实现原则）、§14.12（只有第 15 节门禁全部通过才允许开始 0.14.0 Go 实现）、§15.7（Feature-Complete Manifest 为 Go 起点）、§16（Go 阶段详细计划 §16.1-§16.6）、§17（语言无关 Conformance 架构）、§21.2（Go API 政策）、§22/§23（1.0.0 门槛与真实项目验证）；RFC 0016（Go API mapping charter，模块拓扑/值映射/API 形状/错误分类/conformance 集成契约/§8 冻结拼写/rejected alternatives 全部冻结）；docs/0.13.0-gate-plan.md（§4 M4/M9 与 §1.7：C-1/C-2/C-3 开放项）；docs/fc-manifest-0.13.0.json（当前门禁状态：gate_open / not_closed）
 - 目标版本：0.14.0（Go core、PVCE、PGCE 与协议）→ 0.15.0（Document、JSON family 与 TOML）→ 0.16.0（YAML、INI 与 Properties）→ 0.17.0（XML 与 plist）→ 0.18.0（HCL 与全操作 parity）→ 0.19.0（双语言一致性与产品 Beta），全部对应路线图 §16.1-§16.6
 - 先例：`docs/cli-implementation-plan.md`（0.12.0）与 `docs/0.13.0-gate-plan.md`（0.13.0）的多 agent 文件域计划体例；`conformance/oracles/hcl-go-v1/`（仓库内 Go 子目录 module 先例，仅差分 oracle）
 - 语义权威顺序（沿用 `docs/IMPLEMENTATION.md`，0.13.0-gate-plan.md:6）：永久不变量 → 已接受 RFC → 语言无关 conformance vectors → 本实现计划与 Rust API → 第三方行为仅为实现细节
@@ -22,12 +22,12 @@
 
 - `docs/rfcs/0016-go-api-mapping-v1.md` 已冻结：模块拓扑（§3）、PortableValue/PortableGraph→Go 映射（§4）、formation/projection/materialization/edit API 形状（§5）、错误分类（§6）、conformance 集成契约（§7）、语言无关拼写（§8）、版本关系（§9）、rejected alternatives（§10）。
 - 门禁记录：fc-manifest-0.13.0.json S-6（第 195-199 行）status=complete（"Go API mapping RFC 已接受；Go 实现 0.14.0 G0.1-G0.3 已按 2026-08-07 decision record 启动"）；0.13.0-gate-plan.md:169（G-8 交付）与 :74（§1.2 规范门禁表）。
-- **2026-08-07 decision record（fc-manifest decisions[0]）**：owner 决定在 C-1/C-2/C-3 完成前启动 Go 实现（go/，0.14.0 G0.1-G0.3）；Go 里程碑顺序、验收门禁（§6）与 C-1/C-2/C-3 完成路径不变；go/ 以 fc-manifest 为能力起点（路线图 §15.7 第 1451 行），不以工作树偶然状态为起点。go/ 已存在 core/graph/protocol 三 package（2026-08-07 实测 go build/vet/test/race/gofmt 全绿）。
+- **2026-08-07 decision record（fc-manifest decisions[0]）**：owner 决定在 C-1/C-2/C-3 完成前启动 Go 实现（go/，0.14.0 G0.1-G0.3）；Go 里程碑顺序、验收门禁（§6）与 C-1/C-2/C-3 完成路径不变；go/ 以 fc-manifest 为能力起点（路线图 §15.7），不以工作树偶然状态为起点。go/ 已存在 core/graph/protocol 三 package（2026-08-07 实测 go build/vet/test/race/gofmt 全绿）。
 
 **0.13.0 Rust Feature-Complete Gate 当前状态（START GATE 的直接输入，未关闭）：**
 
 - fc-manifest-0.13.0.json：`status: "gate_open"`（第 5 行），`feature_complete_judgment.verdict: "not_closed"`（第 505 行），status_meaning 原明示"仅在本判定翻转为 closed 后启动"（第 6 行）——已按 2026-08-07 decision record 修订为"已提前启动 go/ 0.14.0 G0.1-G0.3，C-1/C-2/C-3 完成路径不变"。
-- 开放项（2026-08-07 时点快照，fc-manifest open_items 第 785-833 行）：C-1（CI 10 job 在 GitHub 干净 checkout 真跑全矩阵全绿，第 787-804 行）——**已 closed（2026-08-11，GitHub Actions run#5 132/132 steps 全绿，head 437fd35）**；C-2（每格式 72 CPU-hours release-candidate fuzz，2026-08-07 会话结束快照 26.309 CPU-hours、runs.csv 4,063 行；**最新复算 122,478 行 / 780.529 CPU-hours，2026-08-13，runs.csv 权威，properties/yaml/ini/hcl/json 五单位已过 72h 门槛**，第 806-818 行）、C-3（真实发布密钥与 0.13.0 发布执行，第 820-833 行）。
+- 开放项（2026-08-07 时点快照，fc-manifest open_items 第 785-833 行）：C-1（CI 10 job 在 GitHub 干净 checkout 真跑全矩阵全绿，第 787-804 行）——**已 closed（2026-08-11，GitHub Actions run#5 132/132 steps 全绿，head 437fd35）**；C-2（每格式 72 CPU-hours release-candidate fuzz，2026-08-07 会话结束快照 26.309 CPU-hours、runs.csv 4,063 行；**最新复算 122,477 数据行 / 780.529 CPU-hours，2026-08-13，runs.csv 权威，properties/yaml/ini/hcl/json 五单位已过 72h 门槛**，第 806-818 行）、C-3（真实发布密钥与 1.0.0-rc.1 发布执行，第 820-833 行）。
 - 已关闭：全部功能/规范/性能门禁，质量除 Q-7 外（fc-manifest closed_gates 第 771-776 行；partial_gates 第 778-781 行）；安全（SEC-9）与 API/产品（A-4/A-9）已随 C-1 闭环（2026-08-11 run#5，fc-manifest open_items C-1 closes 列表）。
 - 原约束结论（0.13.0-gate-plan.md:136）："0.14.0 不得在判定翻转前开始"——2026-08-07 decision record 已修订为：C-1/C-2/C-3 完成前不得发布 0.14.0、不得宣称 Go 里程碑关闭，go/ 按 §6 门禁独立验证（见 §7）。
 
@@ -64,7 +64,7 @@
 | 根包 | consema-rs/consema facade | `Document` union、`Convert*` 组合、`Registry` 面（families/profiles/query domains/operation registries） |
 | `conformance` + `cmd/consema-conformance` | consema-conformance | Go conformance runner（§4） |
 
-约束（RFC 0016 §3.2 第 111-117 行）：任何 package 不得 import 兄弟格式 package 的私有内部；跨家族组合（convert）只在根包；`core` 与 `graph` 不依赖模块内任何其他 package（路线图 §16.1 第 1459 行"先证明最底层值、图、编码和协议可以独立实现"）。
+约束（RFC 0016 §3.2 第 111-117 行）：任何 package 不得 import 兄弟格式 package 的私有内部；跨家族组合（convert）只在根包；`core` 与 `graph` 不依赖模块内任何其他 package（路线图 §16.1"先证明最底层值、图、编码和协议可以独立实现"）。
 
 ### 0.3 推进节奏与跨语言身份
 
@@ -87,13 +87,13 @@
 | 协议 payload 固定字段与 exit 分类（`core.cli-output@1`/`core.batch-plan@1`/`core.batch-result@1`、`core.query-definition@1`、ProjectionRequest/MaterializationRequest 等） | 字段形状是契约；typed decoder 重验交叉约束照 v6/v7 先例 | RFC 0015；RFC 0016 §5.1/§6；cli-implementation-plan.md:197（Go CLI 同 schema 先例）、:199 |
 | 上游官方 suite 数据（toml-test、yaml-test-suite、JSON5、五套 INI/Properties runtime oracle 记录） | 语言无关输入/事实，按对应里程碑消费 | README.md:65；fc-manifest 第 44-49 行；路线图 §17.4 第 1613-1624 行 |
 | oracle exclusion inventory（HCL D-1..D-9、plist D-1..D-21、YAML 1 项） | 规范边界事实，Go 复现同样接受/拒绝 | hcl-go-v1/manifest.json、plist-macos-v1/manifest.json |
-| mutation corpus（46 fixtures / 174,921 cases）与 fuzz regression 流程 | 语言无关语料与"regression 永久入 corpus"纪律 | fc-manifest 第 49-51 行；路线图 §15.3 第 1389 行 |
+| mutation corpus（46 fixtures / 174,921 cases）与 fuzz regression 流程 | 语言无关语料与"regression 永久入 corpus"纪律 | fc-manifest 第 49-51 行；路线图 §15.3 |
 | FC manifest digest（conformance_suite 聚合 sha256） | runner 启动校验（§4.5） | fc-manifest 第 35-41 行 |
 
 ### 1.2 重新实现（Go 惯用实现，非 Rust 翻译）
 
 - **值模型**（RFC 0016 §4.1 第 121-146 行冻结）：`core.Value` 封闭接口十五 kind，exhaustive matching 无静默 `default`（第 134-136 行）；`core.Object` = 有序 `[]core.Entry`（**绝不用 `map[string]Value`**，第 125 行）；`core.Integer` 包装 `*big.Int`（第 128 行）；`core.Decimal` 规范化十进制、无 float round-trip（第 129 行）；`core.BinaryFloat64` 精确 IEEE-754 binary64（第 130 行）；`Equal`/`Hash` 与顺序相关（第 137-140 行）；对象构造时拒重 key（第 141-143 行）。
-- **PVCE/1、PGCE/1 codec**：从协议规范 + 向量重实现；字节与 Rust codec 相等由向量和跨语言字节断言证明（RFC 0016 §4.2 第 150-153 行；路线图 §16.1 第 1475 行硬门禁）。
+- **PVCE/1、PGCE/1 codec**：从协议规范 + 向量重实现；字节与 Rust codec 相等由向量和跨语言字节断言证明（RFC 0016 §4.2 第 150-153 行；路线图 §16.1 硬门禁）。
 - **canonical JSON 传输**（RFC 0015 §3.2）：严格规范解码器，与 `consema-protocol` 的 canonical JSON 字节一致（RFC 0016 §4.2 第 152-153 行；protocol-v1/v2 双传输等价 32+11 case 先例）。
 - **protocol 注册表校验**：Diagnostic 构造校验未知 code / category 矛盾即协议错误（RFC 0016 §6 第 182 行；RFC 0011）；`protocol.ClassifyErrorCode` 一次实现（第 184 行），SDK 自身不分类。
 - **各家族 parser/query/projection/materialization/edit** 全套（0.15.0-0.18.0 按 §2 排期）。
@@ -105,7 +105,7 @@
 
 1. RFC 0016 §10 全部 rejected alternatives：cgo/FFI 包装 Rust（第 218 行）、序列化 Rust 私有 AST（第 219 行）、bindgen 式代码生成（第 220 行）、Go map 表达 Object（第 221 行）、复用 Rust conformance runner（第 222 行）——全部拒绝；
 2. 仓库零新外部依赖传统（cli-implementation-plan.md:19、:293——plist base64/date 自写先例）；Rust 侧 deny.toml `[sources]` 仅 crates.io 钉版（cli-implementation-plan.md:19）；
-3. 双实现审计价值：任何第三方 parser 基座都会使"两个实现均独立，不通过 FFI 或私有中间结果作弊"（路线图 §22.2 第 1890 行）失去意义。
+3. 双实现审计价值：任何第三方 parser 基座都会使"两个实现均独立，不通过 FFI 或私有中间结果作弊"（路线图 §22.2）失去意义。
 
 **具体拒绝清单（0.14.0 决策时记录于 RFC/实现文档的 rejected alternatives）：**
 
@@ -120,7 +120,7 @@
 
 ### 1.4 禁止复用边界
 
-- 不得 import/链接/调用 Rust（cgo 禁止；RFC 0016 §1.1 第 48-50 行；路线图 §11.2 第 844 行；§16.1 第 1477 行硬门禁）。
+- 不得 import/链接/调用 Rust（cgo 禁止；RFC 0016 §1.1 第 48-50 行；路线图 §11.2；§16.1 硬门禁）。
 - 不得消费序列化 Rust 私有 AST（RFC 0016 §1.1 第 51-53 行、§10 第 219 行）；唯一跨语言字节面：PVCE/1、PGCE/1、protocol transports（canonical JSON）、shared vectors（RFC 0016 §1.1 第 52-53 行）。
 - 不得 import `conformance/oracles/hcl-go-v1/` 的 Go 代码（oracle 是第三方行为钉，与 SDK 是两个独立 module）。
 - 不复制 Rust 枚举名漂移：一个注册 code 一个 Go 名字（RFC 0016 §5.3 第 173 行 F3、§8 第 205 行 F2/F3）。
@@ -149,26 +149,26 @@
 - **G0.2（‖，依赖 G0.1）**：`graph` package——PortableGraph、graph equality/hash、节点身份顺序（RFC 0006）、PGCE/1 codec（RFC 0016 §4.1 第 144-146 行）。1000-1500 行。
 - **G0.3（‖，依赖 G0.1）**：`protocol` package——language-neutral codecs、contract registry（v7 41 条）、error registry（v7 187 码）、Diagnostic 构造校验、Capability/Profile 描述符、QueryDefinition validation/binding、CLI machine protocol records（RFC 0015 v7：CliOutputMessage/BatchPlanMessage/BatchResultMessage）、`ClassifyErrorCode`（RFC 0016 §5.4/§6）。3500-5500 行。
 - **G0.4（串行，依赖 G0.1-G0.3）**：`conformance` package + `cmd/consema-conformance`——Go runner（§4.3）。2000-3000 行。
-- **G0.5（‖ G0.4，依赖 G0.1-G0.3）**：Go fuzz targets（Go 原生 fuzzing，对标路线图 §16.1 第 1465 行"Go fuzz targets"）+ 跨语言 PVCE/PGCE 字节相等 harness（§4.4）。1500-2200 行。
+- **G0.5（‖ G0.4，依赖 G0.1-G0.3）**：Go fuzz targets（Go 原生 fuzzing，对标路线图 §16.1"Go fuzz targets"）+ 跨语言 PVCE/PGCE 字节相等 harness（§4.4）。1500-2200 行。
 
-**硬门禁（§16.1 第 1473-1479 行）**：Rust 与 Go 的 PVCE/PGCE bytes 完全一致；shared vectors（适用 capability，§4.2）100% 通过；Go 不导入或调用 Rust；Go error text 不参与规范比较；protocol unknown-field/canonicality 规则一致。
+**硬门禁（§16.1）**：Rust 与 Go 的 PVCE/PGCE bytes 完全一致；shared vectors（适用 capability，§4.2）100% 通过；Go 不导入或调用 Rust；Go error text 不参与规范比较；protocol unknown-field/canonicality 规则一致。
 
 ### 2.2 0.15.0 — Go Document、JSON family 与 TOML（路线图 §16.2 第 1481-1496 行）
 
 - **G1.1（串行起点）**：`document` package——raw SourceSnapshot、encoding facts、Span（byte offset）、NodeRef、ProfileId、FormationStatus（封闭二值 Complete/Recovered，RFC 0016 §5.1 第 160 行 F10）、ParseLimits、MaterializationRequest、SourcePatch（RFC 0016 §3.2 第 106 行）。2500-3500 行。
-- **G1.2（‖，依赖 G1.1）**：`json` package——JSON/JSONC/JSON5 形成、native/syntax query、projection/materialization/provenance、scalar/structural edit、ChangeSet、`context.Context` 取消适配（§16.2 第 1487 行）。2500-3500 行。
+- **G1.2（‖，依赖 G1.1）**：`json` package——JSON/JSONC/JSON5 形成、native/syntax query、projection/materialization/provenance、scalar/structural edit、ChangeSet、`context.Context` 取消适配（§16.2）。2500-3500 行。
 - **G1.3（‖，依赖 G1.1）**：`toml` package——同 G1.2 全能力面。2000-2800 行。
 - **G1.4（串行，依赖 G1.1-G1.3）**：根包起步——`Document` union、`Registry` 面（families/profiles/query domains/operation registries）、JSON↔TOML `Convert*` 两阶段组合（RFC 0016 §3.2 第 108 行；convert 只在根包）。1500-2200 行。
-- **G1.5（‖ G1.4）**：cross-language normalized-result differential harness（§16.2 第 1494 行；§4.4）。1500-2500 行。
+- **G1.5（‖ G1.4）**：cross-language normalized-result differential harness（§16.2；§4.4）。1500-2500 行。
 
-**硬门禁（第 1496 行）**：对应 Rust capability set 的共享向量 100% 一致。
+**硬门禁（§16.2）**：对应 Rust capability set 的共享向量 100% 一致。
 
 ### 2.3 0.16.0 — Go YAML、INI 与 Properties（路线图 §16.3 第 1498-1515 行）
 
 - **G2.1（串行起点，本版本最大）**：`yaml` package——YAML 1.2/1.1 compatibility、anchor/alias/tag/graph、全操作与 security limits。5500-7500 行。
 - **G2.2（‖，依赖 G1.1）**：`ini` package——Portable/Windows/Python ConfigParser 三 Profile（RFC 0009）。3000-4200 行。
 - **G2.3（‖，依赖 G1.1）**：`properties` package——Reader/Latin-1 两 Profile（RFC 0010）、Java UTF-16 code units。2800-3800 行。
-- **G2.4（串行，依赖 G2.1-G2.3）**：全操作补齐（query/projection/materialization/edit 闭包）+ security limits 矩阵 + Rust/Go cross-run fixtures（§16.3 第 1503 行）。1500-2500 行。
+- **G2.4（串行，依赖 G2.1-G2.3）**：全操作补齐（query/projection/materialization/edit 闭包）+ security limits 矩阵 + Rust/Go cross-run fixtures（§16.3）。1500-2500 行。
 
 **硬门禁（第 1511-1515 行）**：Go graph identity 和 query ordering 满足同一 contract；alias bomb、cycle、INI dialect 和 Properties encoding 的负向向量一致；Go map 的随机迭代顺序不得影响任何公共结果。
 
@@ -176,28 +176,28 @@
 
 - **G3.1（‖）**：`xml` package——XML 1.0 safe Profile（RFC 0012）、namespace/mixed content、entity deny-by-default、byte-exact span、确定性恢复。5500-7500 行。
 - **G3.2（‖）**：`plist` package——plist XML/binary 双表示、bplist offset/object-ref 编解码（照 Rust property_plist.rs 的每合法宽度 property tests 先例，fc-manifest 第 276 行）、binary offset hardening。6000-8000 行。
-- **G3.3（串行，依赖 G3.2）**：macOS Foundation differential run（§16.4 第 1528 行）——消费 `conformance/oracles/plist-macos-v1/manifest.json` 的固定事实与 exclusion（D-1..D-21）。1000-1500 行。
+- **G3.3（串行，依赖 G3.2）**：macOS Foundation differential run（§16.4）——消费 `conformance/oracles/plist-macos-v1/manifest.json` 的固定事实与 exclusion（D-1..D-21）。1000-1500 行。
 
-**硬门禁（第 1530 行）**：Rust 与 Go 在 native normalized facts、报告、诊断 code/order 和 edit bytes 上一致。
+**硬门禁（§16.4）**：Rust 与 Go 在 native normalized facts、报告、诊断 code/order 和 edit bytes 上一致。
 
 ### 2.5 0.18.0 — Go HCL 与全操作 parity（路线图 §16.5 第 1532-1545 行）
 
 - **G4.1（串行起点，本计划最大单一交付）**：`hcl` package——HCL native/tfvars（RFC 0014）、expression/template native view（**不求值**，SECURITY.md:36；hcl-go-v1 oracle 先例 "evaluation: never invoked"）、HCL D-1..D-9 exclusion 语义。7000-9500 行。
 - **G4.2（‖，依赖各家族）**：全格式 Materialization 补齐（根包 convert 全组合面）。2000-3000 行。
 - **G4.3（‖，依赖各家族）**：全格式 mandatory structural Edit、SourcePatch 与 batch-plan protocol（RFC 0016 §5.3；RFC 0004）。2000-3000 行。
-- **G4.4（串行，依赖 G4.1-G4.3）**：Go SDK examples 与完整文档（§16.5 第 1543 行）+ **capability parity 断言**：Go mandatory capability set 与 Rust Feature-Complete Manifest 对齐（第 1545 行硬门禁）。2000-3000 行。
+- **G4.4（串行，依赖 G4.1-G4.3）**：Go SDK examples 与完整文档（§16.5）+ **capability parity 断言**：Go mandatory capability set 与 Rust Feature-Complete Manifest 对齐（§16.5 硬门禁）。2000-3000 行。
 
 ### 2.6 0.19.0 — 双语言一致性与产品 Beta（路线图 §16.6 第 1547-1563 行）
 
-- **G5.1（‖）**：shared conformance runner orchestration（§16.6 第 1547 行）——双 runner 同批执行与结果汇总（§4）。1500-2500 行。
-- **G5.2（‖）**：Rust/Go bidirectional differential runs（第 1548 行）——双方向规范化结果比较 + differential corpus 追加（§17.4 第 1615 行）。1500-2500 行。
-- **G5.3（‖）**：cross-language protocol exchange（第 1549 行）——Rust CLI 与 Go CLI 互认 machine output（§22.2 第 1888 行 cross-encode/decode 100%）。1000-1800 行。
-- **G5.4（‖）**：full corpus、fuzz、benchmark 和 security matrix（第 1550 行）——Go 侧 release-candidate fuzz clean-run（§22.4 第 1909 行）与三平台验证（第 1913 行）。2000-3000 行。
-- **G5.5（‖）**：SDK usability review（第 1551 行）——Go public API 稳定性审查（§22.2 第 1891 行；§21.2 六项政策核对：未导出字段/只读方法、context 只做取消、error code 与 message 分离、有序结果不用 map、iterator 显式 Close、最低版本 CI 验证）。文档。
+- **G5.1（‖）**：shared conformance runner orchestration（§16.6）——双 runner 同批执行与结果汇总（§4）。1500-2500 行。
+- **G5.2（‖）**：Rust/Go bidirectional differential runs（§16.6）——双方向规范化结果比较 + differential corpus 追加（§17.4）。1500-2500 行。
+- **G5.3（‖）**：cross-language protocol exchange（§16.6）——Rust CLI 与 Go CLI 互认 machine output（§22.2 cross-encode/decode 100%）。1000-1800 行。
+- **G5.4（‖）**：full corpus、fuzz、benchmark 和 security matrix（§16.6）——Go 侧 release-candidate fuzz clean-run（§22.4）与三平台验证（§22.4）。2000-3000 行。
+- **G5.5（‖）**：SDK usability review（§16.6）——Go public API 稳定性审查（§22.2；§21.2 六项政策核对：未导出字段/只读方法、context 只做取消、error code 与 message 分离、有序结果不用 map、iterator 显式 Close、最低版本 CI 验证）。文档。
 - **G5.6（串行，依赖 0.14.0-0.18.0 全部）**：Go CLI beta——复用 RFC 0015 machine protocol（RFC 0016 §2.2 第 80-81 行；RFC 0015 是语言无关 schema，cli-implementation-plan.md:197 先例）；镜像 Rust CLI 的 11 命令面与 exit 分类（`protocol.ClassifyErrorCode` 单次实现，RFC 0016 §6 第 184 行）。5000-8000 行。
-- **G5.7（串行）**：real-repository migration pilots（§23.2 必做工作流；§22.7 第 1943 行"Rust 与 Go 分别完成至少一个端到端 SDK pilot"）+ release/upgrade/rollback drill + `1.0.0-rc.1` 候选清单（§16.6 第 1561 行）。1500-2500 行。
+- **G5.7（串行）**：real-repository migration pilots（§23.2 必做工作流；§22.7"Rust 与 Go 分别完成至少一个端到端 SDK pilot"）+ release/upgrade/rollback drill + `1.0.0-rc.1` 候选清单（§16.6）。1500-2500 行。
 
-**硬门禁（第 1563 行）**：第 22 节 `1.0.0` 门槛除 RC soak 外全部通过。
+**硬门禁（§16.6）**：第 22 节 `1.0.0` 门槛除 RC soak 外全部通过。
 
 ---
 
@@ -242,9 +242,9 @@
 
 ### 4.1 双 runner 契约（路线图 §17.1 第 1569-1577 行；RFC 0016 §7 第 190-194 行）
 
-- **同一向量、两个 runner**：Rust runner（`consema-rs/consema-conformance`）与 Go runner（`go/conformance` + `cmd/consema-conformance`）各自独立实现、各自执行全部 18 套共享向量。"Rust 测试通过不能代替 Go 测试，Go 测试通过也不能证明规范没有歧义"（§17.1 第 1579 行）；权威来自规范含义与两实现共同验证。
+- **同一向量、两个 runner**：Rust runner（`consema-rs/consema-conformance`）与 Go runner（`go/conformance` + `cmd/consema-conformance`）各自独立实现、各自执行全部 18 套共享向量。"Rust 测试通过不能代替 Go 测试，Go 测试通过也不能证明规范没有歧义"（§17.1）；权威来自规范含义与两实现共同验证。
 - 权威组成五元（§17.1 第 1571-1577 行）：normative prose + contract registry + machine-readable vectors + raw fixtures + independent Rust and Go runners。
-- Go runner 直接消费 `conformance/vectors/*.json`（向量文件是权威，RFC 0016 §7 第 190 行）与 `conformance/fixtures/`（raw 字节，§17.3 第 1601 行）。
+- Go runner 直接消费 `conformance/vectors/*.json`（向量文件是权威，RFC 0016 §7 第 190 行）与 `conformance/fixtures/`（raw 字节，§17.3）。
 
 ### 4.2 向量台账与里程碑适用面（18 套 / 519 cases，本计划逐文件计数）
 
@@ -269,7 +269,7 @@
 | plist-v1 | 49 | 0.17.0 | XML/binary |
 | hcl-v1 | 57 | 0.18.0 | HCL native/tfvars |
 
-- 0.18.0 收口：18/508 全量 100%、零 documented skip（增补前——2026-08-12 P2-B 向量补强后现为 18/519）；0.19.0 保持并叠加 cross-language 编排层（§17.2 第 1596 行）。
+- 0.18.0 收口：18/508 全量 100%、零 documented skip（增补前——2026-08-12 P2-B 向量补强后现为 18/519）；0.19.0 保持并叠加 cross-language 编排层（§17.2）。
 - 中途里程碑的通过标准：**适用 capability 的 case 100% 通过**；未实现 capability 的 case 进入 documented skip（带 capability 与原因，绝不静默，RFC 0016 §7 第 191 行）；skip 计数入 runner 报告。
 
 ### 4.3 Go runner 设计（镜像 `consema-conformance` 体例）
@@ -283,10 +283,10 @@
 
 ### 4.4 差分 harness 设计（跨语言）
 
-- **0.14.0（硬门禁）**：跨语言 PVCE/PGCE 字节相等（RFC 0016 §7 第 192 行；§16.1 第 1475 行）——Go 侧 encode/decode 与 Rust 侧 encode/decode 双向字节相等 + 向量中的 pvce/graph hex 字段断言。
-- **0.15.0**：cross-language normalized-result differential harness（§16.2 第 1494 行）——同一输入，Rust/Go 分别运行，比较规范化结果：parse formation、native facts、query count/identity/order、projection/materialization report、edit bytes（§11.2 第 853-863 行十二面）。
-- **0.19.0**：bidirectional differential（§16.6 第 1548 行）+ cross-language protocol exchange（第 1549 行）——Rust CLI 与 Go CLI 互认 machine output（§22.2 第 1888 行 cross-encode/decode 100%）。
-- differential corpus 追加式入 conformance（§17.4 第 1615 行"Rust/Go differential corpus"）；pilot 发现的缺陷入 regression corpus（§22.7 第 1944 行）。
+- **0.14.0（硬门禁）**：跨语言 PVCE/PGCE 字节相等（RFC 0016 §7 第 192 行；§16.1）——Go 侧 encode/decode 与 Rust 侧 encode/decode 双向字节相等 + 向量中的 pvce/graph hex 字段断言。
+- **0.15.0**：cross-language normalized-result differential harness（§16.2）——同一输入，Rust/Go 分别运行，比较规范化结果：parse formation、native facts、query count/identity/order、projection/materialization report、edit bytes（§11.2 十二面）。
+- **0.19.0**：bidirectional differential（§16.6）+ cross-language protocol exchange（§16.6）——Rust CLI 与 Go CLI 互认 machine output（§22.2 cross-encode/decode 100%）。
+- differential corpus 追加式入 conformance（§17.4"Rust/Go differential corpus"）；pilot 发现的缺陷入 regression corpus（§22.7）。
 
 ### 4.5 聚合 digest 校验
 
@@ -301,17 +301,17 @@ Go runner 每次执行校验 `conformance/vectors/` 聚合 sha256 与 fc-manifes
 | R-1 | **START GATE 未关即开工**：0.13.0 门禁（C-1/C-2/C-3）开放时派发 Go 实现 agent | §7 门禁 + gatekeeper 检查；go/ 下任何文件创建前先核 fc-manifest status；违反即回滚该波次 | 每次派发前 |
 | R-2 | parity drift：Go 证明规范歧义或 Rust 行为不可移植 | 路线图 §11.3 七步流程（第 869-875 行）：暂停对应 capability → 建立最小跨语言反例 → 分类（实现/测试/规范缺口）→ 先修正规范与 conformance → 公共行为改变则发布新 contract ID → Rust 先通过修订向量 → Go 再继续；禁止把偶然实现细节提升为标准（第 877 行）。RFC 0016 §7 第 193 行：FC Baseline 不是"Rust 永远正确" | 每个差分不一致 |
 | R-3 | 契约解释分歧：同一向量两边解释不同 | 最小跨语言反例 + §11.3；oracle exclusion inventory（HCL D-1..D-9、plist D-1..D-21）是"规范边界须文档化"的既有先例 | 每 suite 首跑 |
-| R-4 | 第三方实现诱惑（go-yaml/hashicorp-hcl/cty/encoding-xml 作基座） | §1.3 拒绝清单；oracle 只作差分对侧（hcl-go-v1/manifest.json authority 段）；违反即失去"独立实现"审计价值（§22.2 第 1884 行） | 0.16.0-0.18.0 每家族 |
-| R-5 | Go map 迭代顺序泄漏进公共结果 | Object 用有序 `[]core.Entry`（RFC 0016 §4.1 第 125 行）；`-race` + 顺序断言测试；§16.3 第 1515 行硬门禁 | 0.16.0 起每里程碑 |
-| R-6 | Go error text / 内部类型参与跨语言比较 | 错误文本是 human presentation only（RFC 0016 §6 第 186 行；§16.1 第 1478 行）；向量只比较稳定字段（§17.3 第 1606 行） | 每里程碑 |
+| R-4 | 第三方实现诱惑（go-yaml/hashicorp-hcl/cty/encoding-xml 作基座） | §1.3 拒绝清单；oracle 只作差分对侧（hcl-go-v1/manifest.json authority 段）；违反即失去"独立实现"审计价值（§22.2） | 0.16.0-0.18.0 每家族 |
+| R-5 | Go map 迭代顺序泄漏进公共结果 | Object 用有序 `[]core.Entry`（RFC 0016 §4.1 第 125 行）；`-race` + 顺序断言测试；§16.3 硬门禁 | 0.16.0 起每里程碑 |
+| R-6 | Go error text / 内部类型参与跨语言比较 | 错误文本是 human presentation only（RFC 0016 §6 第 186 行；§16.1）；向量只比较稳定字段（§17.3） | 每里程碑 |
 | R-7 | canonical JSON / PVCE 字节漂移 | protocol-v1/v2 双传输等价向量（32+11 case）+ 双 runner 字节断言 | 0.14.0 起 |
 | R-8 | 双 runner 向量集漂移（各自跳过不同 case） | case 计数断言 + 聚合 digest 校验（§4.5）；skip 必须文档化（§4.3） | runner 每跑 |
-| R-9 | Go 工具链/最低版本漂移 | go.mod 最低版本 0.14.0 冻结，三平台 CI 验证（§21.2 第 1831 行）；门禁含 gofmt/vet/race/fuzz（第 1838 行） | 每个里程碑 |
+| R-9 | Go 工具链/最低版本漂移 | go.mod 最低版本 0.14.0 冻结，三平台 CI 验证（§21.2）；门禁含 gofmt/vet/race/fuzz（§21.2） | 每个里程碑 |
 | R-10 | 数值语义漂移（Integer/Decimal 精度） | math/big 基座、无 float64 round-trip（RFC 0016 §4.1 第 128-130 行）；向量字符串表示纪律（conformance/README.md:3） | 0.14.0 起 |
-| R-11 | context.Context 滥用（隐藏业务参数） | 只用于取消/deadline（§21.2 第 1833 行；RFC 0016 §5.1 第 159 行） | 0.15.0 起 |
-| R-12 | 差分覆盖不足 | differential corpus 追加式（§17.4 第 1615 行）；pilot 缺陷入 regression（§22.7 第 1944 行） | 0.15.0 起 |
-| R-13 | Go CLI 与 Rust CLI 的 machine schema 漂移 | 同一 RFC 0015 protocol + cross-language protocol exchange（§16.6 第 1549 行）；machine schema 无 Rust 类型名（cli-implementation-plan.md:496 先例） | 0.19.0 |
-| R-14 | Go 侧 72h fuzz 等价物缺失 | Go 原生 fuzzing（`go test -fuzz`）对标 §15.3；0.19.0 需 release-candidate fuzz clean-run（§22.4 第 1909 行） | 0.19.0 |
+| R-11 | context.Context 滥用（隐藏业务参数） | 只用于取消/deadline（§21.2；RFC 0016 §5.1 第 159 行） | 0.15.0 起 |
+| R-12 | 差分覆盖不足 | differential corpus 追加式（§17.4）；pilot 缺陷入 regression（§22.7） | 0.15.0 起 |
+| R-13 | Go CLI 与 Rust CLI 的 machine schema 漂移 | 同一 RFC 0015 protocol + cross-language protocol exchange（§16.6）；machine schema 无 Rust 类型名（cli-implementation-plan.md:496 先例） | 0.19.0 |
+| R-14 | Go 侧 72h fuzz 等价物缺失 | Go 原生 fuzzing（`go test -fuzz`）对标 §15.3；0.19.0 需 release-candidate fuzz clean-run（§22.4） | 0.19.0 |
 | R-15 | 行数/工期膨胀（hcl 24k、plist 23k 是 Rust 侧最大家族） | 版本内并行波 + 每版本收口复核（RFC 0016 §9 第 214 行）；HCL 最后交付即最大风险面，0.18.0 预留并行波（G4.2/G4.3） | 0.17.0-0.18.0 |
 
 ---
@@ -320,38 +320,38 @@ Go runner 每次执行校验 `conformance/vectors/` 聚合 sha256 与 fc-manifes
 
 | 门禁 | 体例来源 | 适用里程碑 |
 |---|---|---|
-| `gofmt -l` 干净、`go vet ./...`、`go test ./...`、`go test -race ./...`、`go mod tidy` 干净、`go build ./...` | 路线图 §21.2 第 1838 行（go vet、static analysis、race detector、fuzz 进发布门禁） | 每个里程碑 |
+| `gofmt -l` 干净、`go vet ./...`、`go test ./...`、`go test -race ./...`、`go mod tidy` 干净、`go build ./...` | 路线图 §21.2（go vet、static analysis、race detector、fuzz 进发布门禁） | 每个里程碑 |
 | 适用 capability 向量 100% + case 计数断言（中途 documented skip 计入报告） | RFC 0016 §7；conformance/README.md | 每个里程碑（0.14.0 起） |
 | 聚合 digest 校验（fc-manifest conformance_suite） | fc-manifest 第 35-41 行 | runner 每次执行 |
-| 跨语言 PVCE/PGCE 字节相等（双向） | §16.1 第 1475 行；RFC 0016 §4.2/§7 | 0.14.0 起每个里程碑 |
-| protocol unknown-field / canonicality 规则一致 | §16.1 第 1479 行 | 0.14.0 |
-| Go 不导入或调用 Rust（cgo 禁令） | §16.1 第 1477 行；RFC 0016 §1.1 | 每里程碑（依赖面审查） |
-| Go error text 不参与规范比较 | §16.1 第 1478 行 | 每里程碑 |
-| normalized-result 差分（parse/query/projection/materialization/edit） | §16.2 第 1494 行；§22.2 第 1889 行 | 0.15.0 起 |
+| 跨语言 PVCE/PGCE 字节相等（双向） | §16.1；RFC 0016 §4.2/§7 | 0.14.0 起每个里程碑 |
+| protocol unknown-field / canonicality 规则一致 | §16.1 | 0.14.0 |
+| Go 不导入或调用 Rust（cgo 禁令） | §16.1；RFC 0016 §1.1 | 每里程碑（依赖面审查） |
+| Go error text 不参与规范比较 | §16.1 | 每里程碑 |
+| normalized-result 差分（parse/query/projection/materialization/edit） | §16.2；§22.2 | 0.15.0 起 |
 | graph identity 与 query ordering 同一 contract；负向向量（alias bomb/cycle/INI dialect/Properties encoding）一致 | §16.3 第 1513-1514 行 | 0.16.0 |
-| Go map 迭代顺序不影响任何公共结果 | §16.3 第 1515 行 | 0.16.0 起 |
-| native normalized facts、报告、诊断 code/order、edit bytes 一致 | §16.4 第 1530 行 | 0.17.0 |
-| macOS Foundation differential run | §16.4 第 1528 行 | 0.17.0 |
-| **Go mandatory capability set == Rust Feature-Complete Manifest capability set，无 "Rust only" mandatory 行为** | §16.5 第 1545 行硬门禁 | 0.18.0 |
-| 18/519 全量 100%、零 documented skip | §22.2 第 1886 行 | 0.18.0 起 |
-| bidirectional differential + cross-language protocol exchange 100% | §22.2 第 1888 行 | 0.19.0 |
-| Go public API 稳定性审查（§21.2 六项 + 文档注释门禁） | §22.2 第 1891 行；§16.6 第 1557 行 | 0.19.0 |
-| Rust 与 Go 分别完成至少一个端到端 SDK pilot | §22.7 第 1943 行 | 0.19.0 |
+| Go map 迭代顺序不影响任何公共结果 | §16.3 | 0.16.0 起 |
+| native normalized facts、报告、诊断 code/order、edit bytes 一致 | §16.4 | 0.17.0 |
+| macOS Foundation differential run | §16.4 | 0.17.0 |
+| **Go mandatory capability set == Rust Feature-Complete Manifest capability set，无 "Rust only" mandatory 行为** | §16.5 硬门禁 | 0.18.0 |
+| 18/519 全量 100%、零 documented skip | §22.2 | 0.18.0 起 |
+| bidirectional differential + cross-language protocol exchange 100% | §22.2 | 0.19.0 |
+| Go public API 稳定性审查（§21.2 六项 + 文档注释门禁） | §22.2；§16.6 | 0.19.0 |
+| Rust 与 Go 分别完成至少一个端到端 SDK pilot | §22.7 | 0.19.0 |
 | Go release-candidate fuzz clean-run + 三平台（Windows/Linux/macOS）全矩阵 | §22.4 第 1909、1913 行 | 0.19.0 |
-| §22 全部门槛除 RC soak | §16.6 第 1563 行 | 0.19.0 收口 |
+| §22 全部门槛除 RC soak | §16.6 | 0.19.0 收口 |
 | 每 Go 里程碑开始时复核 fc-manifest（Go 起点与能力对齐不漂移） | RFC 0016 §9 第 214 行 | 每里程碑 |
 
 ---
 
 ## 7. START GATE（起始门禁；本计划最高优先级条款）
 
-> **§7 实况注记（2026-08-12 追加，2026-08-13 更新 C-2 数字；本文档为规划阶段产物，下列条款保留为 0.14.0 时点的历史门禁条款）**：Go 里程碑已按 §6 门禁独立验证交付——0.14.0-0.19.0 G0.1-G5.6 全部 closed（consema-go/README 逐项记录，productVersion 1.0.0-rc.1，runner 519/519（增补后口径，与 :36/fc-manifest 的 519/cfd6e296 一致））；C-1 已闭环（2026-08-11，GitHub Actions run#5 132/132 steps 全绿，head 437fd35）；C-2 推进中（2026-08-13 复算：122,478 行 / 780.529 CPU-hours，runs.csv 权威，properties/yaml/ini/hcl/json 五单位已过 72h 门槛）；C-3 partial。
+> **§7 实况注记（2026-08-12 追加，2026-08-13 更新 C-2 数字；本文档为规划阶段产物，下列条款保留为 0.14.0 时点的历史门禁条款）**：Go 里程碑已按 §6 门禁独立验证交付——0.14.0-0.19.0 G0.1-G5.6 全部 closed（consema-go/README 逐项记录，productVersion 1.0.0-rc.1，runner 519/519（增补后口径，与 :36/fc-manifest 的 519/cfd6e296 一致））；C-1 已闭环（2026-08-11，GitHub Actions run#5 132/132 steps 全绿，head 437fd35）；C-2 推进中（2026-08-13 复算：122,477 数据行 / 780.529 CPU-hours，runs.csv 权威，properties/yaml/ini/hcl/json 五单位已过 72h 门槛）；C-3 partial。
 
 > **C-1/C-2/C-3 完成之前，不得发布 0.14.0、不得宣称任何 Go 里程碑关闭；`go/` 内实现按 §6 门禁独立验证。**（2026-08-07 decision record 修订：owner 已书面授权提前启动 go/ 0.14.0 G0.1-G0.3，原"门禁全闭前不创建任何实现文件"条款不再适用于已开工的 G0.1-G0.3。）
 
 **2026-08-07 决策记录（owner 书面授权；路线图 §0 冲突解决层级：改路线图、不静默缩小承诺）：**
 
-owner 决定：在 C-1/C-2/C-3 完成前启动 Go 实现（`go/`，0.14.0 G0.1-G0.3）。Go 里程碑顺序（§2）、验收门禁（§6）与 C-1/C-2/C-3 完成路径不变；`go/` 以 fc-manifest 为能力起点（路线图 §15.7 第 1451 行），不以工作树偶然状态为起点。决策记录落于 `docs/fc-manifest-0.13.0.json` 顶层 `decisions[0]`（2026-08-07）。
+owner 决定：在 C-1/C-2/C-3 完成前启动 Go 实现（`go/`，0.14.0 G0.1-G0.3）。Go 里程碑顺序（§2）、验收门禁（§6）与 C-1/C-2/C-3 完成路径不变；`go/` 以 fc-manifest 为能力起点（路线图 §15.7），不以工作树偶然状态为起点。决策记录落于 `docs/fc-manifest-0.13.0.json` 顶层 `decisions[0]`（2026-08-07）。
 
 **§7 START GATE 条款（修订后）**：C-1/C-2/C-3 完成前不得发布 0.14.0、不得宣称任何 Go 里程碑关闭；go/ 内已开工的 0.14.0 G0.1-G0.3 按 §6 门禁独立验证（每波次实测 go build/vet/test/race/gofmt 全绿）。门禁翻转判定权仍在 fc-manifest 的书面状态（§7.3），下文 §7.1-§7.3 保留为"发布/里程碑关闭"侧的门禁条款。
 
@@ -361,13 +361,13 @@ owner 决定：在 C-1/C-2/C-3 完成前启动 Go 实现（`go/`，0.14.0 G0.1-G
 2. 开放项全部关闭（open_items 第 785-833 行）：
    - C-1：CI 10 job 在 GitHub 干净 checkout 全矩阵全绿（closes A-4/A-9/SEC-9，第 787-804 行；**已 closed 2026-08-11**）；
    - C-2：每格式 72 CPU-hours release-candidate fuzz，零未解释问题（closes Q-7，第 806-818 行）；
-   - C-3：真实发布密钥生成（含备份与吊销证书）与 0.13.0 发布执行，版本推进与 registry digest 回填（closes SEC-8 发布物侧，第 820-833 行；fc-manifest 第 16-18、28 行）；
+   - C-3：真实发布密钥生成（含备份与吊销证书）与 1.0.0-rc.1 发布执行，版本推进与 registry digest 回填（closes SEC-8 发布物侧，第 820-833 行；fc-manifest 第 16-18、28 行）；
 3. 门禁记录由 0.13.0 gatekeeper / release owner 在 manifest 中书面确认（owner 字段：fc-manifest 第 803、817、832 行）。
 
 ### 7.2 依据（file:line）
 
-- 路线图 §14.12 第 1351 行："只有第 15 节 Rust Feature-Complete Gate 全部通过，才允许开始 `0.14.0` 的 Go 实现"；
-- 路线图 §15.7 第 1451 行：Go 以 Feature-Complete Manifest 为起点，不以本地工作树偶然状态为起点；
+- 路线图 §14.12："只有第 15 节 Rust Feature-Complete Gate 全部通过，才允许开始 `0.14.0` 的 Go 实现"；
+- 路线图 §15.7：Go 以 Feature-Complete Manifest 为起点，不以本地工作树偶然状态为起点；
 - 路线图 §11.1 第 826-836 行：Rust 全部功能实现 → 全部门禁通过 → Feature-Complete Baseline 冻结 → 才开始 Go 正式实现（"Go 开发不得提前与 Rust 格式实现并行"）；
 - fc-manifest-0.13.0.json 第 6 行（status_meaning："仅在本判定翻转为 closed 后启动"）、第 770 行（verdict_meaning："0.14.0 Go 实现不得提前开始"）——以上为 2026-08-07 decision record 修订前的原文表述（修订后见 fc-manifest decisions[0] 与本文件 §7 决策记录）；
 - docs/0.13.0-gate-plan.md:136（"0.14.0 不得在判定翻转前开始"）、:4（目标版本声明）。

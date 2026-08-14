@@ -2,8 +2,10 @@
 
 ![CI](https://img.shields.io/github/actions/workflow/status/consema/consema/ci.yml?branch=main)
 ![Docs](https://img.shields.io/github/deployments/consema/consema/github-pages?label=docs)
-![Version](https://img.shields.io/github/v/tag/consema/consema)
+![Version](https://img.shields.io/badge/version-1.0.0--rc.1-blue)
 ![License](https://img.shields.io/github/license/consema/consema)
+
+**Version: 1.0.0-rc.1**（五语言同步版本，2026-08-13 决策；版本纪律见 [RELEASING.md](RELEASING.md) §1）
 
 Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、INI、Java Properties、XML、Property List 与 HCL 八个格式家族提供无损文档、格式原生语义、公共值、查询、显式投影、来源映射和原子编辑，默认拒绝未经授权的转换、截断或信息损失。规范与设计语言无关，由五个独立实现（Rust、Go、TypeScript、Python、Kotlin）共同证明（2026-08-11 决策：五语言同等地位，见 `docs/multi-language-implementation-plan.md` 与 `docs/five-language-ci-design.md`）。
 
@@ -48,7 +50,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 - [fc-manifest-0.13.0.json](docs/fc-manifest-0.13.0.json)：0.13.0 Feature-Complete Gate 记录（含 conformance 聚合 digest `cfd6e296…` 与各门禁条目证据）
 - [five-element-review-1.0.0.md](docs/five-element-review-1.0.0.md)：五要素审计
 - [fuzz-evidence-0.13.0.md](docs/fuzz-evidence-0.13.0.md) 与 `docs/fuzz-evidence-0.13.0-logs/`：fuzz 证据（含原始日志）
-- [0.13.0-gate-plan.md](docs/0.13.0-gate-plan.md)、[API-REVIEW-0.13.0.md](docs/API-REVIEW-0.13.0.md)、[COVERAGE-0.13.0.md](docs/COVERAGE-0.13.0.md)、[CHANGELOG.md](docs/CHANGELOG.md)、`docs/release/`（SBOM / 校验和 / 发布记录）
+- [0.13.0-gate-plan.md](docs/0.13.0-gate-plan.md)、[API-REVIEW-0.13.0.md](docs/API-REVIEW-0.13.0.md)、[COVERAGE-0.13.0.md](docs/COVERAGE-0.13.0.md)、[CHANGELOG.md](CHANGELOG.md)（根 CHANGELOG，主记录；`docs/CHANGELOG.md` 仅为勘误页）、`docs/release/`（SBOM / 校验和 / 发布记录）
 - 决策与设计记录：`docs/multi-language-implementation-plan.md`、`docs/five-language-ci-design.md`、`docs/go-implementation-plan.md`
 
 **Conformance 仲裁层**（`conformance/`，语言无关权威）：
@@ -62,7 +64,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 
 - 差分 oracle 驱动：`run-hcl-go-oracle.ps1`、`run-plist-macos-oracle.ps1`（exit 3 = documented skip）
 - 固定 runtime oracle 源码与固定工具链：`scripts/oracles/`
-- 上游格式 gate：`run-toml-test.ps1`（官方 toml-test v2.2.0）、`run-yaml-test-suite.ps1`（官方 yaml-test-suite data-2022-01-17）——脚本与记录在母仓、**无 CI job 执行**；六仓拆分后母仓根无 Cargo.toml，脚本需从 consema-rs 布局运行（见下「验证（本仓侧）」注）
+- 上游格式 gate：`run-toml-test.ps1`（官方 toml-test v2.2.0）、`run-yaml-test-suite.ps1`（官方 yaml-test-suite data-2022-01-17）——脚本与记录在母仓、**无 CI job 执行**；六仓拆分后母仓根无 Cargo.toml，脚本在母仓原位不可执行（第一步 cargo build 必然 exit 101），保留为记录载体；可执行入口的迁移/重建待总指挥决策（2026-08-14 波 2 处置，见下「验证（本仓侧）」注）
 - 固定 runtime oracle：`run-properties-jdk-oracle.ps1` / `run-python-configparser-oracle.ps1` / `run-dotnet-ini-oracle.ps1` / `run-windows-ini-oracle.ps1` / `run-qt-ini-oracle.ps1`（5 套，36/36 差分案例；一次性记录 2026-08-05——六仓任何 workflow 均不执行这 5 个脚本，不是常设门禁）
 
 **其他**：SECURITY.md（安全政策）、LICENSE、CHANGELOG.md（版本变更记录）、`.github/workflows/ci.yml`（本仓 CI：oracles + shared-conformance-digest + check 聚合门禁，三 job）。
@@ -71,7 +73,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 
 - 各语言仓 CI 从本仓 `conformance/` 取数：consema-go / consema-ts / consema-py / consema-kt 经多仓 checkout 取数；consema-rs 使用 vendored 快照（`consema-rs/conformance/`，入库镜像，不随本仓 main 实时取数）——vectors、fixtures、oracles 与 differential case 集是本仓维护、五仓共享的**单一语言无关权威**。
 - 本仓 CI 的 `shared-conformance-digest` job 复算 `conformance/vectors/` 聚合 digest 并断言等于 `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`（算法：文件名字节序排序、逐文件 sha256、`{basename}:{digest}` 以 `\n` 连接、再 sha256；以规范 checkout 的 LF 字节为准，见 `docs/fc-manifest-0.13.0.json` conformance_suite note）。
-- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 都必须同步全部五个语言仓（实现与测试）并同步更新聚合 digest 与 18/519 计数；未同步的向量变更会让 go/ts/kt 三仓 conformance gate 与 digest 断言失败（consema-rs 为 vendored 快照、consema-py CI 钉定 commit，两仓不自动跟随母仓 main 前进）。
+- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 都必须同步全部五个语言仓（实现与测试）并同步更新聚合 digest 与 18/519 计数；未同步的向量变更仅 consema-go 仓（live HEAD 跟随）会以 conformance gate 与 digest 断言失败；consema-ts/consema-kt/consema-py 三仓 CI 钉定 commit ad667021（2026-08-12 P2-B 向量补强提交）、consema-rs 为 vendored 快照，均不自动跟随母仓 main 前进。
 
 ## 格式家族
 
@@ -84,9 +86,10 @@ JSON family（`json.strict@1`、`jsonc.bounded@1`、`json5.standard@1`）、TOML
 ```powershell
 # 注意：六仓拆分后母仓根无 Cargo.toml/workspace——run-toml-test.ps1 与
 # run-yaml-test-suite.ps1 的第一步 cargo build 在母仓原位必然失败（exit 101）；
-# 需先从 consema-rs 检出运行（脚本保留于本仓 scripts/，无 CI job 执行）。
-./scripts/run-toml-test.ps1                          # 官方 toml-test v2.2.0 gate（205 valid + 474 invalid；从 consema-rs 运行）
-./scripts/run-yaml-test-suite.ps1                    # 官方 yaml-test-suite data-2022-01-17 gate（402 case；从 consema-rs 运行）
+# 脚本只存在于母仓 scripts/（consema-rs 无副本），保留为记录载体、无 CI job
+# 执行；可执行入口的迁移/重建待总指挥决策（2026-08-14 波 2 处置）。
+./scripts/run-toml-test.ps1                          # 官方 toml-test v2.2.0 gate（205 valid + 474 invalid；记录载体，母仓原位不可执行）
+./scripts/run-yaml-test-suite.ps1                    # 官方 yaml-test-suite data-2022-01-17 gate（402 case；记录载体，母仓原位不可执行）
 ./scripts/run-properties-jdk-oracle.ps1              # 固定 runtime oracle（5 套 / 36/36 差分案例；一次性记录 2026-08-05，非常设门禁）
 ./scripts/run-python-configparser-oracle.ps1
 ./scripts/run-dotnet-ini-oracle.ps1
