@@ -82,7 +82,7 @@
 
 ## 7. fuzz 驱动迁移
 
-- **驱动位置**：`run_waves.ps1` 现从 consema-rs checkout 根目录运行（2026-08-13 起已入库跟踪——consema-rs commit d97a038，commit message「fuzz driver committed」；记录时点为本地未跟踪副本）；原脚本作为冻结协议证据保留在母仓账本目录 `docs/fuzz-evidence-0.13.0-logs/run_waves.ps1`（`git ls-files` 实测）。
+- **驱动位置**：`run_waves.ps1` 现从 consema-rs checkout 根目录运行（2026-08-13 起已入库跟踪——consema-rs commit d97a038，commit message「fuzz driver committed」；记录时点为本地未跟踪副本）；原脚本保留在母仓账本目录 `docs/fuzz-evidence-0.13.0-logs/run_waves.ps1`（`git ls-files` 实测；该副本于 2026-08-13 被母仓 commit 8f1ffa2 追加 CONSEMA_GIT_EXE override（+13 行），非冻结原版——「冻结协议证据」声称撤销，见 fuzz-evidence §3.1 驱动暂停状态）。
 - **账本仍在母仓**：`-LedgerDir` 默认指向 `C:\Users\franck\Documents\consema\docs\fuzz-evidence-0.13.0-logs`（runs.csv 与 waves.log 为 fc-manifest 引用的权威账本；per-process `.out.log`/`.err.log` 为驱动诊断日志，fc-manifest 不引用）。
 - **C-2 恢复累计**：session 455 起恢复（runs.csv 只读抽查：session 455 行存在，记录时点已推进至 471）。
 - **账本为后台驱动的活文件**：记录时点后台驱动仍在写 wave 输出（母仓工作树有未提交的 runs.csv / waves.log 改动）——本记录不触碰、不纳入提交。
@@ -94,7 +94,7 @@
 3. **consema-rs semver baseline** 使用 `fbe98b5c` 等价 commit（split 历史中树与 monorepo v0.8.0 `crates/` 树一致的 commit；v0.8.0 tag 在 split 历史中不存在），baseline 在 CI 中经 `git archive` + 11-member workspace 清单重建。
 4. **五仓 CI 每次向量变更需五仓同步**（见 §6；README 已声明）。
 5. **fixture 维护协议**：`conformance/fixtures/toml/Cargo.toml` 须与 consema-rs 根 manifest 保持逐字节一致（fixture README 记载；consema-rs 组装类改动须同步更新）。
-6. **run_waves.ps1 已入库**：consema-rs 根的驱动已随 d97a038（2026-08-13）入库跟踪（commit message「fuzz driver committed」）；协议权威 = consema-rs 根入库副本，母仓账本内的原脚本为冻结历史。
+6. **run_waves.ps1 已入库**：consema-rs 根的驱动已随 d97a038（2026-08-13）入库跟踪（commit message「fuzz driver committed」）；协议权威 = consema-rs 根入库副本；母仓账本内的副本为拆分时点快照 + 8f1ffa2（2026-08-13，CONSEMA_GIT_EXE override）追加，非冻结历史。
 
 ## 9. 六仓 CI 状态表（截至记录时点 2026-08-12）
 

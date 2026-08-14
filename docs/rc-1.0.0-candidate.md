@@ -1,7 +1,7 @@
 # `1.0.0-rc.1` 候选清单（0.19.0 G5.7，路线图 §16.6）
 
 - 日期：2026-08-10（本地实测）
-- 依据：路线图 §22（`1.0.0` 最终发布门槛，第 1871-1946 行）、§23（真实项目验证）；
+- 依据：路线图 §22（`1.0.0` 最终发布门槛——行号可能漂移，以 §22 标题为锚）、§23（真实项目验证）；
   fc-manifest-0.13.0.json（open_items C-1/C-2/C-3）；go-implementation-plan §6 门禁总表
 - 本文档 = G5.7 交付物 4/5：阻塞项清单（C-1/C-2/C-3 状态）、§22 门禁核对表、
   RC soak 计划、已知 P2 发布判断清单；并含 release/upgrade/rollback 演练记录
@@ -12,8 +12,8 @@
 | 阻塞项 | 状态 | 证据 | 完成路径 |
 |---|---|---|---|
 | C-1：CI 10 job 在 GitHub 干净 checkout 全矩阵全绿 | **closed** | GitHub Actions run #5（2026-08-11，head 437fd35，main push）：132/132 steps 全绿（增补前 10+1 job：lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package/go-1-26，11 定义/17 次执行）在 windows/ubuntu/macos 全矩阵通过；2026-08-12 增补 go-differential 后为 10+2 job（12 定义；六仓拆分后各 job 归仓：10 个 Rust 门禁属 consema-rs/.github/workflows/ci.yml、go-matrix 与 go-differential 属 consema-go/.github/workflows/ci-go.yml（以 job 名为锚，行号可能漂移）、oracles 属母仓 ci.yml——母仓 ci.yml 为 oracles/shared-conformance-digest/check 三 job）；run 历史：run#1 workflow-parse fail（job id go-1.26 含点号）→ run#2 5 根因（symlink_dir 移除、oracles ParserError、coverage Get-CimInstance guard、package 工具链顺序、tags 未推）→ run#3 4 根因（macOS /var→/private/var 临时路径 symlink、oracles 缺 exit 0、semver 嵌套 baseline 歧义、coverage 数组 guard $null）→ run#4 fmt import 顺序 → run#5 全绿；结果已回填 manifest（C-1 → closed） | 已闭环（2026-08-11，run #5 全绿） |
-| C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §3.2.1/§8 快照：258.327 CPU-hours（session 297 时点复算，2026-08-11）；runs.csv 41,939 行（零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈66.8%，完成路径不变）；**2026-08-13 复算快照（runs.csv 权威）**：122,477 数据行 / 780.529 CPU-hours，零新 crash（非零退出 = 40 行：10 行 session-9 外部终止 + 16 行 session-448-wave-3 超时 + 14 行 session-454 拆分停机，均非 fuzz finding）；**properties 145.4h（201.9%）、yaml 128.8h（178.9%）、ini 124.8h（173.3%）、hcl 95.5h（132.7%）、json 95.3h（132.3%）五单位已过 72h 门槛**；toml 57.7h（80.2%）、protocol-decode 50.7h（70.4%）、plist 47.4h（65.8%）、xml 35.0h（48.6%）继续累计；完成路径不变（快照口径：runs.csv 为唯一权威账本，实时数字持续增长） | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
-| C-3：真实发布密钥与 1.0.0-rc.1 发布执行 | **partial** | 演练密钥 82301612…（隔离 keyring）验证过全流程；**默认 keyring 尚无真实发布密钥**；docs/release 现含 0.8.0 演练产物与 1.0.0-rc.1 PREVIEW 预检产物（2026-08-12 入库：sbom-1.0.0-rc.1.json、cargo-package-1.0.0-rc.1.log、verify-package-archives-1.0.0-rc.1.result.txt、PREVIEW-1.0.0-rc.1.md） | 按 release-process-0.13.0.md §7 十项检查单顺序执行；1.0.0-rc.1 发布执行（版本已推进 0.8.0→0.13.0→1.0.0-rc.1，2209582）；真实密钥+备份+吊销证书；**manifest 必须从干净发布 commit 重新生成**（见 §4 D-1） |
+| C-2：每格式 72 CPU-hours release-candidate fuzz | **partial** | docs/fuzz-evidence-0.13.0.md §3.2.1/§8 快照：258.327 CPU-hours（session 297 时点复算，2026-08-11）；runs.csv 41,939 行（零新 crash；每格式 72h 门槛仍开放，最接近 properties ≈66.8%，完成路径不变）；**2026-08-13 复算快照（runs.csv 权威）**：122,477 数据行 / 780.529 CPU-hours，零新 crash（非零退出 = 40 行：10 行 session-9 外部终止 + 16 行 session-448-wave-3 超时 + 14 行 session-454 拆分停机，均非 fuzz finding）；**properties 145.4h（201.9%）、yaml 128.8h（178.9%）、ini 124.8h（173.3%）、hcl 95.5h（132.7%）、json 95.3h（132.3%）五单位已过 72h 门槛**；toml 57.7h（80.2%）、protocol-decode 50.7h（70.4%）、plist 47.4h（65.8%）、xml 35.0h（48.6%）低于门槛；**驱动已暂停（2026-08-13 11:19 session 916 无记录终止后未重启），账本冻结于 122,478 文件行 / 780.529 CPU-hours——四单位未过门槛如实记录为遗留（fuzz-evidence §3.1 驱动暂停状态）**；完成路径不变（快照口径：runs.csv 为唯一权威账本） | clang 主机 cargo-fuzz 为主、本机协议续跑为备选；追加式账本，新 crash 清零该 target 计时；72/格式全闭 |
+| C-3：真实发布密钥与 1.0.0-rc.1 发布执行 | **partial** | 演练密钥 82301612…（隔离 keyring）验证过全流程；**默认 keyring 尚无真实发布密钥**；docs/release 现含 0.8.0 演练产物与 1.0.0-rc.1 PREVIEW 预检产物（2026-08-11 入库——git 实测 d14e8b7 2026-08-11 09:56 引入、ebfca68 2026-08-11 15:59 最后触碰：sbom-1.0.0-rc.1.json、cargo-package-1.0.0-rc.1.log、verify-package-archives-1.0.0-rc.1.result.txt、PREVIEW-1.0.0-rc.1.md） | 按 release-process-0.13.0.md §7 十项检查单顺序执行；1.0.0-rc.1 发布执行（版本已推进 0.8.0→0.13.0→1.0.0-rc.1，2209582）；真实密钥+备份+吊销证书；**manifest 必须从干净发布 commit 重新生成**（见 §4 D-1） |
 
 ## 2. §22 门禁核对表（逐行状态，2026-08-10）
 
@@ -29,8 +29,9 @@
 
 - capability set 一致：G4.4 capability parity 硬门禁（无 "Rust only" mandatory）。✓
 - shared conformance 100%：18 套 / 519 cases 五 runner 全过（增补后 519；
-  聚合 digest `cfd6e296da5b…` 五 runner 共钉，fc-manifest-0.13.0.json:39
-  为权威——2026-08-12 P2-B 向量补强 508→519，:41）。✓
+  聚合 digest `cfd6e296da5b…` 五 runner 共钉，fc-manifest-0.13.0.json
+  digests.conformance_suite 为权威——2026-08-12 P2-B 向量补强 508→519，
+  以字段名为锚，行号可能漂移）。✓
 - PVCE/PGCE byte-exact：G0.1-G0.2 硬门禁 + differential harness。✓
 - protocol cross-encode/decode 100%：G5.3（Rust CLI ↔ Go protocol codec）。✓
 - normalized parse/query/projection/materialization/edit 结果一致：G5.2 bidirectional differential。✓
@@ -248,8 +249,8 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
   consema-go/go/README.md targets 30s）
 - 每格式真实 corpus 抽检巡检 → **已完成**（2026-08-10：钉版 12 文件 digest 12/12
   一致；508 核对一致（增补前——2026-08-12 P2-B 向量补强至 519 后该计数为
-  519，fc-manifest-0.13.0.json:37-39）；regressions 空数组符合预期；
-  9 家族来源与覆盖足够；4 条观察见下）
+  519，fc-manifest-0.13.0.json digests.conformance_suite，以字段名为锚）；
+  regressions 空数组符合预期；9 家族来源与覆盖足够；4 条观察见下）
 - 性能基线复测 → **Go 侧已执行**（2026-08-10：8×2 benchmarks；9/16 项比值
   >1.10，全部标注"疑似回退（fuzz 负载下测得，需空闲复测确认）"，无代码回退
   结论——同会话 7 项更快、无代码改动、GC 争抢特征）；Go 侧无冻结预算
@@ -292,7 +293,7 @@ workspace 0.8.0，commit 7e9de38）→ 当前（0.13.0）**；回滚 = 恢复旧
   2026-08-13 修正记录见 five-language-ci-design.md §10）；TestShim.kt 已于
   2026-08-13 删除（死件，git 历史保留）；共享 conformance 脚本随 runner-CLI 批次
   仍为未来项（five-language-ci-design.md §10）
-- 每 48h fuzz 账本检查 → 进行中（最新快照 122,477 数据行 / 780.529 CPU-hours，2026-08-13 复算，runs.csv 权威；properties/yaml/ini/hcl/json 五单位已过 72h 门槛；详见 §1 C-2 行）
+- 每 48h fuzz 账本检查 → 驱动暂停后账本冻结（最新快照 122,477 数据行 / 780.529 CPU-hours，2026-08-13 复算，runs.csv 权威；properties/yaml/ini/hcl/json 五单位已过 72h 门槛；驱动 2026-08-13 11:19 后未重启，详见 §1 C-2 行）
 
 ### 4.2 巡检 4 条观察记录（P2 级）
 
