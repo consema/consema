@@ -472,3 +472,32 @@
 - 按常设阶段继续波 4 重打（stateFile 含波 2+3 累积 571 条确认）。
 
 **§12 结论**：波 3 修复后本机验证全绿、实况比对一致（CI 绿口径见 §12.3 勘误——kt/ts CI 由波 4 修复）；行号失效矿脉大幅收缩（裸 `RFC §x:y`、路线图 `§x:y`、`G114 印章` 六仓零命中）——锚点约定全面落地。继续波 4 重打验证。
+
+## 13. 第四轮对抗性审计第四波（2026-08-15，修复后重打与收口）
+
+### 13.1 审计与归并
+
+- 触发：波 3 修复落地后按常设阶段重打（stateFile 带波 1+2+3 确认集 571 条组级上下文）
+- 结果：**387 条确认**（P0×1 / P1×19 / P2×367；12 轮满、dryStreak=0 仍未打穿，523 agents 零错误）
+- 六分片归并（母仓 123 / rs 50 / go 45 / ts 41 / py 48 / kt 60 P2 全部 1:1 归组）+ **55 项总指挥当波裁决**（`loop-state/disposition-2026-08-15-wave4.md`）
+- 波 4 审计自身命中波 3 收口记录：§12「六仓全绿」声称与 kt/ts CI 实测红矛盾——已勘误（50366d4）并立为教训：**本机验证≠CI 绿，收口计数必须标注验证口径**
+
+### 13.2 关键发现与修复
+
+- **P0**：ts 干净安装 smoke PowerShell 转义缺陷（main CI 持续红）；**P1 大族**：跨五语言 JSON/JSON5/YAML/TOML 数字 magnitude-DoS（无位数上限 O(N²) 放大）+ py >4300 位裸 ValueError + py `+nan`→inf 值级损坏 + py TOML EOF 崩溃 + py XML facade 崩溃 + kt u64→Int 截断 + 六仓披露渠道「已启用」全不实 + kt CI GRADLE_USER_HOME 硬编码红 + rs 发布守卫 24h 窗口 vs resume 矛盾
+- 修复：跨语言政策 `max_number_digits` 默认 100_000（rs 参考定义、检查前置、冻结 ResourceLimit、不崩溃不截断）；五仓未知 profile 统一 `core.materialization.unsupported-profile@1`；semantic-model 校验五仓全量转真；fence 门禁五仓落地（kt 式）；tag 守卫 peel 四仓；provision 钉统一 ccc9943 + manifest sha256 断言 + 幂等；docs-site G03 全量重随（mdbook 预演 exit 0）；R40 裸行号六仓全量 sweep（含波 3 sweep 误伤 104 处残骸修复）
+- 15 个修复 agent + 2 补派 + 2 收口紧急修复，六仓全程即时提交推送
+
+### 13.3 收口验证（六仓本机全绿 + CI 实证）
+
+- 本机：rs 1,650 / go 全绿含 -race 与 -tags release / ts 698 / py 729 / kt 585 / 母仓 mdbook exit 0 + JSON + YAML
+- CI 实证：kt main 转绿（0ce33c4 run success）；ts 经收口紧急修复（ec7b7c3）后 run 31831183938 **success 全 10 job 绿**
+- 10 项裁决抽查处置记录 vs 文件实况全部一致；hash 表六仓实测吻合（fc-manifest 权威 5cb4ab51）
+- 收口异常 6 项全部修复（钉定声称再锚、三仓副本刷新实证、sync-note 声称转真、CoC 占位符、审计提取物清理）
+
+### 13.4 遗留（波 5 输入）
+
+- 审计提取物已清理；R15 披露注记仅 py 落地（记录级）；kt 编译器警告 1 处（语言 2.3 升级为错误前修复）；ts 本机 provisioned 盘副本与钉 ccc9943 有局部漂移（re-provision 建议）
+- 按常设阶段继续波 5 重打（stateFile 含波 2+3+4 累积 930 条确认）。
+
+**§13 结论**：波 4 修复后六仓本机全绿、kt/ts CI 转绿实证；行号/锚点矿脉已近收口（裸 `file:N` 六仓活文件零命中），新矿脉为跨语言数值语义（magnitude-DoS 家族）与门禁自洽性（波 4 自伤 2 处已修）。继续波 5 重打验证。
