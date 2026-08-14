@@ -2,7 +2,7 @@
 
 ## Vendored 同步注记（2026-08-14，波 3 F1 re-vendor 收口）
 
-本文件为六仓 conformance/README.md 的权威版。来源提交 SHA：`096e5f8`（波 3 审计前已实证：该提交 conformance/ 树与母仓 HEAD 零差异）。2026-08-14 波 3 修复（组 W3-01/W3-02）在权威版落地以下内容修正后，五仓副本以修正版为基准 re-vendor：differential 断言口径（go/ts/py/kt 侧各仓测试断言、rs 侧 vendored 快照）、G0.1-G5.6 的 G028 限定、`toml-v1.json:102` 行号引用、`oracles/plist-macos-v1/README.md`「not skipped」如实化。go/ts/py/kt 仓为逐字节 vendored 副本；rs 仓为按「同一批内容修正」同步的变体形态（不逐字节复制）。
+六仓 conformance/README.md 以母仓 consema 为权威：母仓持有权威原文，go/ts/py/kt 仓持有逐字节 vendored 副本，rs 仓持有按「同一批内容修正」同步的变体形态（不逐字节复制）。本注记（除文末 hash 比对表外）为 vendored 内容，在六仓文件中一致。来源提交 SHA：`096e5f8`（波 3 审计前已实证：该提交 conformance/ 树与母仓 HEAD 零差异）。2026-08-14 波 3 修复（组 W3-01/W3-02）在权威版落地以下内容修正后，五仓副本以修正版为基准 re-vendor：differential 断言口径（go/ts/py/kt 侧各仓测试断言、rs 侧 vendored 快照）、G0.1-G5.6 的 G028 限定、`toml-v1.json:102` 行号引用、`oracles/plist-macos-v1/README.md`「not skipped」如实化。
 
 同步命令（母仓权威版 → 各仓 vendored 副本，在母仓 checkout 内执行）：
 
@@ -20,7 +20,7 @@ Get-FileHash <repo>\conformance\README.md,<repo>\conformance\oracles\plist-macos
 # 与母仓权威版比对；六仓同名文件 hash 表见母仓本注记末尾（裁决 R11 载体）
 ```
 
-六仓同名文件 hash 表为母仓独有记录，位于本注记末尾；注记其余内容为 vendored 内容，五仓副本（go/ts/py/kt 逐字节一致，rs 变体形态）不携带比对表。
+六仓同名文件 hash 比对表为母仓独有记录，位于本注记末尾（裁决 R11 载体）；五仓副本不携带比对表。
 
 本目录保存跨语言可复放的行为契约。向量只使用 strict JSON，二进制位模式、任意精度数字和 wire 结果使用字符串表示，避免宿主语言的数值模型改变预期事实。
 
