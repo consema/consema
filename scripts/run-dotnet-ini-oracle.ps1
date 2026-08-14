@@ -19,6 +19,17 @@ if ($manifest.suite -cne 'consema.ini.dotnet10-provider-differential@1') {
     throw "unexpected .NET INI oracle suite: $($manifest.suite)"
 }
 
+# 前置可及化（2026-08-15 波 4，与 run-plistlib-oracle.ps1 同族）：documented
+# skip（exit 3）检查必须在任何钉版工具链文件访问（Assert-FileHash 钉版
+# zip/dotnet.exe）之前——钉版工件在本仓任何 checkout 都不存在，若先做文件
+# 检查，脚本以 exit 1 终止，skip 路径不可达（对照 run-hcl-go-oracle.ps1
+# 体例，skip 检查同样在工具链探测之前）。
+$windowsBuild = [Environment]::OSVersion.Version.ToString()
+if ($windowsBuild -cne $manifest.runtime.windows_build) {
+    Write-Output ".NET INI oracle: SKIPPED (Windows build mismatch: expected $($manifest.runtime.windows_build), got $windowsBuild; documented skip path, 2026-08-15 波 4 前置可及化 对照 run-hcl-go-oracle.ps1 体例)"
+    exit 3
+}
+
 function Assert-FileHash([string]$Path, [string]$Algorithm, [string]$Expected, [string]$Label) {
     $actual = (Get-FileHash -LiteralPath $Path -Algorithm $Algorithm).Hash.ToLowerInvariant()
     if ($actual -cne $Expected) {
@@ -73,12 +84,6 @@ foreach ($fact in $manifest.runtime.PSObject.Properties) {
         throw ".NET runtime mismatch for $($fact.Name): expected $($fact.Value), got $($runtime[$fact.Name])"
     }
 }
-$windowsBuild = [Environment]::OSVersion.Version.ToString()
-if ($windowsBuild -cne $manifest.runtime.windows_build) {
-    Write-Output ".NET INI oracle: SKIPPED (Windows build mismatch: expected $($manifest.runtime.windows_build), got $windowsBuild; documented skip path, 2026-08-14 波 2 对照 run-hcl-go-oracle.ps1 体例)"
-    exit 3
-}
-
 $seen = @{}
 $report = [System.Collections.Generic.List[string]]::new()
 $report.Add("suite`t$($manifest.suite)")

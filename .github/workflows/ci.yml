@@ -28,7 +28,11 @@
 # exit 3 when their documented skip path applies (conformance/oracles/
 # hcl-go-v1/manifest.json and plist-macos-v1/manifest.json "skip_path"). The
 # oracles job treats exit 0 (ran and passed) and exit 3 (documented skip) as
-# success and any other exit code as failure.
+# success and any other exit code as failure. Since hosted runners always take
+# the skip path, exit 3 is accepted ONLY when the script itself prints its
+# documented skip marker ('SKIPPED'): a skip-condition regression that exits 3
+# silently, or for a new reason, fails the job instead of being swallowed as
+# success (wave-4, 2026-08-15).
 name: CI
 
 on:
@@ -86,14 +90,29 @@ jobs:
           foreach ($script in @('run-hcl-go-oracle.ps1', 'run-plist-macos-oracle.ps1')) {
             $path = Join-Path $env:GITHUB_WORKSPACE "scripts/$script"
             Write-Output "==> $script"
-            & $path
+            # Capture stdout so a documented skip can be told apart from a
+            # skip-condition regression (wave-4): exit 3 is accepted ONLY when
+            # the script itself prints its documented skip marker ('SKIPPED').
+            # A silent exit 3 — or one for a new reason — fails the job instead
+            # of being swallowed as success. EAP is lowered around the call
+            # (native stderr handling differs across pwsh versions).
+            $previousEap = $ErrorActionPreference
+            $ErrorActionPreference = 'SilentlyContinue'
+            try { $output = @(& $path 2>&1) } finally { $ErrorActionPreference = $previousEap }
             $code = $LASTEXITCODE
+            $text = $output -join "`n"
             if ($code -eq 3) {
+              if ($text -notmatch 'SKIPPED') {
+                Write-Output "${script}: exit 3 without the documented skip marker:"
+                foreach ($line in $output) { Write-Output "  $line" }
+                exit 1
+              }
               Write-Output "${script}: documented skip (exit 3) treated as success"
               continue
             }
             if ($code -ne 0) {
               Write-Output "${script}: failed with exit code $code"
+              foreach ($line in $output) { Write-Output "  $line" }
               exit $code
             }
           }

@@ -59,7 +59,14 @@ function Get-DirtyEntries {
         Write-Output 'warning: git not found on PATH; clean-tree precondition cannot be verified'
         return @()
     }
+    # EAP is lowered around the probe (wave-4, aligned with consema-rs): under
+    # Windows PowerShell 5.1 a native stderr line (git prints "fatal: not a git
+    # repository") becomes a terminating NativeCommandError even with 2>$null,
+    # which would abort the graceful degradation below instead of taking it.
+    $previousEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
     & git -C $workspaceRoot rev-parse --is-inside-work-tree 2>$null | Out-Null
+    $ErrorActionPreference = $previousEap
     if ($LASTEXITCODE -ne 0) {
         Write-Output 'warning: workspace is not a git work tree; clean-tree precondition cannot be verified'
         return @()
@@ -154,11 +161,23 @@ $workspacePackages = @(
         Where-Object { $workspaceMembers.ContainsKey($_.id) } |
         Sort-Object name
 )
+# cargo publish semantics (wave-4, aligned with consema-rs): `publish` absent
+# (null) = publishable to crates.io; `publish = ["registry", ...]` = publishable
+# to the listed registries; `publish = false` (or an empty list) = repository-
+# only, never published. `$null -ne $_.publish` would misclassify every
+# registry list as repository-only and wrongly add it to --exclude, dropping a
+# publishable crate from the package gate and from the release manifest.
 $publishablePackages = @(
-    $workspacePackages | Where-Object { $null -eq $_.publish }
+    $workspacePackages | Where-Object {
+        $null -eq $_.publish -or
+        ($_.publish -is [System.Array] -and $_.publish.Count -gt 0)
+    }
 )
 $repositoryOnlyPackages = @(
-    $workspacePackages | Where-Object { $null -ne $_.publish }
+    $workspacePackages | Where-Object {
+        ($_.publish -is [bool] -and -not $_.publish) -or
+        ($_.publish -is [System.Array] -and $_.publish.Count -eq 0)
+    }
 )
 
 if ($publishablePackages.Count -eq 0) {

@@ -24,6 +24,17 @@ if ($manifest.suite -cne 'consema.plist.macos-differential@1') {
     throw "unexpected Plist oracle suite: $($manifest.suite)"
 }
 
+# 前置可及化（2026-08-15 波 4）：documented skip（exit 3）检查必须在任何钉版
+# 工具链文件访问（Get-FileHash zip / python.exe）之前——钉版工件在本仓任何
+# checkout 都不存在，若先做文件检查，EAP=Stop 下缺文件错误使脚本以 exit 1
+# 终止，skip 路径不可达（对照 run-hcl-go-oracle.ps1 体例，skip 检查同样在
+# 工具链探测之前）。
+$windowsBuild = [Environment]::OSVersion.Version.ToString()
+if ($windowsBuild -cne $manifest.runtime.windows_build) {
+    Write-Output "plistlib oracle: SKIPPED (Windows build mismatch: expected $($manifest.runtime.windows_build), got $windowsBuild; documented skip path, 2026-08-15 波 4 前置可及化 对照 run-hcl-go-oracle.ps1 体例)"
+    exit 3
+}
+
 $packageHash = (Get-FileHash -LiteralPath $PackagePath -Algorithm SHA256).Hash.ToLowerInvariant()
 if ($packageHash -cne $manifest.plistlib.package.sha256) {
     throw "CPython package digest mismatch: expected $($manifest.plistlib.package.sha256), got $packageHash"
@@ -168,12 +179,6 @@ foreach ($fact in $manifest.plistlib.python.PSObject.Properties) {
         throw "runtime mismatch for $($fact.Name): expected $($fact.Value), got $($runtime[$fact.Name])"
     }
 }
-$windowsBuild = [Environment]::OSVersion.Version.ToString()
-if ($windowsBuild -cne $manifest.runtime.windows_build) {
-    Write-Output "plistlib oracle: SKIPPED (Windows build mismatch: expected $($manifest.runtime.windows_build), got $windowsBuild; documented skip path, 2026-08-14 波 2 对照 run-hcl-go-oracle.ps1 体例)"
-    exit 3
-}
-
 $seen = @{}
 $report = [System.Collections.Generic.List[string]]::new()
 $report.Add("suite`t$($manifest.suite)")

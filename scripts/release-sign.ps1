@@ -48,6 +48,10 @@
 #     "Your Name <you@example.com>" rsa4096 sign`). Release signing must
 #     use a key that is backed up; a lost key makes every prior signature
 #     unverifiable (see docs/release-process-0.13.0.md "丢失标签" drill).
+#     The secret-key prerequisite applies to -SignTag and -SignArtifacts
+#     only: -VerifyArtifacts recomputes checksums and runs gpg --verify,
+#     which needs just the signer's PUBLIC key in the keyring (a
+#     public-only keyring is sufficient; wave-4, aligned with consema-rs).
 #
 # Isolation switch: -GpgHome <dir> sets $env:GNUPGHOME for the whole
 # process, so the signing/verification runs against a scratch keyring
@@ -284,25 +288,32 @@ function Test-UsableSigningKey {
     return $null
 }
 
-$signingKey = Test-UsableSigningKey $KeyId
-if ($null -eq $signingKey) {
-    Write-Output 'error: no usable secret signing key in the effective keyring.'
-    if ($KeyId) {
-        Write-Output "  No secret key matches -KeyId '$KeyId' (fingerprint suffix)."
+# Secret-key precondition, sign/tag modes only (wave-4, aligned with
+# consema-rs): -VerifyArtifacts recomputes checksums and runs gpg --verify,
+# which needs only the signer's PUBLIC key in the effective keyring —
+# requiring a secret key there contradicted the header's "verification path
+# used by the recovery drill and by consumers" (see the prerequisites note).
+if ($mode -ne 'verify') {
+    $signingKey = Test-UsableSigningKey $KeyId
+    if ($null -eq $signingKey) {
+        Write-Output 'error: no usable secret signing key in the effective keyring.'
+        if ($KeyId) {
+            Write-Output "  No secret key matches -KeyId '$KeyId' (fingerprint suffix)."
+        }
+        Write-Output '  Create a signing key with:'
+        Write-Output '    gpg --full-generate-key'
+        Write-Output '  (non-interactive: gpg --batch --passphrase "" --quick-generate-key'
+        Write-Output '   "Your Name <you@example.com>" rsa4096 sign)'
+        Write-Output "  List keys with: gpg --list-secret-keys --with-colons"
+        if ($GpgHome) {
+            Write-Output "  (an isolated keyring is active via -GpgHome: $GpgHome;"
+            Write-Output '   generate the key inside it with: gpg --homedir'
+            Write-Output "   `"$GpgHome`" --full-generate-key)"
+        }
+        exit 2
     }
-    Write-Output '  Create a signing key with:'
-    Write-Output '    gpg --full-generate-key'
-    Write-Output '  (non-interactive: gpg --batch --passphrase "" --quick-generate-key'
-    Write-Output '   "Your Name <you@example.com>" rsa4096 sign)'
-    Write-Output "  List keys with: gpg --list-secret-keys --with-colons"
-    if ($GpgHome) {
-        Write-Output "  (an isolated keyring is active via -GpgHome: $GpgHome;"
-        Write-Output '   generate the key inside it with: gpg --homedir'
-        Write-Output "   `"$GpgHome`" --full-generate-key)"
-    }
-    exit 2
+    Write-Output "signing key: $signingKey"
 }
-Write-Output "signing key: $signingKey"
 
 function Invoke-GpgVerify {
     # Runs gpg --verify and maps the outcome onto the gate: gpg prints its

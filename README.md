@@ -34,7 +34,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 
 - **工程标准**：六仓齐备 [CONTRIBUTING.md](CONTRIBUTING.md) / [RELEASING.md](RELEASING.md) / [SECURITY.md](SECURITY.md)，本仓为权威版
 - **1.0.0 RC soak 五本**（`docs/`）：[rc-soak-stage1-benchmarks.md](docs/rc-soak-stage1-benchmarks.md)、[rc-soak-stage1-corpus.md](docs/rc-soak-stage1-corpus.md)、[rc-soak-stage1-differential.md](docs/rc-soak-stage1-differential.md)、[rc-soak-stage1-disk-drill.md](docs/rc-soak-stage1-disk-drill.md)、[rc-soak-stage1-go-fuzz.md](docs/rc-soak-stage1-go-fuzz.md)
-- **CI 深度项**（六仓一致）：全部 action 以提交 SHA pin（`@<sha> # vX.Y.Z` 注释，防 supply-chain 漂移）；`re-actors/alls-green@05ac9388… # v1.2.2` 聚合门禁 `check (all gates green)` 是分支保护唯一 required check（tokio/pydantic 模式，`if: always()` + `jobs: toJSON(needs)`）；release/publishing 流程经 zizmor 静态审计（如 cache-poisoning 规避）
+- **CI 深度项**（六仓一致）：全部 action 以提交 SHA pin（`@<sha> # vX.Y.Z` 注释，防 supply-chain 漂移）；`re-actors/alls-green@05ac9388… # v1.2.2` 聚合门禁 `check (all gates green)` 是分支保护唯一 required check（tokio/pydantic 模式，`if: always()` + `jobs: toJSON(needs)`）；release/publishing 流程**未设** zizmor 静态审计常设步骤（六仓 workflow 零 zizmor 调用；go/ts/kt 三仓 release.yml 仅以注释引用 zizmor cache-poisoning 作为 `cache: false` 的理由，2026-08-15 波 4 如实化）
 
 ## 本仓内容
 
@@ -57,7 +57,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 
 - `vectors/`：18 套语言无关 suite 共 519/519 cases（聚合 digest `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`）
 - `fixtures/`：真实配置夹具；`corpora/`：mutation 语料
-- `oracles/`：固定 runtime oracle（`hcl-go-v1`、`plist-macos-v1` 等，manifest 记录 runtime 固定事实与 documented skip_path）
+- `oracles/`：差分 oracle（`hcl-go-v1` 29 case、`plist-macos-v1` 7 case，manifest 记录 runtime 固定事实与 documented skip_path；常设 CI job 为 documented-skip 状态检查）与固定 runtime oracle（`java-properties-v1` / `python-configparser-v1` / `dotnet-ini-v1` / `windows-ini-v1` / `qt-ini-v1` 五套，36/36 差分案例，一次性记录 2026-08-05——非常设门禁；2026-08-15 波 4 与 conformance/README 口径统一）
 - `differential/`：跨语言差分 case 集（byte parity / normalized / protocol-exchange，五语言共用单一权威）
 
 **脚本**（`scripts/`）：

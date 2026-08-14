@@ -1,3 +1,8 @@
+# 签名失效注记（2026-08-15，波 4 R29）：本清单的签名对（SHA256SUMS-0.8.0.txt.asc
+# clearsign + SHA256SUMS-0.8.0.txt.sig detached）因 2026-08-13 的内容编辑已不可验证
+# ——按 docs/release-process-0.13.0.md §3.4 的消费者验证路径（gpg --verify .asc/.sig）
+# 对现行文件必然报 bad signature。不重签不下架：文件与签名对仅作历史产物存档，
+# 签名失效不代表文件被篡改，而是注记编辑的已知后果。
 # 预检产物注记（2026-08-13 如实披露）：本清单由 7e9de38（2026-08-07）dry-run 生成，构成与真实 v0.8.0 发布（tag f79dd99，2026-08-05）不符——含 consema-hcl/plist/xml（0.9.0-0.11.0 才新增的 crate），而真实 v0.8.0 树仅 12 目录/11 可发布；对 v0.8.0/9c1ede2/7e9de38 干净重建均无法复现（0/14 匹配，见 rc-1.0.0-candidate.md D-1）。发布时须从干净发布 commit 重新生成。
 4c61c922964773c2fbdc1ec84f9d2c642fb1ae99f57437e55ac29a00e9b0e8fc  consema-0.8.0.crate
 ee81f816b40bf29929c4e8f14a2de1652303b7cd2bc61df39345508f6cb58a30  consema-core-0.8.0.crate

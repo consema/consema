@@ -1,4 +1,4 @@
-param(
+﻿param(
     # Path to the consema CLI binary (consema.exe). Default:
     # <RustWorkspace>\target\release\consema.exe.
     [string]$Cli = '',
@@ -47,9 +47,20 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
-$isWindows = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
-    [System.Runtime.InteropServices.OSPlatform]::Windows)
-if (-not $isWindows) {
+# 编码注（2026-08-15 波 4）：本文件为 UTF-8 WITH BOM——Windows PowerShell 5.1
+# 在中文代码页（936）下会把 BOM-less UTF-8 注释字节误读为 GBK，部分字符吞掉换行、
+# 注释吞并下一行代码导致解析失败（实测，本文件在加 BOM 前 PS 5.1 解析即失败）；
+# BOM 使 5.1 正确解析，保留 BOM。
+
+# 2026-08-15 波 4：原 `$isWindows = [RuntimeInformation]::IsOSPlatform(...)` 在
+# PowerShell Core 下必然抛错——`$IsWindows` 是只读自动变量，任何赋值（大小写
+# 不敏感）都触发「Cannot overwrite variable IsWindows because it is read-only
+# or constant」（pwsh 7.6 实测），EAP=Stop 下为终止性错误，脚本第一行即死。
+# 改用仓内跨版本约定并换变量名：$env:OS 在每个 Windows 主机（PS 5.1 与 Core）
+# 上均为 'Windows_NT'，非 Windows 上不存在（coverage.ps1 /
+# verify-package-archives.ps1 同款）。
+$runningOnWindows = $env:OS -eq 'Windows_NT'
+if (-not $runningOnWindows) {
     Write-Error 'rc-soak-disk-full-windows.ps1 is the Windows variant; on the Linux runner use scripts/rc-soak-disk-full.ps1 (tmpfs).'
     exit 3
 }
@@ -158,7 +169,11 @@ try {
     # --- edit request (cookbook.md §6: window:width -> 1600) ----------------
     $requestPath = Join-Path $WorkDir 'edit-request.json'
     $requestJson = '{"schema":"core.portable-value-json@1","value":{"type":"Object","entries":[{"key":"schema","value":{"type":"String","value":"cli.edit-request@1"}},{"key":"operations","value":{"type":"Sequence","items":[{"type":"Object","entries":[{"key":"operation","value":{"type":"Object","entries":[{"key":"id","value":{"type":"String","value":"ini.edit.replace-semantic-value"}},{"key":"version","value":{"type":"Integer","value":"1"}}]}},{"key":"target","value":{"type":"Object","entries":[{"key":"kind","value":{"type":"String","value":"entry"}},{"key":"section","value":{"type":"String","value":"window"}},{"key":"key","value":{"type":"String","value":"width"}},{"key":"occurrence","value":{"type":"Integer","value":"0"}}]}},{"key":"arguments","value":{"type":"Object","entries":[{"key":"value","value":{"type":"String","value":"1600"}},{"key":"representation_policy","value":{"type":"String","value":"preserve-compatible"}}]}}]}]}}]}}'
-    Set-Content -LiteralPath $requestPath -Value $requestJson -Encoding UTF8 -NoNewline
+    # BOM-less UTF-8 (wave-4): Set-Content -Encoding UTF8 writes a BOM under
+    # Windows PowerShell 5.1, and the CLI reads the request file bytes verbatim
+    # (query_cmd.rs read_capped, strict JSON decode — serde_json rejects a
+    # leading BOM), so the plan step would deterministically fail on PS 5.1.
+    [System.IO.File]::WriteAllText($requestPath, $requestJson, [System.Text.UTF8Encoding]::new($false))
 
     # --- plan ---------------------------------------------------------------
     $planPath = Join-Path $WorkDir 'plan.json'

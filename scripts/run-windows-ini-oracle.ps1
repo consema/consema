@@ -36,8 +36,11 @@ if ($windowsBuild -cne $manifest.authority.windows_build) {
     # Allowed skip path (2026-08-14 波 2，对照 run-hcl-go-oracle.ps1 体例)：
     # build 不匹配（hosted runner 10.0.26100 vs pinned 10.0.26200.0）此前无条件
     # throw，使该 oracle 在任何 hosted runner 上不可执行；现按 documented skip
-    # （exit 3，记录于 oracle manifest）处理。
-    Write-Output "Windows INI oracle: SKIPPED (Windows build mismatch: expected $($manifest.authority.windows_build), got $windowsBuild; documented skip recorded in the oracle manifest)"
+    # （exit 3）处理。注（2026-08-15 波 4）：本 manifest（windows-ini-v1）不含
+    # skip_path 记录——七份 oracle manifest 中仅 hcl-go-v1 与 plist-macos-v1
+    # 携带 skip_path；此 skip 是 runtime 约束检查的常设属性，不声称记录于
+    # manifest。
+    Write-Output "Windows INI oracle: SKIPPED (Windows build mismatch: expected $($manifest.authority.windows_build), got $windowsBuild; documented skip (exit 3) — runtime-constraint check, not a manifest skip_path record)"
     exit 3
 }
 $kernelPath = Join-Path ([Environment]::SystemDirectory) 'kernel32.dll'

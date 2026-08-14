@@ -1,4 +1,4 @@
-param(
+﻿param(
     # Path to the consema CLI binary. Default: <RustWorkspace>\target\release\consema
     # (built on demand with `cargo build --release --locked -p consema` unless -SkipBuild).
     [string]$Cli = '',
@@ -67,15 +67,34 @@ param(
 
 $ErrorActionPreference = 'Stop'
 
+# 编码注（2026-08-15 波 4）：本文件为 UTF-8 WITH BOM——Windows PowerShell 5.1
+# 在中文代码页（936）下会把 BOM-less UTF-8 注释字节误读为 GBK，部分字符吞掉换行、
+# 注释吞并下一行代码导致解析失败（实测，本文件在加 BOM 前 PS 5.1 解析即失败）；
+# BOM 使 5.1 正确解析，保留 BOM。
+
 # --- platform guard ---------------------------------------------------------
-$isWindows = [System.Runtime.InteropServices.RuntimeInformation]::IsOSPlatform(
-    [System.Runtime.InteropServices.OSPlatform]::Windows)
-if ($isWindows) {
-    Write-Error 'rc-soak-disk-full.ps1 targets the Linux runner (tmpfs). On Windows use scripts/rc-soak-disk-full-windows.ps1 (requires admin + Hyper-V module, 需授权环境).'
+# 2026-08-15 波 4：原 `$isWindows = [RuntimeInformation]::IsOSPlatform(...)` 在
+# PowerShell Core 下必然抛错——`$IsWindows` 是只读自动变量，任何赋值（大小写
+# 不敏感）都触发「Cannot overwrite variable IsWindows because it is read-only
+# or constant」（pwsh 7.6 实测），EAP=Stop 下为终止性错误，脚本第一行即死
+# （演练记录显示本脚本从未在 pwsh 上执行过，故此前未被发现）。改用仓内跨版本
+# 约定并换变量名：$env:OS 在每个 Windows 主机（PS 5.1 与 Core）上均为
+# 'Windows_NT'，非 Windows 上不存在（coverage.ps1 / verify-package-archives.ps1
+# 同款）。
+$runningOnWindows = $env:OS -eq 'Windows_NT'
+if ($runningOnWindows) {
+    # Write-Output, not Write-Error: under $ErrorActionPreference = 'Stop' a
+    # Write-Error is a terminating error, so the documented `exit 3` below was
+    # unreachable and the guard always died with exit 1 (2026-08-15 波 4;
+    # Windows 变体 Fail-Blocked 用 Write-Host 同体例)。
+    Write-Output 'rc-soak-disk-full.ps1 targets the Linux runner (tmpfs). On Windows use scripts/rc-soak-disk-full-windows.ps1 (requires admin + Hyper-V module, 需授权环境).'
     exit 3
 }
 
 $repoRoot = Split-Path -Parent $PSScriptRoot
+# $env:CONSEMA_CARGO 覆盖约定（与其他交付脚本一致，wave-4）：未设置时回退
+# 'cargo'——cargo 不在 PATH 但 CONSEMA_CARGO 已设的主机上 drill 才能确定性运行。
+$cargo = if ($env:CONSEMA_CARGO) { $env:CONSEMA_CARGO } else { 'cargo' }
 # -RustWorkspace 默认值按六仓并排布局检测（rc-soak-stage1-disk-drill.md §2）：
 # 六仓并排检出时（consema-rs 与母仓同级），从母仓根向上取并排 consema-rs；
 # 嵌套目录假设（<repoRoot>\consema-rs）仅作为拆分前布局的兼容回退，两者都
@@ -125,10 +144,10 @@ if ($Cli -eq '') {
         if ($SkipBuild) {
             Write-Error "CLI not found: $Cli and -SkipBuild was given"
         }
-        Write-Host "[0/9] building the CLI (cargo build --release --locked -p consema) in $RustWorkspace ..."
+        Write-Host "[0/9] building the CLI ($cargo build --release --locked -p consema) in $RustWorkspace ..."
         Push-Location $RustWorkspace
         try {
-            & cargo build --release --locked -p consema
+            & $cargo build --release --locked -p consema
             Assert-True ($LASTEXITCODE -eq 0) "cargo build failed (exit $LASTEXITCODE)"
         }
         finally {

@@ -29,6 +29,11 @@
 #      at HEAD and a regression beyond the frozen gate fails. A failed gate
 #      still writes the report (evidence for the disposition) and exits 1.
 #
+#   Note (wave-4, R33): the report's "numbers come from script runs" claim is
+#   scoped — the cargo-llvm-cov version is pinned by the CI install step
+#   (consema-rs ci.yml), NOT by this script, which deliberately performs no
+#   runtime version comparison; the generated report says exactly that.
+#
 # Exit codes: 0 = success (report written, gates green); 1 = coverage gate
 # failure (hard floor or -Trend regression); 2 = precondition failure (missing
 # tool, no Cargo.lock, not a git work tree); 3 = cargo/llvm-cov execution
@@ -113,7 +118,17 @@ if ($rustup) {
     foreach ($line in $componentLines) {
         # Newer rustup names the component llvm-tools-<target> (the -preview
         # suffix was dropped); older releases used llvm-tools-preview-<target>.
-        if ($line -match '^llvm-tools(?:-preview)?(?:-|$)') {
+        # `rustup component list` (without --installed) also lists components
+        # that are NOT installed (trailing "(missing)" or a bare line), so the
+        # name prefix alone is no proof of installation — the "(installed)"
+        # marker must be present too (wave-4, aligned with consema-rs). Without
+        # it the check always passes when rustup exists, the exit-2
+        # precondition failure path is unreachable, and the real failure only
+        # surfaces later as a misleading cargo llvm-cov exit 3.
+        if (
+            $line -match '^llvm-tools(?:-preview)?(?:-|$)' -and
+            $line -match '\(installed\)'
+        ) {
             $hasLlvmTools = $true
             break
         }
@@ -138,7 +153,14 @@ if (-not (Get-Command 'git' -ErrorAction SilentlyContinue)) {
     Write-Output '  report, both of which need git.'
     exit 2
 }
+# EAP is lowered around the probe (wave-4, aligned with consema-rs): under
+# Windows PowerShell 5.1 a native stderr line (git prints "fatal: not a git
+# repository") becomes a terminating NativeCommandError even with 2>$null,
+# which would abort the graceful exit-2 precondition message below.
+$previousEap = $ErrorActionPreference
+$ErrorActionPreference = 'Continue'
 & git -C $workspaceRoot rev-parse --is-inside-work-tree 2>$null | Out-Null
+$ErrorActionPreference = $previousEap
 if ($LASTEXITCODE -ne 0) {
     Write-Output 'error: the workspace is not a git work tree; the report is'
     Write-Output '  committed at a fixed commit and cannot be produced here.'
@@ -471,7 +493,9 @@ $report = @"
   “coverage 可复现报告”）。
 - 取代一次性数字：CHANGELOG.md 与 RELEASE-0.8.0.md 的 84.65% regions /
   82.73% functions / 86.59% lines 是单次辅助报告，无脚本、无工件、不可复现；自本
-  报告起 coverage 由常设脚本在固定 commit 上产出，任何数字变化都来自脚本运行。
+  报告起 coverage 由常设脚本在固定 commit 上产出，数字变化来自脚本运行
+  （cargo-llvm-cov 版本固定见 CI install 步骤，脚本不做运行时版本比对；
+  2026-08-15 波 4 R33 收窄）。
 
 $gateBanner
 
