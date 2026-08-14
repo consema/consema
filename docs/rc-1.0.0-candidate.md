@@ -61,8 +61,8 @@
   复算，2026-08-11，runs.csv 33,337 行，零新 crash）；**最新快照 122,477 数据行 / 780.529 CPU-hours
   （2026-08-13 复算，runs.csv 权威，零新 crash；properties 145.4h（201.9%）、yaml 128.8h
   （178.9%）、ini 124.8h（173.3%）、hcl 95.5h（132.7%）、json 95.3h（132.3%）五单位已过 72h
-  门槛；toml 57.7h、protocol-decode 50.7h、plist 47.4h、xml 35.0h 继续累计；122,478 文件行含表头）**
-  = C-2（其余单位 72h 门槛仍开放，继续累计）；Go fuzz targets clean-run 记录已有
+  门槛；toml 57.7h、protocol-decode 50.7h、plist 47.4h、xml 35.0h 低于门槛；122,478 文件行含表头；驱动已暂停（2026-08-13 11:19 后未重启），累计冻结）**
+  = C-2（其余单位 72h 门槛仍开放，驱动暂停后累计冻结——见 §1 C-2 行）；Go fuzz targets clean-run 记录已有
   （2026-08-10，consema-go/go/README.md targets 各 30s，零 panic/hang/limit bypass）。⏳
 - 无未解决 P0/P1：当前 0。✓
 - 无未接受 critical/high dependency vulnerability：deny/audit 门禁。✓
