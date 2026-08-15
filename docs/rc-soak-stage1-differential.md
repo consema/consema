@@ -34,9 +34,10 @@
   （five-language-ci-design.md §3.5，2026-08-12 迁移；母仓与 consema-rs 的
   conformance/ 内容逐字节一致——母仓维护、consema-rs 镜像快照，本机实测
   `cases.json` 0 差异；如实注记：两树有 3 个文件不同（conformance/README.md、
-  conformance/fixtures/hcl/README.md 与 conformance/oracles/plist-macos-v1/
-  README.md——2026-08-14 波 3 F1 re-vendor 后实测，rs vendored 副本未随母仓
-  最新修订同步），case 数据文件全部一致）。
+  conformance/oracles/plist-macos-v1/README.md 与 conformance/oracles/
+  plist-macos-v1/manifest.json——2026-08-15 波 5 归正枚举：fixtures/hcl/
+  README.md 实为同一 blob（6e52d1d9…，零差异），此前误列入；rs vendored
+  副本未随母仓最新修订同步），case 数据文件全部一致）。
 - **Rust 锚侧** = `consema-rs` 检出：四个 Rust 例子
   （`emit_parity_bytes.rs` / `emit_normalized_results.rs` / `emit_protocol_exchange.rs`
   / `emit_conformance_reports.rs`，`consema-conformance/examples/`）只消费 case 文件

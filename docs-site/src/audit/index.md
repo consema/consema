@@ -4,7 +4,7 @@
 
 ## 终审与候选
 
-- [五要素终审（§28 收口记录，`1.0.0` 前哨）](https://github.com/consema/consema/blob/main/docs/five-element-review-1.0.0.md)：`docs/five-element-review-1.0.0.md`（2026-08-10，0.13.0–0.19.0 全周期累计审计证据的最终状态核验）
+- [五要素终审（§28 收口记录，`1.0.0` 前哨）](https://github.com/consema/consema/blob/main/docs/five-element-review-1.0.0.md)：`docs/five-element-review-1.0.0.md`（2026-08-10 起稿、此后持续累积的审计证据记录——§8-§13 记录至 2026-08-15 波 4 收口、§13.4 列出波 5 输入，审计仍在进行；2026-08-15 波 5 归正描述，此前「最终状态核验」为过时表述）
 - [`1.0.0-rc.1` 候选清单（0.19.0 G5.7）](https://github.com/consema/consema/blob/main/docs/rc-1.0.0-candidate.md)：`docs/rc-1.0.0-candidate.md`（阻塞项清单 C-1/C-2/C-3、§22 门禁核对表、RC soak 计划、P2 发布判停清单）
 
 ## 门禁与证据

@@ -79,8 +79,11 @@ coverage.crate consema-yaml regions=85.23 functions=88.21 lines=87.36
   全部 test target 都计入。
 - 语料复用：conformance vectors 与 fixtures 通过 `include_str!`/`include_bytes!`
   编译进 `consema-conformance` 的 lib 与集成测试（`crates/consema-conformance/src/*_v1.rs`、
-  `tests/*_fixtures.rs`），因此本测量天然执行 18 套 suite / 519 case（2026-08-12 P2-B 向量补强后；补强前为 508，与本文档政策节口径一致）、fixtures、
-  hardening 与 encoding corpus，无需额外接线。
+  `tests/*_fixtures.rs`），因此本测量天然执行 18 套 suite（2026-08-07 测量时点为
+  508 case——P2-B 向量补强前口径，2026-08-15 波 5 归正：原「本测量执行 519 case」
+  为事后口径改写，一次 08-07 的测量不可能执行 08-12 才存在的 519 cases；补强后
+  为 519，与本文档政策节口径一致）、fixtures、hardening 与 encoding corpus，
+  无需额外接线。
 - 百分比从 `llvm-cov export --summary-only`（JSON）的每文件 covered/total 求和
   重算（与 llvm-cov TOTAL 行同一聚合语义）；region 列即 llvm-cov 的 Region 指标
   （Rust stable 上由 `-C instrument-coverage` 的 region counter 给出）。

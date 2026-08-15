@@ -7,7 +7,7 @@ The pinned TOML 1.0 manifest contains:
 - 205 valid decoder cases with tagged-JSON expectations;
 - 474 invalid decoder cases that must return a non-zero status.
 
-Last release-gate verification on 2026-08-04（如实注记：该次验证的完整输出无入库载体——205/474 为文档内唯一自证数字，上游 toml-test v2.2.0 语料不在仓内，无法复算；完整输出归档列为 1.0.0-rc 发布前置项）:
+Last release-gate verification on 2026-08-04（如实注记：该次验证的完整输出无入库载体——205/474 为文档内唯一自证数字，上游 toml-test v2.2.0 语料不在仓内，无法复算；完整输出归档在 2026-08-15 波 5 前被本句列为 1.0.0-rc 发布前置项，但没有任何权威发布门禁文档承载该前置项——rc-1.0.0-candidate.md §22 核对表与 0.13.0-gate-plan.md 门禁总表均无归档项，属幻影前置项；该归档要求若保留需由总指挥在 rc-candidate §22 或等价载体落定）:
 
 ```text
 toml-test v2.2.0 [consema-toml-test-decoder] [no encoder]

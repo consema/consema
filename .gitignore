@@ -1,15 +1,16 @@
 /target/
 /.pi-tmp/
 **/*.rs.bk
-*.log
-!docs/fuzz-evidence-0.13.0-logs/waves.log
-!docs/fuzz-evidence-0.13.0-logs/wave-*.out.log
-!docs/fuzz-evidence-0.13.0-logs/wave-*.err.log
-!docs/fuzz-evidence-0.13.0-logs/workspace-gate-*.log
-# 发布证据日志（GW4-23，2026-08-15）：已跟踪的 docs/release/cargo-package-1.0.0-rc.1.log
-# 与 `*.log` 规则冲突（只靠 index 保护，目录级 git add 会静默忽略新发布日志）；
-# release 证据日志按发布记录入库，与 ignore 契约「log 不入库（fuzz 账本除外）」
-# 的一致性由此豁免恢复。
+# 日志忽略只锚定 fuzz 账本目录（2026-08-15 波 5 归正）：非锚定 `*.log` 会静默吞掉
+# 任何新位置的证据日志（GW4-23 已记录该失败模式并只修补 docs/release/ 一处）；
+# 锚定后新日志位置不再被 ignore 吞掉——git status 直接可见，提示显式跟踪决策。
+/docs/fuzz-evidence-0.13.0-logs/*.log
+!/docs/fuzz-evidence-0.13.0-logs/waves.log
+!/docs/fuzz-evidence-0.13.0-logs/wave-*.out.log
+!/docs/fuzz-evidence-0.13.0-logs/wave-*.err.log
+!/docs/fuzz-evidence-0.13.0-logs/workspace-gate-*.log
+# 发布证据日志（GW4-23，2026-08-15）：docs/release/*.log 由发布记录显式跟踪，
+# 不受上述目录限定忽略影响；目录级 git add 会把新发布日志显示为未跟踪。
 !docs/release/*.log
 # HCL Go oracle driver 构建产物（2026-08-15 波 4）：默认 DriverPath 已移至
 # target\oracles；旧内树路径供显式 -DriverPath 用法兜底，忽略以免弄脏工作树。

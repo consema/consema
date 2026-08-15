@@ -21,6 +21,14 @@ on:
       - 'docs-site/**'
       - 'docs/**'
       - '.github/workflows/docs-site.yml'
+      # Root-level authoritative documents byte-mirrored into docs-site/src
+      # (release/RELEASING.md, concepts/roadmap-1.0.0.md,
+      # concepts/content-standard.md) must rebuild the site too
+      # (2026-08-15 波 5; README/SECURITY/CHANGELOG/CONTRIBUTING are
+      # blob-linked from index.md, not mirrored, so they stay out).
+      - 'RELEASING.md'
+      - 'Consema 1.0.0 产品路线图与双语言落地设计.md'
+      - '配置内容统一处理标准与 Rust 参考实现.md'
   workflow_dispatch:
 
 concurrency:
