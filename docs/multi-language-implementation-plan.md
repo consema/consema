@@ -13,7 +13,10 @@
 - Rust（0.13.0 Feature-Complete，1.0.0-rc.1 版本推进）与 Go（0.14.0-0.19.0 六里程碑）已完成
   conformance 508/508（P2-B 补强前时点；补强后 519/519）、PVCE/PGCE byte-exact、
   protocol exchange 83/83、normalized 108×2。
-- 共享仲裁层：`conformance/vectors/`（18 套 / 519 cases，聚合 digest cfd6e296 五语言共钉；
+- 共享仲裁层：`conformance/vectors/`（18 套 / 519 cases，聚合 digest cfd6e296 共钉——
+  2026-08-15 波 5 如实归正：钉/复算集合为 rs（vendored DIGEST）/go/py/kt 四 runner +
+  母仓 shared-conformance-digest 作业，ts runner 因 CI 不 provision fc-manifest 为
+  documented skip，不在此集合内；
   508/35bebc8d 为 2026-08-12 P2-B 补强前值，见 §7.1 关账表）、
   `conformance/fixtures/`、`conformance/corpora/`、`conformance/oracles/`；
   注册表：contract v7（41 条）/ error codes v7（187 码）；RFC 0016 为 Go API mapping v1 宪章（Go 专属契约面，非语言无关——标题即「Go API mapping v1」；TS/Python/Kotlin 实现不作其语言无关权威）。
@@ -76,7 +79,7 @@ Go 的测试）。
 | L2 | L1 | 三语言并行 | yaml（1.2/1.1、anchor/alias/graph，↔G2.1）+ ini（三 Profile，↔G2.2）+ properties（Reader/Latin-1，↔G2.3）+ 全操作补齐（↔G2.4） |
 | L3 | L2 | 三语言并行 | xml（1.0 safe Profile，↔G3.1）+ plist（XML/binary，↔G3.2）+ hcl（native/tfvars，不求值，↔G4.1） |
 | L4 | L3 | 三语言并行 | 全格式 materialize 全组合（↔G4.2）+ mandatory structural edit/SourcePatch/batch-plan（↔G4.3）+ examples/文档/capability parity 断言（↔G4.4） |
-| L5 | L4 | 三语言并行 | conformance runner 全 519（↔G5.1；增补后口径——2026-08-12 P2-B 前为 508，见 fc-manifest-0.13.0.json:39、41）+ 跨语言差分（Rust↔TS/Python/Kotlin，↔G5.2）+ protocol exchange（↔G5.3）+ fuzz/bench/security matrix（↔G5.4）+ CLI beta（↔G5.6） |
+| L5 | L4 | 三语言并行 | conformance runner 全 519（↔G5.1；增补后口径——2026-08-12 P2-B 前为 508，见 fc-manifest-0.13.0.json 的 digests.conformance_suite 字段——行号可能漂移，以字段名为锚）+ 跨语言差分（Rust↔TS/Python/Kotlin，↔G5.2）+ protocol exchange（↔G5.3）+ fuzz/bench/security matrix（↔G5.4）+ CLI beta（↔G5.6） |
 
 每里程碑硬门禁（照 Go 先例）：对应 capability 的共享向量 100% 通过；PVCE/PGCE 字节与 Rust
 一致；不依赖他语言产物；error text 不参与比较；unknown-field/canonicality 规则一致。
@@ -142,9 +145,11 @@ GATE 未过期间的代码统称"盲写产物"，不得进入任何发布证据�
 | L5 harnesses + CI | 2f981df | 跨语言差分 harness（normalized/protocol exchange）+ 各语言 CI workflow；差分发现的 wire-codec 缺陷随本 commit 修复（五要素终审 §3.2 关账表） |
 | CI 修复 | dbba9a4 | 五语言 CI 全绿（python fixtures 路径、kotlin jar 供给等首跑缺陷修复；ci.yml run#9 + ci-typescript/ci-python/ci-kotlin 各 run#2，见 rc-1.0.0-candidate.md §4.1） |
 
-- 每语言 conformance 519/519（增补后；digest cfd6e296da5b… 五 runner 共钉，
-  fc-manifest-0.13.0.json:39 为权威）+ capability parity + 差分（68/108/83）
-  全绿；五语言 CI 在 dbba9a4 全绿。
+- 每语言 conformance 519/519（增补后；digest cfd6e296da5b… 共钉——2026-08-15 波 5
+  如实归正：钉/复算集合为 rs/go/py/kt 四 runner + 母仓 shared-conformance-digest 作业，
+  ts runner 为 documented skip 不在此集合内；权威记录在 fc-manifest-0.13.0.json 的
+  digests.conformance_suite 字段——行号可能漂移，以字段名为锚）+ capability parity
+  + 差分（68/108/83）全绿；五语言 CI 在 dbba9a4 全绿。
 - **L5 关闭面如实界定**：ts/py/kt 的 L5 关闭面 = 差分 harness + 各语言 CI
   （含零 documented skip 断言与 `L-package` job，2026-08-12 上线）；
   **fuzz/bench/security matrix 为 Rust/Go 专属**（C-2 fuzz 账本仅覆盖

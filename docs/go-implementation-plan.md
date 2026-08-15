@@ -170,7 +170,7 @@
 - **G2.3（‖，依赖 G1.1）**：`properties` package——Reader/Latin-1 两 Profile（RFC 0010）、Java UTF-16 code units。2800-3800 行。
 - **G2.4（串行，依赖 G2.1-G2.3）**：全操作补齐（query/projection/materialization/edit 闭包）+ security limits 矩阵 + Rust/Go cross-run fixtures（§16.3）。1500-2500 行。
 
-**硬门禁（第 1511-1515 行）**：Go graph identity 和 query ordering 满足同一 contract；alias bomb、cycle、INI dialect 和 Properties encoding 的负向向量一致；Go map 的随机迭代顺序不得影响任何公共结果。
+**硬门禁（路线图 §16.3 的「硬门禁：」段——现行第 1517 行起，2026-08-15 波 5 归正行号；行号可能漂移，以节标题为锚）**：Go graph identity 和 query ordering 满足同一 contract；alias bomb、cycle、INI dialect 和 Properties encoding 的负向向量一致；Go map 的随机迭代顺序不得影响任何公共结果。
 
 ### 2.4 0.17.0 — Go XML 与 plist（路线图 §16.4「`0.17.0`：Go XML 与 plist」）
 
@@ -328,7 +328,7 @@ Go runner 每次执行校验 `conformance/vectors/` 聚合 sha256 与 fc-manifes
 | Go 不导入或调用 Rust（cgo 禁令） | §16.1；RFC 0016 §1.1 | 每里程碑（依赖面审查） |
 | Go error text 不参与规范比较 | §16.1 | 每里程碑 |
 | normalized-result 差分（parse/query/projection/materialization/edit） | §16.2；§22.2 | 0.15.0 起 |
-| graph identity 与 query ordering 同一 contract；负向向量（alias bomb/cycle/INI dialect/Properties encoding）一致 | §16.3 第 1513-1514 行 | 0.16.0 |
+| graph identity 与 query ordering 同一 contract；负向向量（alias bomb/cycle/INI dialect/Properties encoding）一致 | §16.3 的「硬门禁：」段（现行第 1517 行起；行号可能漂移，以节标题为锚） | 0.16.0 |
 | Go map 迭代顺序不影响任何公共结果 | §16.3 | 0.16.0 起 |
 | native normalized facts、报告、诊断 code/order、edit bytes 一致 | §16.4 | 0.17.0 |
 | macOS Foundation differential run | §16.4 | 0.17.0 |
@@ -337,7 +337,7 @@ Go runner 每次执行校验 `conformance/vectors/` 聚合 sha256 与 fc-manifes
 | bidirectional differential + cross-language protocol exchange 100% | §22.2 | 0.19.0 |
 | Go public API 稳定性审查（§21.2 六项 + 文档注释门禁） | §22.2；§16.6 | 0.19.0 |
 | Rust 与 Go 分别完成至少一个端到端 SDK pilot | §22.7 | 0.19.0 |
-| Go release-candidate fuzz clean-run + 三平台（Windows/Linux/macOS）全矩阵 | §22.4 第 1909、1913 行 | 0.19.0 |
+| Go release-candidate fuzz clean-run + 三平台（Windows/Linux/macOS）全矩阵 | §22.4（现行第 1914 行起；行号可能漂移，以节标题为锚） | 0.19.0 |
 | §22 全部门槛除 RC soak | §16.6 | 0.19.0 收口 |
 | 每 Go 里程碑开始时复核 fc-manifest（Go 起点与能力对齐不漂移） | RFC 0016 §9「9. Versioning and release-train relationship (frozen)」 | 每里程碑 |
 
@@ -345,7 +345,7 @@ Go runner 每次执行校验 `conformance/vectors/` 聚合 sha256 与 fc-manifes
 
 ## 7. START GATE（起始门禁；本计划最高优先级条款）
 
-> **§7 实况注记（2026-08-12 追加，2026-08-13 更新 C-2 数字；本文档为规划阶段产物，下列条款保留为 0.14.0 时点的历史门禁条款）**：Go 里程碑已按 §6 门禁独立验证交付——0.14.0-0.19.0 G0.1-G5.6 全部 closed（consema-go/README 逐项记录，productVersion 1.0.0-rc.1，runner 519/519（增补后口径，与 §0.1（fc-manifest digests.conformance_suite）的 519/cfd6e296 口径一致））；C-1 已闭环（2026-08-11，GitHub Actions run#5 132/132 steps 全绿，head 437fd35）；C-2 推进中（2026-08-13 复算：122,477 数据行 / 780.529 CPU-hours，runs.csv 权威，properties/yaml/ini/hcl/json 五单位已过 72h 门槛）；C-3 partial。
+> **§7 实况注记（2026-08-12 追加，2026-08-13 更新 C-2 数字；本文档为规划阶段产物，下列条款保留为 0.14.0 时点的历史门禁条款）**：Go 里程碑已按 §6 门禁独立验证交付——0.14.0-0.19.0 G0.1-G5.7 全部 closed（含 G5.7 real-repository migration pilot——docs/pilot-go-0.19.0.md 与 docs/rc-1.0.0-candidate.md 均标注 0.19.0 G5.7，2026-08-15 波 5 归正；consema-go/README 逐项记录，productVersion 1.0.0-rc.1，runner 519/519（增补后口径，与 §0.1（fc-manifest digests.conformance_suite）的 519/cfd6e296 口径一致））；C-1 已闭环（2026-08-11，GitHub Actions run#5 132/132 steps 全绿，head 437fd35）；C-2 推进中（2026-08-13 复算：122,477 数据行 / 780.529 CPU-hours，runs.csv 权威，properties/yaml/ini/hcl/json 五单位已过 72h 门槛）；C-3 partial。
 
 > **C-1/C-2/C-3 完成之前，不得发布 0.14.0、不得宣称任何 Go 里程碑关闭；`go/` 内实现按 §6 门禁独立验证。**（2026-08-07 decision record 修订：owner 已书面授权提前启动 go/ 0.14.0 G0.1-G0.3，原"门禁全闭前不创建任何实现文件"条款不再适用于已开工的 G0.1-G0.3。）
 
@@ -377,7 +377,7 @@ owner 决定：在 C-1/C-2/C-3 完成前启动 Go 实现（`go/`，0.14.0 G0.1-G
 - 本计划文档是规划阶段唯一交付物：允许的 Go 侧活动仅限只读调研（`go version` 等环境检查）与本文档维护；任何实现活动（agent 派发、文件创建、依赖引入）必须等到 §7.1 全部满足。**2026-08-07 decision record 例外**：go/ 0.14.0 G0.1-G0.3（core/graph/protocol）已获 owner 书面授权开工并独立验证（§6），不适用本款"等待 §7.1"约束；0.15.0+ 里程碑派发仍按本款执行（除非另行书面决策）。
 - 门禁翻转动作：0.13.0 gatekeeper 在 fc-manifest 中翻转判定并记录证据；**本计划不授权任何 agent 自行判定门禁已闭**——判定权只在 manifest 的书面状态。
 - 启动后复核：每个 Go 里程碑开始时重新核对 fc-manifest（RFC 0016 §9「9. Versioning and release-train relationship (frozen)」）；manifest 或能力集变更必须双语言同批处理（RFC 0016 §8「8. Pinned language-neutral spellings (carried from the 0.13.0 API review)」的 v8 窗口纪律）。
-- 门禁开放期间发现的任何"Go 侧预研"结论不得进入实现状态：按 §11.3 流程留档（路线图第 865-877 行），待门禁关闭后作为 0.14.0 输入。
+- 门禁开放期间发现的任何"Go 侧预研"结论不得进入实现状态：按 §11.3 流程留档（路线图 §11.3——现行第 871 行起，2026-08-15 波 5 归正区间起点；行号可能漂移，以节标题为锚），待门禁关闭后作为 0.14.0 输入。
 
 ---
 
