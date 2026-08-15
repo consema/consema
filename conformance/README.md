@@ -24,6 +24,8 @@ Get-FileHash <repo>\conformance\README.md,<repo>\conformance\oracles\plist-macos
 
 ### 六仓同名文件 hash 比对表（2026-08-14 波 3 F1 re-vendor 收口实测，裁决 R11；2026-08-15 波 4 re-vendor 后实测更新；2026-08-15 波 5 re-vendor 后实测更新）
 
+本表为信息性快照，权威检查 = 上方比对命令；值随 re-vendor 变化属预期。
+
 | 仓 | conformance/README.md（sha256） | conformance/oracles/plist-macos-v1/README.md（sha256） |
 |---|---|---|
 | consema（母仓，权威原文） | `4a27260a743ed99756bf39413957c030d8c8895fcf94e3056fd2ac9e5e0229d0`（波 5 re-vendor 后 vendored 内容实测） | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |

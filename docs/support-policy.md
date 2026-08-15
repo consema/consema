@@ -79,10 +79,10 @@ Node 版本：
   由构造满足只对 Kotlin 2.2.0 精确成立（RFC 0020 §9.3 口径，five-language-ci-design §1.2）。
 - **提升纪律**：最低版本提升遵循 §1/§2 同纪律——只在 minor 发生、永不进入
   patch、不重解释已发布 contract，CHANGELOG 注明用户可停留的最低版本。
-- **验证**：CI 全套 10 job（ts-gates / coverage / ts-compiler-matrix /
-  ts-conformance / ts-differential / npm-audit / check-version-consistency /
-  examples / ts-package / check）在钉定版本 26.7.0 上运行（`npm ci` +
-  `npm run check` + `npm test`）。
+- **验证**：CI 全套门禁（job 数以最近 CI run 为准，GitHub Actions：
+  ts-gates / coverage / ts-compiler-matrix / ts-conformance / ts-differential /
+  npm-audit / check-version-consistency / examples / ts-package / check）
+  在钉定版本 26.7.0 上运行（`npm ci` + `npm run check` + `npm test`）。
 
 ## 4. Python version window
 

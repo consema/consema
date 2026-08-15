@@ -367,10 +367,10 @@ multi-language-implementation-plan.md §7 START GATE：工具链就绪后先验�
 
 | 文件 | 动作 | 内容 |
 |---|---|---|
-| `.github/workflows/ci.yml` | **不改**（Rust 门禁域 + go-1-26 原位） | 现 13 job（12 Rust 门禁 gate + check 聚合；release-build 于 2026-08-15 波 4 R13 增补——以 job 名为锚，2026-08-15 波 5 归正；拆分前 10+1 job 的历史计数见 §10） |
-| `.github/workflows/ci-typescript.yml` | 已新增（2026-08-12 上线全绿，见 §10） | 实际 10 job：`ts-gates`、`coverage`、`ts-compiler-matrix`、`ts-conformance`、`ts-differential`、`npm-audit`、`check-version-consistency`、`examples`、`ts-package`、`check`（§1.2 设计口径 3 job + L5 package 为规划表，保留历史；npm-audit 为 2026-08-14 审计增补，job 名即锚） |
-| `.github/workflows/ci-python.yml` | 已新增（2026-08-12 上线全绿，见 §10） | 实际 9 job：`python-gates`、`python-conformance`、`python-differential`、`coverage`、`pip-audit`、`check-version-consistency`、`examples`、`python-package`、`check`（§1.2 设计口径 3 job + L5 package 为规划表，保留历史；pip-audit 为 2026-08-14 审计增补，job 名即锚） |
-| `.github/workflows/ci-kotlin.yml` | 已新增（2026-08-12 上线全绿，见 §10） | 实际 8 job：`kotlin-gates`、`kotlin-conformance`、`kotlin-differential`、`runtime-classpath-audit`、`check-version-consistency`、`examples`、`kotlin-package`、`check`（§1.2 设计口径 3 job + L5 package 为规划表，保留历史；runtime-classpath-audit 为 2026-08-14 审计增补，job 名即锚） |
+| `.github/workflows/ci.yml` | **不改**（Rust 门禁域 + go-1-26 原位） | 现 job 集合（job 数以最近 CI run 为准，GitHub Actions；release-build 于 2026-08-15 波 4 R13 增补——以 job 名为锚，2026-08-15 波 5 归正；拆分前 10+1 job 的历史计数见 §10） |
+| `.github/workflows/ci-typescript.yml` | 已新增（2026-08-12 上线全绿，见 §10） | 实际 job（job 数以最近 CI run 为准，GitHub Actions）：`ts-gates`、`coverage`、`ts-compiler-matrix`、`ts-conformance`、`ts-differential`、`npm-audit`、`check-version-consistency`、`examples`、`ts-package`、`check`（§1.2 设计口径 3 job + L5 package 为规划表，保留历史；npm-audit 为 2026-08-14 审计增补，job 名即锚） |
+| `.github/workflows/ci-python.yml` | 已新增（2026-08-12 上线全绿，见 §10） | 实际 job（job 数以最近 CI run 为准，GitHub Actions）：`python-gates`、`python-conformance`、`python-differential`、`coverage`、`pip-audit`、`check-version-consistency`、`examples`、`python-package`、`check`（§1.2 设计口径 3 job + L5 package 为规划表，保留历史；pip-audit 为 2026-08-14 审计增补，job 名即锚） |
+| `.github/workflows/ci-kotlin.yml` | 已新增（2026-08-12 上线全绿，见 §10） | 实际 job（job 数以最近 CI run 为准，GitHub Actions）：`kotlin-gates`、`kotlin-conformance`、`kotlin-differential`、`runtime-classpath-audit`、`check-version-consistency`、`examples`、`kotlin-package`、`check`（§1.2 设计口径 3 job + L5 package 为规划表，保留历史；runtime-classpath-audit 为 2026-08-14 审计增补，job 名即锚） |
 
 ### 7.2 scripts/ 新增（命名照 go-verify-* 惯例；自包含、pwsh、零第三方依赖）
 
@@ -459,7 +459,7 @@ multi-language-implementation-plan.md §7 START GATE：工具链就绪后先验�
 数据来源：GitHub Actions API 核验（head dbba9a4，2026-08-12）+ 本机复核（workflow/
 脚本/文件存在性）。
 
-- **三个新语言 workflow 全部 LIVE 且全绿**（§1.2/§7.1 的"每语言 3 job"为设计期口径；实际 job 数：ts 10、py 9、kt 8——gates/conformance/differential 之上叠加 coverage/check-version-consistency/examples/package/check 与 2026-08-14 审计增补的 npm-audit/pip-audit/runtime-classpath-audit，见 §7.1 表）：
+- **三个新语言 workflow 全部 LIVE 且全绿**（§1.2/§7.1 的"每语言 3 job"为设计期口径；实际 job 数以最近 CI run 为准，GitHub Actions——gates/conformance/differential 之上叠加 coverage/check-version-consistency/examples/package/check 与 2026-08-14 审计增补的 npm-audit/pip-audit/runtime-classpath-audit，见 §7.1 表）：
   - `.github/workflows/ci-typescript.yml` run#2：ts-gates / ts-conformance /
     ts-differential（differential = byte parity + normalized + protocol exchange
     三个脚本，windows-latest，ts-differential 为 ci-typescript.yml 的 ts-differential job）
