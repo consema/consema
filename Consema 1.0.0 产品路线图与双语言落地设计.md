@@ -1002,19 +1002,19 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
   ↓
 0.12.0 Rust SDK + CLI 产品集成                           Rust 已完成
   ↓
-0.13.0 Rust 生产加固与 Feature-Complete Gate      Rust 门禁推进中（C-1 已闭环 2026-08-11；C-2 partial，5/9 单位过 72h——2026-08-13 复算 122,477 数据行 / 780.529 CPU-hours，properties/yaml/ini/hcl/json 已过门槛，驱动已暂停（2026-08-13 11:19 后未重启），四单位未过门槛如实记录为遗留；C-3 partial；五语言各 L0-L5 已交付——L0 差分腿 shared-conformance 脚本尚未合入（five-language-ci-design §1.2/§10），L0-L5 关闭面以该文档为准）
+0.13.0 Rust 生产加固与 Feature-Complete Gate      Rust 门禁推进中（C-1 已闭环 2026-08-11；C-2 partial，5/9 单位过 72h——2026-08-13 复算 122,477 数据行 / 780.529 CPU-hours，properties/yaml/ini/hcl/json 已过门槛，驱动已暂停（2026-08-13 11:19 后未重启），四单位未过门槛如实记录为遗留；C-3 partial；五语言各 L0-L5 已交付——L0 差分腿 shared-conformance 脚本：Go 变体已合入（consema-go/scripts/go-verify-shared-conformance.ps1，2026-08-13 G057 起接线 go-differential job），ts/py/kt 三变体尚未合入（five-language-ci-design §1.2/§10，2026-08-15 波 5 归正），L0-L5 关闭面以该文档为准）
   ↓
-0.14.0 Go core / PVCE / PGCE / protocol                  已交付（G0.1-G0.5，2026-08-07 D-1 授权启动）
+0.14.0 Go core / PVCE / PGCE / protocol                  已交付（G0.1-G0.5；D-1 授权 G0.1-G0.3 启动，G0.4-G0.5 按 go-implementation-plan §7 派发条款推进——2026-08-15 波 5 归正）
   ↓
-0.15.0 Go Source/Document + JSON family + TOML            已交付（G0.1-G5.6 全里程碑，逐项记录见 consema-go/go/README.md）
+0.15.0 Go Source/Document + JSON family + TOML            已交付（里程碑分配按 go-implementation-plan §2 表；全集 G0.1-G5.7 已交付，2026-08-15 波 5 归正——原「G0.1-G5.6 全里程碑」为跨版本全集误标；逐项记录见 consema-go/go/README.md）
   ↓
-0.16.0 Go YAML + INI + Properties                         已交付（G0.1-G5.6 全里程碑，逐项记录见 consema-go/go/README.md）
+0.16.0 Go YAML + INI + Properties                         已交付（里程碑分配按 go-implementation-plan §2 表；全集 G0.1-G5.7 已交付，2026-08-15 波 5 归正——原「G0.1-G5.6 全里程碑」为跨版本全集误标；逐项记录见 consema-go/go/README.md）
   ↓
-0.17.0 Go XML + plist                                    已交付（G0.1-G5.6 全里程碑，逐项记录见 consema-go/go/README.md）
+0.17.0 Go XML + plist                                    已交付（里程碑分配按 go-implementation-plan §2 表；全集 G0.1-G5.7 已交付，2026-08-15 波 5 归正——原「G0.1-G5.6 全里程碑」为跨版本全集误标；逐项记录见 consema-go/go/README.md）
   ↓
-0.18.0 Go HCL + Materialization/Edit parity               已交付（G0.1-G5.6 全里程碑，逐项记录见 consema-go/go/README.md）
+0.18.0 Go HCL + Materialization/Edit parity               已交付（里程碑分配按 go-implementation-plan §2 表；全集 G0.1-G5.7 已交付，2026-08-15 波 5 归正——原「G0.1-G5.6 全里程碑」为跨版本全集误标；逐项记录见 consema-go/go/README.md）
   ↓
-0.19.0 双语言一致性、产品 Beta 与真实项目验证            已交付（G0.1-G5.6；五语言扩展见 2026-08-11 决策）
+0.19.0 双语言一致性、产品 Beta 与真实项目验证            已交付（G0.1-G5.7，含 G5.7 real-repository migration pilot——docs/pilot-go-0.19.0.md 与 docs/rc-1.0.0-candidate.md 均标注 0.19.0 G5.7，2026-08-15 波 5 归正；五语言扩展见 2026-08-11 决策）
   ↓
 1.0.0-rc.n  稳定候选
   ↓
@@ -1023,7 +1023,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 
 > **决策注记（2026-08-07）**：owner 决定在 C-1/C-2/C-3 完成前启动 `0.14.0` 的 Go 实现（G0.1-G0.3：core/graph/protocol），这是经记录的路线图偏差，按 §0 冲突解决层级处理——修改路线图、不静默缩小 1.0.0 承诺；`0.13.0` 门禁判定以 docs/fc-manifest-0.13.0.json 为准（gate_open/not_closed，C-1/C-2/C-3 开放，decision record 见该 manifest）。
 >
-> **状态更新（2026-08-12；2026-08-13 更新 C-2 数字）**：C-1 已闭环——2026-08-11 GitHub Actions run#5（head 437fd35）132/132 steps 全绿；C-2 推进中——2026-08-13 复算 122,477 数据行 / 780.529 CPU-hours（runs.csv 权威），properties/yaml/ini/hcl/json 五单位已过 72h 门槛（驱动已暂停 2026-08-13 11:19 后未重启，四单位未过门槛如实记录为遗留）；C-3 partial；Go 全里程碑（0.14.0-0.19.0 G0.1-G5.6）已交付；五语言实现各 L0-L5 已交付（TS/Python/Kotlin 与 Rust/Go 同等地位，见 docs/multi-language-implementation-plan.md 与 docs/five-language-ci-design.md；L0 的 shared-conformance 差分腿尚未合入，见该设计 §10）。
+> **状态更新（2026-08-12；2026-08-13 更新 C-2 数字）**：C-1 已闭环——2026-08-11 GitHub Actions run#5（head 437fd35）132/132 steps 全绿；C-2 推进中——2026-08-13 复算 122,477 数据行 / 780.529 CPU-hours（runs.csv 权威），properties/yaml/ini/hcl/json 五单位已过 72h 门槛（驱动已暂停 2026-08-13 11:19 后未重启，四单位未过门槛如实记录为遗留）；C-3 partial；Go 全里程碑（0.14.0-0.19.0 G0.1-G5.7，含 G5.7）已交付；五语言实现各 L0-L5 已交付（TS/Python/Kotlin 与 Rust/Go 同等地位，见 docs/multi-language-implementation-plan.md 与 docs/five-language-ci-design.md；L0 的 shared-conformance 差分腿：Go 变体已合入（2026-08-13 G057），ts/py/kt 三变体尚未合入，见该设计 §10）。
 
 版本数量可以在实际执行中增加，但不得压缩语义门禁。若某个阶段过大，可以拆成更多 minor 版本；不能为了保持编号漂亮而把未完成能力滚入下一阶段。
 
