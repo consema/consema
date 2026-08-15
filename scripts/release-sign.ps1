@@ -20,9 +20,12 @@
 #       Write the checksum manifest and sign it. The manifest reuses the
 #       sha256 output format of scripts/verify-package-archives.ps1
 #       ("<64 lowercase hex>  <name>.crate"), computed over the same
-#       publishable-crate set (workspace members with publish != null,
-#       sorted by name), so the artifact the release record ships and the
-#       checksums the package gate printed are byte-identical. The
+#       publishable-crate set (workspace members with publish == null —
+#       the publish field defaults to null for publishable crates, []
+#       means never publishable — sorted by name; 2026-08-15 波 5 归正
+#       comment, aligned with consema-rs wave-4 R10), so the artifact the
+#       release record ships and the checksums the package gate printed
+#       are byte-identical. The
 #       manifest file is then signed twice, both standard forms:
 #         gpg --clearsign          -> <manifest>.asc  (text + signature)
 #         gpg --detach-sign --armor -> <manifest>.sig (signature only)

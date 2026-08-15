@@ -167,7 +167,7 @@ if ($LASTEXITCODE -ne 0 -or $commitLines.Count -eq 0) {
 $commitLong = $commitLines[0].Trim()
 $runDate = Get-Date -Format 'yyyy-MM-dd HH:mm:ss zzz'
 
-$metadataJson = Invoke-NativeCapture $cargo @('metadata', '--locked', '--offline', '--no-deps', '--format-version', '1')
+$metadataJson = Invoke-NativeCapture $cargo @('-C', $RepoRoot, 'metadata', '--locked', '--offline', '--no-deps', '--format-version', '1')
 if ($LASTEXITCODE -ne 0) {
     Write-Output 'error: cargo metadata failed; the output file name derives'
     Write-Output '  from the workspace version.'
