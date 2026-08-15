@@ -1354,7 +1354,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * 文档、示例和真实项目 pilot；
 * release process、SBOM、签名和恢复演练。
 
-只有第 15 节 Rust Feature-Complete Gate 全部通过，才允许开始 `0.14.0` 的 Go 实现。（注：该条款已按 2026-08-07 owner decision（fc-manifest decisions[0] D-1）修订——Go 0.14.0-0.19.0 已提前授权启动并全部独立验证交付（G0.1-G5.6），见 §13 里程碑表与 docs/go-implementation-plan.md §7。）
+只有第 15 节 Rust Feature-Complete Gate 全部通过，才允许开始 `0.14.0` 的 Go 实现。（注：该条款已按 2026-08-07 owner decision（fc-manifest decisions[0] D-1）修订——D-1 只授权 0.14.0 G0.1-G0.3 启动，0.15.0+ 按 docs/go-implementation-plan.md §7 派发条款推进；Go 0.14.0-0.19.0 全里程碑（G0.1-G5.7）已交付，2026-08-15 波 5 归正全集，见 §13 里程碑表。）
 
 ---
 
@@ -1380,7 +1380,7 @@ RFC 必须包含：动机、非目标、数据模型、状态机、错误代数�
 * 所有 public object 的 lifecycle、identity、completion 和 failure 已定义；
 * 没有依赖 Rust 类型名才能解释的语言无关行为；
 * 所有 provisional abstraction 已验证、修订或删除；
-* Go API mapping RFC 已接受（2026-08-07 修订为 15-kind 契约映射）；Go 实现 0.14.0 G0.1-G0.3 已按 2026-08-07 决策记录 D-1 启动（core/graph/protocol，见 fc-manifest decisions[0]；C-1/C-2/C-3 完成前不发布 0.14.0、不宣称里程碑关闭）；**（注记：Go 全里程碑已交付——0.14.0-0.19.0 G0.1-G5.6，2026-08-10 前；C-1 已闭环 2026-08-11 run#5）**；
+* Go API mapping RFC 已接受（2026-08-07 修订为 15-kind 契约映射）；Go 实现 0.14.0 G0.1-G0.3 已按 2026-08-07 决策记录 D-1 启动（core/graph/protocol，见 fc-manifest decisions[0]；C-1/C-2/C-3 完成前不发布 0.14.0、不宣称里程碑关闭）；**（注记：Go 全里程碑已交付——0.14.0-0.19.0 G0.1-G5.7（含 G5.7 real-repository migration pilot），2026-08-10 前；D-1 授权范围仅 0.14.0 G0.1-G0.3，2026-08-15 波 5 归正；C-1 已闭环 2026-08-11 run#5）**；
 * 所有已知规范歧义有 resolution 或明确的阻断状态。
 
 ## 15.3 质量门禁

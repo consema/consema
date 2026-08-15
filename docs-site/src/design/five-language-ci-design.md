@@ -259,7 +259,7 @@
 
 ---
 
-## 4. 聚合 digest：五 runner 共钉一个值
+## 4. 聚合 digest：四 runner + 母仓作业共钉一个值（2026-08-15 波 5 归正——ts runner 为 documented skip，见 §4.2 注；节标题原「五 runner 共钉」随正文注记一并归正）
 
 ### 4.1 算法与口径（不变）
 
@@ -405,7 +405,7 @@ multi-language-implementation-plan.md §7 START GATE：工具链就绪后先验�
 
 | 字段 | 内容 |
 |---|---|
-| `digests.conformance_suite.evidence` | 追加"五 runner 共钉"注记（值 cfd6e296… 不变） |
+| `digests.conformance_suite.evidence` | 追加"共钉"注记（值 cfd6e296… 不变；2026-08-15 波 5 归正措辞——共钉集合为 rs/go/py/kt 四 runner + 母仓作业，ts runner 为 documented skip） |
 | 新顶层 `languages` | 每语言一节：toolchain pin（node 26.x / python 3.12.x / kotlin 2.2.0+JVM 17）、里程碑状态（blind_writing / l0_open / l0_closed / … / l5_closed）、每里程碑证据与 owner（照 gates 字典 rust_compiler_msrv 项记录体例）、CI 上线批次 decision record |
 | `corpus_test_suite_revisions.value` | 追加差分 case 集记录（byte-parity 68 / normalized 108 / protocol-exchange 83，含迁移后共享路径） |
 | `capability_set` 相关门禁 | 每语言 capability parity 记录（L4 起，"无 Rust only mandatory"，multi-language-implementation-plan.md） |

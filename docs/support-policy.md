@@ -238,7 +238,7 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 
 | 本政策条目 | 门禁/证据 |
 |---|---|
-| MSRV 1.85 | consema-rs/Cargo.toml:33；consema-rs CI msrv job；根 CHANGELOG.md |
+| MSRV 1.85 | consema-rs/Cargo.toml 的 `rust-version` 字段（行号可能漂移，以字段名为锚）；consema-rs CI msrv job；根 CHANGELOG.md |
 | TS 最低版本 | consema-ts/typescript/package.json 的 `engines` 字段（>= 26）；CI 钉 26.7.0 |
 | Python 最低版本 | consema-py/python/pyproject.toml 的 `requires-python` 字段（>= 3.12；行号可能漂移，以字段名为锚）；CI 钉 '3.12.x' |
 | Kotlin 最低版本 | consema-kt/kotlin/build.gradle.kts 的 Kotlin 版本与 `jvmToolchain` 字段（Kotlin 2.2.0 + JVM 17）；CI Temurin 17 |

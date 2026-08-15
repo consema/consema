@@ -311,14 +311,14 @@
         },
         {
           "id": "S-6",
-          "name": "Go API mapping RFC 已接受（2026-08-07 修订为 15-kind 映射）；Go 实现 0.14.0-0.19.0 全里程碑（G0.1-G5.6）已交付（core/graph/protocol/document + 八格式家族全 surface + CLI go/cmd/consema + conformance runner + fuzz/差分 harness；productVersion 1.0.0-rc.1，runner 519/519）",
+          "name": "Go API mapping RFC 已接受（2026-08-07 修订为 15-kind 映射）；Go 实现 0.14.0-0.19.0 全里程碑（G0.1-G5.7）已交付（D-1 授权 0.14.0 G0.1-G0.3，2026-08-15 波 5 归正全集）（core/graph/protocol/document + 八格式家族全 surface + CLI go/cmd/consema + conformance runner + fuzz/差分 harness；productVersion 1.0.0-rc.1，runner 519/519）",
           "status": "complete",
           "evidence": [
             "docs/rfcs/0016-go-api-mapping-v1.md（Accepted，§4.1 15-kind 值映射冻结）",
             "consema-go/go/：0.14.0 G0.1-G0.5 起步（core 15-kind+PVCE、graph+PGCE、protocol v1-v7 41/187+CLI 记录、consema-go/go/conformance 18-suite runner、6 fuzz target、differential 字节 harness），0.15.0-0.19.0（G1.1-G5.6）完成八格式家族全 surface 与 CLI consema-go/go/cmd/consema（11 命令 + plan/apply，exit 0-5 矩阵）；go build/vet/test/race/gofmt/tidy 全绿，22 包全绿（20 含测试，quickstart/sdk_chain 两示例包无测试；含 race）；productVersion 1.0.0-rc.1（consema-go/go/cmd/consema/version.go 的 productVersion 字段——行号可能漂移，以字段名为锚）",
             "conformance runner 实测：0.14.0 时点适用 case 149/149 通过、359 documented skip（历史）；现为 519/519 零 skip，聚合 digest cfd6e296... 精确一致（规范 checkout 实测；2026-08-07 CRLF 工作树记录 e3d6578858... 已被规范态值取代）",
             "跨语言字节 parity 实测：68/68（51 PVCE + 17 PGCE）双向相等（consema-go/scripts/go-verify-byte-parity.ps1）；normalized 差分 108/108 双向、协议交换 83/83（2026-08-10）",
-            "docs/go-implementation-plan.md（§6 验收门禁表）、§7 修订条款（D-1 决策记录）；consema-go/README.md 逐里程碑交付记录（G0.1-G5.6 全 closed）"
+            "docs/go-implementation-plan.md（§6 验收门禁表）、§7 修订条款（D-1 决策记录）；consema-go/README.md 逐里程碑交付记录（G0.1-G5.7 全 closed）"
           ],
           "source_of_truth": "RFC 0016；2026-08-07 owner decision（decisions[0]）书面授权提前启动；Go 里程碑已按 go-implementation-plan §6 门禁独立验证交付（0.14.0-0.19.0 全 closed，consema-go/README 逐项记录）；C-1 已闭环（2026-08-11 run#5），C-2/C-3 仍开放"
         },
@@ -770,7 +770,7 @@
   },
   "feature_complete_judgment": {
     "verdict": "not_closed",
-    "verdict_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭（C-2/C-3 开放）。已关闭：全部功能/规范门禁、质量门禁除 Q-7 外全部、性能门禁全部、API 与产品门禁全部（A-4/A-9 已随 C-1 闭环——2026-08-11 run#5 132/132 steps 全绿，见 open_items C-1）、安全门禁全部（SEC-9 已随 C-1 闭环——run#5 三 OS cli 测试矩阵全绿）。本判定翻转（closed）需要下列开放项全部完成；Go 实现 0.14.0-0.19.0（G0.1-G5.6）已按 2026-08-07 owner decision（decisions[0]）授权启动并全部独立验证交付（consema-go/README 逐项记录），C-1 已闭环（2026-08-11 run#5），剩余 C-2/C-3 完成路径见 open_items（路线图 §15.7；START GATE 修订条款见 docs/go-implementation-plan.md §7）。",
+    "verdict_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭（C-2/C-3 开放）。已关闭：全部功能/规范门禁、质量门禁除 Q-7 外全部、性能门禁全部、API 与产品门禁全部（A-4/A-9 已随 C-1 闭环——2026-08-11 run#5 132/132 steps 全绿，见 open_items C-1）、安全门禁全部（SEC-9 已随 C-1 闭环——run#5 三 OS cli 测试矩阵全绿）。本判定翻转（closed）需要下列开放项全部完成；Go 实现 0.14.0-0.19.0（G0.1-G5.7）已交付（D-1 只授权 0.14.0 G0.1-G0.3 启动，0.15.0+ 按 go-implementation-plan §7 派发条款推进，2026-08-15 波 5 归正）（consema-go/README 逐项记录），C-1 已闭环（2026-08-11 run#5），剩余 C-2/C-3 完成路径见 open_items（路线图 §15.7；START GATE 修订条款见 docs/go-implementation-plan.md §7）。",
     "closed_gates": [
       "functional（§15.1）",
       "spec（§15.2）",
