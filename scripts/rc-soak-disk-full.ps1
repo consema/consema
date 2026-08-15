@@ -329,17 +329,38 @@ df --output=size,used,avail -B1 "$VOL" | tail -1
     Write-Host '=== end report ==='
 }
 finally {
+    $cleanupFailed = $false
     if ($mounted) {
         Write-Host '[8/9] unmounting the volume ...'
         bash -c $umountScript 'rc-soak' $vol
+        if ($LASTEXITCODE -ne 0) {
+            # A failed umount (volume busy / leak) means the tmpfs is still
+            # mounted on the host; surfacing it instead of claiming a clean
+            # drill (2026-08-15 波 5). Remove-Item below would otherwise
+            # recursively delete the still-mounted volume's contents and
+            # leak the empty root mount.
+            Write-Host "WARNING: umount failed (exit $LASTEXITCODE); the volume may still be mounted."
+            $cleanupFailed = $true
+        }
         $mounted = $false
     }
     if ($Keep) {
         Write-Host "work dir kept: $work"
     }
+    elseif ($cleanupFailed) {
+        # Never recursively delete a still-mounted tmpfs — that would erase
+        # the volume's contents and leak an empty root mount on the host
+        # (2026-08-15 波 5).
+        Write-Host "work dir kept for manual cleanup (umount failed): $work"
+    }
     elseif (Test-Path $work) {
         Remove-Item -LiteralPath $work -Recurse -Force
     }
+    if ($cleanupFailed) {
+        Write-Host '[9/9] drill complete — with cleanup warnings (see WARNING above); the tmpfs mount may need manual cleanup.'
+    }
+    else {
+        Write-Host '[9/9] drill complete (exit 0)'
+    }
 }
-Write-Host '[9/9] drill complete (exit 0)'
 exit 0

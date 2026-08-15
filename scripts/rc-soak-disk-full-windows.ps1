@@ -61,7 +61,12 @@ $ErrorActionPreference = 'Stop'
 # verify-package-archives.ps1 同款）。
 $runningOnWindows = $env:OS -eq 'Windows_NT'
 if (-not $runningOnWindows) {
-    Write-Error 'rc-soak-disk-full-windows.ps1 is the Windows variant; on the Linux runner use scripts/rc-soak-disk-full.ps1 (tmpfs).'
+    # Write-Output, not Write-Error: under $ErrorActionPreference = 'Stop' a
+    # Write-Error is a terminating error, so the documented `exit 3` was
+    # unreachable and the guard always died with exit 1, the record written
+    # to stderr instead of stdout (2026-08-15 波 5; Linux 变体同体例已在
+    # 波 4 修复)。
+    Write-Output 'rc-soak-disk-full-windows.ps1 is the Windows variant; on the Linux runner use scripts/rc-soak-disk-full.ps1 (tmpfs).'
     exit 3
 }
 
@@ -288,21 +293,42 @@ try {
     Write-Host '=== end report ==='
 }
 finally {
+    $cleanupFailed = $false
     if ($mounted) {
         Write-Host '[8/8] cleaning up: dismounting the VHD ...'
         try {
             Remove-PartitionAccessPath -DiskNumber $diskNumber -PartitionNumber $partition.PartitionNumber -AccessPath $mp -Confirm:$false -ErrorAction SilentlyContinue
         }
         catch { }
-        Dismount-VHD -Path $vhdPath -ErrorAction SilentlyContinue
+        try {
+            Dismount-VHD -Path $vhdPath -ErrorAction Stop
+        }
+        catch {
+            # Dismount-VHD failing is a real cleanup failure: the VHD may
+            # still be mounted/occupying the disk. Surface it instead of
+            # claiming a clean drill (2026-08-15 波 5).
+            Write-Host "WARNING: Dismount-VHD failed ($($_.Exception.Message)); the VHD may still be mounted."
+            $cleanupFailed = $true
+        }
         $mounted = $false
     }
-    if (-not $Keep) {
-        Remove-Item -LiteralPath $WorkDir -Recurse -Force -ErrorAction SilentlyContinue
-    }
-    else {
+    if ($Keep) {
         Write-Host "work dir kept: $WorkDir"
     }
+    elseif ($cleanupFailed) {
+        # Never recursively delete the work dir while the VHD is still
+        # mounted — the volume contents would be erased and the VHD leaked
+        # (2026-08-15 波 5).
+        Write-Host "work dir kept for manual cleanup (dismount failed): $WorkDir"
+    }
+    else {
+        Remove-Item -LiteralPath $WorkDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    if ($cleanupFailed) {
+        Write-Host '[8/8] drill complete — with cleanup warnings (see WARNING above); the VHD/partition may need manual cleanup.'
+    }
+    else {
+        Write-Host '[8/8] drill complete (exit 0)'
+    }
 }
-Write-Host '[8/8] drill complete (exit 0)'
 exit 0
