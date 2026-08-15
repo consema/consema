@@ -20,7 +20,7 @@
 - **仓库中不存在任何 CLI 代码**：`crates/*/src/bin/` 仅有 `crates/consema-conformance/src/bin/` 下两个上游 suite 测试适配器（`consema-toml-test-decoder.rs`、`consema-yaml-test-adapter.rs`），不是产品 CLI；全 workspace 无 `main.rs`、无 `[[bin]]`、无 clap/structopt 等参数解析依赖。
 - `crates/consema` 是 lib-only 可发布 facade crate（`crates/consema/Cargo.toml`），`pub use` 全部 13 个 backend crate 并通过 `Document::parse_*`/`as_*` 与 `convert_*` 提供统一语义入口（`crates/consema/src/lib.rs`、`conversion.rs`）。
 - 仓库无 `.github/`：CI 是本地门禁（`scripts/verify-package-archives.ps1` 打包验证 + 各 oracle 脚本 + cargo 门禁）。
-- 依赖政策：`deny.toml` 的 `[sources]` 仅 crates.io 钉版、`[bans]` 禁多版本/通配；workspace 只钉版 7 个直接依赖（`Cargo.toml:21-28`）。CLI 计划因此**零新外部依赖**（§5）。
+- 依赖政策：`deny.toml` 的 `[sources]` 仅 crates.io 钉版、`[bans]` 禁多版本/通配；workspace 只钉版 7 个直接依赖（consema-rs/Cargo.toml 的 `[workspace.dependencies]` 配置；行号可能漂移，以字段名为锚）。CLI 计划因此**零新外部依赖**（§5）。
 - `docs/IMPLEMENTATION.md` §13「0.8.0 明确边界」明示"文件系统原子替换"未实现——0.12.0 是首次实现文件系统写入的版本，且按路线图 §6「统一操作链条」只属于 CLI/application 层，不得塞回 Document 核心。
 
 ### 0.2 命令面（路线图 §10「产品级 CLI」，11 个正式命令）
@@ -117,7 +117,7 @@ bin 绝不直接依赖任何 backend crate（硬门禁 1）
 | `Document::snapshot_identity`、`SourceSnapshot` digest 事实 | 直接复用 | inspect 的 digest 报告；plan/apply 的前置条件事实 |
 | `ParseLimits`/`ProtocolLimits` 等全部上限类型 | 直接复用 | 每命令的解析/传输预算，CLI 层只做文件读取上限（§7 R-9） |
 | `EditPlan` / `SourcePatch` / `UntouchedByteProof` / `dry_run` 等价契约 | 直接复用 | edit/plan 命令的规划核心（IMPLEMENTATION.md §8「原子 scalar 与 structural edit」dry-run/commit 相同 patch + §13「0.8.0 明确边界」EditPlan 不授予文件系统写入权限） |
-| `unsafe_code = forbid`、`missing_docs = warn`、clippy pedantic workspace lint | 沿用 | bin 模块同样受 workspace lint 约束（Cargo.toml:36-50） |
+| `unsafe_code = forbid`、`missing_docs = warn`、clippy pedantic workspace lint | 沿用 | bin 模块同样受 workspace lint 约束（consema-rs/Cargo.toml 的 `workspace.lints` 配置；行号可能漂移，以字段名为锚） |
 
 ### 1.2 需要扩展的复用点（semantic-model v7，M2）
 

@@ -176,7 +176,7 @@
 
 ## 4. rustdoc 100% 断言
 
-- 门禁体例：workspace lint `missing_docs = "warn"`（Cargo.toml:38）+ `RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps`。
+- 门禁体例：workspace lint `missing_docs = "warn"`（consema-rs/Cargo.toml 的 `workspace.lints` 配置；行号可能漂移，以字段名为锚）+ `RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps`。
 - 实测（2026-08-07）：`cargo doc --workspace --no-deps --exclude consema-conformance` 在 `-D warnings` 下**零警告**（0 个 missing-docs），其余 14 个 crate 全部 100% 覆盖。
 - 唯一失败点：`cargo doc -p consema-conformance` 12 个 missing-docs 警告，全部位于 `consema-rs/consema-conformance/src/fuzz.rs`（`Mutation` 枚举字段/变体），当时为 M2 并行轨（fuzz 域）未落盘的新文件。该文件已随 0.13.0 落地（094f5d1/7e9de38 提交，已入库），M2 合入后 12 处 missing-docs 已补齐（fuzz.rs 全部带 /// 文档），门禁全绿（0.13.0 收口 M9 复核确认）。
 

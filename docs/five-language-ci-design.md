@@ -17,6 +17,8 @@
 - **CI**：`.github/workflows/ci.yml` 单一 workflow，11 个 job = 10 个 Rust 门禁（lint/test/coverage/
   msrv/conformance/deny/audit/semver/oracles/package，拆分前母仓 ci.yml:25-307，现行 job 名见
   consema-rs ci.yml）+ `go-1-26`（拆分前母仓 ci.yml:321-331，现行归 consema-go 仓）。
+  （2026-08-15 波 5 注：全文 16 处「拆分前母仓 ci.yml:NN」均为拆分前单仓树内的历史行号
+  括注，行号可能漂移且该文件已拆仓迁移——现行引用一律以 job 名为锚。）
   C-1 记录此 10 job 需在 GitHub 干净 checkout 全矩阵全绿（fc-manifest-0.13.0.json open_items 字典 C-1 项；C-1 status 已 closed——2026-08-11 run #5 132/132 steps 全绿并回填 closure）。〔注：本节为 2026-08-11 调研快照，已由 §10 实况取代——拆分前母仓 ci.yml 为 10+2 job（go-1-26、go-differential 两个 job）；六仓拆分 2d7494f 后 go-differential 归 consema-go 仓（ci-go.yml 的 go-differential job），母仓 ci.yml 现为 oracles / shared-conformance-digest / check 三 job〕
 - **差分 harness 现状（关键事实）**〔注：本节为 2026-08-11 调研快照——「go-verify 未接入 CI」已被 §10 实况取代：Go 差分已由本地执行 + 文档化完成路径变为 CI 常设 gate（consema-go ci-go.yml 的 go-differential job，以 job 名为锚）。2026-08-15 波 5 补仓归属注：`go-verify-*.ps1` 已随 88933da（2026-08-13）从母仓 `scripts/` 删除，现只存在于 **consema-go/scripts/**；本文档全部 `go-verify-*` 引用（含 :12-29/:16-17/:33-47/:117-124 等行号）均指 consema-go 仓脚本，行号可能漂移，以脚本内函数/语义段为锚〕：`scripts/go-verify-byte-parity.ps1`、`go-verify-normalized-
   differential.ps1`、`go-verify-protocol-exchange.ps1`、`go-verify-shared-conformance.ps1` 当时**未接入
