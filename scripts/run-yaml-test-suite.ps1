@@ -4,11 +4,13 @@
 )
 
 $ErrorActionPreference = 'Stop'
-# 注（2026-08-13，2026-08-14 波 2 修订）：六仓拆分后母仓根无 Cargo.toml/workspace——
-# 本脚本的 `cargo build --locked -p consema-conformance` 在母仓原位必然失败（exit 101）；
-# 脚本只存在于母仓 scripts/（consema-rs 无副本，无处可检），目前作为记录载体保留、
-# 无 CI job 执行（官方 yaml-test-suite 402 项的记录见 fuzz-evidence 与 conformance/README
-# 上游 gate 段）；可执行入口的迁移/重建待总指挥决策。
+# 注（2026-08-13，2026-08-14 波 2 修订，2026-08-15 波 5 归正）：六仓拆分后母仓根
+# 无 Cargo.toml/workspace——本脚本的 `cargo build --locked -p consema-conformance`
+# 在母仓原位必然失败（exit 101）；脚本只存在于母仓 scripts/（consema-rs 无副本，
+# 无处可检），目前作为记录载体保留、无 CI job 执行（官方 yaml-test-suite 402 项
+# 的记录载体是 docs/UPSTREAM-YAML-TEST-SUITE.md 与 conformance/README 上游 gate
+# 段——fuzz-evidence 不含该记录，2026-08-15 波 5 归正证据指针）；可执行入口的
+# 迁移/重建待总指挥决策。
 # 注意：若未来迁移执行，必须先修正 target 路径解析——cargo build 按启动 cwd 解析、
 # 脚本按自身位置解析 target 目录，两者不一致会静默命中陈旧二进制。
 # 编码注（2026-08-15 波 4）：本文件为 UTF-8 WITH BOM——Windows PowerShell 5.1
