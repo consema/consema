@@ -48,7 +48,7 @@
 
 | 仓 | 通道 | 触发 | 机制 | 用户侧凭证动作 |
 |---|---|---|---|---|
-| consema-rs | crates.io（14 crate） | tag v* | trusted publishing (OIDC, 2025-07 GA) 主路径 + `CARGO_REGISTRY_TOKEN` fallback；14 crate 按依赖序逐个 `cargo publish --locked` | 首次发布手动一次；之后每个 crate 在 crates.io 配置 Trusted Publishers（repo `consema/consema-rs`，workflow `release.yml`） |
+| consema-rs | crates.io（14 crate） | tag v* | trusted publishing (OIDC, 2025-07 GA) 主路径 + `CARGO_REGISTRY_TOKEN` fallback；14 crate 按依赖拓扑序逐个 `cargo publish --locked`（顺序由 consema-rs `scripts/publish-order.jq` 从 cargo metadata 推导——2026-08-15 波 5 P0 落定；facade crate `consema` 依赖全部 13 个兄弟 crate，先发布依赖后发布 facade） | 首次发布手动一次；之后每个 crate 在 crates.io 配置 Trusted Publishers（repo `consema/consema-rs`，workflow `release.yml`） |
 | consema-ts | npm（`@consema/consema`） | tag v* | `npm publish --provenance`（id-token: write）+ `NPM_TOKEN` | npm 生成 publish token → GitHub secret `NPM_TOKEN`；canary（zod 模式）P2 |
 | consema-py | PyPI（`consema`） | tag v* | trusted publishing (OIDC) 标准做法，无密码 | PyPI 项目设置 → Publishing → 添加 GitHub publisher（consema/consema-py，workflow `release.yml`） |
 | consema-kt | Maven Central（`dev.consema:consema-kotlin`） | tag v* | `gradle publish`（Central Portal deploy 端点）+ PGP 签名 | Sonatype Portal 认领 `dev.consema` namespace + deploy token → secrets `OSSRH_USERNAME`/`OSSRH_PASSWORD`；PGP 密钥 → secrets `SIGNING_KEY`/`SIGNING_PASSWORD`；凭证专人 |

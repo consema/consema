@@ -57,7 +57,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 
 - `vectors/`：18 套语言无关 suite 共 519/519 cases（聚合 digest `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`）
 - `fixtures/`：真实配置夹具；`corpora/`：mutation 语料
-- `oracles/`：差分 oracle（`hcl-go-v1` 29 case、`plist-macos-v1` 7 case，manifest 记录 runtime 固定事实与 documented skip_path；常设 CI job 为 documented-skip 状态检查）与固定 runtime oracle（`java-properties-v1` / `python-configparser-v1` / `dotnet-ini-v1` / `windows-ini-v1` / `qt-ini-v1` 五套，36/36 差分案例，一次性记录 2026-08-05——非常设门禁；2026-08-15 波 4 与 conformance/README 口径统一）
+- `oracles/`：差分 oracle（`hcl-go-v1` 29 case、`plist-macos-v1` 7 case，manifest 记录 runtime 固定事实与 documented skip_path；常设 CI job 为 documented-skip 状态检查）与固定 runtime oracle（`java-properties-v1` / `python-configparser-v1` / `dotnet-ini-v1` / `windows-ini-v1` / `qt-ini-v1` 五套，36/36 差分案例，一次性记录 2026-08-05——非常设门禁；2026-08-15 波 4 与 conformance/README 口径统一。如实注记 2026-08-15：consema-rs 的 conformance crate 把这 36 个 case 作为常设 `#[test]` 门禁执行——`consema-conformance/src/ini_dotnet_oracle.rs` 等五文件均有 `published_*_oracle_manifest_is_conformant` 测试全量执行 manifest case 并断言通过——「非常设门禁」指六仓 CI workflow 不执行这 5 个脚本，consema-rs `cargo test` 全量常设执行）
 - `differential/`：跨语言差分 case 集（byte parity / normalized / protocol-exchange，五语言共用单一权威）
 
 **脚本**（`scripts/`）：
@@ -65,7 +65,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 - 差分 oracle 驱动：`run-hcl-go-oracle.ps1`、`run-plist-macos-oracle.ps1`（exit 3 = documented skip）
 - 固定 runtime oracle 源码与固定工具链：`scripts/oracles/`
 - 上游格式 gate：`run-toml-test.ps1`（官方 toml-test v2.2.0）、`run-yaml-test-suite.ps1`（官方 yaml-test-suite data-2022-01-17）——脚本与记录在母仓、**无 CI job 执行**；六仓拆分后母仓根无 Cargo.toml，脚本在母仓原位不可执行（第一步 cargo build 必然 exit 101），保留为记录载体；可执行入口的迁移/重建待总指挥决策（2026-08-14 波 2 处置，见下「验证（本仓侧）」注）
-- 固定 runtime oracle：`run-properties-jdk-oracle.ps1` / `run-python-configparser-oracle.ps1` / `run-dotnet-ini-oracle.ps1` / `run-windows-ini-oracle.ps1` / `run-qt-ini-oracle.ps1`（5 套，36/36 差分案例；一次性记录 2026-08-05——六仓任何 workflow 均不执行这 5 个脚本，不是常设门禁）
+- 固定 runtime oracle：`run-properties-jdk-oracle.ps1` / `run-python-configparser-oracle.ps1` / `run-dotnet-ini-oracle.ps1` / `run-windows-ini-oracle.ps1` / `run-qt-ini-oracle.ps1`（5 套，36/36 差分案例；一次性记录 2026-08-05——六仓任何 workflow 均不执行这 5 个脚本，不是 CI 常设门禁；如实注记：consema-rs 以 `cargo test` 常设执行这 36 个 case，见上 oracles 段）
 
 **其他**：SECURITY.md（安全政策）、LICENSE、CHANGELOG.md（版本变更记录）、`.github/workflows/ci.yml`（本仓 CI：oracles + shared-conformance-digest + check 聚合门禁，三 job）。
 
@@ -90,7 +90,7 @@ JSON family（`json.strict@1`、`jsonc.bounded@1`、`json5.standard@1`）、TOML
 # 执行；可执行入口的迁移/重建待总指挥决策（2026-08-14 波 2 处置）。
 ./scripts/run-toml-test.ps1                          # 官方 toml-test v2.2.0 gate（205 valid + 474 invalid；记录载体，母仓原位不可执行）
 ./scripts/run-yaml-test-suite.ps1                    # 官方 yaml-test-suite data-2022-01-17 gate（402 case；记录载体，母仓原位不可执行）
-./scripts/run-properties-jdk-oracle.ps1              # 固定 runtime oracle（5 套 / 36/36 差分案例；一次性记录 2026-08-05，非常设门禁）
+./scripts/run-properties-jdk-oracle.ps1              # 固定 runtime oracle（5 套 / 36/36 差分案例；一次性记录 2026-08-05，非 CI 常设门禁——consema-rs cargo test 常设执行，见上）
 ./scripts/run-python-configparser-oracle.ps1
 ./scripts/run-dotnet-ini-oracle.ps1
 ./scripts/run-windows-ini-oracle.ps1
