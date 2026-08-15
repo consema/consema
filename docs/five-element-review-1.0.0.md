@@ -503,3 +503,31 @@
 - 按常设阶段继续波 5 重打（stateFile 含波 2+3+4 累积 930 条确认）。
 
 **§13 结论**：波 4 修复后六仓本机全绿、kt/ts CI 转绿实证；行号/锚点矿脉已近收口（裸 `file:N` 六仓活文件零命中），新矿脉为跨语言数值语义（magnitude-DoS 家族）与门禁自洽性（波 4 自伤 2 处已修）。继续波 5 重打验证。
+
+## 14. 第四轮对抗性审计第五波（2026-08-16，修复后重打与收口）
+
+### 14.1 审计与归并
+
+- 触发：波 4 修复落地后按常设阶段重打（stateFile 带波 2+3+4 累积 930 条确认；loader 一次输出超限未加载去重上下文，攻击全量执行）
+- 结果：**366 条确认**（P0×4 / P1×22 / P2×340；12 轮满、dryStreak=0 仍未打穿）
+- 波 5 再次命中波 4 收口记录（§13.3「CI 实证」未披露母仓 CI 红×7 与 rs semver 红×4）——教训已升级为「收口记录必须全量披露六仓 CI 状态，未核查一律标注」，本记录 §14.3 按全量披露执行
+
+### 14.2 关键发现与修复
+
+- **P0×4**：rs 发布循环字母序把 facade 排第一（必败）→ 依赖拓扑序（publish-order.jq Kahn 算法，38 边程序化断言）；母仓 oracles macos 腿原生 stderr 不被捕获（每次必红）→ 标记改 stdout + 子进程 pwsh 捕获（3×4 矩阵预演选型）
+- **P1 大族**：rs 发布三重缺陷（无 User-Agent 403 / 无 fetch 误拒 / semver 破坏未批准）；magnitude 修复漏网面六处（rs yaml、go yaml int、kt plist+yaml、py toml float、py hcl 投影/物化 4300 位崩溃）+ py json 分块转换 %4≠0 静默错值；死门禁两处（go parity 路径 bug、kt release skip glob）；语言分叉（ts toml +Inf、py yaml 空指数误分类）；rs ctrlc 处理器死锁；ts 零匹配守卫假保护
+- 修复：16 agent 并行（10 专职 + 6 按仓 P2，340 条 P2 处置约 96%），六仓全程即时提交推送
+
+### 14.3 收口验证（2026-08-16，六仓本机全绿 + 六仓 CI 全量披露）
+
+- 本机：rs 1,660 / go 全包 / ts 701 / py 736 / kt 595 / 母仓 mdbook+JSON+YAML
+- **CI 全量披露（六仓六查）**：母仓 success（oracles macos 腿转绿实证）；consema-rs success（全 17 job 绿，含 semver/MSRV/聚合 check——期间 fmt/clippy 红由收口最小修复 e7d9b33/9648101 转绿）；ts success；kt success；go success；py success
+- manifest sha256 再迁（af27d599）与 provision 钉同步 db821cd、四仓 re-vendor 逐字节一致（4a27260a）；9 类根因零命中 grep 全过
+- 跳过清单核销：H1 领地 4 条（2 已修/1 部分缓解/1 遗留——rs release 不重跑全量版本一致性门禁）
+
+### 14.4 遗留（波 6 输入）
+
+- rs release verify-tag 不重跑全量 check-version-consistency（遗留）；rs dtolnay rustc 字节无仓库内校验和（部分缓解）；ts runner 聚合 digest 断言永久 documented skip（设计如此，可选补 provision）；kt 测试计数按实测 595 落笔
+- 按常设阶段继续波 6 重打（stateFile 含波 2+3+4+5 累积 1,237 条确认）。
+
+**§14 结论**：波 5 修复后六仓本机全绿、六仓 CI 全量披露全部转绿；跨语言数值语义矿脉基本闭合（位数上限全家族覆盖）。继续波 6 重打验证。
