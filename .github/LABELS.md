@@ -1,10 +1,13 @@
 # Pull request labels
 
-Every pull request must carry **at least one** `kind:` label — enforced by
+Every pull request must carry **at least one** `kind:` label — checked by
 `.github/workflows/pr-labels.yml` (viper checks.yaml pattern;
 `mheap/github-action-required-labels`, mode: minimum / count: 1). The check
 re-evaluates on `opened`, `synchronize`, `reopened`, `labeled` and
 `unlabeled`, so adding a label flips it green without a rebase.
+（如实注记 2026-08-15：该检查不是分支保护的 required check——required
+status checks 只有 `check (all gates green)` 一个上下文，无 kind 标签的
+PR 检查红但合并按钮不被阻断；标签要求由维护者在合并前人工确认。）
 
 The `area:` taxonomy below is applied automatically by
 `.github/workflows/labeler.yml` (actions/labeler, tokio labeler pattern;

@@ -16,10 +16,17 @@
 
 现状与门禁事实：
 
-- workspace `rust-version = "1.85"`（consema-rs/Cargo.toml:33），edition
-  2024；`unsafe_code = "forbid"`（consema-rs/Cargo.toml:37）。
-- CI 常设 `msrv` job 在 1.85.0 上运行与 stable 相同的全部测试矩阵
-  （`docs/0.13.0-gate-plan.md` M1；consema-rs/.github/workflows/ci.yml）；
+- workspace `rust-version = "1.85"`（consema-rs/Cargo.toml 的
+  `rust-version` 字段——行号可能漂移，以字段名为锚），edition
+  2024；`unsafe_code = "forbid"`（consema-rs/Cargo.toml 的
+  `workspace.lints`/crate lint 配置——行号可能漂移，以字段名为锚）。
+- CI 常设 `msrv` job 在 1.85.0 上运行 stable 的 lint/test 门禁（如实注记
+  2026-08-15：msrv job 为单 OS 单腿——ubuntu-latest、无 strategy/matrix，
+  只跑 fmt/clippy/rustdoc/test 四门禁；stable 的 lint/test 是 3 OS 矩阵，
+  即「与 stable 相同的全部测试矩阵」不成立，Windows/macOS 的 MSRV 兼容性
+  无 CI 载体；以 job 名为锚，consema-rs/.github/workflows/ci.yml）；
+  发布门禁同时在 current stable 与 MSRV 上通过 `--all-targets --all-features`
+  构建（根 CHANGELOG.md：Rust 1.97.1 与 MSRV 1.85.0 双腿）。
   发布门禁同时在 current stable 与 MSRV 上通过 `--all-targets --all-features`
   构建（根 CHANGELOG.md：Rust 1.97.1 与 MSRV 1.85.0 双腿）。
 
@@ -35,7 +42,10 @@
 - **验证**：CI msrv job 是唯一权威（本地 `cargo +1.85.0` 只作复验）；任何
   使用高于 MSRV 语法的代码（如 let-chains）在合入前必须被 msrv job 拦截
   （gate-plan §4 M1 验证记录已实测拦截行为）。
-- **示例**：当前发布基线 = MSRV 1.85（0.8.0 起声明）+ 验证工具链
+- **示例**：当前发布基线 = MSRV 1.85（自 v0.1.0 基线 4d07c24、
+  2026-08-04 起声明——git 实证 v0.1.0..v0.8.0 全部 8 个 tag 树均含
+  `rust-version = "1.85"`，2026-08-15 波 5 归正；路线图早期版本完成
+  证据同口径「0.3.0 起声明的 MSRV Rust 1.85」）+ 验证工具链
   Rust 1.97.1（根 CHANGELOG.md；冻结记录 fc-manifest-0.13.0.json
   `rust_compiler_msrv`）。
 
@@ -82,7 +92,8 @@ Python 实现（`consema` 包，consema-py 仓）随五语言同等地位（2026
 - **声明最低版本**：`requires-python >= 3.12`（consema-py/python/pyproject.toml 的
   requires-python 字段——行号可能漂移，以字段名为锚）；CI 矩阵为
   3.12.x / 3.13.x / 3.14.x 三 minor 线（consema-py ci-python.yml python-gates job，
-  setup-python；consema-py SECURITY:49 自述同口径）。
+  setup-python；consema-py SECURITY 的「支持窗口」段——以字段锚
+  `requires-python >= 3.12` 为准，行号可能漂移——自述同口径）。
 - **支持窗口**：自声明最低版本起至当时 stable 工具链的所有版本——CI 矩阵
   3.12.x/3.13.x/3.14.x（各自 minor 线最新补丁），声明最低版本 3.12.0 未被精确版本验证
   （"really verified in CI" 由构造满足不成立；RFC 0020 §9.3 口径）。
@@ -229,7 +240,7 @@ P3  文档、易用性、非稳定 message 或低风险边角问题
 |---|---|
 | MSRV 1.85 | consema-rs/Cargo.toml:33；consema-rs CI msrv job；根 CHANGELOG.md |
 | TS 最低版本 | consema-ts/typescript/package.json 的 `engines` 字段（>= 26）；CI 钉 26.7.0 |
-| Python 最低版本 | consema-py/python/pyproject.toml:21（requires-python >= 3.12）；CI 钉 '3.12.x' |
+| Python 最低版本 | consema-py/python/pyproject.toml 的 `requires-python` 字段（>= 3.12；行号可能漂移，以字段名为锚）；CI 钉 '3.12.x' |
 | Kotlin 最低版本 | consema-kt/kotlin/build.gradle.kts 的 Kotlin 版本与 `jvmToolchain` 字段（Kotlin 2.2.0 + JVM 17）；CI Temurin 17 |
 | 三平台 | CI 矩阵（gate-plan M1）；BENCHMARKS-0.12.0.md Environment |
 | 缺陷等级 P0-P3 | 路线图 §18.4；SECURITY.md 硬化套件 |

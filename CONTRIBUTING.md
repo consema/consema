@@ -43,6 +43,9 @@ TOML、YAML、INI、Java Properties、XML、Property List 与 HCL 八个格式�
   Security Advisory 当前未启用（2026-08-14 gh api 实测 false），启用后为
   首选渠道；启用前首选维护者邮箱 franckcl1989 &lt;franckcl@icloud.com&gt;；
   见 SECURITY.md），发现 panic、无界分配或规范绕过时同样走该渠道。
+  （本句的「panic、无界分配」为 Rust 参考实现的内部细节措辞，归属
+  consema-rs 仓——与 SECURITY.md hardening 段的 Rust 归因注记同口径；
+  语言无关的缺陷特征描述见 SECURITY.md 披露渠道段与各语言仓 SECURITY。）
 
 ## 如何提 Feature
 
@@ -92,7 +95,10 @@ TOML、YAML、INI、Java Properties、XML、Property List 与 HCL 八个格式�
 
 ## 标签体系
 
-PR 必须携带至少一个 `kind:` 标签（`.github/workflows/pr-labels.yml` 强制）。
+PR 必须携带至少一个 `kind:` 标签（`.github/workflows/pr-labels.yml` 检查项；
+  如实注记 2026-08-15：该检查不是分支保护的 required check——required
+  status checks 只有 `check (all gates green)` 一个上下文，无 kind 标签的
+  PR 检查红但合并按钮不被阻断，标签检查在合并前由人工确认）。
 五个 kind 标签见 [.github/LABELS.md](.github/LABELS.md)：
 
 | 标签 | 含义 |
