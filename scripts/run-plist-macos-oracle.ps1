@@ -58,7 +58,7 @@ if (-not (Test-Path -LiteralPath '/usr/bin/xcodebuild')) {
 # match the pins exactly. A host pin mismatch takes the documented skip path
 # instead of failing: the CI macOS leg runs on the unpinned macos-latest
 # image whose point versions drift (plan risk R-2), so a mismatch is
-# recorded as a skip (exit 3 with a stderr note), mirroring how
+# recorded as a skip (exit 3 with a stdout note), mirroring how
 # run-hcl-go-oracle.ps1 skips. Matching pins run the differential; any
 # genuine execution failure still exits non-zero. The Foundation facts
 # reported by the driver (os.version, corefoundation.version) are recorded
@@ -68,7 +68,11 @@ if (-not (Test-Path -LiteralPath '/usr/bin/xcodebuild')) {
 function Assert-OrSkipHostPin {
     param([string]$Component, [string]$Expected, [string]$Actual)
     if ($Actual -cne $Expected) {
-        [Console]::Error.WriteLine("Plist macOS differential: SKIPPED (host $Component pin mismatch: expected '$Expected', got '$Actual'; documented skip path, plan risk R-2, mirroring run-hcl-go-oracle.ps1 exit-3 skip)")
+        # Wave-5 (2026-08-15): the skip marker goes to STDOUT via Write-Output,
+        # mirroring run-hcl-go-oracle.ps1. The previous [Console]::Error
+        # (native stderr) write was invisible to the CI check's in-process
+        # 2>&1 capture, so the macOS leg failed despite the documented skip.
+        Write-Output "Plist macOS differential: SKIPPED (host $Component pin mismatch: expected '$Expected', got '$Actual'; documented skip path, plan risk R-2, mirroring run-hcl-go-oracle.ps1 exit-3 skip)"
         exit 3
     }
 }

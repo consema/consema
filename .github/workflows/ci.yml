@@ -62,7 +62,7 @@ jobs:
   # pinned-host run (Windows or macOS) has ever been recorded; this job is
   # the documented-skip standing check, not the real run.
   # run-plist-macos-oracle.ps1: the manifest pins a macOS toolchain; hosted
-  # runners take the documented skip (exit 3 with a stderr note) on every
+  # runners take the documented skip (exit 3 with a stdout note) on every
   # leg, including the unpinned macos-latest image (host pin drift against
   # the manifest runtime pins, plan risk R-2). No macOS execution has been
   # observed or recorded in any repository. Exit 3 is wired as success per
@@ -90,15 +90,22 @@ jobs:
           foreach ($script in @('run-hcl-go-oracle.ps1', 'run-plist-macos-oracle.ps1')) {
             $path = Join-Path $env:GITHUB_WORKSPACE "scripts/$script"
             Write-Output "==> $script"
-            # Capture stdout so a documented skip can be told apart from a
-            # skip-condition regression (wave-4): exit 3 is accepted ONLY when
-            # the script itself prints its documented skip marker ('SKIPPED').
-            # A silent exit 3 — or one for a new reason — fails the job instead
-            # of being swallowed as success. EAP is lowered around the call
-            # (native stderr handling differs across pwsh versions).
+            # Capture BOTH stdout and native stderr so a documented skip can be
+            # told apart from a skip-condition regression (wave-4): exit 3 is
+            # accepted ONLY when the script itself prints its documented skip
+            # marker ('SKIPPED'). A silent exit 3 — or one for a new reason —
+            # fails the job instead of being swallowed as success.
+            # Wave-5 (2026-08-15): the script runs as a child pwsh process. An
+            # in-process `& $path 2>&1` cannot see [Console]::Error.WriteLine
+            # (it writes the process's OS stderr directly, bypassing PowerShell
+            # stream redirection), so the plist oracle's stderr-written marker
+            # was invisible and every macOS leg failed. As a native command the
+            # child pwsh's stderr IS captured by 2>&1, so a marker on either
+            # stream is accepted. EAP is lowered around the call (native stderr
+            # handling differs across pwsh versions).
             $previousEap = $ErrorActionPreference
             $ErrorActionPreference = 'SilentlyContinue'
-            try { $output = @(& $path 2>&1) } finally { $ErrorActionPreference = $previousEap }
+            try { $output = @(& pwsh -NoProfile -File $path 2>&1) } finally { $ErrorActionPreference = $previousEap }
             $code = $LASTEXITCODE
             $text = $output -join "`n"
             if ($code -eq 3) {
