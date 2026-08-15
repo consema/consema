@@ -40,7 +40,19 @@ $targetDirectory = if ($env:CARGO_TARGET_DIR) {
 function Invoke-Cargo {
     param([string[]]$Arguments)
 
-    & $cargo @Arguments
+    $toolchainSelector = @($Arguments | Where-Object { $_ -like '+*' }) | Select-Object -First 1
+    if ($toolchainSelector) {
+        # '+<toolchain>' is a rustup-proxy cargo feature; CONSEMA_CARGO may
+        # point at a direct toolchain cargo that does not understand it.
+        # Route the selector through `rustup run <toolchain> -- <cargo>` so
+        # the MSRV leg selects the exact installed MSRV toolchain regardless
+        # of how $cargo was resolved (2026-08-15 波 5).
+        $argsWithoutSelector = @($Arguments | Where-Object { $_ -ne $toolchainSelector })
+        & rustup run $toolchainSelector.TrimStart('+') -- $cargo @argsWithoutSelector
+    }
+    else {
+        & $cargo @Arguments
+    }
     if ($LASTEXITCODE -ne 0) {
         throw "cargo $($Arguments -join ' ') failed with exit code $LASTEXITCODE"
     }
@@ -260,8 +272,12 @@ try {
         foreach ($entry in $entries) {
             if (
                 -not $entry.StartsWith($rootPrefix, [StringComparison]::Ordinal) -or
-                $entry.Split('/') -contains '..'
+                $entry -match '(^|[/\\])\.\.([/\\]|$)'
             ) {
+                # The previous split on '/' alone missed backslash-delimited
+                # '..' segments (e.g. 'consema-core-1.0.0-rc.1/..\..\evil'),
+                # which the script's own System32\tar.exe (bsdtar) extraction
+                # path would process (2026-08-15 波 5).
                 throw "unsafe or unexpected archive entry '$entry' in $($artifact.Archive)"
             }
         }
