@@ -176,7 +176,34 @@ if ($LASTEXITCODE -ne 0 -or -not $commitLong) {
 $commit = $commitLong.Substring(0, [math]::Min(7, $commitLong.Length))
 $dirtyEntries = @(& git -C $workspaceRoot status --porcelain)
 $dirtyCount = @($dirtyEntries).Count
-$rustcVersion = (& rustc --version).Trim()
+# The report's toolchain line must name the rustc that actually measured:
+# measurement runs through $cargo (CONSEMA_CARGO may pin a toolchain that is
+# not on PATH), so derive rustc from the same binary — a direct toolchain
+# cargo's sibling rustc, or the rustup shim rustc when cargo came from PATH.
+# PATH-only rustc probing is gone: it mis-attributed the toolchain under
+# CONSEMA_CARGO and threw CommandNotFoundException (trap -> exit 3) on hosts
+# with cargo but no rustc on PATH (2026-08-15 波 5).
+$rustcVersion = try {
+    if ($cargo -and $cargo -ne 'cargo') {
+        $rustcCandidate = Join-Path (Split-Path -Parent $cargo) 'rustc.exe'
+        if (-not (Test-Path -LiteralPath $rustcCandidate -PathType Leaf)) {
+            $rustcCandidate = Join-Path (Split-Path -Parent $cargo) 'rustc'
+        }
+        (& $rustcCandidate --version).Trim()
+    }
+    else {
+        $rustcProbe = Get-Command 'rustc' -ErrorAction SilentlyContinue
+        if ($rustcProbe) {
+            (& $rustcProbe.Source --version).Trim()
+        }
+        else {
+            'unknown (no rustc resolvable)'
+        }
+    }
+}
+catch {
+    "unknown (rustc resolution failed: $($_.Exception.Message))"
+}
 $cargoVersion = (& $cargo --version).Trim()
 $llvmCovVersion = (& cargo llvm-cov --version).Trim()
 $hostName = $env:COMPUTERNAME
@@ -233,12 +260,26 @@ if ($measureExit -ne 0) {
     if (-not (Test-Path -LiteralPath $summaryJsonPath -PathType Leaf)) {
         throw "cargo llvm-cov failed (exit $measureExit) and produced no summary at $summaryJsonPath; the coverage run could not complete"
     }
-    $gateMessages += (
-        "hard floor: at least one workspace total fell below the frozen floors " +
-        "(regions $hardFloorRegions% / functions $hardFloorFunctions% / " +
-        "lines $hardFloorLines%, §18.3 policy); the report records the failing numbers"
-    )
-    Write-Output "note: cargo llvm-cov exited $measureExit -- hard floor gate failed, but the summary was produced; the report below records the failing numbers as evidence."
+    if ($measureExit -eq 1) {
+        # exit 1 is llvm-cov's --fail-under-* hard-floor signal. Other exit
+        # codes (e.g. 101 = a test process failed inside the instrumented
+        # suite, or a tool crash after the summary was written) must NOT be
+        # mis-attributed to the hard floor (2026-08-15 波 5).
+        $gateMessages += (
+            "hard floor: at least one workspace total fell below the frozen floors " +
+            "(regions $hardFloorRegions% / functions $hardFloorFunctions% / " +
+            "lines $hardFloorLines%, §18.3 policy); the report records the failing numbers"
+        )
+        Write-Output "note: cargo llvm-cov exited $measureExit -- hard floor gate failed, but the summary was produced; the report below records the failing numbers as evidence."
+    }
+    else {
+        $gateMessages += (
+            "coverage run: cargo llvm-cov exited $measureExit with a summary produced; " +
+            "this is not the hard-floor gate (exit 101 = test-process failure inside the " +
+            "instrumented suite, other codes = tool failure); the report below records the numbers as evidence"
+        )
+        Write-Output "note: cargo llvm-cov exited $measureExit with a summary produced; this is not a hard-floor gate failure (see gate messages)."
+    }
 }
 if (-not (Test-Path -LiteralPath $summaryJsonPath -PathType Leaf)) {
     throw "llvm-cov summary not produced at $summaryJsonPath"
@@ -474,8 +515,10 @@ if ($otherFiles.Count -gt 0) {
     $otherNote = @()
 }
 
-if ($measureExit -ne 0) {
+if ($measureExit -eq 1) {
     $gateBanner = '> GATE FAILED: hard floor -- at least one workspace total fell below the frozen floors (see policy item 2). The numbers below are the failing evidence; the next green run replaces this report.'
+} elseif ($measureExit -ne 0) {
+    $gateBanner = '> GATE FAILED: cargo llvm-cov exited with a non-zero code that is not the hard-floor gate (see the note above for the classification); the numbers below are the evidence.'
 } else {
     $gateBanner = ''
 }
