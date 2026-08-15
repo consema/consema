@@ -75,9 +75,9 @@ TOML、YAML、INI、Java Properties、XML、Property List 与 HCL 八个格式�
    计数（聚合 digest
    `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`，见
    README「Conformance 权威声明」），否则在钉定移动前语言仓 CI 不会自动捕获
-   （consema-go/consema-ts/consema-kt/consema-py 四仓钉定 commit ccc9943
-   （2026-08-15 波 4 R5 统一 provision 钉、F2 再锚母仓 HEAD；fc-manifest
-   sha256 5cb4ab51）、consema-rs 为
+   （consema-go/consema-ts/consema-kt/consema-py 四仓钉定 commit db821cd
+   （2026-08-15 波 5 收口统一 provision 钉；fc-manifest
+   sha256 af27d599）、consema-rs 为
    vendored 快照，均不自动跟随）。
 4. **PR**：标题遵循提交规范；确保 CI 全绿（含 pr-labels.yml 的 kind 标签
    门禁）。

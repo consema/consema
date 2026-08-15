@@ -73,7 +73,7 @@ Consema 是配置格式统一处理库：对 JSON/JSONC/JSON5、TOML、YAML、IN
 
 - 各语言仓 CI 从本仓 `conformance/` 取数：consema-go / consema-ts / consema-py / consema-kt 经多仓 checkout 取数；consema-rs 使用 vendored 快照（`consema-rs/conformance/`，入库镜像，不随本仓 main 实时取数）——vectors、fixtures、oracles 与 differential case 集是本仓维护、五仓共享的**单一语言无关权威**。
 - 本仓 CI 的 `shared-conformance-digest` job 复算 `conformance/vectors/` 聚合 digest 并断言等于 `cfd6e296da5b22b62d37b076d35bf6bbf58b0678ceddb37eea51a8b47200ab6a`（算法：文件名字节序排序、逐文件 sha256、`{basename}:{digest}` 以 `\n` 连接、再 sha256；以规范 checkout 的 LF 字节为准，见 `docs/fc-manifest-0.13.0.json` conformance_suite note）。
-- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 都必须同步全部五个语言仓（实现与测试）并同步更新聚合 digest 与 18/519 计数；未同步的向量变更在钉定移动前不会被语言仓 CI 自动捕获——consema-go/consema-ts/consema-kt/consema-py 四仓 CI 钉定 commit ccc9943（2026-08-15 波 4 R5 统一 provision 钉、F2 再锚母仓 HEAD；fc-manifest sha256 5cb4ab51）、consema-rs 为 vendored 快照，均不自动跟随母仓 main 前进。
+- **向量变更是五仓同步事件**：任何一仓修改 `conformance/vectors/` 都必须同步全部五个语言仓（实现与测试）并同步更新聚合 digest 与 18/519 计数；未同步的向量变更在钉定移动前不会被语言仓 CI 自动捕获——consema-go/consema-ts/consema-kt/consema-py 四仓 CI 钉定 commit db821cd（2026-08-15 波 5 收口统一 provision 钉；fc-manifest sha256 af27d599）、consema-rs 为 vendored 快照，均不自动跟随母仓 main 前进。
 
 ## 格式家族
 

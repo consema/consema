@@ -494,7 +494,7 @@
 
 - 本机：rs 1,650 / go 全绿含 -race 与 -tags release / ts 698 / py 729 / kt 585 / 母仓 mdbook exit 0 + JSON + YAML
 - CI 实证：kt main 转绿（0ce33c4 run success）；ts 经收口紧急修复（ec7b7c3）后 run 31831183938 **success 全 10 job 绿**
-- 10 项裁决抽查处置记录 vs 文件实况全部一致；hash 表六仓实测吻合（fc-manifest 权威 5cb4ab51）
+- 10 项裁决抽查处置记录 vs 文件实况全部一致；hash 表六仓实测吻合（fc-manifest 权威 af27d599…）
 - 收口异常 6 项全部修复（钉定声称再锚、三仓副本刷新实证、sync-note 声称转真、CoC 占位符、审计提取物清理）
 
 ### 13.4 遗留（波 5 输入）
