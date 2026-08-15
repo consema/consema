@@ -18,7 +18,7 @@
   msrv/conformance/deny/audit/semver/oracles/package，拆分前母仓 ci.yml:25-307，现行 job 名见
   consema-rs ci.yml）+ `go-1-26`（拆分前母仓 ci.yml:321-331，现行归 consema-go 仓）。
   C-1 记录此 10 job 需在 GitHub 干净 checkout 全矩阵全绿（fc-manifest-0.13.0.json open_items 字典 C-1 项；C-1 status 已 closed——2026-08-11 run #5 132/132 steps 全绿并回填 closure）。〔注：本节为 2026-08-11 调研快照，已由 §10 实况取代——拆分前母仓 ci.yml 为 10+2 job（go-1-26、go-differential 两个 job）；六仓拆分 2d7494f 后 go-differential 归 consema-go 仓（ci-go.yml 的 go-differential job），母仓 ci.yml 现为 oracles / shared-conformance-digest / check 三 job〕
-- **差分 harness 现状（关键事实）**〔注：本节为 2026-08-11 调研快照——「go-verify 未接入 CI」已被 §10 实况取代：Go 差分已由本地执行 + 文档化完成路径变为 CI 常设 gate（consema-go ci-go.yml 的 go-differential job，以 job 名为锚）〕：`scripts/go-verify-byte-parity.ps1`、`go-verify-normalized-
+- **差分 harness 现状（关键事实）**〔注：本节为 2026-08-11 调研快照——「go-verify 未接入 CI」已被 §10 实况取代：Go 差分已由本地执行 + 文档化完成路径变为 CI 常设 gate（consema-go ci-go.yml 的 go-differential job，以 job 名为锚）。2026-08-15 波 5 补仓归属注：`go-verify-*.ps1` 已随 88933da（2026-08-13）从母仓 `scripts/` 删除，现只存在于 **consema-go/scripts/**；本文档全部 `go-verify-*` 引用（含 :12-29/:16-17/:33-47/:117-124 等行号）均指 consema-go 仓脚本，行号可能漂移，以脚本内函数/语义段为锚〕：`scripts/go-verify-byte-parity.ps1`、`go-verify-normalized-
   differential.ps1`、`go-verify-protocol-exchange.ps1`、`go-verify-shared-conformance.ps1` 当时**未接入
   CI**（.github 全域检索 `go-verify` 零命中）；按拆分前的既定分工，.github 是 Rust
   门禁域（拆分后 consema-go 仓 .github 已是 Go 门禁域，consema-go/go/README.md「Three-platform
@@ -38,7 +38,10 @@
   运行时依赖**（测试框架除外，multi-language-implementation-plan.md）。
 - **缺口（CI 上线前置，本设计 §7 列为实施批次）**：三语言均无测试目录（2026-08-11 Glob 实测）；
   `typescript/` 无 package-lock.json（npm ci 必需）；`kotlin/` 无 gradle wrapper（gradlew /
-  gradle/wrapper/ 缺失）。
+  gradle/wrapper/ 缺失）。（2026-08-15 波 5 归正注：本 bullet 为 §0.1 调研快照，
+  三条事实均已陈旧——consema-kt 的 gradle wrapper（kotlin/gradlew、gradlew.bat、
+  gradle/wrapper/）自 2026-08-12 c60d31a 入库并由 CI kotlin-gates 经 gradlew 驱动
+  （b640af6 起），三语言测试目录与 lockfile 现状以各语言仓 CI 与 §10 实况为准。）
 
 ### 0.2 设计不变量（本设计不得违反）
 
@@ -86,7 +89,7 @@
 | deny（cargo deny check，拆分前母仓 ci.yml:175-184） | Rust 依赖政策 | 每语言零运行时依赖断言 + 开发依赖审计（§1.3）：TS `npm ls --omit=dev` 空 + `npm audit`（L5，现行 ci-typescript.yml npm-audit job）；Python `dependencies = []`（consema-py python/pyproject.toml 的 dependencies 字段）断言 + `pip check`；Kotlin runtimeClasspath 空断言 + gradle 依赖锁定/验证（L5，现行 ci-kotlin.yml runtime-classpath-audit job） |
 | audit（cargo audit / RustSec，拆分前母仓 ci.yml:186-199） | Rust 供应链 | 同 deny 行。安全面 = 运行时零依赖 → 供应链面只剩 dev 工具（typescript/@types/node、pytest、kotlin.test+junit-jupiter）；L5 收口时逐语言审计并记录（照 fc-manifest-0.13.0.json gates 字典 SEC-6 项体例） |
 | semver（cargo-semver-checks，拆分前母仓 ci.yml:201-235） | Rust API 稳定性 | **Rust 专属**。三语言 API 稳定性门禁属 1.0.0 收口（路线图 §22.2"Rust/Go public API 都完成稳定性审查"扩展至五语言；multi-language-implementation-plan.md）：TS exports 冻结审查 / Python `__all__` 审查 / Kotlin public API dump（kotlinx binary-compatibility-validator 属 dev 依赖，政策允许），全部 L5+ |
-| oracles（差分 oracle 3 OS，拆分前母仓 ci.yml:251-281；六仓拆分后归母仓 ci.yml oracles job） | 语言无关（第三方行为钉） | **不变**，仍由 Rust job 执行。注意：java-properties-v1 oracle 钉 OpenJDK 25.0.4、python-configparser-v1 钉 CPython 3.14.6（conformance/README.md oracles 清单段）——这是第三方行为 pin，与 SDK 工具链（Kotlin JVM 17 / Python 3.12）是两回事，不得混淆 |
+| oracles（差分 oracle 3 OS，拆分前母仓 ci.yml:251-281；六仓拆分后归母仓 ci.yml oracles job） | 语言无关（第三方行为钉） | **迁移后由母仓 ci.yml 的 oracles job（PowerShell 驱动）执行**（2026-08-15 波 5 归正：拆仓后 consema-rs 仓无 oracles job，「仍由 Rust job 执行」为拆分前设计期残留）。注意：java-properties-v1 oracle 钉 OpenJDK 25.0.4、python-configparser-v1 钉 CPython 3.14.6（conformance/README.md oracles 清单段）——这是第三方行为 pin，与 SDK 工具链（Kotlin JVM 17 / Python 3.12）是两回事，不得混淆 |
 | package（verify-package-archives，拆分前母仓 ci.yml:283-307） | Rust 归档验证 | Rust 专属。每语言打包验证为 L5/1.0.0 门禁（§5，现行各仓 package job）：TS `npm pack` + 干净目录安装；Python build wheel + 干净 venv 安装；Kotlin gradle jar + 干净 JVM 运行 |
 | go-1-26（拆分前母仓 ci.yml:321-331；六仓拆分后归 consema-go 仓） | Go 门禁（最低版本） | **保持原位**（不迁移，见 §5.2 决策）；是三个新语言 gates job 的直接模板 |
 | go-differential（拆分前母仓 ci.yml:344-375，2026-08-12 增补，见 §10；六仓拆分后归 consema-go 仓） | Go 差分 gate（byte parity + normalized + protocol exchange） | **保持原位**；是三个新语言 differential job 的直接模板 |
@@ -279,7 +282,11 @@
 2. **每 runner 测试内硬钉（变更即红）**：每个语言的 runner 测试把聚合值 `cfd6e296…` 与计数
    18/519 作为常量断言（"双语言共钉"扩展到"五语言共钉"，multi-language-implementation-plan.md）。
    该硬钉是 suite-count 断言（拆分前母仓 ci.yml conformance job 的语言内等价物，现行见
-   consema-rs ci.yml conformance job）——向量增删而不更新五处 = CI 红。
+   consema-rs ci.yml conformance job）——向量增删而不更新 = CI 红。（2026-08-15 波 5 如实
+   归正：ts runner 中聚合 digest 字面量 0 处——其断言在无 provisioned fc-manifest 时为
+   documented skip（runner.ts 打印 aggregate digest: SKIP），ts CI 刻意不 provision 该文件；
+   实际钉/复算集合为 rs/go/py/kt 四 runner + 母仓 shared-conformance-digest 作业，
+   「五处」对 ts 不成立。）
 
 ### 4.3 变更纪律（同批五处）
 
@@ -358,7 +365,7 @@ multi-language-implementation-plan.md §7 START GATE：工具链就绪后先验�
 
 | 文件 | 动作 | 内容 |
 |---|---|---|
-| `.github/workflows/ci.yml` | **不改**（Rust 门禁域 + go-1-26 原位） | 现 11 job 全保留（§1.1 映射表） |
+| `.github/workflows/ci.yml` | **不改**（Rust 门禁域 + go-1-26 原位） | 现 13 job（12 Rust 门禁 gate + check 聚合；release-build 于 2026-08-15 波 4 R13 增补——以 job 名为锚，2026-08-15 波 5 归正；拆分前 10+1 job 的历史计数见 §10） |
 | `.github/workflows/ci-typescript.yml` | 已新增（2026-08-12 上线全绿，见 §10） | 实际 10 job：`ts-gates`、`coverage`、`ts-compiler-matrix`、`ts-conformance`、`ts-differential`、`npm-audit`、`check-version-consistency`、`examples`、`ts-package`、`check`（§1.2 设计口径 3 job + L5 package 为规划表，保留历史；npm-audit 为 2026-08-14 审计增补，job 名即锚） |
 | `.github/workflows/ci-python.yml` | 已新增（2026-08-12 上线全绿，见 §10） | 实际 9 job：`python-gates`、`python-conformance`、`python-differential`、`coverage`、`pip-audit`、`check-version-consistency`、`examples`、`python-package`、`check`（§1.2 设计口径 3 job + L5 package 为规划表，保留历史；pip-audit 为 2026-08-14 审计增补，job 名即锚） |
 | `.github/workflows/ci-kotlin.yml` | 已新增（2026-08-12 上线全绿，见 §10） | 实际 8 job：`kotlin-gates`、`kotlin-conformance`、`kotlin-differential`、`runtime-classpath-audit`、`check-version-consistency`、`examples`、`kotlin-package`、`check`（§1.2 设计口径 3 job + L5 package 为规划表，保留历史；runtime-classpath-audit 为 2026-08-14 审计增补，job 名即锚） |
@@ -461,7 +468,9 @@ multi-language-implementation-plan.md §7 START GATE：工具链就绪后先验�
     kotlin-gates 走 wrapper 驱动（ci-kotlin.yml 的 kotlin-gates job）；"直驱 K2JVMCompiler +
     kotlin.test shim"为 wrapper 落地前设计期描述）
   - `.github/workflows/ci.yml` run#9：Rust 10+1 job（增补前——go-differential
-    2026-08-12 增补后为 10+2 job / 12 定义）保持全绿——§5.2 的文件级失败
+    2026-08-12 增补后为 10+2 job / 12 定义；2026-08-15 波 4 R13 再增补
+    release-build 后为 10+3 job / 13 定义，已列入 check needs——以 job 名为锚，
+    2026-08-15 波 5 归正）保持全绿——§5.2 的文件级失败
     隔离在实跑中成立（新语言上线未触碰 Rust 门禁域）
 - **首跑缺陷（均在 dbba9a4 修复）**：
   - python 测试夹具硬编码路径 8 处 → 仓库相对路径（本机复核：pytest 收集面
@@ -524,7 +533,9 @@ multi-language-implementation-plan.md §7 START GATE：工具链就绪后先验�
   `go-differential`（拆分前母仓 ci.yml:344-375；六仓拆分 2d7494f 后归
   consema-go 仓 ci-go.yml 的 go-differential job，windows-latest）串行执行
   scripts/go-verify-byte-parity.ps1 / go-verify-normalized-differential.ps1 /
-  go-verify-protocol-exchange.ps1（脚本失败即 job 失败，无 continue-on-error）；
+  go-verify-protocol-exchange.ps1 / go-verify-shared-conformance.ps1
+  （-StrictSkips 参数；自 2026-08-13 G057 起为 4 个 harness，job 名即声明
+  ——2026-08-15 波 5 归正；脚本失败即 job 失败，无 continue-on-error）；
   §0.1 的「go-verify 未接入 CI」表述自此过时（Go 差分由本地执行 + 文档化完成
   路径变为 CI 常设 gate）；ci.yml 由 10+1 job 增至 10+2 job（12 定义：10 Rust +
   go-1-26 + go-differential）；§5.2 的「ci.yml 一字不动」设计决策由此部分让渡——
