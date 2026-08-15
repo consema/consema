@@ -22,21 +22,22 @@ Get-FileHash <repo>\conformance\README.md,<repo>\conformance\oracles\plist-macos
 
 六仓同名文件 hash 比对表为母仓独有记录，位于本注记末尾（裁决 R11 载体）；五仓副本不携带比对表。
 
-### 六仓同名文件 hash 比对表（2026-08-14 波 3 F1 re-vendor 收口实测，裁决 R11；2026-08-15 波 4 re-vendor 后实测更新）
+### 六仓同名文件 hash 比对表（2026-08-14 波 3 F1 re-vendor 收口实测，裁决 R11；2026-08-15 波 4 re-vendor 后实测更新；2026-08-15 波 5 re-vendor 后实测更新）
 
 | 仓 | conformance/README.md（sha256） | conformance/oracles/plist-macos-v1/README.md（sha256） |
 |---|---|---|
-| consema（母仓，权威原文） | `deda03160fb4d35b682d243973fe43376d160b4dc476fc3e70351316a68dcacd`（波 4 re-vendor 后 vendored 内容实测） | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
-| consema-rs（变体形态） | `abb9b616f75e28f2fc02c8422bcf023b31c7ae83c954f32b46040a246bcf03d1` | `8c23f8d8a69fb48074bd7b1a1f5ba9a066890d3cef415d78ff5bba8e578ff05e` |
-| consema-go（逐字节副本） | `deda03160fb4d35b682d243973fe43376d160b4dc476fc3e70351316a68dcacd` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
-| consema-ts（逐字节副本） | `deda03160fb4d35b682d243973fe43376d160b4dc476fc3e70351316a68dcacd` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
-| consema-py（逐字节副本） | `deda03160fb4d35b682d243973fe43376d160b4dc476fc3e70351316a68dcacd` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
-| consema-kt（逐字节副本） | `deda03160fb4d35b682d243973fe43376d160b4dc476fc3e70351316a68dcacd` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema（母仓，权威原文） | `4a27260a743ed99756bf39413957c030d8c8895fcf94e3056fd2ac9e5e0229d0`（波 5 re-vendor 后 vendored 内容实测） | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema-rs（变体形态） | `d6a987699fbd9455b70292b6cba50a72553f92790c73afa4647d398085e55289` | `8c23f8d8a69fb48074bd7b1a1f5ba9a066890d3cef415d78ff5bba8e578ff05e` |
+| consema-go（逐字节副本） | `4a27260a743ed99756bf39413957c030d8c8895fcf94e3056fd2ac9e5e0229d0` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema-ts（逐字节副本） | `4a27260a743ed99756bf39413957c030d8c8895fcf94e3056fd2ac9e5e0229d0` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema-py（逐字节副本） | `4a27260a743ed99756bf39413957c030d8c8895fcf94e3056fd2ac9e5e0229d0` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
+| consema-kt（逐字节副本） | `4a27260a743ed99756bf39413957c030d8c8895fcf94e3056fd2ac9e5e0229d0` | `b8dc656c085b4906ccca273c49941558c5d530d3d52e3f60d45d7abbe7d4e4d9` |
 
-- 母仓行记录 vendored 内容 hash（hash 比对表节不计入，即五仓副本的比对面）：比对命令对母仓以 `git show HEAD:conformance/README.md` 删除「### 六仓同名文件 hash 比对表」标题至「- 母仓权威修正提交」条目（含两者及紧邻空行）后的内容为准（波 4 re-vendor 后为 deda0316…；plist README 未变）；对五仓以当前文件直接比对。
+- 母仓行记录 vendored 内容 hash（hash 比对表节不计入，即五仓副本的比对面）：比对命令对母仓以 `git show HEAD:conformance/README.md` 删除「### 六仓同名文件 hash 比对表」标题至「- 母仓权威修正提交」条目（含两者及紧邻空行）后的内容为准（波 5 re-vendor 后为 4a27260a…；plist README 未变）；对五仓以当前文件直接比对。
 - **波 4 re-vendor 完成（2026-08-15）**：go/ts/py/kt 本地盘副本已以波 4 修正版（来源提交 SHA `7cb9f9d`）re-vendor，与母仓 vendored 内容逐字节一致（实测见上表）；rs 变体已手工同步同一批内容修正（rs 提交 `4b8f9bd`）。
-- go/ts/py/kt 的 `/conformance/` 为 gitignored provisioned 数据（CI 自母仓 checkout provision，见各仓 .gitignore 注释与 py `.github/actions/provision-conformance/action.yml`），re-vendor 更新其本地盘副本，无提交；rs 的 re-vendor 提交为 `804c2e4`、plist README 复修同步为 `2deb075`、波 4 内容修正同步提交为 `4b8f9bd`。
-- 母仓权威修正提交：`564c1f1`（本文件 (a)/(b)/(c) + 注记）、`ef8d583`（plist README 如实化）、`1218190`（注记中性化，re-vendor 基准）、`9d096a9`（plist README 溯源括注去旧声称字面量）。
+- **波 5 re-vendor 完成（2026-08-15）**：go/ts/py/kt 本地盘副本已以波 5 修正版（来源提交 SHA `db821cd`）re-vendor，与母仓 vendored 内容逐字节一致（实测见上表）；rs 变体已由 rs 仓 wave-5 agent 手工同步同一批内容修正（rs 提交 `0b8db89`）。
+- go/ts/py/kt 的 `/conformance/` 为 gitignored provisioned 数据（CI 自母仓 checkout provision，见各仓 .gitignore 注释与 py `.github/actions/provision-conformance/action.yml`），re-vendor 更新其本地盘副本，无提交；rs 的 re-vendor 提交为 `804c2e4`、plist README 复修同步为 `2deb075`、波 4 内容修正同步提交为 `4b8f9bd`、波 5 内容修正同步提交为 `0b8db89`。
+- 母仓权威修正提交：`564c1f1`（本文件 (a)/(b)/(c) + 注记）、`ef8d583`（plist README 如实化）、`1218190`（注记中性化，re-vendor 基准）、`9d096a9`（plist README 溯源括注去旧声称字面量）、`db821cd`（波 5 如实归正注记 + 本表 re-measure）。
 
 本目录保存跨语言可复放的行为契约。向量只使用 strict JSON，二进制位模式、任意精度数字和 wire 结果使用字符串表示，避免宿主语言的数值模型改变预期事实。
 
