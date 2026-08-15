@@ -490,6 +490,8 @@
 
 ### 13.3 收口验证（六仓本机全绿 + CI 实证）
 
+- **勘误（2026-08-16 波 5 P1 实证）**：本节原题「+ CI 实证」不完整——记录落笔时**母仓自身 CI 已连续 7 次全红**（run#102-#108，自 7cb9f9d 起）未披露：oracles 检查的「exit 3 必须带 SKIPPED 标记」与 run-plist-macos-oracle.ps1 的 [Console]::Error.WriteLine 原生 stderr 不被 `2>&1` 捕获矛盾，macos 腿必红；**consema-rs CI 亦自 a9cfd08 起连续 4 次红**（ParseLimits 加 pub 字段触发 constructible_struct_adds_field semver 破坏，无批准记录）。§13.1 教训「本机验证≠CI 绿」在自身记录中再次被违反——教训升级：**收口记录必须全量披露六仓 CI 状态，未核查的仓一律如实标注「CI 状态未核查」**。两处 CI 红由波 5 P0/P1 修复（母仓 oracles 捕获修复、rs 发布循环拓扑序 + semver allowlist），修复后 CI 状态见 §13.5 追加记录。
+
 - 本机：rs 1,650 / go 全绿含 -race 与 -tags release / ts 698 / py 729 / kt 585 / 母仓 mdbook exit 0 + JSON + YAML
 - CI 实证：kt main 转绿（0ce33c4 run success）；ts 经收口紧急修复（ec7b7c3）后 run 31831183938 **success 全 10 job 绿**
 - 10 项裁决抽查处置记录 vs 文件实况全部一致；hash 表六仓实测吻合（fc-manifest 权威 5cb4ab51）
