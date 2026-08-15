@@ -2,8 +2,9 @@
   "manifest": "consema.fc-manifest@1",
   "gate_version": "0.13.0",
   "recorded_at": "2026-08-07",
+  "last_updated": "2026-08-15（波 5 修订；recorded_at 为门禁记录日，内容「当前状态」截至本字段——此前内容截至 2026-08-13 C-2 复算快照）",
   "status": "gate_open",
-  "status_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭（C-1 已闭环 2026-08-11；C-2/C-3 开放）：本 manifest 记录每个门禁条目的当前状态、证据与完成路径；Go 实现以本 manifest 为起点（路线图 §15.7），0.14.0-0.19.0 全里程碑（G0.1-G5.6）已按 2026-08-07 owner decision（decisions[0]）授权启动并全部独立验证交付（consema-go/README 逐项记录；productVersion 1.0.0-rc.1，runner 519/519），C-1/C-2/C-3 完成路径与 Go 里程碑门禁不变。",
+  "status_meaning": "0.13.0 的 Rust Feature-Complete Gate 尚未全部关闭（C-1 已闭环 2026-08-11；C-2/C-3 开放）：本 manifest 记录每个门禁条目的当前状态、证据与完成路径；Go 实现以本 manifest 为起点（路线图 §15.7），0.14.0-0.19.0 全里程碑（G0.1-G5.7）已交付——D-1 只授权 0.14.0 G0.1-G0.3 启动，0.15.0+ 按 docs/go-implementation-plan.md §7 派发条款推进（全仓无第二份书面决策，2026-08-15 波 5 归正）（consema-go/README 逐项记录；productVersion 1.0.0-rc.1，runner 519/519），C-1/C-2/C-3 完成路径与 Go 里程碑门禁不变。（closed/complete 状态反映闭环时点证据；现行 CI 健康度以最近 CI run 为准，不由此处状态推断。）",
   "evidence_note": "六仓拆分（2026-08-12，commit 2d7494f）后证据路径迁移至 consema-rs：本 manifest 的 ci.yml 与根 Cargo.toml 证据（原单仓 .github/workflows/ci.yml 行号区间 :33-303、根 Cargo.toml）现属 consema-rs 仓，证据一律以 job 名/step 名/字段名为锚（行号仅作 7e9de38 树内括注，行号可能漂移，以锚为准）；oracles job 属母仓 ci.yml（oracles/shared-conformance-digest/check 三 job），go-matrix/go-differential 属 consema-go，Go 实现证据路径为 consema-go/go/；README.md 的 conformance 声明现位于 README.md。拆仓前单仓 ci.yml 的 10+1/10+2 job 结构与 run#1-5 记录为历史事实，其行号在拆分后文件不适用；其余 Rust 实现事实类 README 引用（原 README.md 区间）改为语义锚：facade 操作表见 consema-rs/README.md 的 SDK 操作表面段、operation registry 见该段 registry 条目、sdk_chain 编辑示例见该文件 examples 段；registry 冻结/187 codes 事实改指 docs/IMPLEMENTATION.md 第 12 章。本 manifest 的 evidence 行号按 7e9de38 提交树核验（2026-08-14 起不再维护现行树行号——任何后续提交都会使其漂移；证据以语义锚为准）。",
   "source_of_truth": [
     "路线图《Consema 1.0.0 产品路线图与双语言落地设计.md》§15.1-§15.7（门禁清单）、§18.3/§18.4（coverage 政策/缺陷分级）、§19.4（发布供应链）、§20.3（回退政策）、§23（真实项目验证）",
@@ -53,7 +54,7 @@
     },
     "benchmark_baseline_revision": {
       "value": "docs/BENCHMARKS-0.13.0.md（2026-08-07 测量；测量构建 HEAD b505ada，会话内 0.12.0 落为 9c1ede2）",
-      "evidence": "docs/BENCHMARKS-0.13.0.md（§1 Environment；行号可能漂移，以节标题为锚）、:90-138（§4 冻结预算行）、:184-204（§7 场景行）",
+      "evidence": "docs/BENCHMARKS-0.13.0.md（§1 Environment；行号可能漂移，以节标题为锚）、:90-138（§4 冻结预算行；行号可能漂移，以节标题为锚）、:184-204（§7 场景行；行号可能漂移，以节标题为锚）",
       "note": "后修复复测：S3 10k-duplicate properties 4.97 s→127.5 ms（p50），S4 20k-element XML 56.6 s→0.105 s（另一次测量 96.6 s，source.rs）——修复只改善性能，冻结预算仍为有效上界（BENCHMARKS §7 修正注）。"
     },
     "rust_compiler_msrv": {
@@ -564,7 +565,7 @@
           "name": "parser/decoder 在正常输入上具有经验证的线性或明确复杂度",
           "status": "complete",
           "evidence": [
-            "三处超线性路径已修复并复验：xml raw_offset 恒等快捷（consema-rs/consema-xml/src/parser.rs；回归网 :2842-2878）、SourceSnapshot RawUtf8 保留已校验文本（consema-rs/consema-document/src/source.rs；回归网 :1538-1589）、yaml RawByteResolver 单遍偏移解析（consema-rs/consema-yaml/src/offsets.rs；测试 :90-156）",
+            "三处超线性路径已修复并复验：xml raw_offset 恒等快捷（consema-rs/consema-xml/src/parser.rs 的 raw_offset 回归网；行号可能漂移，以测试名为锚）、SourceSnapshot RawUtf8 保留已校验文本（consema-rs/consema-document/src/source.rs 的 RawUtf8 回归网；行号可能漂移，以测试名为锚）、yaml RawByteResolver 单遍偏移解析（consema-rs/consema-yaml/src/offsets.rs 的 RawByteResolver 测试；行号可能漂移，以测试名为锚）",
             "后修复实测：xml 20k 96.6 s→0.105 s（~920×，source.rs）、yaml 335KB 69.4 s→1.01 s（~69×，pilot F-2 解决记录）、properties 10k 5.09 s→127.5 ms（~40×）",
             "S1 3.5 MB 大文档行与 S4 20k 节点行均线性（BENCHMARKS §7 修正注）"
           ],
@@ -623,7 +624,8 @@
             ":349-356（§9 批准记录模板；行号可能漂移，以节标题为锚）",
             "至 2026-08-07 无触发：后修复只改善性能（冻结预算仍为有效上界）"
           ],
-          "source_of_truth": "路线图 §20.3；BENCHMARKS §8"
+          "source_of_truth": "路线图 §20.3；BENCHMARKS §8",
+          "note": "2026-08-15 波 5 如实注记：批准记录载体 docs/APPROVALS-0.13.0.md 尚未创建（BENCHMARKS §8.4 自注），任何回归在载体建立前不得无记录放行、gate 保持开放；本条 complete 反映至记录时点无触发，载体建立为 1.0.0 前待办（M5 验收第三项 -Check job 落地同列）。"
         },
         {
           "id": "P-7",
@@ -685,7 +687,7 @@
           "name": "MSRV 在 manifest 中声明并在 CI 真正验证",
           "status": "closed",
           "evidence": [
-            "声明：consema-rs/Cargo.toml:33（rust-version = \"1.85\"）",
+            "声明：consema-rs/Cargo.toml 的 rust-version 字段（\"1.85\"；行号可能漂移，以字段名为锚）",
             "CI job 已交付：consema-rs/.github/workflows/ci.yml 的 msrv job（1.85.0 全门禁；以 job 名为锚，行号可能漂移）",
             "本地验证记录：gate plan §4 M1（干净 worktree 全流程 exit 0，MSRV 腿实测拦截 let-chains）",
             "GitHub Actions run #5（2026-08-11，head 437fd35）：132/132 steps 全绿（msrv job 在干净 checkout 上真跑）"
@@ -702,7 +704,7 @@
             "docs/API-REVIEW-0.13.0.md §4（14 个 crate 在 -D warnings 下零 missing-docs）",
             "M2 合入后 fuzz.rs 的 12 处 missing-docs 已补齐（consema-rs/consema-conformance/src/fuzz.rs 全部带 /// 文档）"
           ],
-          "source_of_truth": "workspace lint missing_docs = \"warn\"（Cargo.toml:38）+ RUSTDOCFLAGS=\"-D warnings\" cargo doc"
+          "source_of_truth": "workspace lint missing_docs = \"warn\"（consema-rs/Cargo.toml 的 workspace.lints 配置；行号可能漂移，以字段名为锚）+ RUSTDOCFLAGS=\"-D warnings\" cargo doc"
         },
         {
           "id": "A-6",
@@ -791,10 +793,10 @@
           "A-9（package job 真跑）",
           "SEC-9（Linux/macOS 上 cli 测试矩阵）",
           "oracles job 在 hosted runner 的文档化 skip 行为",
-          "semver job 的 approved-failure 落定（API-REVIEW §3：三个 crate 的 enum_variant_added 保持失败 + RFC 级批准记录，或推入时加 allowlist——ci.yml 属 .github 域，由 gatekeeper 在推入时落定）"
+          "semver job 的 approved-failure 落定（API-REVIEW §3：二选一已落定为 allowlist——consema-rs 各 crate Cargo.toml [package.metadata.cargo-semver-checks.lints] enum_variant_added = \"allow\"，cargo-semver-checks 0.50.0 无逐 variant allowlist；2026-08-15 波 5 归正，gate-plan:334 同文）"
         ],
         "evidence": [
-          ".github/workflows/ci.yml（六仓拆分 2d7494f 后为 consema-rs/.github/workflows/ci.yml：11 gate + check 聚合 = 12 job——lint/test/coverage/msrv/conformance/deny/audit/semver/package/check-version-consistency/examples/check；oracles 属母仓 ci.yml，go-matrix/go-differential 属 consema-go；run#5 的 10 job 为拆仓前单仓结构历史事实）",
+          ".github/workflows/ci.yml（六仓拆分 2d7494f 后为 consema-rs/.github/workflows/ci.yml：12 gate + check 聚合 = 13 job——lint/test/coverage/msrv/conformance/deny/audit/semver/package/check-version-consistency/examples/release-build/check（release-build 为 2026-08-15 波 4 R13 增补并列入 check needs，以 job 名为锚）；oracles 属母仓 ci.yml，go-matrix/go-differential 属 consema-go；run#5 的 10 job 为拆仓前单仓结构历史事实）",
           "gate plan §4 M1 验证记录（本地等效全流程实测；GitHub 真跑未发生）",
           "GitHub Actions run #5（2026-08-11，head 437fd35，main push）：132/132 steps 全绿（增补前 10+1 job：lint/test/coverage/msrv/conformance/deny/audit/semver/oracles/package/go-1-26，11 定义 / 17 次执行）在 windows/ubuntu/macos 全矩阵通过；2026-08-12 增补 go-differential 后 ci.yml 为 10+2 job（12 定义：10 Rust + go-matrix + go-differential）；run 历史：run#1 workflow-parse fail（job id go-1.26 含点号）→ run#2 5 根因（symlink_dir 移除、oracles ParserError、coverage Get-CimInstance guard、package 工具链顺序、tags 未推）→ run#3 4 根因（macOS /var→/private/var 临时路径 symlink、oracles 缺 exit 0、semver 嵌套 baseline 歧义、coverage 数组 guard $null）→ run#4 fmt import 顺序 → run#5 全绿"
         ],
@@ -831,7 +833,7 @@
       }
     ],
     "tree_state_note": "本 manifest 记录时（2026-08-07）仓库曾为工作树状态；M2 修复（M2-F1/M2-F2）、fuzz/property/mutation 语料、三处性能修复与回归测试已随 0.13.0 落地 commit 094f5d1（Harden and gate the Rust implementation）与 7e9de38（Record the 0.13.0 gate evidence）提交入库，不再处于工作树状态；本 manifest 的 evidence 行号按 7e9de38 提交树核验。",
-    "go_milestone_status": "Go 0.14.0-0.19.0 全里程碑（G0.1-G5.6）已交付（2026-08-10 前完成，consema-go/README 逐项记录；productVersion 1.0.0-rc.1 已提交，母仓 commit 2209582 = consema-rs 51fa86d）；C-1 已闭环（2026-08-11 run#5），C-2/C-3 门禁仍开放（D-1 修订条款，见 decisions[0]）"
+    "go_milestone_status": "Go 0.14.0-0.19.0 全里程碑（G0.1-G5.7，含 G5.7 real-repository migration pilot——docs/pilot-go-0.19.0.md 与 docs/rc-1.0.0-candidate.md 均标注 0.19.0 G5.7）已交付（2026-08-10 前完成，consema-go/README 逐项记录；productVersion 1.0.0-rc.1 已提交，母仓 commit 2209582 = consema-rs 51fa86d）；C-1 已闭环（2026-08-11 run#5），C-2/C-3 门禁仍开放（D-1 修订条款，见 decisions[0]）"
   },
   "decisions": [
     {
