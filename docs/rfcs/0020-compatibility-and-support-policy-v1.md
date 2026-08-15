@@ -333,10 +333,12 @@ published ──(minor: deprecation notice)──▶ deprecated
   exceeding `ParseLimits`, `DecodeLimits`, `ProtocolLimits`,
   `QueryLimits`, `ProjectionLimits`, `SourceLimits`, `SourcePatchLimits`,
   or `MaterializationLimits` fails the operation — truncation is never
-  disguised as success (SECURITY.md, lines 3-14).
+  disguised as success (SECURITY.md, lines 3-14 — 行号可能漂移，以限
+  制字段清单为锚).
 - A security fix may never "fix" a limit failure by reporting partial
   success; limit semantics are part of the security boundary
-  (SECURITY.md, line 46) and are frozen surface behavior (Section 4.2).
+  (SECURITY.md, line 46 — 行号可能漂移，以「安全披露与支持周期」节为锚)
+  and are frozen surface behavior (Section 4.2).
 - Limit values and semantics are carried by the contracts that own them
   and change only through contract versioning (Section 11).
 
@@ -397,7 +399,7 @@ the disposition is publicly stated.
 - Supply-chain findings (dependencies, SBOM, signatures, CI) use the same
   channel.
 - Fixes must not relax resource-limit or completion-status semantics
-  (Section 7; SECURITY.md, line 46).
+  (Section 7; SECURITY.md, line 46 — 行号可能漂移，以「安全披露与支持周期」节为锚).
 
 ### 8.4 Security fix support windows
 
@@ -406,7 +408,7 @@ the disposition is publicly stated.
   `1.0.0-rc.1`; before GA this means the current rc version and its
   predecessor rc — no GA release tags exist yet); older versions are not
   promised fixes unless the impact analysis justifies a backport
-  (SECURITY.md, line 48).
+  (SECURITY.md, line 48 — 行号可能漂移，以「支持窗口」段为锚).
 - From `1.0.0`: the Section 5.1 branch lifecycle applies — security fixes
   for the latest and previous minor, advisories only for the
   security-announcements-only window.
@@ -418,20 +420,21 @@ the disposition is publicly stated.
   check` (unknown registries/Git sources, wildcards, and license
   inventory rejected; duplicates 按 bans 图口径——排除 dev/lockfile-only 后
   现存 3 组 justified duplicates getrandom/syn/r-efi 放行，见 SECURITY.md), and the locked license allowlist
-  (SECURITY.md, line 38; §19.3).
+  (SECURITY.md, line 38 — 行号可能漂移，以「依赖门禁」段为锚; §19.3).
 - Go: dependency audit is part of the release checklist (§19.4); the Go
   module is stdlib-only (go-implementation-plan §1.3), so the third-party
   surface is the Rust side plus the audited upstream conformance corpora.
 - Upstream advisory tracking follows §19.3; upstream corpus version
   changes (e.g. toml-test, yaml-test-suite) require a separate audit
-  (SECURITY.md, line 30).
+  (SECURITY.md, line 30 — 行号可能漂移，以「toml.1.0@1」段为锚).
 
 ## 9. Toolchain support cycle
 
 ### 9.1 Rust MSRV window
 
 - **Declared MSRV**: every release declares the exact `rust-version` in
-  the manifest. The current value is `1.85` (consema-rs/Cargo.toml:33,
+  the manifest. The current value is `1.85` (consema-rs/Cargo.toml — 行号
+  可能漂移，以 `rust-version` 字段为锚:33,
   edition 2024, `unsafe_code = "forbid"`). "1.85" is a current declared
   value, not a multi-year promise; the committed window is the *policy*,
   the number is frozen per Section 9.7.
@@ -443,7 +446,10 @@ the disposition is publicly stated.
 - **Verification**: the CI `msrv` job (runs the full test matrix on the
   declared MSRV) is the sole authority; local `cargo +<msrv>` is
   re-verification only. Code using syntax above the MSRV is blocked by
-  this job before merge.
+  this job before merge. (如实注记 2026-08-15：msrv job 实为单 OS 单腿
+  ——consema-rs ci.yml 的 `msrv` job 无 strategy/matrix，只在
+  ubuntu-latest 上运行 fmt/clippy/rustdoc/test 四门禁；3 OS 全矩阵从未在
+  MSRV 1.85 上验证，Windows/macOS 的 MSRV 兼容性无 CI 载体——以 job 名为锚。)
 - **Freeze record**: the Rust-Feature-Complete freeze (0.13.0) recorded
   MSRV 1.85 with measured toolchain rustc 1.97.1 in
   `docs/fc-manifest-0.13.0.json` (`rust_compiler_msrv`); the release
@@ -465,6 +471,8 @@ the disposition is publicly stated.
 - **Verification**: CI runs the module on the declared minimum (the
   go-matrix job's exact `1.26.0` leg) and on current stable (`1.26.5`)
   (go vet, static analysis, race detector, fuzz per §21.2).
+  (如实注记 2026-08-15：go.dev 现行 stable 已为 1.26.6；CI 钉 1.26.5
+  属已知的精确腿选择而非「current stable」，consema-go ci-go.yml 头注同口径。)
 - **Freeze record**: the minimum and the verification toolchain are
   formally frozen at the Go RC freeze point (Section 9.7) and recorded in
   the corresponding release manifest. (Current environment fact: go1.26.5
@@ -484,18 +492,25 @@ the disposition is publicly stated.
   "really verified in CI" by construction holds only for Kotlin 2.2.0 —
   the declared minima 26.0/3.12.0 are not precisely verified (Section 9.3
   wording——原「Section 9.2 wording」误引已纠正；five-language-ci-design §1.2 同口径).
+  (如实注记 2026-08-15：Python CI 实际钉三条 minor 线——3.12.x/3.13.x/3.14.x，
+  非单一 '3.12.x'，见 §9.4 注记；本句「pin the latest patch of their minor
+  line」对 Python 按「三 minor 线各自最新补丁」理解。)
 - **Bumps**: minimum-version increases follow the same discipline as the
   Rust MSRV — minor-only, never in patch, never reinterpreting published
   contracts, with the CHANGELOG noting the lowest stayable version.
 - **Verification**: CI runs the suite on the declared minimum
   (`npm ci` + `npm run check` + `npm test`).
+  (如实注记 2026-08-15：声明最低版本 26.0 从未被任何 CI 腿验证——consema-ts
+  全部 setup-node 步骤一律钉 26.7.0，无 node 26.0.0 腿；「the declared minimum
+  is manifest-embedded and CI-verified」的 verified 部分以 26.7.0 为实际验证点。)
 - **Freeze record**: the declared minimum is manifest-embedded and
   CI-verified; the formal freeze follows Section 9.7.
 
 ### 9.4 Python version window
 
 - **Declared minimum**: `requires-python` declares the minimum Python
-  version; the value is `>= 3.12` (consema-py/python/pyproject.toml:21),
+  version; the value is `>= 3.12` (consema-py/python/pyproject.toml —
+  行号可能漂移，以 `requires-python` 字段为锚),
   CI-verified at the pinned '3.12.x' (consema-py ci-python.yml,
   setup-python).
 - **Support window**: all Python versions from the declared minimum
@@ -507,6 +522,9 @@ the disposition is publicly stated.
   never reinterpreting published contracts.
 - **Verification**: CI runs compileall + the full pytest suite plus the
   zero-dependency assertion on the declared minimum (ci-python.yml).
+  (如实注记 2026-08-15：CI 的任何腿都不在声明的 minimum（精确 3.12.0）上运行
+  ——python-gates job 矩阵为 3.12.x/3.13.x/3.14.x 三 minor 线，setup-python
+  '3.12.x' 解析为最新补丁；3.12.0 未被精确版本验证，见上文 Support-window 注记。)
 - **Freeze record**: the declared minimum is manifest-embedded and
   CI-verified; the formal freeze follows Section 9.7.
 
@@ -543,6 +561,10 @@ matrix):
   supported platforms.
 - Release artifacts are verified by `scripts/verify-package-archives.ps1`
   (path safety, checksums, unpacked content, MSRV leg).
+  (如实注记 2026-08-15：该脚本只存在于 consema-rs 且只验证 cargo `.crate`
+  归档——cargo package + MSRV 腿为 Rust 专属语义；go/ts/py/kt 四仓的发布产物
+  （GitHub Release / npm tarball / wheel/sdist / jar）均不经过该脚本，
+  各仓验证以各仓 package 门禁为准。)
 - CLI platform-dependent behavior (Windows read-only/ACL, POSIX
   permissions, symlink policy, temp-file permissions) is verified
   per-platform on the supported targets (RFC 0015 §9.6).
